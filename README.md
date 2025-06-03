@@ -2,7 +2,7 @@
 
 Para ejecutar el proyecto es necesario tener instalados:
 - Node.js v18 o superior
-- Angular CLI v 18.1.4
+- Angular CLI v18.1.4
 
 ## Instalación y Ejecución del Proyecto
 1. Clonar el repositorio:
