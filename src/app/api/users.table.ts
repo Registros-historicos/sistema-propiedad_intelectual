@@ -43,7 +43,7 @@ export class UsersTable {
       email: 'user@demo.com',
       authToken: 'auth-token-6829bba69dd3421d8762-991e9e806dbf',
       refreshToken: 'auth-token-f8e4c61a318e4d618b6c199ef96b9e55',
-      roles: [2], // Manager
+      roles: [2], // Coordinator
       pic: './assets/media/avatars/300-6.jpg',
       fullname: 'Megan F',
       firstname: 'Megan',
@@ -104,6 +104,41 @@ export class UsersTable {
         facebook: 'https://facebook.com/guest',
         twitter: 'https://twitter.com/guest',
         instagram: 'https://instagram.com/guest',
+      },
+    },
+    {
+      id: 4,
+      username: 'coordinador',
+      password: 'demo',
+      email: 'coordinador@demo.com',
+      authToken: 'auth-token-c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2',
+      refreshToken: 'auth-token-e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6',
+      roles: [2], // Coordinator
+      pic: './assets/media/avatars/300-5.jpg',
+      fullname: 'Coordinador A',
+      firstname: 'Coordinador',
+      lastname: 'A',
+      occupation: 'Coordinador TI',
+      companyName: 'ITO',
+      phone: '456669067892',
+      language: 'es',
+      timeZone: 'International Date Line West',
+      communication: {
+        email: true,
+        sms: true,
+        phone: false,
+      },
+      address: {
+        addressLine: '1467  Griffin Street',
+        city: 'Phoenix',
+        state: 'Arizona',
+        postCode: '85012',
+      },
+      socialNetworks: {
+        linkedIn: 'https://linkedin.com/coordinador',
+        facebook: 'https://facebook.com/coordinador',
+        twitter: 'https://twitter.com/coordinador',
+        instagram: 'https://instagram.com/coordinador',
       },
     },
   ];
