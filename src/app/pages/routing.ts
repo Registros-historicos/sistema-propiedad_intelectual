@@ -27,6 +27,10 @@ const Routing: Routes = [
         loadChildren: () => import('./solicitante/dashboard/dashboard.module').then((m) => m.DashboardModule),
       },
       {
+        path: 'registrar',
+        loadChildren: () => import('./solicitante/registrar/registrar.module').then((m) => m.RegistrarModule),
+      },
+      {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full'
