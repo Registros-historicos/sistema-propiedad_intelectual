@@ -26,6 +26,7 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Output() deleteEvent = new EventEmitter<number>();
   @Output() editEvent = new EventEmitter<number>();
+  @Output() viewEvent = new EventEmitter<number>();
   @Output() createEvent = new EventEmitter<boolean>();
 
   dtOptions: Config = {};
@@ -92,6 +93,14 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
             </i>
           </button>`;
 
+        const viewButton = `
+          <button class="btn btn-icon btn-active-light-primary w-30px h-30px me-3" data-action="view" data-id="${full.id}">
+            <i class="ki-duotone ki-eye fs-3">
+              <span class="path1"></span><span class="path2"></span><span class="path3"></span>
+              <span class="path4"></span><span class="path5"></span><span class="path6"></span>
+            </i>
+          </button>`;
+
         const buttons = [];
 
         if (this.editEvent.observed) {
@@ -100,6 +109,10 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
 
         if (this.deleteEvent.observed) {
           buttons.push(deleteButton);
+        }
+
+        if (this.viewEvent.observed) {
+          buttons.push(viewButton);
         }
 
         return buttons.join('');
@@ -120,6 +133,7 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
 
         switch (action) {
           case 'view':
+            console.log('Navigating to:', `${this.route}/${id}`);
             this.router.navigate([`${this.route}/${id}`]);
             break;
 

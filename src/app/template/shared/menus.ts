@@ -34,27 +34,27 @@ export const ADMINISTRATOR_MENUS = [
       {
         name: 'MENU.ADMIN.PATENTS',
         icon: 'element-11',
-        link: '/administrador/patente',
+        link: '/administrador/propiedades/patente',
       },
       {
         name: 'MENU.ADMIN.TRADEMARKS',
         icon: 'element-11',
-        link: '/administrador/marca',
+        link: '/administrador/propiedades/marca',
       },
       {
         name: 'MENU.ADMIN.UTILITY_MODELS',
         icon: 'element-11',
-        link: '/administrador/modelo-utilidad',
+        link: '/administrador/propiedades/modelo-utilidad',
       },
       {
         name: 'MENU.ADMIN.COPYRIGHTS',
         icon: 'element-11',
-        link: '/administrador/derecho-autor',
+        link: '/administrador/propiedades/derecho-autor',
       },
       {
         name: 'MENU.ADMIN.INDUSTRIAL_DESIGNS',
         icon: 'element-11',
-        link: '/administrador/diseno-industrial',
+        link: '/administrador/propiedades/diseno-industrial',
       }
     ],
   }

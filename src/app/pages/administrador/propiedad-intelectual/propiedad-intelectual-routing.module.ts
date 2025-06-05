@@ -1,5 +1,10 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
+import {PatenteComponent} from './patente/patente.component';
+import {MarcaComponent} from './marca/marca.component';
+import {ModeloUtilidadComponent} from './modelo-utilidad/modelo-utilidad.component';
+import {DerechoAutorComponent} from './derecho-autor/derecho-autor.component';
+import {DisenoIndustrialComponent} from './diseno-industrial/diseno-industrial.component';
 
 const routes: Routes = [
   {
@@ -7,23 +12,23 @@ const routes: Routes = [
     children: [
       {
         path: 'patente',
-        loadChildren: () => import('./patente/patente.component').then(m => m.PatenteComponent)
+        component: PatenteComponent
       },
       {
         path: 'marca',
-        loadChildren: () => import('./marca/marca.component').then(m => m.MarcaComponent)
+        component: MarcaComponent
       },
       {
         path: 'modelo-utilidad',
-        loadChildren: () => import('./modelo-utilidad/modelo-utilidad.component').then(m => m.ModeloUtilidadComponent)
+        component: ModeloUtilidadComponent
       },
       {
         path: 'derecho-autor',
-        loadChildren: () => import('./derecho-autor/derecho-autor.component').then(m => m.DerechoAutorComponent)
+        component: DerechoAutorComponent
       },
       {
         path: 'diseno-industrial',
-        loadChildren: () => import('./diseno-industrial/diseno-industrial.component').then(m => m.DisenoIndustrialComponent)
+        component: DisenoIndustrialComponent
       }
     ]
   }

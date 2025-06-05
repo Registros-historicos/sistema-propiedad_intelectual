@@ -7,6 +7,9 @@ import { MarcaComponent } from './marca/marca.component';
 import { ModeloUtilidadComponent } from './modelo-utilidad/modelo-utilidad.component';
 import { DerechoAutorComponent } from './derecho-autor/derecho-autor.component';
 import { DisenoIndustrialComponent } from './diseno-industrial/diseno-industrial.component';
+import {CrudModule} from '../../../modules/crud/crud.module';
+import {SharedModule} from '../../../template/shared/shared.module';
+import {TranslationModule} from '../../../modules/i18n';
 
 
 @NgModule({
@@ -19,7 +22,10 @@ import { DisenoIndustrialComponent } from './diseno-industrial/diseno-industrial
   ],
   imports: [
     CommonModule,
-    PropiedadIntelectualRoutingModule
+    PropiedadIntelectualRoutingModule,
+    CrudModule,
+    SharedModule,
+    TranslationModule
   ]
 })
 export class PropiedadIntelectualModule { }

@@ -12,7 +12,7 @@ const routes: Routes = [
         loadChildren: () => import('../dashboard/dashboard.module').then((m) => m.DashboardModule),
       },
       {
-        path: 'propiedad-intelectual',
+        path: 'propiedades',
         loadChildren: () => import('./propiedad-intelectual/propiedad-intelectual.module').then(m => m.PropiedadIntelectualModule)
       },
       {
