@@ -1,1 +1,196 @@
-<h4>dashboard Solicitante!</h4>
+<div class="container">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-start mb-5">
+    <div>
+      <h1 class="fw-bold text-gray-800 display-4">Juan Pérez Hernandez</h1>
+      <p class="text-gray-800 mb-2 fs-5">
+        <strong>Institución:</strong> Instituto Tecnológico de Orizaba
+      </p>
+      <p class="text-gray-800 mb-2 fs-5">
+        <strong>Tipo de Institución:</strong> Federativa
+      </p>
+      <p class="text-gray-800 mb-2 fs-5"><strong>Estado:</strong> Veracruz</p>
+      <p class="text-gray-800 mb-2 fs-5"><strong>Puesto:</strong> Doctor</p>
+    </div>
+    <div>
+      <button class="btn btn-lg btn-primary">Registrar Solicitud</button>
+    </div>
+  </div>
+
+  <!-- Estadísticas -->
+  <div class="row mb-5">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body text-center">
+          <h3 class="fw-bold text-gray-800">Total Solicitudes</h3>
+          <span class="fs-1 fw-bolder text-primary">120</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body text-center">
+          <h3 class="fw-bold text-gray-800">Solicitudes Pendientes</h3>
+          <span class="fs-1 fw-bolder text-warning">15</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráficos -->
+  <div class="row mb-5">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-body">
+          <h3 class="fw-bold text-gray-800 text-center">
+            Distribución por Tipo
+          </h3>
+          <div class="chart-container" style="height: 300px">
+            <div
+              style="
+                display: flex;
+                align-items: flex-end;
+                justify-content: space-around;
+                height: 100%;
+                border: 1px solid #ccc;
+                padding: 10px;
+              "
+            >
+              <div
+                style="
+                  width: 15%;
+                  height: 60%;
+                  background-color: #007bff;
+                  text-align: center;
+                  color: white;
+                  font-weight: bold;
+                "
+              >
+                Derechos de autor
+              </div>
+              <div
+                style="
+                  width: 15%;
+                  height: 80%;
+                  background-color: #28a745;
+                  text-align: center;
+                  color: white;
+                  font-weight: bold;
+                "
+              >
+                Patente
+              </div>
+              <div
+                style="
+                  width: 15%;
+                  height: 50%;
+                  background-color: #ffc107;
+                  text-align: center;
+                  color: white;
+                  font-weight: bold;
+                "
+              >
+                Modelo de utilidad
+              </div>
+              <div
+                style="
+                  width: 15%;
+                  height: 40%;
+                  background-color: #17a2b8;
+                  text-align: center;
+                  color: white;
+                  font-weight: bold;
+                "
+              >
+                Diseño industrial
+              </div>
+              <div
+                style="
+                  width: 15%;
+                  height: 70%;
+                  background-color: #dc3545;
+                  text-align: center;
+                  color: white;
+                  font-weight: bold;
+                "
+              >
+                Marca
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mis Solicitudes -->
+  <div class="card">
+    <div class="card-header mt-5">
+      <h3 class="fw-bold text-gray-800">Mis Solicitudes</h3>
+    </div>
+    <div class="card-body">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th>Estado</th>
+            <th>Fecha</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Patente</td>
+            <td><span class="badge badge-light-warning">En trámite</span></td>
+            <td>2025-06-01</td>
+            <td>
+              <button class="btn btn-sm btn-primary">Ver Detalles</button>
+            </td>
+          </tr>
+          <tr>
+            <td>Marca</td>
+            <td><span class="badge badge-light-primary">Registrada</span></td>
+            <td>2025-05-28</td>
+            <td>
+              <button class="btn btn-sm btn-primary">Ver Detalles</button>
+            </td>
+          </tr>
+          <tr>
+            <td>Modelo de utilidad</td>
+            <td>
+              <span class="badge badge-light-danger"
+                >Trámite con Observaciones</span
+              >
+            </td>
+            <td>2025-05-20</td>
+            <td>
+              <button class="btn btn-sm btn-primary">Ver Detalles</button>
+            </td>
+          </tr>
+          <tr>
+            <td>Diseño industrial</td>
+            <td><span class="badge badge-light-success">Aprobada</span></td>
+            <td>2025-06-10</td>
+            <td>
+              <button class="btn btn-sm btn-primary">Ver Detalles</button>
+            </td>
+          </tr>
+          <tr>
+            <td>Derechos de autor</td>
+            <td>
+              <span
+                class="badge"
+                style="background-color: #b0bec5; color: white"
+                >Concluida</span
+              >
+            </td>
+            <td>2025-06-15</td>
+            <td>
+              <button class="btn btn-sm btn-primary">Ver Detalles</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
