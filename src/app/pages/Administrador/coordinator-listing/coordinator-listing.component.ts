@@ -25,7 +25,7 @@ import {environment} from '../../../../environments/environment';
   templateUrl: './coordinator-listing.component.html',
   standalone: true,
   imports: [
-    CommonModule,        // ← AGREGADO - Necesario para *ngIf, *ngFor
+    CommonModule,
     FormsModule,
     NgbCollapse,
     SharedModule,
@@ -46,10 +46,8 @@ export class CoordinatorListingComponent implements OnInit, AfterViewInit, OnDes
 
   datatableConfig: Config = {};
 
-  // Reload emitter inside datatable
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
 
-  // Single model
   aCoordinator: Observable<ICoordinatorModel>;
   coordinatorModel: ICoordinatorModel = {
     id: 0,
@@ -68,13 +66,11 @@ export class CoordinatorListingComponent implements OnInit, AfterViewInit, OnDes
   @ViewChild('noticeSwal')
   noticeSwal!: SwalComponent;
 
-  // Referencia al elemento de archivo
   @ViewChild('oficioAsignacion')
   oficioAsignacion: ElementRef;
 
   swalOptions: SweetAlertOptions = {};
 
-  // Catálogos - INICIALIZADOS CORRECTAMENTE
   entidadesFederativas: string[] = ENTIDADES_FEDERATIVAS;
   sexoOptions: string[] = SEXO_OPTIONS;
 
@@ -88,7 +84,6 @@ export class CoordinatorListingComponent implements OnInit, AfterViewInit, OnDes
     private institucionService: InstitucionService,
     private cdr: ChangeDetectorRef
   ) {
-    // Inicializar los catálogos en el constructor
     this.entidadesFederativas = ENTIDADES_FEDERATIVAS;
     this.sexoOptions = SEXO_OPTIONS;
   }
@@ -97,7 +92,6 @@ export class CoordinatorListingComponent implements OnInit, AfterViewInit, OnDes
   }
 
   ngOnInit(): void {
-    // Verificar que los catálogos estén cargados
     console.log('Entidades Federativas:', this.entidadesFederativas);
     console.log('Opciones de Sexo:', this.sexoOptions);
 
@@ -109,7 +103,7 @@ export class CoordinatorListingComponent implements OnInit, AfterViewInit, OnDes
         });
       },*/
       ajax: (dataTablesParameters: any, callback) => {
-        // Para desarrollo: usar datos mock
+
         if (environment.production === false) {
           const mockData = this.generateMockCoordinators();
           callback({
@@ -119,7 +113,6 @@ export class CoordinatorListingComponent implements OnInit, AfterViewInit, OnDes
             recordsFiltered: mockData.length
           });
         } else {
-          // Producción: llamada real al servicio
           this.coordinatorService.getCoordinators(dataTablesParameters).subscribe(resp => {
             callback(resp);
           });
@@ -179,7 +172,6 @@ export class CoordinatorListingComponent implements OnInit, AfterViewInit, OnDes
       console.log('Instituciones cargadas:', instituciones);
     });
 
-    // Cargar instituciones
     this.instituciones$ = this.coordinatorService.getInstituciones();
     this.instituciones$.subscribe(instituciones => {
       console.log('Instituciones cargadas:', instituciones);
@@ -190,7 +182,6 @@ export class CoordinatorListingComponent implements OnInit, AfterViewInit, OnDes
     console.log('Entidad seleccionada:', this.coordinatorModel.entidad_federativa);
     this.coordinatorModel.institucion_adscripcion = '';
 
-    // Usar el servicio directamente para obtener instituciones filtradas
     this.institucionService.getInstitucionesByEntidad(this.coordinatorModel.entidad_federativa)
       .subscribe(instituciones => {
         this.institucionesFiltradas = instituciones;
@@ -202,7 +193,6 @@ export class CoordinatorListingComponent implements OnInit, AfterViewInit, OnDes
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file && file.type === 'application/pdf') {
-      // Simulamos la selección del archivo sin asignarlo al modelo
       this.selectedFile = {
         name: file.name,
         size: file.size,

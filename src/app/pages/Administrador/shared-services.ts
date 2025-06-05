@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 
-// Interfaces compartidas
 export interface IInstitucionModel {
   id: number;
   nombre: string;
@@ -49,17 +48,16 @@ export interface IApplicantModel {
   created_at?: string;
 }
 
-// Servicio para manejar instituciones por entidad federativa
 @Injectable({
   providedIn: 'root'
 })
 export class InstitucionService {
-  private apiUrl = 'api/instituciones'; // Cambiar por la URL real de tu API
+  private apiUrl = 'api/instituciones';
 
   constructor(private http: HttpClient) { }
 
   getInstituciones(): Observable<IInstitucionModel[]> {
-    // Por ahora devolvemos los datos mock, pero puedes cambiar esto por la llamada HTTP real
+
     return of(this.getMockInstituciones());
     // return this.http.get<IInstitucionModel[]>(this.apiUrl);
   }
@@ -73,11 +71,9 @@ export class InstitucionService {
     // return this.http.get<IInstitucionModel[]>(`${this.apiUrl}?entidad=${entidad}`);
   }
 
-  // Datos de ejemplo para desarrollo
   getMockInstituciones(): IInstitucionModel[] {
     const instituciones: IInstitucionModel[] = [];
 
-    // Convertir institucionesPorEntidad a un array plano con entidad_federativa
     for (const [entidadId, institucionesEntidad] of Object.entries(ENTIDADES_FEDERATIVAS_MAP)) {
       const entidadObj = ENTIDADES_FEDERATIVAS_DATA.find(e => e.id === parseInt(entidadId));
       if (entidadObj) {
@@ -95,12 +91,11 @@ export class InstitucionService {
   }
 }
 
-// Servicio para coordinadores
 @Injectable({
   providedIn: 'root'
 })
 export class CoordinatorService {
-  private apiUrl = 'api/coordinators'; // Cambiar por la URL real de tu API
+  private apiUrl = 'api/coordinators';
 
   constructor(private http: HttpClient, private institucionService: InstitucionService) { }
 
@@ -145,12 +140,11 @@ export class CoordinatorService {
   }
 }
 
-// Servicio para solicitantes
 @Injectable({
   providedIn: 'root'
 })
 export class ApplicantService {
-  private apiUrl = 'api/applicants'; // Cambiar por la URL real de tu API
+  private apiUrl = 'api/applicants';
 
   constructor(private http: HttpClient, private institucionService: InstitucionService) { }
 
@@ -179,7 +173,6 @@ export class ApplicantService {
   }
 }
 
-// Utilidades para validación
 export class ValidationUtils {
   static validateRFC(rfc: string): boolean {
     const rfcPattern = /^[A-Z&Ñ]{3,4}[0-9]{6}[A-Z0-9]{3}$/;
@@ -202,10 +195,8 @@ export class ValidationUtils {
   }
 }
 
-// Constantes para catálogos - CORREGIDAS
 export const SEXO_OPTIONS = ['Masculino', 'Femenino', 'Otro'];
 
-// Array de strings para usar en los templates
 export const ENTIDADES_FEDERATIVAS = [
   'Aguascalientes',
   'Baja California',
@@ -241,7 +232,6 @@ export const ENTIDADES_FEDERATIVAS = [
   'Zacatecas'
 ];
 
-// Array de objetos para mapear con instituciones
 export const ENTIDADES_FEDERATIVAS_DATA = [
   { id: 1, nombre: 'Aguascalientes' },
   { id: 2, nombre: 'Baja California' },

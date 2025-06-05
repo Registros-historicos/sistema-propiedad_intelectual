@@ -12,14 +12,12 @@
     padding-top: 1rem;
   }
 
-  // Mejora para elementos inválidos
   .invalid-feedback {
     display: block;
     font-size: 0.85rem;
     margin-top: 0.25rem;
   }
 
-  // Para entrada de texto en mayúsculas
   input[name="rfc"],
   input[name="curp"] {
     text-transform: uppercase;
