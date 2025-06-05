@@ -10,7 +10,7 @@ export const ADMINISTRATOR_MENUS = [
     type: 'separator',
   },
   {
-    name: 'Users',
+    name: 'MENU.ADMIN.USERS',
     icon: 'profile-user',
     type: 'dropdown',
     children: [

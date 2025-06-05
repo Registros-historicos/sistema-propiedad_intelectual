@@ -11,6 +11,18 @@ export const locale = {
         INDUSTRIAL_DESIGN: 'Registrar diseño industrial'
       }
     },
+    TABLE: {
+      ACTIONS: {
+        LABEL: 'Acciones',
+        EDIT: 'Editar',
+        DELETE: 'Eliminar',
+        VIEW: 'Ver'
+      },
+      APPLICANT_NAME: "Nombre del solicitante",
+      WORK_TITLE: "Título del trabajo",
+      INSTITUTION: "Institución",
+      DATE: "Fecha de solicitud"
+    },
     TRANSLATOR: {
       SELECT: 'Elige tu idioma',
     },

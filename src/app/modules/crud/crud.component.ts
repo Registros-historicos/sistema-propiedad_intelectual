@@ -7,6 +7,7 @@ import { fromEvent } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 import { SweetAlertOptions } from 'sweetalert2';
 import { Api, Config } from 'datatables.net';
+import {TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'app-crud',
@@ -52,7 +53,12 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private clickListener: () => void;
 
-  constructor(private renderer: Renderer2, private router: Router, private modalService: NgbModal) { }
+  constructor(
+    private renderer: Renderer2,
+    private router: Router,
+    private modalService: NgbModal,
+    private translate: TranslateService
+  ) { }
 
   ngOnInit(): void {
     this.dtOptions = {
@@ -78,7 +84,7 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
   renderActionColumn(): void {
     const actionColumn = {
       sortable: false,
-      title: 'Actions',
+      title: this.translate.instant('TABLE.ACTIONS.LABEL'),
       render: (data: any, type: any, full: any) => {
         const editButton = `
           <button class="btn btn-icon btn-active-light-primary w-30px h-30px me-3" data-action="edit" data-id="${full.id}">
