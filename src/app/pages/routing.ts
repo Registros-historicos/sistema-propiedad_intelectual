@@ -6,11 +6,11 @@ const Routing: Routes = [
     loadChildren: () => import('./dashboard/dashboard.module').then((m) => m.DashboardModule),
   },
   {
-    path: 'solicitante',
+    path: 'coordinador',
     children: [
       {
         path: 'dashboard',
-        loadChildren: () => import('./solicitante/dashboard/dashboard.module').then((m) => m.DashboardModule),
+        loadChildren: () => import('./coordinador/dashboard/dashboard.module').then((m) => m.DashboardModule),
       },
       {
         path: '',
