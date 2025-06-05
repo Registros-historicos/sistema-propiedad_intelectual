@@ -2,10 +2,31 @@
 export const locale = {
   lang: 'es',
   data: {
+    BUTTON: {
+      NEW: {
+        PATENT: 'Registrar patente',
+        TRADEMARK: 'Registrar marca',
+        UTILITY_MODEL: 'Registrar modelo de utilidad',
+        COPYRIGHT: 'Registrar derecho de autor',
+        INDUSTRIAL_DESIGN: 'Registrar diseño industrial'
+      }
+    },
     TRANSLATOR: {
       SELECT: 'Elige tu idioma',
     },
     MENU: {
+      ADMIN: {
+        MANAGEMENT: 'Gestión',
+        USERS: 'Usuarios',
+        COORDINATORS: 'Coordinadores',
+        APPLICANTS: 'Solicitantes',
+        INTELECTUAL_PROPERTY: 'Propiedad Intelectual',
+        PATENTS: 'Patentes',
+        TRADEMARKS: 'Marcas',
+        UTILITY_MODELS: 'Modelos de Utilidad',
+        COPYRIGHTS: 'Derechos de Autor',
+        INDUSTRIAL_DESIGNS: 'Diseños Industriales'
+      },
       NEW: 'nuevo',
       ACTIONS: 'Comportamiento',
       CREATE_POST: 'Crear nueva publicación',

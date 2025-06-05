@@ -1,0 +1,30 @@
+<div class="card">
+  <div class="card-header border-0 pt-6">
+    <!--begin::Card title-->
+    <div class="card-title">
+      <!--begin::Search-->
+      <div class="d-flex align-items-center position-relative my-1">
+        <app-keenicon name="magnifier" class="fs-3 position-absolute ms-5"></app-keenicon>
+        <input type="text" data-action="filter" class="form-control form-control-solid w-250px ps-12" placeholder="Buscar Solicitantes">
+      </div>
+      <!--end::Search-->
+    </div>
+    <!--begin::Card title-->
+
+    <!--begin::Card toolbar-->
+    <div class="card-toolbar">
+      <!--begin::Toolbar-->
+      <div class="d-flex justify-content-end">
+        <!--begin::Add applicant-->
+        <button type="button" class="btn btn-primary" data-action="create" translate="BUTTON.NEW.PATENT"></button>
+        <!--end::Add applicant-->
+      </div>
+      <!--end::Toolbar-->
+    </div>
+    <!--end::Card toolbar-->
+  </div>
+
+  <div class="card-body pt-0">
+    <app-crud [datatableConfig]="datatableConfig" route="/administrador/propiedades/patente" (viewEvent)="edit($event)" (deleteEvent)="delete($event)" (createEvent)="create()" [reload]="reloadEvent"></app-crud>
+  </div>
+</div>
