@@ -13,7 +13,7 @@ import {
   DataTablesResponse,
   ENTIDADES_FEDERATIVAS,
   SEXO_OPTIONS,
-  InstitucionService  // ← AGREGADO para usar el servicio correcto
+  InstitucionService
 } from '../shared-services';
 import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap';
 import { NgClass } from '@angular/common';
@@ -26,7 +26,7 @@ import {environment} from '../../../../environments/environment';
   templateUrl: './applicant-listing.component.html',
   standalone: true,
   imports: [
-    CommonModule,        // ← AGREGADO - Necesario para *ngIf, *ngFor
+    CommonModule,
     FormsModule,
     NgbCollapse,
     NgClass,
@@ -47,10 +47,8 @@ export class ApplicantListingComponent implements OnInit, AfterViewInit, OnDestr
 
   datatableConfig: Config = {};
 
-  // Reload emitter inside datatable
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
 
-  // Single model
   aApplicant: Observable<IApplicantModel>;
   applicantModel: IApplicantModel = {
     id: 0,
@@ -71,7 +69,6 @@ export class ApplicantListingComponent implements OnInit, AfterViewInit, OnDestr
 
   swalOptions: SweetAlertOptions = {};
 
-  // Catálogos - INICIALIZADOS CORRECTAMENTE
   entidadesFederativas: string[] = ENTIDADES_FEDERATIVAS;
   sexoOptions: string[] = SEXO_OPTIONS;
 
@@ -80,10 +77,9 @@ export class ApplicantListingComponent implements OnInit, AfterViewInit, OnDestr
 
   constructor(
     private applicantService: ApplicantService,
-    private institucionService: InstitucionService, // ← AGREGADO
+    private institucionService: InstitucionService,
     private cdr: ChangeDetectorRef
   ) {
-    // Inicializar los catálogos en el constructor
     this.entidadesFederativas = ENTIDADES_FEDERATIVAS;
     this.sexoOptions = SEXO_OPTIONS;
   }
@@ -92,7 +88,7 @@ export class ApplicantListingComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   ngOnInit(): void {
-    // Verificar que los catálogos estén cargados
+
     console.log('Entidades Federativas:', this.entidadesFederativas);
     console.log('Opciones de Sexo:', this.sexoOptions);
 
@@ -114,7 +110,6 @@ export class ApplicantListingComponent implements OnInit, AfterViewInit, OnDestr
             recordsFiltered: mockData.length
           });
         } else {
-          // Producción: llamada real al servicio
           this.applicantService.getApplicants(dataTablesParameters).subscribe(resp => {
             callback(resp);
           });
@@ -170,7 +165,6 @@ export class ApplicantListingComponent implements OnInit, AfterViewInit, OnDestr
       },
     };
 
-    // Cargar instituciones usando el servicio correcto
     this.instituciones$ = this.applicantService.getInstituciones();
     this.instituciones$.subscribe(instituciones => {
       console.log('Instituciones cargadas:', instituciones);
@@ -181,7 +175,6 @@ export class ApplicantListingComponent implements OnInit, AfterViewInit, OnDestr
     console.log('Entidad seleccionada:', this.applicantModel.entidad_federativa);
     this.applicantModel.institucion_adscripcion = '';
 
-    // Usar el servicio directamente para obtener instituciones filtradas (igual que en coordinator)
     this.institucionService.getInstitucionesByEntidad(this.applicantModel.entidad_federativa)
       .subscribe(instituciones => {
         this.institucionesFiltradas = instituciones;
@@ -200,7 +193,7 @@ export class ApplicantListingComponent implements OnInit, AfterViewInit, OnDestr
     this.aApplicant = this.applicantService.getApplicant(id);
     this.aApplicant.subscribe((applicant: IApplicantModel) => {
       this.applicantModel = { ...applicant };
-      this.onEntidadChange(); // Cargar instituciones de la entidad seleccionada
+      this.onEntidadChange();
     });
   }
 
@@ -323,10 +316,8 @@ export class ApplicantListingComponent implements OnInit, AfterViewInit, OnDestr
     const nombres = ['Juan', 'María', 'Pedro', 'Ana', 'Luis', 'Laura'];
     const apellidos = ['García', 'López', 'Martínez', 'Hernández', 'González', 'Rodríguez'];
 
-    // Obtener todas las instituciones del mock
     const todasLasInstituciones = this.institucionService.getMockInstituciones();
 
-    // Agrupar instituciones por entidad federativa
     const institucionesPorEntidad: {[key: string]: IInstitucionModel[]} = {};
     todasLasInstituciones.forEach(inst => {
       if (!institucionesPorEntidad[inst.entidad_federativa]) {
@@ -335,17 +326,14 @@ export class ApplicantListingComponent implements OnInit, AfterViewInit, OnDestr
       institucionesPorEntidad[inst.entidad_federativa].push(inst);
     });
 
-    // Obtener lista de entidades que tienen instituciones
     const entidadesConInstituciones = Object.keys(institucionesPorEntidad);
 
     for (let i = 1; i <= 20; i++) {
       const nombre = nombres[Math.floor(Math.random() * nombres.length)];
       const apellido = apellidos[Math.floor(Math.random() * apellidos.length)];
 
-      // Seleccionar una entidad aleatoria que tenga instituciones
       const entidad = entidadesConInstituciones[Math.floor(Math.random() * entidadesConInstituciones.length)];
 
-      // Obtener instituciones para esta entidad
       const institucionesEntidad = institucionesPorEntidad[entidad];
       const institucion = institucionesEntidad[Math.floor(Math.random() * institucionesEntidad.length)];
 
