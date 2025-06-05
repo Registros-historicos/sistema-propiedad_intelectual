@@ -6,10 +6,12 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./sidebar-menu.component.scss']
 })
 export class SidebarMenuComponent implements OnInit {
+  role: number = 1;
 
   constructor() { }
 
   ngOnInit(): void {
+    this.role = parseInt(sessionStorage.getItem('role') ?? '0'); 
   }
 
 }
