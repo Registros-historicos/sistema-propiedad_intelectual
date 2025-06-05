@@ -6,6 +6,18 @@ export const locale = {
       SELECT: 'Elige tu idioma',
     },
     MENU: {
+      ADMIN: {
+        MANAGEMENT: 'Gestión',
+        USERS: 'Usuarios',
+        COORDINATORS: 'Coordinadores',
+        APPLICANTS: 'Solicitantes',
+        INTELECTUAL_PROPERTY: 'Propiedad Intelectual',
+        PATENTS: 'Patentes',
+        TRADEMARKS: 'Marcas',
+        UTILITY_MODELS: 'Modelos de Utilidad',
+        COPYRIGHTS: 'Derechos de Autor',
+        INDUSTRIAL_DESIGNS: 'Diseños Industriales'
+      },
       NEW: 'nuevo',
       ACTIONS: 'Comportamiento',
       CREATE_POST: 'Crear nueva publicación',
