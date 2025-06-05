@@ -69,13 +69,16 @@ export class AuthService implements OnDestroy {
   private redirectUserBasedOnRole(user: UserModel): void {
     if (user.roles && user.roles.length > 0) {
       const userRole = user.roles[0];
-      
+
       switch (userRole) {
         case 1:
           this.router.navigate(['/dashboard']);
           break;
         case 2:
           this.router.navigate(['/coordinador/dashboard']);
+          break;
+        case 3:
+          this.router.navigate(['/solicitante/dashboard']);
           break;
         default:
           this.router.navigate(['/dashboard']);
