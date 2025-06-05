@@ -52,12 +52,38 @@ export class AuthService implements OnDestroy {
         return result;
       }),
       switchMap(() => this.getUserByToken()),
+      map((user: UserType) => {
+        if (user) {
+          this.redirectUserBasedOnRole(user);
+        }
+        return user;
+      }),
       catchError((err) => {
         console.error('err', err);
         return of(undefined);
       }),
       finalize(() => this.isLoadingSubject.next(false))
     );
+  }
+
+  private redirectUserBasedOnRole(user: UserModel): void {
+    if (user.roles && user.roles.length > 0) {
+      const userRole = user.roles[0];
+      
+      switch (userRole) {
+        case 1:
+          this.router.navigate(['/dashboard']);
+          break;
+        case 2:
+          this.router.navigate(['/coordinador/dashboard']);
+          break;
+        default:
+          this.router.navigate(['/dashboard']);
+          break;
+      }
+    } else {
+      this.router.navigate(['/dashboard']);
+    }
   }
 
   logout() {

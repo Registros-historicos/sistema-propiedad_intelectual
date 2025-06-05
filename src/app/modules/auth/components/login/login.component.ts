@@ -78,11 +78,12 @@ export class LoginComponent implements OnInit, OnDestroy {
       .login(this.f.email.value, this.f.password.value)
       .pipe(first())
       .subscribe((user: UserModel | undefined) => {
-        if (user) {
-          this.router.navigate([this.returnUrl]);
-        } else {
+        if (!user) {
           this.hasError = true;
         }
+
+        const role = user?.roles[0] || 0;
+        sessionStorage.setItem('role', role.toString());
       });
     this.unsubscribe.push(loginSubscr);
   }
