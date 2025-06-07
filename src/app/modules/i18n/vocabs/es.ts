@@ -4,11 +4,12 @@ export const locale = {
   data: {
     BUTTON: {
       NEW: {
+        APPLICANTS: 'Registrar solicitante',
+        COPYRIGHT: 'Registrar derecho de autor',
+        INDUSTRIAL_DESIGN: 'Registrar diseño industrial',
         PATENT: 'Registrar patente',
         TRADEMARK: 'Registrar marca',
         UTILITY_MODEL: 'Registrar modelo de utilidad',
-        COPYRIGHT: 'Registrar derecho de autor',
-        INDUSTRIAL_DESIGN: 'Registrar diseño industrial'
       }
     },
     TABLE: {
@@ -38,6 +39,16 @@ export const locale = {
         UTILITY_MODELS: 'Modelos de Utilidad',
         COPYRIGHTS: 'Derechos de Autor',
         INDUSTRIAL_DESIGNS: 'Diseños Industriales'
+      },
+      COORD: {
+        APPLICANTS: 'Solicitantes',
+        COPYRIGHTS: 'Derechos de Autor',
+        INDUSTRIAL_DESIGNS: 'Diseños Industriales',
+        INTELECTUAL_PROPERTY: 'Propiedad Intelectual',
+        MANAGEMENT: 'Gestión',
+        PATENTS: 'Patentes',
+        TRADEMARKS: 'Marcas',
+        UTILITY_MODELS: 'Modelos de Utilidad',
       },
       NEW: 'nuevo',
       ACTIONS: 'Comportamiento',
