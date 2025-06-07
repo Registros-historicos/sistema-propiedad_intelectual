@@ -131,6 +131,34 @@ const Routing: Routes = [
     loadChildren: () => import('./permission/permission.module').then((m) => m.PermissionModule),
   },
   {
+    path: 'agregar-coordinador',
+    loadChildren: () => import('./Administrador/administrador.module').then(m => m.AdministradorModule),
+    data: {
+      title: 'Agregar Coordinador',
+      breadcrumb: 'Agregar Coordinador',
+      redirectTo: 'coordinators'
+    }
+  },
+  {
+    path: 'agregar-solicitante',
+    loadChildren: () => import('./Administrador/administrador.module').then(m => m.AdministradorModule),
+    data: {
+      title: 'Agregar Solicitante',
+      breadcrumb: 'Agregar Solicitante',
+      redirectTo: 'applicants'
+    }
+  },
+
+  // Ruta general del administrador (opcional, para acceso directo)
+  {
+    path: 'administrador',
+    loadChildren: () => import('./Administrador/administrador.module').then(m => m.AdministradorModule),
+    data: {
+      title: 'Administrador',
+      breadcrumb: 'Administrador'
+    }
+  },
+  {
     path: '',
     redirectTo: '/dashboard',
     pathMatch: 'full',
