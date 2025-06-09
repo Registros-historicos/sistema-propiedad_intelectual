@@ -4,12 +4,11 @@ export const locale = {
   data: {
     BUTTON: {
       NEW: {
-        APPLICANTS: 'Registrar solicitante',
-        COPYRIGHT: 'Registrar derecho de autor',
-        INDUSTRIAL_DESIGN: 'Registrar diseño industrial',
         PATENT: 'Registrar patente',
         TRADEMARK: 'Registrar marca',
         UTILITY_MODEL: 'Registrar modelo de utilidad',
+        COPYRIGHT: 'Registrar derecho de autor',
+        INDUSTRIAL_DESIGN: 'Registrar diseño industrial'
       }
     },
     TABLE: {

@@ -1,21 +1,21 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { RegistroComponent } from './registro.component';
-import { ModalsModule, WidgetsModule } from '../../../../template/widgets';
+import { ModelosUtilidadComponent } from './modelos-utilidad.component';
+import { ModalsModule, WidgetsModule } from '../../../template/widgets';
 
 @NgModule({
-    declarations: [RegistroComponent],
+    declarations: [ModelosUtilidadComponent],
     imports: [
         CommonModule,
         RouterModule.forChild([
             {
                 path: '',
-                component: RegistroComponent,
+                component: ModelosUtilidadComponent,
             },
         ]),
         WidgetsModule,
         ModalsModule,
     ],
 })
-export class RegistroModule { }
+export class ModelosUtilidadModule { }
