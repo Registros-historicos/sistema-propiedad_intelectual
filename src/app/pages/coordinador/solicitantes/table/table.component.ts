@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-solicitantes',
-  templateUrl: './solicitantes.component.html'
+  templateUrl: './table.component.html'
 })
-export class SolicitantesComponent {
+export class TableComponent {
 
 }
