@@ -1,1 +1,159 @@
-<p>table works!</p>
+<div class="card">
+    <div class="card-body pt-0">
+        <app-crud [datatableConfig]="datatableConfig" route="/apps/patents" (deleteEvent)="delete($event)"
+            (editEvent)="edit($event)" (createEvent)="create()" [reload]="reloadEvent" [modal]="formModal"></app-crud>
+    </div>
+</div>
+
+<swal #noticeSwal [swalOptions]="swalOptions"></swal>
+
+<ng-template #formModal let-modal>
+    <form #myForm="ngForm" (ngSubmit)="onSubmit($event, myForm)">
+        <div class="modal-header">
+            <h4 class="modal-title">
+                {{ patentModel.id > 0 ? 'Editar' : 'Nueva' }} Solicitud de Propiedad Intelectual
+            </h4>
+            <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+        </div>
+
+        <div class="modal-body">
+            <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-800px">
+
+                <div class="notice d-flex bg-light-primary rounded border-primary border border-dashed mb-9 p-6">
+                    <app-keenicon name="information" class="fs-2tx text-primary me-4"></app-keenicon>
+                    <div class="d-flex flex-stack flex-grow-1">
+                        <div class="fw-semibold">
+                            <div class="fs-6 text-gray-700">
+                                Complete todos los campos requeridos para el registro de propiedad intelectual.
+                                Para más información consulte la
+                                <a href="#" class="fw-bold">normatividad del IMPI</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fw-bold fs-3 rotate collapsible mb-7" data-bs-toggle="collapse" role="button"
+                    (click)="collapse1.toggle()" [attr.aria-expanded]="!isCollapsed1">
+                    Información General
+                    <span class="ms-2 rotate-180">
+                        <i class="ki-duotone ki-down fs-3" [ngClass]="{ 'ki-up': !isCollapsed1 }"></i>
+                    </span>
+                </div>
+
+                <div class="collapse show" #collapse1="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
+
+                    <div class="row mb-7">
+                        <div class="col-md-6">
+                            <label class="required fw-semibold fs-6 mb-2">ID Solicitud</label>
+                            <input type="text" class="form-control form-control-solid" name="solicitudId"
+                                [(ngModel)]="patentModel.solicitudId" #solicitudId="ngModel"
+                                placeholder="Se generará automáticamente si se deja vacío" />
+                        </div>
+                    </div>
+
+                    <div class="fv-row mb-7">
+                        <label class="required fw-semibold fs-6 mb-2">Nombre de la Patente/Invención</label>
+                        <input type="text" class="form-control form-control-solid" name="nombrePatente"
+                            [(ngModel)]="patentModel.nombrePatente" #nombrePatente="ngModel" required minlength="10" />
+                        <div *ngIf="myForm.submitted && myForm.invalid"
+                            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                            <div *ngIf="nombrePatente.errors?.['required']">El nombre es requerido</div>
+                            <div *ngIf="nombrePatente.errors?.['minlength']">El nombre debe tener al menos 10 caracteres
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="fv-row mb-7">
+                        <label class="required fw-semibold fs-6 mb-2">Descripción</label>
+                        <textarea class="form-control form-control-solid" rows="4" name="descripcion"
+                            [(ngModel)]="patentModel.descripcion" #descripcion="ngModel" required minlength="50"
+                            placeholder="Describa detalladamente la invención o trabajo intelectual"></textarea>
+                        <div *ngIf="myForm.submitted && myForm.invalid"
+                            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                            <div *ngIf="descripcion.errors?.['required']">La descripción es requerida</div>
+                            <div *ngIf="descripcion.errors?.['minlength']">La descripción debe tener al menos 50
+                                caracteres</div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-7">
+                        <div class="col-md-6">
+                            <label class="required fw-semibold fs-6 mb-2">Fecha de Solicitud</label>
+                            <input type="date" class="form-control form-control-solid" name="fechaSolicitud"
+                                [(ngModel)]="patentModel.fechaSolicitud" #fechaSolicitud="ngModel" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="required fw-semibold fs-6 mb-2">Estado</label>
+                            <select class="form-select form-select-solid" name="estado" [(ngModel)]="patentModel.estado"
+                                #estado="ngModel" required>
+                                <option *ngFor="let estado of estados" [value]="estado">{{estado}}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fw-bold fs-3 rotate collapsible mb-7 mt-7" data-bs-toggle="collapse" role="button"
+                    (click)="collapse2.toggle()" [attr.aria-expanded]="!isCollapsed2">
+                    Información del Solicitante
+                    <span class="ms-2 rotate-180">
+                        <i class="ki-duotone ki-down fs-3" [ngClass]="{ 'ki-up': !isCollapsed2 }"></i>
+                    </span>
+                </div>
+
+                <div class="collapse" #collapse2="ngbCollapse" [(ngbCollapse)]="isCollapsed2">
+
+                    <div class="fv-row mb-7">
+                        <label class="required fw-semibold fs-6 mb-2">Solicitante</label>
+                        <input type="text" class="form-control form-control-solid" name="solicitante"
+                            [(ngModel)]="patentModel.solicitante" #solicitante="ngModel" required minlength="5" />
+                        <div *ngIf="myForm.submitted && myForm.invalid"
+                            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                            <div *ngIf="solicitante.errors?.['required']">El solicitante es requerido</div>
+                        </div>
+                    </div>
+
+                    <div class="fv-row mb-7">
+                        <label class="required fw-semibold fs-6 mb-2">Institución</label>
+                        <input type="text" class="form-control form-control-solid" name="institucion"
+                            [(ngModel)]="patentModel.institucion" #institucion="ngModel" required />
+                        <div *ngIf="myForm.submitted && myForm.invalid"
+                            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                            <div *ngIf="institucion.errors?.['required']">La institución es requerida</div>
+                        </div>
+                    </div>
+
+                    <div class="fv-row mb-7">
+                        <label class="required fw-semibold fs-6 mb-2">
+                            <span>Email de Contacto</span>
+                            <span class="ms-1" placement="end" ngbTooltip="Email para notificaciones del sistema">
+                                <app-keenicon name="information" class="fs-7"></app-keenicon>
+                            </span>
+                        </label>
+                        <input type="email" class="form-control form-control-solid" name="email"
+                            [(ngModel)]="patentModel.email" #email="ngModel" required
+                            pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" />
+                        <div *ngIf="myForm.submitted && myForm.invalid"
+                            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                            <div *ngIf="email.errors?.['required']">El email es requerido</div>
+                            <div *ngIf="email.errors?.['pattern']">El email no es válido</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer flex-center">
+            <button type="reset" class="btn btn-light me-3" (click)="modal.dismiss('cancel')">
+                Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
+                <span class="indicator-label">
+                    {{ patentModel.id > 0 ? 'Actualizar' : 'Registrar' }} Solicitud
+                </span>
+                <span class="indicator-progress">
+                    Procesando... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                </span>
+            </button>
+        </div>
+    </form>
+</ng-template>
