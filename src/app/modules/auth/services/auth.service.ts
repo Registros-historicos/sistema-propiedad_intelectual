@@ -71,7 +71,7 @@ export class AuthService implements OnDestroy {
       const userRole = user.roles[0];
       switch (userRole) {
         case 1:
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/administrador/dashboard']);
           break;
         case 2:
           this.router.navigate(['/coordinador/dashboard']);

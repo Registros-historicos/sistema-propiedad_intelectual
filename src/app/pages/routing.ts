@@ -13,24 +13,44 @@ const Routing: Routes = [
         loadChildren: () => import('./coordinador/dashboard/dashboard.module').then((m) => m.DashboardModule),
       },
       {
-        path: 'derechos-autor',
-        loadChildren: () => import('./coordinador/derechos-autor/derechos-autor.module').then((m) => m.DerechosAutorModule),
+        path: 'derechos-autores',
+        loadChildren: () => import('./coordinador/derechos-autor/table/table.module').then((m) => m.TableModule),
       },
       {
-        path: 'diseno-industrial',
-        loadChildren: () => import('./coordinador/diseno-industrial/diseno-industrial.module').then((m) => m.DisenoIndustrialModule),
+        path: 'derecho-autor/registro',
+        loadChildren: () => import('./coordinador/derechos-autor/registro/registro.module').then((m) => m.RegistroModule),
       },
       {
-        path: 'marca',
-        loadChildren: () => import('./coordinador/marca/marca.module').then((m) => m.MarcaModule),
+        path: 'disenos-industriales',
+        loadChildren: () => import('./coordinador/diseno-industrial/table/table.module').then((m) => m.TableModule),
+      },
+      {
+        path: 'diseno-industrial/registro',
+        loadChildren: () => import('./coordinador/diseno-industrial/registro/registro.module').then((m) => m.RegistroModule),
+      },
+      {
+        path: 'marcas',
+        loadChildren: () => import('./coordinador/marca/table/table.module').then((m) => m.TableModule),
+      },
+      {
+        path: 'marca/registro',
+        loadChildren: () => import('./coordinador/marca/registro/registro.module').then((m) => m.RegistroModule),
       },
       {
         path: 'modelos-utilidad',
-        loadChildren: () => import('./coordinador/modelos-utilidad/modelos-utilidad.module').then((m) => m.ModelosUtilidadModule),
+        loadChildren: () => import('./coordinador/modelos-utilidad/table/table.module').then((m) => m.TableModule),
+      },
+      {
+        path: 'modelo-utilidad/registro',
+        loadChildren: () => import('./coordinador/modelos-utilidad/registro/registro.module').then((m) => m.RegistroModule),
       },
       {
         path: 'patentes',
-        loadChildren: () => import('./coordinador/patentes/patentes.module').then((m) => m.PatentesModule),
+        loadChildren: () => import('./coordinador/patentes/table/table.module').then((m) => m.TableModule),
+      },
+      {
+        path: 'patente/registro',
+        loadChildren: () => import('./coordinador/patentes/registro/registro.module').then((m) => m.RegistroModule),
       },
       {
         path: 'reportes',
@@ -38,7 +58,11 @@ const Routing: Routes = [
       },
       {
         path: 'solicitantes',
-        loadChildren: () => import('./coordinador/solicitantes/solicitantes.module').then((m) => m.SolicitantesModule),
+        loadChildren: () => import('./coordinador/solicitantes/table/table.module').then((m) => m.TableModule),
+      },
+      {
+        path: 'solicitante/registro',
+        loadChildren: () => import('./coordinador/solicitantes/registro/registro.module').then((m) => m.RegistroModule),
       },
       {
         path: '',
@@ -60,6 +84,10 @@ const Routing: Routes = [
         pathMatch: 'full'
       }
     ]
+  },
+  {
+    path: 'administrador',
+    loadChildren: () => import('./administrador/administrador.module').then((m) => m.AdministradorModule),
   },
   {
     path: 'builder',
@@ -101,34 +129,6 @@ const Routing: Routes = [
   {
     path: 'apps/permissions',
     loadChildren: () => import('./permission/permission.module').then((m) => m.PermissionModule),
-  },
-  {
-    path: 'agregar-coordinador',
-    loadChildren: () => import('./Administrador/administrador.module').then(m => m.AdministradorModule),
-    data: {
-      title: 'Agregar Coordinador',
-      breadcrumb: 'Agregar Coordinador',
-      redirectTo: 'coordinators'
-    }
-  },
-  {
-    path: 'agregar-solicitante',
-    loadChildren: () => import('./Administrador/administrador.module').then(m => m.AdministradorModule),
-    data: {
-      title: 'Agregar Solicitante',
-      breadcrumb: 'Agregar Solicitante',
-      redirectTo: 'applicants'
-    }
-  },
-
-  // Ruta general del administrador (opcional, para acceso directo)
-  {
-    path: 'administrador',
-    loadChildren: () => import('./Administrador/administrador.module').then(m => m.AdministradorModule),
-    data: {
-      title: 'Administrador',
-      breadcrumb: 'Administrador'
-    }
   },
   {
     path: '',

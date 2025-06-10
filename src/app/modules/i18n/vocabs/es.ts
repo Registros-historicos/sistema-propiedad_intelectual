@@ -2,10 +2,93 @@
 export const locale = {
   lang: 'es',
   data: {
+    BUTTON: {
+      NEW: {
+        APPLICANTS: 'Registrar solicitante',
+        COPYRIGHT: 'Registrar derecho de autor',
+        INDUSTRIAL_DESIGN: 'Registrar diseño industrial',
+        PATENT: 'Registrar patente',
+        TRADEMARK: 'Registrar marca',
+        UTILITY_MODEL: 'Registrar modelo de utilidad',
+      }
+    },
+    TABLE: {
+      ACTIONS: {
+        LABEL: 'Acciones',
+        EDIT: 'Editar',
+        DELETE: 'Eliminar',
+        VIEW: 'Ver'
+      },
+      APPLICANT_NAME: "Nombre del solicitante",
+      WORK_TITLE: "Título del trabajo",
+      INSTITUTION: "Institución",
+      DATE: "Fecha de solicitud"
+    },
+    GRAPHICS: {
+      TITLES: {
+        REQUEST_TYPES: "Tipos de solicitud",
+        REQUEST: "Solicitudes",
+        DEPARTMENTS: "Departamentos",
+        EDUCATIONAL_PROGRAM: "Programa educativo",
+        RESEARCHERS: "Investigadores",
+        RESEARCHER: "Investigador",
+        DEPARTMENT: "Departamento"
+      },
+      SUBTITLES: {
+        REGISTER: "Registros",
+        MONTHS: "Meses",
+        TOP_3: "Top 3",
+        TOP_5: "Top 5"
+      },
+    },
+    DEPARTMENTS: {
+      IT: "Departamento de TI",
+      MECHANIC: "Departamento de Mecánica",
+      CHEMISTRY: "Departamento de Química",
+      ACRONYM: {
+        PATENTS: "PA",
+        TRADEMARKS: "MA",
+        UTILITY_MODELS: 'MU',
+        COPYRIGHTS: 'DA',
+        INDUSTRIAL_DESIGNS: 'DI'
+      }
+    },
+    ACADEMIC_LEVEL: {
+      DOCTOR_CS: "Doctor en Ciencias de la Computación",
+      MASTER_CS: "Maestro en Sistemas Computacionales",
+      MASTER_CSIENCE: "Maestro en Ciencias de la Computación"
+    },
+    EDUCATIONAL_PROGRAM: {
+      SYSTEMS: "Sistemas computacionales",
+      INFORMATICS: "Informática",
+      DATA_SCIENCE: "Ciencia de datos"
+    },
     TRANSLATOR: {
       SELECT: 'Elige tu idioma',
     },
     MENU: {
+      ADMIN: {
+        MANAGEMENT: 'Gestión',
+        USERS: 'Usuarios',
+        COORDINATORS: 'Coordinadores',
+        APPLICANTS: 'Solicitantes',
+        INTELECTUAL_PROPERTY: 'Propiedad Intelectual',
+        PATENTS: 'Patentes',
+        TRADEMARKS: 'Marcas',
+        UTILITY_MODELS: 'Modelos de Utilidad',
+        COPYRIGHTS: 'Derechos de Autor',
+        INDUSTRIAL_DESIGNS: 'Diseños Industriales'
+      },
+      COORD: {
+        APPLICANTS: 'Solicitantes',
+        COPYRIGHTS: 'Derechos de Autor',
+        INDUSTRIAL_DESIGNS: 'Diseños Industriales',
+        INTELECTUAL_PROPERTY: 'Propiedad Intelectual',
+        MANAGEMENT: 'Gestión',
+        PATENTS: 'Patentes',
+        TRADEMARKS: 'Marcas',
+        UTILITY_MODELS: 'Modelos de Utilidad'
+      },
       NEW: 'nuevo',
       ACTIONS: 'Comportamiento',
       CREATE_POST: 'Crear nueva publicación',
