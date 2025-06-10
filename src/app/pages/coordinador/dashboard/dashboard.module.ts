@@ -5,6 +5,7 @@ import { DashboardComponent } from './dashboard.component';
 import { DropdownMenusModule, ModalsModule, WidgetsModule } from '../../../template/widgets';
 import { SharedModule } from 'src/app/template/shared/shared.module';
 import { NgApexchartsModule } from 'ng-apexcharts';
+import { TranslationModule } from 'src/app/modules/i18n/translation.module';
 
 @NgModule({
     declarations: [DashboardComponent],
@@ -20,7 +21,8 @@ import { NgApexchartsModule } from 'ng-apexcharts';
         ModalsModule,
         SharedModule,
         DropdownMenusModule,
-        NgApexchartsModule
+        NgApexchartsModule,
+        TranslationModule
     ],
 })
 export class DashboardModule { }

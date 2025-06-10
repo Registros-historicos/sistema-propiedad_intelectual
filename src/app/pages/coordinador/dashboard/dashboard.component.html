@@ -5,8 +5,8 @@
         <div class="card card-xl-stretch mb-xl-8">
             <div class="card-header border-0 pt-5">
                 <h3 class="card-title align-items-start flex-column">
-                    <span class="card-label fw-bolder fs-3 mb-1">Tipos de solicitud</span>
-                    <span class="text-muted fw-bold fs-7">Registros</span>
+                    <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.REQUEST_TYPES"></span>
+                    <span class="text-muted fw-bold fs-7" translate="GRAPHICS.SUBTITLES.REGISTER"></span>
                 </h3>
                 <div class="card-toolbar">
                     <!-- begin::Menu -->
@@ -49,24 +49,19 @@
                                     </div>
                                 </th>
                                 <td>
-                                    <a href="#" class="text-gray-900 fw-bolder text-hover-primary mb-1 fs-6">
-                                        Derechos de autor
-                                    </a>
+                                    <span class="text-gray-900 fw-bolder mb-1 fs-6" translate="MENU.COORD.PATENTS">
+                                    </span>
                                 </td>
                                 <td>
                                     <div class="d-flex flex-column w-100 me-2">
                                         <div class="d-flex flex-stack mb-2">
-                                            <span class="text-muted me-2 fs-7 fw-bold">70%</span>
-                                        </div>
-                                        <div class="progress h-6px w-100">
-                                            <div class="progress-bar bg-primary" role="progressbar"
-                                                [style.width]="'70%'">
-                                            </div>
+                                            <span class="me-2 fs-6 fw-bold text-primary">90 solicitudes</span>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="text-end">
-                                    <a routerLink="/coordinador/dashboard" class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
+                                    <a routerLink="/coordinador/patentes"
+                                        class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
                                         <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
                                     </a>
                                 </td>
@@ -81,24 +76,19 @@
                                     </div>
                                 </th>
                                 <td>
-                                    <a href="#" class="text-gray-900 fw-bolder text-hover-primary mb-1 fs-6">
-                                        Patente
-                                    </a>
+                                    <span class="text-gray-900 fw-bolder mb-1 fs-6"
+                                        translate="MENU.COORD.TRADEMARKS"></span>
                                 </td>
                                 <td>
                                     <div class="d-flex flex-column w-100 me-2">
                                         <div class="d-flex flex-stack mb-2">
-                                            <span class="text-muted me-2 fs-7 fw-bold">50%</span>
-                                        </div>
-                                        <div class="progress h-6px w-100">
-                                            <div class="progress-bar bg-primary" role="progressbar"
-                                                [style.width]="'50%'">
-                                            </div>
+                                            <span class="me-2 fs-6 fw-bold text-primary">80 solicitudes</span>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="text-end">
-                                    <a routerLink="/coordinador/dashboard" class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
+                                    <a routerLink="/coordinador/marcas"
+                                        class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
                                         <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
                                     </a>
                                 </td>
@@ -113,24 +103,19 @@
                                     </div>
                                 </th>
                                 <td>
-                                    <a href="#" class="text-gray-900 fw-bolder text-hover-primary mb-1 fs-6">
-                                        Modelo de utilidad
-                                    </a>
+                                    <span class="text-gray-900 fw-bolder mb-1 fs-6"
+                                        translate="MENU.COORD.UTILITY_MODELS"></span>
                                 </td>
                                 <td>
                                     <div class="d-flex flex-column w-100 me-2">
                                         <div class="d-flex flex-stack mb-2">
-                                            <span class="text-muted me-2 fs-7 fw-bold">80%</span>
-                                        </div>
-                                        <div class="progress h-6px w-100">
-                                            <div class="progress-bar bg-primary" role="progressbar"
-                                                [style.width]="'80%'">
-                                            </div>
+                                            <span class="me-2 fs-6 fw-bold text-primary">70 solicitudes</span>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="text-end">
-                                    <a routerLink="/coordinador/dashboard" class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
+                                    <a routerLink="/coordinador/modelos-utilidad"
+                                        class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
                                         <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
                                     </a>
                                 </td>
@@ -145,24 +130,19 @@
                                     </div>
                                 </th>
                                 <td>
-                                    <a href="#" class="text-gray-900 fw-bolder text-hover-primary mb-1 fs-6">
-                                        Diseño industrial
-                                    </a>
+                                    <span class="text-gray-900 fw-bolder mb-1 fs-6"
+                                        translate="MENU.COORD.COPYRIGHTS"></span>
                                 </td>
                                 <td>
                                     <div class="d-flex flex-column w-100 me-2">
                                         <div class="d-flex flex-stack mb-2">
-                                            <span class="text-muted me-2 fs-7 fw-bold">90%</span>
-                                        </div>
-                                        <div class="progress h-6px w-100">
-                                            <div class="progress-bar bg-primary" role="progressbar"
-                                                [style.width]="'90%'">
-                                            </div>
+                                            <span class="me-2 fs-6 fw-bold text-primary">60 solicitudes</span>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="text-end">
-                                    <a routerLink="/coordinador/dashboard" class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
+                                    <a routerLink="/coordinador/derechos-autores"
+                                        class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
                                         <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
                                     </a>
                                 </td>
@@ -177,24 +157,19 @@
                                     </div>
                                 </th>
                                 <td>
-                                    <a href="#" class="text-gray-900 fw-bolder text-hover-primary mb-1 fs-6">
-                                        Marca
-                                    </a>
+                                    <span class="text-gray-900 fw-bolder mb-1 fs-6"
+                                        translate="MENU.COORD.INDUSTRIAL_DESIGNS"></span>
                                 </td>
                                 <td>
                                     <div class="d-flex flex-column w-100 me-2">
                                         <div class="d-flex flex-stack mb-2">
-                                            <span class="text-muted me-2 fs-7 fw-bold">70%</span>
-                                        </div>
-                                        <div class="progress h-6px w-100">
-                                            <div class="progress-bar bg-primary" role="progressbar"
-                                                [style.width]="'70%'">
-                                            </div>
+                                            <span class="me-2 fs-6 fw-bold text-primary">50 solicitudes</span>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="text-end">
-                                    <a routerLink="/coordinador/dashboard" class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
+                                    <a routerLink="/coordinador/disenos-industriales"
+                                        class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
                                         <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
                                     </a>
                                 </td>
@@ -217,9 +192,8 @@
             <div class="card-header border-0 pt-5">
                 <!-- begin::Title-->
                 <h3 class="card-title align-items-start flex-column">
-                    <span class="card-label fw-bolder fs-3 mb-1">Solicitudes</span>
-
-                    <span class="text-muted fw-bold fs-7">Meses</span>
+                    <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.REQUEST"></span>
+                    <span class="text-muted fw-bold fs-7" translate="GRAPHICS.SUBTITLES.MONTHS"></span>
                 </h3>
                 <!-- end::Title-->
 
@@ -254,4 +228,363 @@
         </div>
     </div>
     <!-- end::Col -->
+</div>
+
+<div class="row g-5 g-xl-8">
+    <div class="col-xl-6">
+        <div class="card card-xl-stretch mb-xl-8">
+            <!-- begin::Header -->
+            <div class="card-header border-0 pt-5">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.DEPARTMENTS"></span>
+                    <span class="text-muted mt-1 fw-bold fs-7" translate="GRAPHICS.SUBTITLES.TOP_3"></span>
+                </h3>
+                <div class="card-toolbar">
+                    <!-- begin::Menu -->
+                    <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary"
+                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-flip="top-end">
+                        <app-keenicon name="category" class="fs-2"></app-keenicon>
+                    </button>
+                    <app-dropdown-menu1></app-dropdown-menu1>
+                    <!-- end::Menu -->
+                </div>
+            </div>
+            <!-- end::Header -->
+            <!-- begin::Body -->
+            <div class="card-body py-3">
+                <!-- begin::Table container -->
+                <div class="table-responsive">
+                    <!-- begin::Table -->
+                    <table class="table align-middle gs-0 gy-5">
+                        <!-- begin::Table head -->
+                        <thead>
+                            <tr>
+                                <th class="p-0 min-w-150px"></th>
+                                <th class="p-0 min-w-150px"></th>
+                                <th class="p-0 min-w-125px"></th>
+                            </tr>
+                        </thead>
+                        <!-- end::Table head -->
+                        <!-- begin::Table body -->
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <span class="text-gray-900 fw-bolder mb-1 fs-6" translate="DEPARTMENTS.IT"></span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="badge badge-light-danger fw-bold me-1"
+                                        translate="DEPARTMENTS.ACRONYM.PATENTS"></span>
+                                    <span class="badge badge-light-info fw-bold me-1"
+                                        translate="DEPARTMENTS.ACRONYM.TRADEMARKS"></span>
+                                    <span class="badge badge-light-warning fw-bold me-1"
+                                        translate="DEPARTMENTS.ACRONYM.UTILITY_MODELS"></span>
+                                    <span class="badge badge-light-success fw-bold me-1"
+                                        translate="DEPARTMENTS.ACRONYM.COPYRIGHTS"></span>
+                                    <span class="badge badge-light-primary fw-bold me-1"
+                                        translate="DEPARTMENTS.ACRONYM.INDUSTRIAL_DESIGNS"></span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="text-muted fw-bold">7200 Solicitudes</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="text-gray-900 fw-bolder mb-1 fs-6"
+                                        translate="DEPARTMENTS.MECHANIC"></span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="badge badge-light-danger fw-bold me-1"
+                                        translate="DEPARTMENTS.ACRONYM.PATENTS"></span>
+                                    <span class="badge badge-light-warning fw-bold me-1"
+                                        translate="DEPARTMENTS.ACRONYM.UTILITY_MODELS"></span>
+                                    <span class="badge badge-light-primary fw-bold me-1"
+                                        translate="DEPARTMENTS.ACRONYM.INDUSTRIAL_DESIGNS"></span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="text-muted fw-bold">4600 Solicitudes</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="text-gray-900 fw-bolder mb-1 fs-6"
+                                        translate="DEPARTMENTS.CHEMISTRY"></span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="badge badge-light-danger fw-bold me-1"
+                                        translate="DEPARTMENTS.ACRONYM.PATENTS"></span>
+                                    <span class="badge badge-light-info fw-bold me-1"
+                                        translate="DEPARTMENTS.ACRONYM.TRADEMARKS"></span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="text-muted fw-bold">890 Solicitudes</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <!-- end::Table body -->
+                    </table>
+                    <!-- end::Table -->
+                </div>
+                <!-- end::Table container -->
+            </div>
+            <!-- end::Body -->
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <div class="card card-xl-stretch mb-xl-8">
+            <!-- begin::Header -->
+            <div class="card-header border-0 pt-5">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.EDUCATIONAL_PROGRAM"></span>
+                    <span class="text-muted mt-1 fw-bold fs-7" translate="GRAPHICS.SUBTITLES.TOP_3"></span>
+                </h3>
+                <div class="card-toolbar">
+                    <!-- begin::Menu -->
+                    <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary"
+                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-flip="top-end">
+                        <app-keenicon name="category" class="fs-2"></app-keenicon>
+                    </button>
+                    <app-dropdown-menu1></app-dropdown-menu1>
+                    <!-- end::Menu -->
+                </div>
+            </div>
+            <!-- end::Header -->
+            <!-- begin::Body -->
+            <div class="card-body py-3">
+                <!-- begin::Table container -->
+                <div class="table-responsive">
+                    <!-- begin::Table -->
+                    <table class="table align-middle gs-0 gy-5">
+                        <!-- begin::Table head -->
+                        <thead>
+                            <tr>
+                                <th class="p-0 min-w-150px"></th>
+                                <th class="p-0 min-w-150px"></th>
+                                <th class="p-0 min-w-125px"></th>
+                            </tr>
+                        </thead>
+                        <!-- end::Table head -->
+                        <!-- begin::Table body -->
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <span class="text-gray-900 fw-bolder mb-1 fs-6"
+                                        translate="EDUCATIONAL_PROGRAM.SYSTEMS"></span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="badge badge-light-danger fw-bold me-1"
+                                        translate="DEPARTMENTS.ACRONYM.PATENTS"></span>
+                                    <span class="badge badge-light-info fw-bold me-1"
+                                        translate="DEPARTMENTS.ACRONYM.TRADEMARKS"></span>
+                                    <span class="badge badge-light-success fw-bold me-1"
+                                        translate="DEPARTMENTS.ACRONYM.COPYRIGHTS"></span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="text-muted fw-bold">2300 Solicitudes</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="text-gray-900 fw-bolder mb-1 fs-6"
+                                        translate="EDUCATIONAL_PROGRAM.INFORMATICS"></span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="badge badge-light-danger fw-bold me-1"
+                                        translate="DEPARTMENTS.ACRONYM.PATENTS"></span>
+                                    <span class="badge badge-light-warning fw-bold me-1"
+                                        translate="DEPARTMENTS.ACRONYM.UTILITY_MODELS"></span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="text-muted fw-bold">1500 Solicitudes</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="text-gray-900 fw-bolder mb-1 fs-6"
+                                        translate="EDUCATIONAL_PROGRAM.DATA_SCIENCE"></span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="badge badge-light-danger fw-bold me-1"
+                                        translate="DEPARTMENTS.ACRONYM.PATENTS"></span>
+                                    <span class="badge badge-light-info fw-bold me-1"
+                                        translate="DEPARTMENTS.ACRONYM.TRADEMARKS"></span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="text-muted fw-bold">800 Solicitudes</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <!-- end::Table body -->
+                    </table>
+                    <!-- end::Table -->
+                </div>
+                <!-- end::Table container -->
+            </div>
+            <!-- end::Body -->
+        </div>
+    </div>
+</div>
+<div class="row g-5 g-xl-8">
+    <div class="col-xl-12">
+        <div class="card card-xl-stretch mb-xl-8">
+            <!-- begin::Header -->
+            <div class="card-header border-0 pt-5">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.RESEARCHERS"></span>
+                    <span class="text-muted mt-1 fw-bold fs-7" translate="GRAPHICS.SUBTITLES.TOP_5"></span>
+                </h3>
+            </div>
+            <!-- end::Header -->
+            <!-- begin::Body -->
+            <div class="card-body py-3">
+                <!-- begin::Table container -->
+                <div class="table-responsive">
+                    <!-- begin::Table -->
+                    <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+                        <!-- begin::Table head -->
+                        <thead>
+                            <tr class="fw-bolder text-muted">
+                                <th class="min-w-150px"><span translate="GRAPHICS.TITLES.RESEARCHER"></span></th>
+                                <th class="min-w-290px text-center"><span translate="GRAPHICS.TITLES.DEPARTMENT"></span></th>
+                                <th class="min-w-200px text-center"><span translate="GRAPHICS.TITLES.REQUEST"></span></th>
+                            </tr>
+                        </thead>
+                        <!-- end::Table head -->
+                        <!-- begin::Table body -->
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="symbol symbol-45px me-5">
+                                            <img src="./assets/media/avatars/300-5.jpg" alt="" />
+                                        </div>
+                                        <div class="d-flex justify-content-start flex-column">
+                                            <span class="text-gray-900 fw-bolder fs-6">Giner Alor Hernández</span>
+                                            <span class="text-muted fw-bold text-muted d-block fs-7"
+                                                translate="ACADEMIC_LEVEL.DOCTOR_CS"></span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="text-gray-900  fw-bolder d-block fs-6"
+                                        translate="DEPARTMENTS.IT"></span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex flex-column w-100 me-2">
+                                        <div class="d-flex justify-content-center flex-stack mb-2">
+                                            <span class="me-2 fs-6 fw-bold text-primary">90</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="symbol symbol-45px me-5">
+                                            <img src="./assets/media/avatars/300-23.jpg" alt="" />
+                                        </div>
+                                        <div class="d-flex justify-content-start flex-column">
+                                            <span class="text-gray-900 fw-bolder fs-6">Luis Angel Reyes Hernández</span>
+                                            <span class="text-muted fw-bold text-muted d-block fs-7"
+                                                translate="ACADEMIC_LEVEL.MASTER_CS"></span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="text-gray-900 fw-bolder d-block fs-6"
+                                        translate="DEPARTMENTS.IT"></span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex flex-column w-100 me-2">
+                                        <div class="d-flex justify-content-center flex-stack mb-2">
+                                            <span class="me-2 fs-6 fw-bold text-primary">70</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="symbol symbol-45px me-5">
+                                            <img src="./assets/media/avatars/300-2.jpg" alt="" />
+                                        </div>
+                                        <div class="d-flex justify-content-start flex-column">
+                                            <span class="text-gray-900 fw-bolder fs-6">Lisbeth Rodríguez Mazahua</span>
+                                            <span class="text-muted fw-bold text-muted d-block fs-7"
+                                                translate="ACADEMIC_LEVEL.DOCTOR_CS"></span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="text-gray-900 fw-bolder d-block fs-6"
+                                        translate="DEPARTMENTS.IT"></span>
+                                </td>
+                                <td  class="text-center">
+                                    <div class="d-flex flex-column w-100 me-2">
+                                        <div class="d-flex justify-content-center flex-stack mb-2">
+                                            <span class="me-2 fs-6 fw-bold text-primary">60</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="symbol symbol-45px me-5">
+                                            <img src="./assets/media/avatars/300-20.jpg" alt="" />
+                                        </div>
+                                        <div class="d-flex justify-content-start flex-column">
+                                            <span class="text-gray-900 fw-bolder fs-6">Mónica Ruiz Martínez</span>
+                                            <span class="text-muted fw-bold text-muted d-block fs-7"
+                                                translate="ACADEMIC_LEVEL.MASTER_CSIENCE"></span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="text-gray-900 fw-bolder d-block fs-6"
+                                        translate="DEPARTMENTS.IT"></span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex flex-column w-100 me-2">
+                                        <div class="d-flex justify-content-center flex-stack mb-2">
+                                            <span class="me-2 fs-6 fw-bold text-primary">50</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="symbol symbol-45px me-5">
+                                            <img src="./assets/media/avatars/300-23.jpg" alt="" />
+                                        </div>
+                                        <div class="d-flex justify-content-start flex-column">
+                                            <span class="text-gray-900 fw-bolder fs-6">José Luis Sánchez
+                                                Cervantes</span>
+                                            <span class="text-muted fw-bold text-muted d-block fs-7"
+                                                translate="ACADEMIC_LEVEL.DOCTOR_CS"></span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="text-gray-900 fw-bolder d-block fs-6"
+                                        translate="DEPARTMENTS.IT"></span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex flex-column w-100 me-2">
+                                        <div class="d-flex justify-content-center flex-stack mb-2">
+                                            <span class="me-2 fs-6 fw-bold text-primary">40</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <!-- end::Table body -->
+                    </table>
+                    <!-- end::Table -->
+                </div>
+                <!-- end::Table container -->
+            </div>
+            <!-- begin::Body -->
+        </div>
+    </div>
 </div>
