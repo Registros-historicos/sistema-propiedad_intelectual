@@ -73,7 +73,7 @@ export const LightSidebarConfig: ILayout = {
     },
     toolbar: {
       componentName: 'toolbar',
-      display: true,
+      display: false,
       layout: 'classic',
       class: 'py-3 py-lg-6',
       container: 'fluid',
