@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import {CoordinatorListingComponent} from './coordinator-listing/coordinator-listing.component';
 import {ApplicantListingComponent} from './applicant-listing/applicant-listing.component';
+import {AdminDashboardComponent} from './admin-dashboard/admin-dashboard.component';
 
 const routes: Routes = [
   {
@@ -9,7 +10,7 @@ const routes: Routes = [
     children: [
       {
         path: 'dashboard',
-        loadChildren: () => import('../dashboard/dashboard.module').then((m) => m.DashboardModule),
+        component: AdminDashboardComponent
       },
       {
         path: 'propiedades',
