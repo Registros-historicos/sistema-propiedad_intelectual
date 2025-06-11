@@ -4,11 +4,13 @@ export const locale = {
   data: {
     BUTTON: {
       NEW: {
+        COORDINATOR: 'Registrar coordinador',
+        APPLICANT: 'Registrar solicitante',
         PATENT: 'Registrar patente',
         TRADEMARK: 'Registrar marca',
         UTILITY_MODEL: 'Registrar modelo de utilidad',
         COPYRIGHT: 'Registrar derecho de autor',
-        INDUSTRIAL_DESIGN: 'Registrar diseño industrial'
+        INDUSTRIAL_DESIGN: 'Registrar diseño industrial',
       }
     },
     TABLE: {
@@ -31,14 +33,23 @@ export const locale = {
         EDUCATIONAL_PROGRAM: "Programa educativo",
         RESEARCHERS: "Investigadores",
         RESEARCHER: "Investigador",
-        DEPARTMENT: "Departamento"
+        DEPARTMENT: "Departamento",
+        FEDERAL_INSTITUTIONS: "Instituciones Federales",
+        CENTRALIZED_INSTITUTIONS: "Instituciones Centralizadas",
+        APPLICATION_TYPE: "Tipo de solicitud",
+        FEDERAL_ENTITIES: "Entidades Federales",
       },
       SUBTITLES: {
         REGISTER: "Registros",
         MONTHS: "Meses",
         TOP_3: "Top 3",
-        TOP_5: "Top 5"
+        TOP_5: "Top 5",
       },
+      LEGENDS: {
+        NO_FEDERAL_ENTITIES: "No hay entidades federales con registros.",
+        NO_FEDERAL_INSTITUTIONS: "No hay instituciones federales con registros.",
+        NO_CENTRALIZED_INSTITUTIONS: "No hay instituciones centralizadas con registros.",
+      }
     },
     DEPARTMENTS: {
       IT: "Departamento de TI",

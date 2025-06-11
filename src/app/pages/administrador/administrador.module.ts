@@ -8,14 +8,22 @@ import {SweetAlert2Module} from '@sweetalert2/ngx-sweetalert2';
 import {ApplicantListingComponent} from './applicant-listing/applicant-listing.component';
 import {CoordinatorListingComponent} from './coordinator-listing/coordinator-listing.component';
 import {ApplicantService, CoordinatorService, InstitucionService} from './shared-services';
+import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
+import {SharedModule} from '../../template/shared/shared.module';
+import {DropdownMenusModule} from '../../template/widgets';
+import {TranslationModule} from '../../modules/i18n';
+import {TranslateModule} from '@ngx-translate/core';
 
 
 @NgModule({
-  declarations: [],
+  declarations: [
+    AdminDashboardComponent
+  ],
   imports: [
     CommonModule,
     FormsModule,
     AdministradorRoutingModule,
+    SharedModule,
 
     NgbCollapseModule,
     NgbTooltipModule,
@@ -24,6 +32,9 @@ import {ApplicantService, CoordinatorService, InstitucionService} from './shared
     SweetAlert2Module.forChild(),
     ApplicantListingComponent,
     CoordinatorListingComponent,
+    DropdownMenusModule,
+    TranslationModule,
+    TranslateModule,
   ],
   providers: [
     CoordinatorService,
