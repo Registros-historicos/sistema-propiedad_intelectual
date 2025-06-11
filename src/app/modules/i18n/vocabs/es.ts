@@ -99,6 +99,11 @@ export const locale = {
         TRADEMARKS: 'Marcas',
         UTILITY_MODELS: 'Modelos de Utilidad'
       },
+      APPLICANT: {
+        MYPROFILE: 'Mi perfil',
+        REQUEST: 'Registrar',
+        REPORTS: 'Reportes',
+      },
       NEW: 'nuevo',
       ACTIONS: 'Comportamiento',
       CREATE_POST: 'Crear nueva publicación',

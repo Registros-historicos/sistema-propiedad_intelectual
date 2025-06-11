@@ -1,113 +1,55 @@
 <!--begin::Menu wrapper-->
-<div id="kt_app_sidebar_menu_scroll" class="scroll-y my-5 mx-3" data-kt-scroll="true" data-kt-scroll-activate="true"
-  data-kt-scroll-height="auto" data-kt-scroll-dependencies="#kt_app_sidebar_logo, #kt_app_sidebar_footer"
-  data-kt-scroll-wrappers="#kt_app_sidebar_menu" data-kt-scroll-offset="5px" data-kt-scroll-save-state="true">
+<div id="kt_app_sidebar_menu_scroll" class="scroll-y my-5 mx-3" data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-height="auto" data-kt-scroll-dependencies="#kt_app_sidebar_logo, #kt_app_sidebar_footer" data-kt-scroll-wrappers="#kt_app_sidebar_menu" data-kt-scroll-offset="5px" data-kt-scroll-save-state="true">
   <!--begin::Menu-->
-  <div class="menu menu-column menu-rounded menu-sub-indention fw-semibold fs-6" id="#kt_app_sidebar_menu"
-    data-kt-menu="true" data-kt-menu-expand="false">
+  <div class="menu menu-column menu-rounded menu-sub-indention fw-semibold fs-6" id="#kt_app_sidebar_menu" data-kt-menu="true" data-kt-menu-expand="false">
     @for (item of menuItems; track item.name) {
-    <!-- Simple link -->
-    @if (item.type === 'link') {
-    <div class="menu-item">
-      <a class="menu-link without-sub" [routerLink]="item.link" routerLinkActive="active">
+      <!-- Simple link -->
+      @if (item.type === 'link') {
+      <div class="menu-item">
+        <a class="menu-link without-sub" [routerLink]="item.link" routerLinkActive="active">
         <span class="menu-icon">
           <app-keenicon [name]="item.icon" class="fs-2"></app-keenicon>
         </span>
-        <span class="menu-title" [translate]="item.name"></span>
-      </a>
-    </div>
-    }
-    <!-- Separator -->
-    @if (item.type === 'separator') {
-    <div class="menu-item">
-      <div class="menu-content pt-8 pb-2">
-        <span class="menu-section text-muted text-uppercase fs-8 ls-1" [translate]="item.name"></span>
+          <span class="menu-title" [translate]="item.name"></span>
+        </a>
       </div>
-    </div>
-    }
-    <!-- Dropdown -->
-    @if (item.type === 'dropdown') {
-    <div class="menu-item menu-accordion" data-kt-menu-trigger="click" routerLinkActive="here show">
+      }
+      <!-- Separator -->
+      @if (item.type === 'separator') {
+      <div class="menu-item">
+        <div class="menu-content pt-8 pb-2">
+          <span class="menu-section text-muted text-uppercase fs-8 ls-1" [translate]="item.name"></span>
+        </div>
+      </div>
+      }
+      <!-- Dropdown -->
+      @if (item.type === 'dropdown') {
+      <div class="menu-item menu-accordion" data-kt-menu-trigger="click" routerLinkActive="here show">
       <span class="menu-link">
         <span class="menu-icon">
           <app-keenicon [name]="item.icon" class="fs-2"></app-keenicon>
         </span>
-        <span class="menu-title" [translate]="item.name"></span>
+        <span
+          class="menu-title" [translate]="item.name"></span>
         <span class="menu-arrow"></span>
       </span>
-      <div class="menu-sub menu-sub-accordion" routerLinkActive="menu-active-bg">
-        <!-- Dropdown items -->
-        @if (Array.isArray(item.children)) {
-        @for (subItem of item.children; track subItem.name) {
-        <!-- Subitem con dropdown-link (tiene link propio y submenú) -->
-        @if (subItem.type === 'dropdown-link') {
-        <div class="menu-item menu-accordion" data-kt-menu-trigger="click">
-          <a class="menu-link" [routerLink]="subItem.link" routerLinkActive="active">
-            <span class="menu-icon">
-              <app-keenicon [name]="subItem.icon" class="fs-2"></app-keenicon>
-            </span>
-            <span class="menu-title" [translate]="subItem.name"></span>
-            <span class="menu-arrow"></span>
-          </a>
-          <div class="menu-sub menu-sub-accordion">
-            <!-- Sub-subitems -->
-            @if (Array.isArray(subItem.children)) {
-            @for (subSubItem of subItem.children; track subSubItem.name) {
-            <div class="menu-item">
-              <a class="menu-link without-sub" [routerLink]="subSubItem.link" routerLinkActive="active">
+        <div class="menu-sub menu-sub-accordion" routerLinkActive="menu-active-bg">
+          <!-- Dropdown items -->
+          @if (Array.isArray(item.children)) {
+            @for (subItem of item.children; track subItem.name) {
+              <div class="menu-item">
+                <a class="menu-link without-sub" [routerLink]="subItem.link" routerLinkActive="active">
                 <span class="menu-icon">
-                  <app-keenicon [name]="subSubItem.icon" class="fs-2"></app-keenicon>
+                  <app-keenicon [name]="subItem.icon" class="fs-2"></app-keenicon>
                 </span>
-                <span class="menu-title" [translate]="subSubItem.name"></span>
-              </a>
-            </div>
+                  <span class="menu-title" [translate]="subItem.name"></span>
+                </a>
+              </div>
             }
-            }
-          </div>
+          }
         </div>
-        } @else {
-        <!-- Subitem simple -->
-        <div class="menu-item">
-          <a class="menu-link without-sub" [routerLink]="subItem.link" routerLinkActive="active">
-            <span class="menu-icon">
-              <app-keenicon [name]="subItem.icon" class="fs-2"></app-keenicon>
-            </span>
-            <span class="menu-title" [translate]="subItem.name"></span>
-          </a>
-        </div>
-        }
-        }
-        }
       </div>
-    </div>
-    }
-    <!-- Dropdown Link -->
-    @if (item.type === 'dropdown-link') {
-    <div class="menu-item menu-accordion" data-kt-menu-trigger="click">
-      <a class="menu-link" [routerLink]="item.link" routerLinkActive="active">
-        <span class="menu-icon">
-          <app-keenicon [name]="item.icon" class="fs-2"></app-keenicon>
-        </span>
-        <span class="menu-title" [translate]="item.name"></span>
-        <span class="menu-arrow"></span>
-      </a>
-      <div class="menu-sub menu-sub-accordion" routerLinkActive="menu-active-bg">
-        <!-- Dropdown items -->
-        @if (Array.isArray(item.children)) {
-        @for (subItem of item.children; track subItem.name) {
-        <div class="menu-item">
-          <a class="menu-link without-sub" [routerLink]="subItem.link" routerLinkActive="active">
-            <span class="menu-icon">
-              <app-keenicon [name]="subItem.icon" class="fs-2"></app-keenicon>
-            </span>
-            <span class="menu-title" [translate]="subItem.name"></span>
-          </a>
-        </div>
-        }
-        }
-      </div>
-    </div>
-    }
+      }
     }
     <div class="menu-item">
       <div class="menu-content pt-8 pb-2">
@@ -116,67 +58,67 @@
     </div>
     <!-- Widgets -->
     <div class="menu-item menu-accordion" data-kt-menu-trigger="click" routerLinkActive="here show">
-      <span class="menu-link">
-        <span class="menu-icon">
-          <app-keenicon name="element-7" class="fs-2"></app-keenicon>
-        </span>
-        <span class="menu-title" data-link="/crafted/widgets">Widgets
-        </span>
-        <span class="menu-arrow"></span>
-      </span>
+          <span class="menu-link">
+            <span class="menu-icon">
+              <app-keenicon name="element-7" class="fs-2"></app-keenicon>
+            </span>
+            <span class="menu-title" data-link="/crafted/widgets">Widgets
+            </span>
+            <span class="menu-arrow"></span>
+          </span>
       <div class="menu-sub menu-sub-accordion" routerLinkActive="menu-active-bg">
         <div class="menu-item">
           <a class="menu-link without-sub" routerLinkActive="active" routerLink="/crafted/widgets/lists">
-            <span class="menu-bullet">
-              <span class="bullet bullet-dot"></span>
-            </span>
+                <span class="menu-bullet">
+                  <span class="bullet bullet-dot"></span>
+                </span>
             <span class="menu-title">Lists
-            </span>
+                </span>
           </a>
         </div>
         <div class="menu-item">
           <a class="menu-link without-sub" routerLinkActive="active" routerLink="/crafted/widgets/statistics">
-            <span class="menu-bullet">
-              <span class="bullet bullet-dot"></span>
-            </span>
+                <span class="menu-bullet">
+                  <span class="bullet bullet-dot"></span>
+                </span>
             <span class="menu-title">Statistics
-            </span>
+                </span>
           </a>
         </div>
         <div class="menu-item">
           <a class="menu-link without-sub" routerLinkActive="active" routerLink="/crafted/widgets/charts">
-            <span class="menu-bullet">
-              <span class="bullet bullet-dot"></span>
-            </span>
+                <span class="menu-bullet">
+                  <span class="bullet bullet-dot"></span>
+                </span>
             <span class="menu-title">Charts
-            </span>
+                </span>
           </a>
         </div>
         <div class="menu-item">
           <a class="menu-link without-sub" routerLinkActive="active" routerLink="/crafted/widgets/mixed">
-            <span class="menu-bullet">
-              <span class="bullet bullet-dot"></span>
-            </span>
+                <span class="menu-bullet">
+                  <span class="bullet bullet-dot"></span>
+                </span>
             <span class="menu-title">Mixed
-            </span>
+                </span>
           </a>
         </div>
         <div class="menu-item">
           <a class="menu-link without-sub" routerLinkActive="active" routerLink="/crafted/widgets/tables">
-            <span class="menu-bullet">
-              <span class="bullet bullet-dot"></span>
-            </span>
+                <span class="menu-bullet">
+                  <span class="bullet bullet-dot"></span>
+                </span>
             <span class="menu-title">Tables
-            </span>
+                </span>
           </a>
         </div>
         <div class="menu-item">
           <a class="menu-link without-sub" routerLinkActive="active" routerLink="/crafted/widgets/feeds">
-            <span class="menu-bullet">
-              <span class="bullet bullet-dot"></span>
-            </span>
+                <span class="menu-bullet">
+                  <span class="bullet bullet-dot"></span>
+                </span>
             <span class="menu-title">Feeds
-            </span>
+                </span>
           </a>
         </div>
       </div>
