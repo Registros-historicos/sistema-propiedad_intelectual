@@ -52,9 +52,9 @@ export const locale = {
       }
     },
     DEPARTMENTS: {
-      IT: "Departamento de TI",
-      MECHANIC: "Departamento de Mecánica",
-      CHEMISTRY: "Departamento de Química",
+      IT: "Sistemas y computación",
+      MECHANIC: "Metal-mecánica",
+      CHEMISTRY: "Química",
       ACRONYM: {
         PATENTS: "PA",
         TRADEMARKS: "MA",
