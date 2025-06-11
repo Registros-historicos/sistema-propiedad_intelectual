@@ -1,11 +1,11 @@
-import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { FormsModule, NgForm } from '@angular/forms';
-import { CommonModule } from '@angular/common'; // ← AGREGADO
+import { ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { SwalComponent, SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { Observable } from 'rxjs';
 import { SweetAlertOptions } from 'sweetalert2';
 import moment from 'moment';
 import { Config } from 'datatables.net';
+import { Router } from '@angular/router';
 import {
   ApplicantService,
   IApplicantModel,
@@ -15,11 +15,10 @@ import {
   SEXO_OPTIONS,
   InstitucionService
 } from '../shared-services';
-import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap';
-import { NgClass } from '@angular/common';
 import { CrudModule } from '../../../modules/crud/crud.module';
 import { SharedModule } from '../../../template/shared/shared.module';
-import {environment} from '../../../../environments/environment';
+import { environment } from '../../../../environments/environment';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-applicant-listing',
@@ -27,84 +26,49 @@ import {environment} from '../../../../environments/environment';
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
-    NgbCollapse,
-    NgClass,
     SweetAlert2Module,
     CrudModule,
-    SharedModule
+    SharedModule,
+    FormsModule
   ],
   styleUrls: ['./applicant-listing.component.scss']
 })
-export class ApplicantListingComponent implements OnInit, AfterViewInit, OnDestroy {
-
-  isCollapsed1 = false;
-  isCollapsed2 = true;
-
-  isLoading = false;
-
-  applicants: DataTablesResponse;
+export class ApplicantListingComponent implements OnInit, OnDestroy {
 
   datatableConfig: Config = {};
-
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
-
-  aApplicant: Observable<IApplicantModel>;
-  applicantModel: IApplicantModel = {
-    id: 0,
-    nombre: '',
-    apellidos: '',
-    edad: 0,
-    entidad_federativa: '',
-    institucion_adscripcion: '',
-    sexo: '',
-    telefono: '',
-    email: '',
-    rfc: '',
-    curp: ''
-  };
+  lengthMenu: number[] = [5, 10, 15, 20];
+  pageLength: number = 10;
+  dtInstance: any; // Para almacenar la instancia de DataTables
 
   @ViewChild('noticeSwal')
   noticeSwal!: SwalComponent;
 
   swalOptions: SweetAlertOptions = {};
 
-  entidadesFederativas: string[] = ENTIDADES_FEDERATIVAS;
-  sexoOptions: string[] = SEXO_OPTIONS;
-
-  instituciones$: Observable<IInstitucionModel[]>;
-  institucionesFiltradas: IInstitucionModel[] = [];
-
   constructor(
     private applicantService: ApplicantService,
     private institucionService: InstitucionService,
-    private cdr: ChangeDetectorRef
-  ) {
-    this.entidadesFederativas = ENTIDADES_FEDERATIVAS;
-    this.sexoOptions = SEXO_OPTIONS;
-  }
-
-  ngAfterViewInit(): void {
-  }
+    private cdr: ChangeDetectorRef,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-
-    console.log('Entidades Federativas:', this.entidadesFederativas);
-    console.log('Opciones de Sexo:', this.sexoOptions);
-
     this.datatableConfig = {
       serverSide: true,
-      /* ajax: (dataTablesParameters: any, callback) => {
-        this.applicantService.getApplicants(dataTablesParameters).subscribe(resp => {
-          callback(resp);
-        });
-      },*/
+      lengthMenu: this.lengthMenu,
+      pageLength: this.pageLength,
       ajax: (dataTablesParameters: any, callback) => {
         // Para desarrollo: usar datos mock
         if (environment.production === false) {
           const mockData = this.generateMockApplicants();
+          // Aplicar paginación manualmente
+          const start = dataTablesParameters.start;
+          const length = dataTablesParameters.length;
+          const paginatedData = mockData.slice(start, start + length);
+
           callback({
-            data: mockData,
+            data: paginatedData,
             draw: dataTablesParameters.draw,
             recordsTotal: mockData.length,
             recordsFiltered: mockData.length
@@ -114,6 +78,10 @@ export class ApplicantListingComponent implements OnInit, AfterViewInit, OnDestr
             callback(resp);
           });
         }
+      },
+      // Añadir este callback para guardar la instancia de la tabla
+      initComplete: (settings, json) => {
+        this.dtInstance = settings.oInstance.api();
       },
       columns: [
         {
@@ -146,16 +114,16 @@ export class ApplicantListingComponent implements OnInit, AfterViewInit, OnDestr
           }
         },
         {
-          title: 'Entidad Federativa', data: 'entidad_federativa'
+          title: 'Entidad Federativa', data: 'entidad_federativa',className: 'text-center'
         },
         {
-          title: 'Institución', data: 'institucion_adscripcion'
+          title: 'Institución', data: 'institucion_adscripcion',className: 'text-center'
         },
         {
-          title: 'Teléfono', data: 'telefono'
+          title: 'Teléfono', data: 'telefono',className: 'text-center'
         },
         {
-          title: 'Fecha de Registro', data: 'created_at', render: function (data) {
+          title: 'Fecha de Registro', data: 'created_at', className: 'text-center', render: function (data) {
             return moment(data).format('DD MMM YYYY, hh:mm a');
           }
         }
@@ -164,23 +132,19 @@ export class ApplicantListingComponent implements OnInit, AfterViewInit, OnDestr
         $('td:eq(0)', row).addClass('d-flex align-items-center');
       },
     };
-
-    this.instituciones$ = this.applicantService.getInstituciones();
-    this.instituciones$.subscribe(instituciones => {
-      console.log('Instituciones cargadas:', instituciones);
-    });
   }
 
-  onEntidadChange() {
-    console.log('Entidad seleccionada:', this.applicantModel.entidad_federativa);
-    this.applicantModel.institucion_adscripcion = '';
+  onPageLengthChange(event: any): void {
+    const newLength = parseInt(event.target.value);
+    this.pageLength = newLength;
 
-    this.institucionService.getInstitucionesByEntidad(this.applicantModel.entidad_federativa)
-      .subscribe(instituciones => {
-        this.institucionesFiltradas = instituciones;
-        console.log('Instituciones filtradas:', this.institucionesFiltradas);
-        this.cdr.detectChanges();
-      });
+    if (this.dtInstance) {
+      // Actualizar la configuración y redibujar
+      this.dtInstance.page.len(newLength).draw();
+    } else {
+      // Si no hay instancia, forzar recarga
+      this.reloadEvent.emit(true);
+    }
   }
 
   delete(id: number) {
@@ -189,105 +153,12 @@ export class ApplicantListingComponent implements OnInit, AfterViewInit, OnDestr
     });
   }
 
-  edit(id: number) {
-    this.aApplicant = this.applicantService.getApplicant(id);
-    this.aApplicant.subscribe((applicant: IApplicantModel) => {
-      this.applicantModel = { ...applicant };
-      this.onEntidadChange();
-    });
+  navigateToEdit(id: number) {
+    this.router.navigate(['/apps/solicitantes/edit', id]);
   }
 
-  create() {
-    this.applicantModel = {
-      id: 0,
-      nombre: '',
-      apellidos: '',
-      edad: 0,
-      entidad_federativa: '',
-      institucion_adscripcion: '',
-      sexo: '',
-      telefono: '',
-      email: '',
-      rfc: '',
-      curp: ''
-    };
-    this.institucionesFiltradas = [];
-  }
-
-  onSubmit(event: Event, myForm: NgForm) {
-    if (myForm && myForm.invalid) {
-      return;
-    }
-
-    this.isLoading = true;
-
-    const successAlert: SweetAlertOptions = {
-      icon: 'success',
-      title: 'Éxito!',
-      text: this.applicantModel.id > 0 ? 'Solicitante actualizado exitosamente!' : 'Solicitante registrado exitosamente!',
-    };
-    const errorAlert: SweetAlertOptions = {
-      icon: 'error',
-      title: 'Error!',
-      text: '',
-    };
-
-    const completeFn = () => {
-      this.isLoading = false;
-    };
-
-    const updateFn = () => {
-      this.applicantService.updateApplicant(this.applicantModel.id, this.applicantModel).subscribe({
-        next: () => {
-          this.showAlert(successAlert);
-          this.reloadEvent.emit(true);
-        },
-        error: (error) => {
-          errorAlert.text = this.extractText(error.error);
-          this.showAlert(errorAlert);
-          this.isLoading = false;
-        },
-        complete: completeFn,
-      });
-    };
-
-    const createFn = () => {
-      this.applicantService.createApplicant(this.applicantModel).subscribe({
-        next: () => {
-          this.showAlert(successAlert);
-          this.reloadEvent.emit(true);
-        },
-        error: (error) => {
-          errorAlert.text = this.extractText(error.error);
-          this.showAlert(errorAlert);
-          this.isLoading = false;
-        },
-        complete: completeFn,
-      });
-    };
-
-    if (this.applicantModel.id > 0) {
-      updateFn();
-    } else {
-      createFn();
-    }
-  }
-
-  extractText(obj: any): string {
-    var textArray: string[] = [];
-
-    for (var key in obj) {
-      if (typeof obj[key] === 'string') {
-        textArray.push(obj[key]);
-      } else if (typeof obj[key] === 'object') {
-        textArray = textArray.concat(this.extractText(obj[key]));
-      }
-    }
-
-    var uniqueTextArray = Array.from(new Set(textArray));
-    var text = uniqueTextArray.join('\n');
-
-    return text;
+  navigateToCreate() {
+    this.router.navigate(['/apps/solicitantes/registro']);
   }
 
   showAlert(swalOptions: SweetAlertOptions) {
@@ -312,14 +183,14 @@ export class ApplicantListingComponent implements OnInit, AfterViewInit, OnDestr
 
   private generateMockApplicants(): IApplicantModel[] {
     const sexos = SEXO_OPTIONS;
-    const mockCoordinators: IApplicantModel[] = [];
+    const mockApplicants: IApplicantModel[] = [];
     const nombres = ['Juan', 'María', 'Pedro', 'Ana', 'Luis', 'Laura'];
     const apellidos = ['García', 'López', 'Martínez', 'Hernández', 'González', 'Rodríguez'];
 
     const todasLasInstituciones = this.institucionService.getMockInstituciones();
 
     const institucionesPorEntidad: {[key: string]: IInstitucionModel[]} = {};
-    todasLasInstituciones.forEach(inst => {
+    todasLasInstituciones.forEach((inst: IInstitucionModel) => {
       if (!institucionesPorEntidad[inst.entidad_federativa]) {
         institucionesPorEntidad[inst.entidad_federativa] = [];
       }
@@ -328,7 +199,7 @@ export class ApplicantListingComponent implements OnInit, AfterViewInit, OnDestr
 
     const entidadesConInstituciones = Object.keys(institucionesPorEntidad);
 
-    for (let i = 1; i <= 20; i++) {
+    for (let i = 1; i <= 200; i++) {
       const nombre = nombres[Math.floor(Math.random() * nombres.length)];
       const apellido = apellidos[Math.floor(Math.random() * apellidos.length)];
 
@@ -337,7 +208,7 @@ export class ApplicantListingComponent implements OnInit, AfterViewInit, OnDestr
       const institucionesEntidad = institucionesPorEntidad[entidad];
       const institucion = institucionesEntidad[Math.floor(Math.random() * institucionesEntidad.length)];
 
-      mockCoordinators.push({
+      mockApplicants.push({
         id: i,
         nombre: nombre,
         apellidos: apellido,
@@ -353,6 +224,6 @@ export class ApplicantListingComponent implements OnInit, AfterViewInit, OnDestr
       });
     }
 
-    return mockCoordinators;
+    return mockApplicants;
   }
 }
