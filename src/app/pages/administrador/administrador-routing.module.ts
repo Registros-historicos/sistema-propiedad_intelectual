@@ -21,9 +21,17 @@ const routes: Routes = [
         loadComponent: () => import('./coordinator-listing/coordinator-listing.component').then(m => m.CoordinatorListingComponent)
       },
       {
+        path: 'coordinador/registro',
+        loadComponent: () => import('./coordinator-form/coordinator-form.component').then(m => m.CoordinatorFormComponent)
+      },
+      {
         path: 'solicitantes',
         loadComponent: () => import('./applicant-listing/applicant-listing.component').then(m => m.ApplicantListingComponent)
-      }
+      },
+      {
+        path: 'solicitante/registro',
+        loadComponent: () => import('./applicant-form/applicant-form.component').then(m => m.ApplicantFormComponent)
+      },
     ]
   }
 ];
