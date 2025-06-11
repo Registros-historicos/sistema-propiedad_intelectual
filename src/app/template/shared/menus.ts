@@ -120,5 +120,30 @@ export const ADMINISTRATOR_MENUS = [
         ],
       }
     ],
-  }
+  },
+];
+
+export const APPLICANTS_MENU = [
+  {
+    name: 'MENU.ADMIN.MANAGEMENT',
+    type: 'separator',
+  },
+  {
+    name: 'MENU.APPLICANT.MYPROFILE',
+    icon: 'profile-user',
+    type: 'link',
+    link: '/solicitante/dashboard',
+  },
+  {
+    name: 'MENU.APPLICANT.REQUEST',
+    icon: 'element-11',
+    type: 'link',
+    link: '/solicitante/registro',
+  },
+  {
+    name: 'MENU.APPLICANT.REPORTS',
+    icon: 'element-11',
+    type: 'link',
+    link: '/solicitante/reportes',
+  },
 ];

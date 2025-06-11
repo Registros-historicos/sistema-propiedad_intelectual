@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {ADMINISTRATOR_MENUS} from '../../../../shared/menus';
+import {ADMINISTRATOR_MENUS, APPLICANTS_MENU} from '../../../../shared/menus';
 
 @Component({
   selector: 'app-sidebar-menu',
@@ -21,6 +21,7 @@ export class SidebarMenuComponent implements OnInit {
       case 2:
         break;
       case 3:
+        this.menuItems = APPLICANTS_MENU;
         break;
       default:
         this.menuItems = ADMINISTRATOR_MENUS;
