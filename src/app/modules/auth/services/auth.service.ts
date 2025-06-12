@@ -80,15 +80,16 @@ export class AuthService implements OnDestroy {
           this.router.navigate(['/solicitante/dashboard']);
           break;
         default:
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/auth/login']);
           break;
       }
     } else {
-      this.router.navigate(['/dashboard']);
+      this.router.navigate(['/auth/login']);
     }
   }
 
   logout() {
+    localStorage.removeItem('role')
     localStorage.removeItem(this.authLocalStorageToken);
     this.router.navigate(['/auth/login'], {
       queryParams: {},

@@ -112,7 +112,7 @@ const Routing: Routes = [
   },
   {
     path: '',
-    redirectTo: '/dashboard',
+    redirectTo: '',
     pathMatch: 'full',
   },
   {
