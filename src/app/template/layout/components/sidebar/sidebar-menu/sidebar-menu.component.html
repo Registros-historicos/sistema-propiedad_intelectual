@@ -8,7 +8,7 @@
       <div class="menu-item">
         <a class="menu-link without-sub" [routerLink]="item.link" routerLinkActive="active">
         <span class="menu-icon">
-          <app-keenicon [name]="item.icon" class="fs-2"></app-keenicon>
+          <mat-icon [fontIcon]="item.icon"></mat-icon>
         </span>
           <span class="menu-title" [translate]="item.name"></span>
         </a>
@@ -27,7 +27,7 @@
       <div class="menu-item menu-accordion" data-kt-menu-trigger="click" routerLinkActive="here show">
       <span class="menu-link">
         <span class="menu-icon">
-          <app-keenicon [name]="item.icon" class="fs-2"></app-keenicon>
+          <mat-icon [fontIcon]="item.icon"></mat-icon>
         </span>
         <span
           class="menu-title" [translate]="item.name"></span>
@@ -40,7 +40,7 @@
               <div class="menu-item">
                 <a class="menu-link without-sub" [routerLink]="subItem.link" routerLinkActive="active">
                 <span class="menu-icon">
-                  <app-keenicon [name]="subItem.icon" class="fs-2"></app-keenicon>
+                  <mat-icon [fontIcon]="subItem.icon"></mat-icon>
                 </span>
                   <span class="menu-title" [translate]="subItem.name"></span>
                 </a>
@@ -49,6 +49,33 @@
           }
         </div>
       </div>
+      }
+      <!-- Dropdown Link -->
+      @if (item.type === 'dropdown-link') {
+        <div class="menu-item menu-accordion" data-kt-menu-trigger="click">
+          <a class="menu-link" [routerLink]="item.link" routerLinkActive="active">
+        <span class="menu-icon">
+          <app-keenicon [name]="item.icon" class="fs-2"></app-keenicon>
+        </span>
+            <span class="menu-title" [translate]="item.name"></span>
+            <span class="menu-arrow"></span>
+          </a>
+          <div class="menu-sub menu-sub-accordion" routerLinkActive="menu-active-bg">
+            <!-- Dropdown items -->
+            @if (Array.isArray(item.children)) {
+              @for (subItem of item.children; track subItem.name) {
+                <div class="menu-item">
+                  <a class="menu-link without-sub" [routerLink]="subItem.link" routerLinkActive="active">
+            <span class="menu-icon">
+              <app-keenicon [name]="subItem.icon" class="fs-2"></app-keenicon>
+            </span>
+                    <span class="menu-title" [translate]="subItem.name"></span>
+                  </a>
+                </div>
+              }
+            }
+          </div>
+        </div>
       }
     }
     <div class="menu-item">
