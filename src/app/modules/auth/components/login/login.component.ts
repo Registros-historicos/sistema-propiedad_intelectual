@@ -83,7 +83,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         }
 
         const role = user?.roles[0] || 0;
-        sessionStorage.setItem('role', role.toString());
+        localStorage.setItem('role', role.toString());
       });
     this.unsubscribe.push(loginSubscr);
   }

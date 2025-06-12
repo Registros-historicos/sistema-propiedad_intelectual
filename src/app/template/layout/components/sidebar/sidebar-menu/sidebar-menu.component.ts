@@ -12,7 +12,7 @@ export class SidebarMenuComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    const role = parseInt(sessionStorage.getItem('role') ?? '0');
+    const role = parseInt(localStorage.getItem('role') ?? '0');
 
     switch (role) {
       case 1:
@@ -24,7 +24,6 @@ export class SidebarMenuComponent implements OnInit {
         this.menuItems = APPLICANTS_MENU;
         break;
       default:
-        this.menuItems = ADMINISTRATOR_MENUS;
         break;
     }
   }

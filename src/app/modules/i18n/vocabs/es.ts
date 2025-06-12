@@ -75,6 +75,14 @@ export const locale = {
     },
     TRANSLATOR: {
       SELECT: 'Elige tu idioma',
+      LANGUAGES: {
+        ENGLISH: 'Inglés',
+        MANDARIN: 'Mandarín',
+        SPANISH: 'Español',
+        JAPANESE: 'Japonés',
+        GERMAN: 'Alemán',
+        FRENCH: 'Francés'
+      }
     },
     MENU: {
       ADMIN: {
@@ -198,6 +206,19 @@ export const locale = {
           ADD_MESSAGE: 'Customer has been created'
         }
       }
+    },
+    KEYWORDS: {
+      ABOUT: 'Acerca de',
+      SUPPORT: 'Soporte',
+      THEME: {
+        LIGHT: 'Claro',
+        DARK: 'Oscuro',
+        SYSTEM: 'Sistema'
+      },
+      MY_PROFILE: 'Mi Perfil',
+      LANGUAGE: 'Idioma',
+      SETTINGS: 'Configuración',
+      SIGN_OUT: 'Cerrar Sesión'
     }
   }
 };

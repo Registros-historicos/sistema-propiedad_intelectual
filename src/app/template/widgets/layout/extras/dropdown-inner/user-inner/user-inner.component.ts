@@ -2,6 +2,14 @@ import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { TranslationService } from '../../../../../../modules/i18n';
 import { AuthService, UserType } from '../../../../../../modules/auth';
+import { TranslateService } from '@ngx-translate/core';
+
+interface LanguageFlag {
+  lang: string;
+  name: string;
+  flag: string;
+  active?: boolean;
+}
 
 @Component({
   selector: 'app-user-inner',
@@ -14,22 +22,59 @@ export class UserInnerComponent implements OnInit, OnDestroy {
 
   language: LanguageFlag;
   user$: Observable<UserType>;
-  langs = languages;
+  langs: LanguageFlag[] = [];
   private unsubscribe: Subscription[] = [];
 
   constructor(
     private auth: AuthService,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
     this.user$ = this.auth.currentUserSubject.asObservable();
+    this.initializeLanguages();
     this.setLanguage(this.translationService.getSelectedLanguage());
   }
 
   logout() {
     this.auth.logout();
     document.location.reload();
+  }
+
+  initializeLanguages() {
+    this.langs = [
+      {
+        lang: 'en',
+        name: this.translate.instant('TRANSLATOR.LANGUAGES.ENGLISH'),
+        flag: './assets/media/flags/united-states.svg',
+      },
+      {
+        lang: 'zh',
+        name: this.translate.instant('TRANSLATOR.LANGUAGES.MANDARIN'),
+        flag: './assets/media/flags/china.svg',
+      },
+      {
+        lang: 'es',
+        name: this.translate.instant('TRANSLATOR.LANGUAGES.SPANISH'),
+        flag: './assets/media/flags/spain.svg',
+      },
+      {
+        lang: 'ja',
+        name: this.translate.instant('TRANSLATOR.LANGUAGES.JAPANESE'),
+        flag: './assets/media/flags/japan.svg',
+      },
+      {
+        lang: 'de',
+        name: this.translate.instant('TRANSLATOR.LANGUAGES.GERMAN'),
+        flag: './assets/media/flags/germany.svg',
+      },
+      {
+        lang: 'fr',
+        name: this.translate.instant('TRANSLATOR.LANGUAGES.FRENCH'),
+        flag: './assets/media/flags/france.svg',
+      },
+    ];
   }
 
   selectLanguage(lang: string) {
@@ -53,43 +98,3 @@ export class UserInnerComponent implements OnInit, OnDestroy {
     this.unsubscribe.forEach((sb) => sb.unsubscribe());
   }
 }
-
-interface LanguageFlag {
-  lang: string;
-  name: string;
-  flag: string;
-  active?: boolean;
-}
-
-const languages = [
-  {
-    lang: 'en',
-    name: 'English',
-    flag: './assets/media/flags/united-states.svg',
-  },
-  {
-    lang: 'zh',
-    name: 'Mandarin',
-    flag: './assets/media/flags/china.svg',
-  },
-  {
-    lang: 'es',
-    name: 'Spanish',
-    flag: './assets/media/flags/spain.svg',
-  },
-  {
-    lang: 'ja',
-    name: 'Japanese',
-    flag: './assets/media/flags/japan.svg',
-  },
-  {
-    lang: 'de',
-    name: 'German',
-    flag: './assets/media/flags/germany.svg',
-  },
-  {
-    lang: 'fr',
-    name: 'French',
-    flag: './assets/media/flags/france.svg',
-  },
-];
