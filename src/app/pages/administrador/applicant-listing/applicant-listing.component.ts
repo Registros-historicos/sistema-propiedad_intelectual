@@ -56,6 +56,9 @@ export class ApplicantListingComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.datatableConfig = {
       serverSide: true,
+      language: {
+        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+      },
       lengthMenu: this.lengthMenu,
       pageLength: this.pageLength,
       ajax: (dataTablesParameters: any, callback) => {

@@ -40,6 +40,9 @@ export class DisenoIndustrialComponent implements OnInit, AfterViewInit, OnDestr
   ngOnInit(): void {
     this.datatableConfig = {
       serverSide: true,
+      language: {
+        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+      },
       /* ajax: (dataTablesParameters: any, callback) => {
         this.applicantService.getApplicants(dataTablesParameters).subscribe(resp => {
           callback(resp);
