@@ -73,31 +73,31 @@ export const ADMINISTRATOR_MENUS = [
   },
   {
     name: 'MENU.ADMIN.PATENTS',
-    icon: 'element-11',
+    icon: 'description',
     link: '/administrador/propiedades/patente',
     type: 'link'
   },
   {
     name: 'MENU.ADMIN.TRADEMARKS',
-    icon: 'element-11',
+    icon: 'description',
     link: '/administrador/propiedades/marca',
     type: 'link'
   },
   {
     name: 'MENU.ADMIN.UTILITY_MODELS',
-    icon: 'element-11',
+    icon: 'description',
     link: '/administrador/propiedades/modelo-utilidad',
     type: 'link'
   },
   {
     name: 'MENU.ADMIN.COPYRIGHTS',
-    icon: 'element-11',
+    icon: 'description',
     link: '/administrador/propiedades/derecho-autor',
     type: 'link'
   },
   {
     name: 'MENU.ADMIN.INDUSTRIAL_DESIGNS',
-    icon: 'element-11',
+    icon: 'description',
     link: '/administrador/propiedades/diseno-industrial',
     type: 'link'
   }
