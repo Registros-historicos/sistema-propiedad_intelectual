@@ -37,7 +37,7 @@ export const locale = {
         FEDERAL_INSTITUTIONS: "Instituciones Federales",
         CENTRALIZED_INSTITUTIONS: "Instituciones Centralizadas",
         APPLICATION_TYPE: "Tipo de solicitud",
-        FEDERAL_ENTITIES: "Entidades Federales",
+        FEDERAL_ENTITIES: "Entidades Federativas",
       },
       SUBTITLES: {
         REGISTER: "Registros",
@@ -46,7 +46,7 @@ export const locale = {
         TOP_5: "Top 5",
       },
       LEGENDS: {
-        NO_FEDERAL_ENTITIES: "No hay entidades federales con registros.",
+        NO_FEDERAL_ENTITIES: "No hay entidades federativas con registros.",
         NO_FEDERAL_INSTITUTIONS: "No hay instituciones federales con registros.",
         NO_CENTRALIZED_INSTITUTIONS: "No hay instituciones centralizadas con registros.",
       }
@@ -85,9 +85,18 @@ export const locale = {
       }
     },
     MENU: {
+      NEW: 'Nuevo',
+      ACTIONS: 'Comportamiento',
+      CREATE_POST: 'Crear nueva publicación',
+      PAGES: 'Pages',
+      FEATURES: 'Caracteristicas',
+      APPS: 'Aplicaciones',
+      DASHBOARD: 'Tablero',
+      REGISTERS: 'Registros',
+      USERS: 'Usuarios',
+      INTELECTUAL_PROPERTIES: 'Propiedades Intelectuales',
       ADMIN: {
         MANAGEMENT: 'Gestión',
-        USERS: 'Usuarios',
         COORDINATORS: 'Coordinadores',
         APPLICANTS: 'Solicitantes',
         INTELECTUAL_PROPERTY: 'Propiedad Intelectual',
@@ -111,14 +120,7 @@ export const locale = {
         MYPROFILE: 'Mi perfil',
         REQUEST: 'Registrar',
         REPORTS: 'Reportes',
-      },
-      NEW: 'nuevo',
-      ACTIONS: 'Comportamiento',
-      CREATE_POST: 'Crear nueva publicación',
-      PAGES: 'Pages',
-      FEATURES: 'Caracteristicas',
-      APPS: 'Aplicaciones',
-      DASHBOARD: 'Tablero'
+      }
     },
     AUTH: {
       GENERAL: {
