@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import {Observable} from 'rxjs';
-import {IIntelectualPropertyModel} from '../shared-services';
+import {IIntelectualPropertyModel} from '../../pages/administrador/shared-services';
 
 @Injectable({
   providedIn: 'root'
 })
-export class TrademarksService {
+export class UtilityModelsService {
   private mockTitles: string[] = [
     'Vacuna SARS-CoV-2',
     'Software de gestión de datos',
@@ -125,11 +125,11 @@ export class TrademarksService {
     // Agrega más provincias aquí
   ];
 
-  private trademarks: any[] = [];
+  private utilityModels: any[] = [];
 
   constructor() {
     for (let i = 0; i < 100; i++) {
-      this.generateRandomTrademark();
+      this.generateRandomUtilityModel();
     }
   }
 
@@ -141,8 +141,8 @@ export class TrademarksService {
     return array[Math.floor(Math.random() * array.length)];
   }
 
-  private generateRandomTrademark() {
-    const id = this.trademarks.length + 1;
+  private generateRandomUtilityModel() {
+    const id = this.utilityModels.length + 1;
     const randomTitle = this.randomElement(this.mockTitles);
     const randomDescription = this.randomElement(this.mockDescriptions);
     const randomDate = this.randomDate(new Date(2023, 0, 1), new Date());
@@ -154,7 +154,7 @@ export class TrademarksService {
     const randomPhone = `55${Math.floor(10000000 + Math.random() * 90000000)}`;
     const randomProvince = this.randomElement(this.mockProvinces);
 
-    this.trademarks.push({
+    this.utilityModels.push({
       id,
       titulo: randomTitle,
       descripcion: randomDescription,
@@ -169,13 +169,13 @@ export class TrademarksService {
     });
   }
 
-  public getTrademarks(tableParams: any): Observable<any> {
+  public getUtilityModels(tableParams: any): Observable<any> {
     const start = tableParams.start || 0;
     const length = tableParams.length || 10;
-    const total = this.trademarks.length;
+    const total = this.utilityModels.length;
 
     // Simulate server-side pagination
-    const paginatedTrademarks = this.trademarks.slice(start, start + length);
+    const paginatedPatents = this.utilityModels.slice(start, start + length);
 
     return new Observable(observer => {
       setTimeout(() => {
@@ -183,16 +183,17 @@ export class TrademarksService {
           draw: tableParams.draw,
           recordsTotal: total,
           recordsFiltered: total,
-          data: paginatedTrademarks
+          data: paginatedPatents
         });
         observer.complete();
       }, 500); // Simulate network delay
     });
   }
 
-  public getTrademark(id: number): Observable<IIntelectualPropertyModel> {
+  public getUtilityModel
+  (id: number): Observable<IIntelectualPropertyModel> {
     return new Observable(observer => {
-      const patent = this.trademarks.find(p => p.id === id);
+      const patent = this.utilityModels.find(p => p.id === id);
       setTimeout(() => {
         observer.next(patent);
         observer.complete();
@@ -200,10 +201,11 @@ export class TrademarksService {
     });
   }
 
-  public createTrademark(patent: IIntelectualPropertyModel): Observable<IIntelectualPropertyModel> {
+  public createUtilityModel
+  (patent: IIntelectualPropertyModel): Observable<IIntelectualPropertyModel> {
     return new Observable(observer => {
-      patent.id = this.trademarks.length + 1;
-      this.trademarks.push(patent);
+      patent.id = this.utilityModels.length + 1;
+      this.utilityModels.push(patent);
       setTimeout(() => {
         observer.next(patent);
         observer.complete();
@@ -211,11 +213,12 @@ export class TrademarksService {
     });
   }
 
-  public updateTrademark(id: number, patent: IIntelectualPropertyModel): Observable<IIntelectualPropertyModel> {
+  public updateUtilityModel
+  (id: number, patent: IIntelectualPropertyModel): Observable<IIntelectualPropertyModel> {
     return new Observable(observer => {
-      const index = this.trademarks.findIndex(p => p.id === id);
+      const index = this.utilityModels.findIndex(p => p.id === id);
       if (index !== -1) {
-        this.trademarks[index] = patent;
+        this.utilityModels[index] = patent;
       }
       setTimeout(() => {
         observer.next(patent);
@@ -224,11 +227,12 @@ export class TrademarksService {
     });
   }
 
-  public deleteTrademark(id: number): Observable<void> {
+  public deleteUtilityModel
+  (id: number): Observable<void> {
     return new Observable(observer => {
-      const index = this.trademarks.findIndex(p => p.id === id);
+      const index = this.utilityModels.findIndex(p => p.id === id);
       if (index !== -1) {
-        this.trademarks.splice(index, 1);
+        this.utilityModels.splice(index, 1);
       }
       setTimeout(() => {
         observer.next();

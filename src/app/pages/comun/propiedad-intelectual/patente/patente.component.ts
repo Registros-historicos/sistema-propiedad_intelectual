@@ -1,17 +1,17 @@
 import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {CopyrightsService} from '../copyright.service';
-import {DataTablesResponse} from '../../shared-services';
+import {DataTablesResponse} from '../../../administrador/shared-services';
 import {Config} from 'datatables.net';
 import {SwalComponent} from '@sweetalert2/ngx-sweetalert2';
 import {SweetAlertOptions} from 'sweetalert2';
-import moment from 'moment';
+import moment from 'moment/moment';
+import {PatentsService} from '../../../../api/services/patents.service';
 
 @Component({
-  selector: 'app-derecho-autor',
-  templateUrl: './derecho-autor.component.html',
-  styleUrl: './derecho-autor.component.scss'
+  selector: 'app-patente',
+  templateUrl: './patente.component.html',
+  styleUrl: './patente.component.scss'
 })
-export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
+export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   isCollapsed1 = false;
   isCollapsed2 = true;
 
@@ -29,7 +29,7 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
   swalOptions: SweetAlertOptions = {};
 
   constructor(
-    private service: CopyrightsService,
+    private service: PatentsService,
     private cdr: ChangeDetectorRef
   ) {
   }
@@ -46,7 +46,7 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       },*/
       ajax: (dataTablesParameters: any, callback) => {
-        this.service.getCopyrights(dataTablesParameters).subscribe(resp => {
+        this.service.getPatents(dataTablesParameters).subscribe(resp => {
           callback(resp);
         });
       },
@@ -105,7 +105,7 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   delete(id: number) {
-    this.service.deleteCopyright(id).subscribe(() => {
+    this.service.deletePatent(id).subscribe(() => {
       this.reloadEvent.emit(true);
     });
   }
