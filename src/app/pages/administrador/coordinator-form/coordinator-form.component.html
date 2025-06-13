@@ -222,6 +222,42 @@
             <!--end::Col-->
           </div>
           <!--end::Row-->
+
+          <!--begin::Row-->
+          <div class="row g-9 mb-7">
+            <!--begin::Col-->
+            <div class="col-md-6 fv-row">
+              <!--begin::Label-->
+              <label class="required fw-semibold fs-6 mb-2">Inicio de vigencia de cargo</label>
+              <!--end::Label-->
+              <!--begin::Input-->
+              <div class="input-group">
+                <input
+                  class="form-control form-control-solid"
+                  placeholder="dd/mm/yyyy"
+                  name="fecha_inicio_vigencia"
+                  [(ngModel)]="coordinatorModel.fecha_inicio_vigencia"
+                  ngbDatepicker
+                  #fechaInicio="ngbDatepicker"
+                  #fecha_inicio_vigencia="ngModel"
+                  required
+                />
+                <button
+                  class="btn btn-icon btn-light"
+                  type="button"
+                  (click)="fechaInicio.toggle()"
+                >
+                  <app-keenicon name="calendar" class="fs-4"></app-keenicon>
+                </button>
+              </div>
+              <div *ngIf="myForm.submitted && myForm.invalid" class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                <div *ngIf="fecha_inicio_vigencia.errors?.['required']">La fecha de inicio de vigencia es requerida</div>
+              </div>
+              <!--end::Input-->
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--end::Row-->
         </div>
         <!--end::Personal Information form-->
 

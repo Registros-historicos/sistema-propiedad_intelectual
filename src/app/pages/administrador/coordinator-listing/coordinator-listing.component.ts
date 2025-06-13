@@ -153,11 +153,11 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
   }
 
   navigateToEdit(id: number) {
-    this.router.navigate(['/apps/coordinators/edit', id]);
+    this.router.navigate(['/administrador/coordinador/editar', id]);
   }
 
   navigateToCreate() {
-    this.router.navigate(['/apps/coordinators/create']);
+    this.router.navigate(['/administrador/coordinador/registro']);
   }
 
   showAlert(swalOptions: SweetAlertOptions) {
@@ -204,6 +204,10 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
     for (let i = 1; i <= 50; i++) {
       const nombre = nombres[Math.floor(Math.random() * nombres.length)];
       const apellido = apellidos[Math.floor(Math.random() * apellidos.length)];
+
+      const createdCoordinators = this.coordinatorService.getCreatedCoordinators();
+      mockCoordinators.push(...createdCoordinators);
+
 
       // Seleccionar una entidad aleatoria que tenga instituciones
       const entidad = entidadesConInstituciones[Math.floor(Math.random() * entidadesConInstituciones.length)];

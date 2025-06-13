@@ -33,7 +33,8 @@
   </div>
 
   <div class="card-body pt-0">
-    <app-crud [datatableConfig]="datatableConfig" route="/apps/coordinators" (deleteEvent)="delete($event)" (editEvent)="navigateToEdit($event)" [reload]="reloadEvent"></app-crud>
+    <!-- En coordinator-listing.component.html -->
+    <app-crud [datatableConfig]="datatableConfig" route="/administrador/coordinadores" (deleteEvent)="delete($event)" (editEvent)="navigateToEdit($event)" [reload]="reloadEvent"></app-crud>
   </div>
 </div>
 

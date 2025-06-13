@@ -13,7 +13,7 @@ import {
   DataTablesResponse,
   ENTIDADES_FEDERATIVAS,
   SEXO_OPTIONS,
-  InstitucionService
+  InstitucionService, DEPARTAMENTOS, PROGRAMAS_EDUCATIVOS
 } from '../shared-services';
 import { CrudModule } from '../../../modules/crud/crud.module';
 import { SharedModule } from '../../../template/shared/shared.module';
@@ -154,11 +154,11 @@ export class ApplicantListingComponent implements OnInit, OnDestroy {
   }
 
   navigateToEdit(id: number) {
-    this.router.navigate(['/apps/solicitantes/edit', id]);
+    this.router.navigate(['/administrador/solicitante/editar', id]);
   }
 
   navigateToCreate() {
-    this.router.navigate(['/apps/solicitantes/registro']);
+    this.router.navigate(['/administrador/solicitante/registro']);
   }
 
   showAlert(swalOptions: SweetAlertOptions) {
@@ -207,6 +207,14 @@ export class ApplicantListingComponent implements OnInit, OnDestroy {
 
       const institucionesEntidad = institucionesPorEntidad[entidad];
       const institucion = institucionesEntidad[Math.floor(Math.random() * institucionesEntidad.length)];
+      const departamento = DEPARTAMENTOS[Math.floor(Math.random() * DEPARTAMENTOS.length)];
+      const programas = PROGRAMAS_EDUCATIVOS.filter(p => p.departamento === departamento);
+      const programaEducativo = programas.length > 0
+        ? programas[Math.floor(Math.random() * programas.length)].nombre
+        : '';
+      const createdApplicants = this.applicantService.getCreatedApplicants();
+      mockApplicants.push(...createdApplicants);
+
 
       mockApplicants.push({
         id: i,
@@ -220,6 +228,8 @@ export class ApplicantListingComponent implements OnInit, OnDestroy {
         email: `${nombre.toLowerCase()}.${apellido.toLowerCase()}@example.com`,
         rfc: `RFC${Math.floor(100000000000 + Math.random() * 900000000000)}`,
         curp: `CURP${Math.floor(1000000000000000 + Math.random() * 9000000000000000)}`,
+        departamento: departamento,
+        programa_educativo: programaEducativo,
         created_at: new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000).toISOString()
       });
     }

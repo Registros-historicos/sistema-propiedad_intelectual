@@ -12,6 +12,10 @@ import {
   IInstitucionModel,
   ENTIDADES_FEDERATIVAS,
   SEXO_OPTIONS,
+  DEPARTAMENTOS,
+  PROGRAMAS_EDUCATIVOS,
+  IProgramaEducativo,
+  ProgramaEducativoService,
   InstitucionService
 } from '../shared-services';
 import { NgClass } from '@angular/common';
@@ -48,7 +52,9 @@ export class ApplicantFormComponent implements OnInit {
     telefono: '',
     email: '',
     rfc: '',
-    curp: ''
+    curp: '',
+    departamento:'',
+    programa_educativo:'',
   };
 
   @ViewChild('noticeSwal')
@@ -61,18 +67,22 @@ export class ApplicantFormComponent implements OnInit {
 
   entidadesFederativas: string[] = ENTIDADES_FEDERATIVAS;
   sexoOptions: string[] = SEXO_OPTIONS;
+  departamentos: string[] = DEPARTAMENTOS;
+  programasEducativosFiltrados: IProgramaEducativo[] = [];
 
   institucionesFiltradas: IInstitucionModel[] = [];
 
   constructor(
     private applicantService: ApplicantService,
     private institucionService: InstitucionService,
+    private programaEducativoService: ProgramaEducativoService,
     private cdr: ChangeDetectorRef,
     private router: Router,
     private route: ActivatedRoute
   ) {
     this.entidadesFederativas = ENTIDADES_FEDERATIVAS;
     this.sexoOptions = SEXO_OPTIONS;
+    this.departamentos = DEPARTAMENTOS;
   }
 
   ngOnInit(): void {
@@ -105,6 +115,18 @@ export class ApplicantFormComponent implements OnInit {
       });
   }
 
+  onDepartamentoChange() {
+    console.log('Departamento seleccionado:', this.applicantModel.departamento);
+    this.applicantModel.programa_educativo = '';
+
+    this.programaEducativoService.getProgramasByDepartamento(this.applicantModel.departamento)
+      .subscribe(programas => {
+        this.programasEducativosFiltrados = programas;
+        console.log('Programas filtrados:', this.programasEducativosFiltrados);
+        this.cdr.detectChanges();
+      });
+  }
+
   onSubmit(event: Event) {
     if (this.myForm && this.myForm.invalid) {
       return;
@@ -132,7 +154,7 @@ export class ApplicantFormComponent implements OnInit {
         next: () => {
           this.showAlert(successAlert);
           // Redirigir después de mostrar la alerta
-          setTimeout(() => this.router.navigate(['/apps/solicitantes']), 1500);
+          setTimeout(() => this.router.navigate(['/administrador/solicitantes']), 1500);
         },
         error: (error) => {
           errorAlert.text = this.extractText(error.error);
@@ -146,7 +168,7 @@ export class ApplicantFormComponent implements OnInit {
         next: () => {
           this.showAlert(successAlert);
           // Redirigir después de mostrar la alerta
-          setTimeout(() => this.router.navigate(['/apps/solicitantes']), 1500);
+          setTimeout(() => this.router.navigate(['/administrador/solicitantes']), 1500);
         },
         error: (error) => {
           errorAlert.text = this.extractText(error.error);
