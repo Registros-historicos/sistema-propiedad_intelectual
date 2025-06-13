@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import {Observable} from 'rxjs';
-import {IIntelectualPropertyModel} from '../shared-services';
+import {IIntelectualPropertyModel} from '../../pages/administrador/shared-services';
 
 @Injectable({
   providedIn: 'root'
 })
-export class PatentsService {
+export class TrademarksService {
   private mockTitles: string[] = [
     'Vacuna SARS-CoV-2',
     'Software de gestión de datos',
@@ -125,11 +125,11 @@ export class PatentsService {
     // Agrega más provincias aquí
   ];
 
-  private patents: any[] = [];
+  private trademarks: any[] = [];
 
   constructor() {
     for (let i = 0; i < 100; i++) {
-      this.generateRandomPatent();
+      this.generateRandomTrademark();
     }
   }
 
@@ -141,8 +141,8 @@ export class PatentsService {
     return array[Math.floor(Math.random() * array.length)];
   }
 
-  private generateRandomPatent() {
-    const id = this.patents.length + 1;
+  private generateRandomTrademark() {
+    const id = this.trademarks.length + 1;
     const randomTitle = this.randomElement(this.mockTitles);
     const randomDescription = this.randomElement(this.mockDescriptions);
     const randomDate = this.randomDate(new Date(2023, 0, 1), new Date());
@@ -154,7 +154,7 @@ export class PatentsService {
     const randomPhone = `55${Math.floor(10000000 + Math.random() * 90000000)}`;
     const randomProvince = this.randomElement(this.mockProvinces);
 
-    this.patents.push({
+    this.trademarks.push({
       id,
       titulo: randomTitle,
       descripcion: randomDescription,
@@ -169,13 +169,13 @@ export class PatentsService {
     });
   }
 
-  public getPatents(tableParams: any): Observable<any> {
+  public getTrademarks(tableParams: any): Observable<any> {
     const start = tableParams.start || 0;
     const length = tableParams.length || 10;
-    const total = this.patents.length;
+    const total = this.trademarks.length;
 
     // Simulate server-side pagination
-    const paginatedPatents = this.patents.slice(start, start + length);
+    const paginatedTrademarks = this.trademarks.slice(start, start + length);
 
     return new Observable(observer => {
       setTimeout(() => {
@@ -183,16 +183,16 @@ export class PatentsService {
           draw: tableParams.draw,
           recordsTotal: total,
           recordsFiltered: total,
-          data: paginatedPatents
+          data: paginatedTrademarks
         });
         observer.complete();
       }, 500); // Simulate network delay
     });
   }
 
-  public getPatent(id: number): Observable<IIntelectualPropertyModel> {
+  public getTrademark(id: number): Observable<IIntelectualPropertyModel> {
     return new Observable(observer => {
-      const patent = this.patents.find(p => p.id === id);
+      const patent = this.trademarks.find(p => p.id === id);
       setTimeout(() => {
         observer.next(patent);
         observer.complete();
@@ -200,10 +200,10 @@ export class PatentsService {
     });
   }
 
-  public createPatent(patent: IIntelectualPropertyModel): Observable<IIntelectualPropertyModel> {
+  public createTrademark(patent: IIntelectualPropertyModel): Observable<IIntelectualPropertyModel> {
     return new Observable(observer => {
-      patent.id = this.patents.length + 1;
-      this.patents.push(patent);
+      patent.id = this.trademarks.length + 1;
+      this.trademarks.push(patent);
       setTimeout(() => {
         observer.next(patent);
         observer.complete();
@@ -211,11 +211,11 @@ export class PatentsService {
     });
   }
 
-  public updatePatent(id: number, patent: IIntelectualPropertyModel): Observable<IIntelectualPropertyModel> {
+  public updateTrademark(id: number, patent: IIntelectualPropertyModel): Observable<IIntelectualPropertyModel> {
     return new Observable(observer => {
-      const index = this.patents.findIndex(p => p.id === id);
+      const index = this.trademarks.findIndex(p => p.id === id);
       if (index !== -1) {
-        this.patents[index] = patent;
+        this.trademarks[index] = patent;
       }
       setTimeout(() => {
         observer.next(patent);
@@ -224,11 +224,11 @@ export class PatentsService {
     });
   }
 
-  public deletePatent(id: number): Observable<void> {
+  public deleteTrademark(id: number): Observable<void> {
     return new Observable(observer => {
-      const index = this.patents.findIndex(p => p.id === id);
+      const index = this.trademarks.findIndex(p => p.id === id);
       if (index !== -1) {
-        this.patents.splice(index, 1);
+        this.trademarks.splice(index, 1);
       }
       setTimeout(() => {
         observer.next();

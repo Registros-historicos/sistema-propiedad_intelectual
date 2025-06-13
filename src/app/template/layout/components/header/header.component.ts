@@ -94,6 +94,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       config
     ) as string;
     if (this.appHeaderDefaultContainerClass) {
+      console.log('Header Container Class:', this.appHeaderDefaultContainerClass);
       this.headerContainerCssClass += ` ${this.appHeaderDefaultContainerClass}`;
     }
 

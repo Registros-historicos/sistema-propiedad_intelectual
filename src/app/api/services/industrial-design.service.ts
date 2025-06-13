@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import {Observable} from 'rxjs';
-import {IIntelectualPropertyModel} from '../shared-services';
+import {IIntelectualPropertyModel} from '../../pages/administrador/shared-services';
 
 @Injectable({
   providedIn: 'root'
 })
-export class UtilityModelsService {
+export class IndustrialDesignsService {
   private mockTitles: string[] = [
     'Vacuna SARS-CoV-2',
     'Software de gestión de datos',
@@ -125,11 +125,11 @@ export class UtilityModelsService {
     // Agrega más provincias aquí
   ];
 
-  private utilityModels: any[] = [];
+  private industrialDesigns: any[] = [];
 
   constructor() {
     for (let i = 0; i < 100; i++) {
-      this.generateRandomUtilityModel();
+      this.generateRandomIndustrialDesign();
     }
   }
 
@@ -141,8 +141,8 @@ export class UtilityModelsService {
     return array[Math.floor(Math.random() * array.length)];
   }
 
-  private generateRandomUtilityModel() {
-    const id = this.utilityModels.length + 1;
+  private generateRandomIndustrialDesign() {
+    const id = this.industrialDesigns.length + 1;
     const randomTitle = this.randomElement(this.mockTitles);
     const randomDescription = this.randomElement(this.mockDescriptions);
     const randomDate = this.randomDate(new Date(2023, 0, 1), new Date());
@@ -154,7 +154,7 @@ export class UtilityModelsService {
     const randomPhone = `55${Math.floor(10000000 + Math.random() * 90000000)}`;
     const randomProvince = this.randomElement(this.mockProvinces);
 
-    this.utilityModels.push({
+    this.industrialDesigns.push({
       id,
       titulo: randomTitle,
       descripcion: randomDescription,
@@ -169,13 +169,13 @@ export class UtilityModelsService {
     });
   }
 
-  public getUtilityModels(tableParams: any): Observable<any> {
+  public getIndustrialDesigns(tableParams: any): Observable<any> {
     const start = tableParams.start || 0;
     const length = tableParams.length || 10;
-    const total = this.utilityModels.length;
+    const total = this.industrialDesigns.length;
 
     // Simulate server-side pagination
-    const paginatedPatents = this.utilityModels.slice(start, start + length);
+    const paginatedIndustrialDesigns = this.industrialDesigns.slice(start, start + length);
 
     return new Observable(observer => {
       setTimeout(() => {
@@ -183,17 +183,16 @@ export class UtilityModelsService {
           draw: tableParams.draw,
           recordsTotal: total,
           recordsFiltered: total,
-          data: paginatedPatents
+          data: paginatedIndustrialDesigns
         });
         observer.complete();
       }, 500); // Simulate network delay
     });
   }
 
-  public getUtilityModel
-  (id: number): Observable<IIntelectualPropertyModel> {
+  public getIndustrialDesign(id: number): Observable<IIntelectualPropertyModel> {
     return new Observable(observer => {
-      const patent = this.utilityModels.find(p => p.id === id);
+      const patent = this.industrialDesigns.find(p => p.id === id);
       setTimeout(() => {
         observer.next(patent);
         observer.complete();
@@ -201,11 +200,10 @@ export class UtilityModelsService {
     });
   }
 
-  public createUtilityModel
-  (patent: IIntelectualPropertyModel): Observable<IIntelectualPropertyModel> {
+  public createIndustrialDesign(patent: IIntelectualPropertyModel): Observable<IIntelectualPropertyModel> {
     return new Observable(observer => {
-      patent.id = this.utilityModels.length + 1;
-      this.utilityModels.push(patent);
+      patent.id = this.industrialDesigns.length + 1;
+      this.industrialDesigns.push(patent);
       setTimeout(() => {
         observer.next(patent);
         observer.complete();
@@ -213,12 +211,11 @@ export class UtilityModelsService {
     });
   }
 
-  public updateUtilityModel
-  (id: number, patent: IIntelectualPropertyModel): Observable<IIntelectualPropertyModel> {
+  public updateIndustrialDesign(id: number, patent: IIntelectualPropertyModel): Observable<IIntelectualPropertyModel> {
     return new Observable(observer => {
-      const index = this.utilityModels.findIndex(p => p.id === id);
+      const index = this.industrialDesigns.findIndex(p => p.id === id);
       if (index !== -1) {
-        this.utilityModels[index] = patent;
+        this.industrialDesigns[index] = patent;
       }
       setTimeout(() => {
         observer.next(patent);
@@ -227,12 +224,11 @@ export class UtilityModelsService {
     });
   }
 
-  public deleteUtilityModel
-  (id: number): Observable<void> {
+  public deleteIndustrialDesign(id: number): Observable<void> {
     return new Observable(observer => {
-      const index = this.utilityModels.findIndex(p => p.id === id);
+      const index = this.industrialDesigns.findIndex(p => p.id === id);
       if (index !== -1) {
-        this.utilityModels.splice(index, 1);
+        this.industrialDesigns.splice(index, 1);
       }
       setTimeout(() => {
         observer.next();

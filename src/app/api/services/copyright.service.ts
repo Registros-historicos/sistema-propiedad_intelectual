@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {Observable} from 'rxjs';
-import {IIntelectualPropertyModel} from '../shared-services';
+import {IIntelectualPropertyModel} from '../../pages/administrador/shared-services';
 
 @Injectable({
   providedIn: 'root'

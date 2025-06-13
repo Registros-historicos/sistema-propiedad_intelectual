@@ -1,9 +1,9 @@
 import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {SweetAlertOptions} from 'sweetalert2';
-import {DataTablesResponse} from '../../shared-services';
+import {DataTablesResponse} from '../../../administrador/shared-services';
 import {Config} from 'datatables.net';
 import {SwalComponent} from '@sweetalert2/ngx-sweetalert2';
-import {UtilityModelsService} from '../utility-models.service';
+import {UtilityModelsService} from '../../../../api/services/utility-models.service';
 import moment from 'moment';
 
 @Component({

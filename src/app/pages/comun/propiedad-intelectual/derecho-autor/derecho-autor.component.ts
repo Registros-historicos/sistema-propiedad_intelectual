@@ -1,17 +1,17 @@
 import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {DataTablesResponse} from '../../shared-services';
+import {CopyrightsService} from '../../../../api/services/copyright.service';
+import {DataTablesResponse} from '../../../administrador/shared-services';
 import {Config} from 'datatables.net';
-import {IndustrialDesignsService} from '../industrial-design.service';
 import {SwalComponent} from '@sweetalert2/ngx-sweetalert2';
 import {SweetAlertOptions} from 'sweetalert2';
 import moment from 'moment';
 
 @Component({
-  selector: 'app-diseno-industrial',
-  templateUrl: './diseno-industrial.component.html',
-  styleUrl: './diseno-industrial.component.scss'
+  selector: 'app-derecho-autor',
+  templateUrl: './derecho-autor.component.html',
+  styleUrl: './derecho-autor.component.scss'
 })
-export class DisenoIndustrialComponent implements OnInit, AfterViewInit, OnDestroy {
+export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
   isCollapsed1 = false;
   isCollapsed2 = true;
 
@@ -29,7 +29,7 @@ export class DisenoIndustrialComponent implements OnInit, AfterViewInit, OnDestr
   swalOptions: SweetAlertOptions = {};
 
   constructor(
-    private service: IndustrialDesignsService,
+    private service: CopyrightsService,
     private cdr: ChangeDetectorRef
   ) {
   }
@@ -46,7 +46,7 @@ export class DisenoIndustrialComponent implements OnInit, AfterViewInit, OnDestr
         });
       },*/
       ajax: (dataTablesParameters: any, callback) => {
-        this.service.getIndustrialDesigns(dataTablesParameters).subscribe(resp => {
+        this.service.getCopyrights(dataTablesParameters).subscribe(resp => {
           callback(resp);
         });
       },
@@ -105,7 +105,7 @@ export class DisenoIndustrialComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   delete(id: number) {
-    this.service.deleteIndustrialDesign(id).subscribe(() => {
+    this.service.deleteCopyright(id).subscribe(() => {
       this.reloadEvent.emit(true);
     });
   }

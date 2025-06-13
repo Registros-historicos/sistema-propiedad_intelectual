@@ -14,7 +14,7 @@ const routes: Routes = [
       },
       {
         path: 'propiedades',
-        loadChildren: () => import('./propiedad-intelectual/propiedad-intelectual.module').then(m => m.PropiedadIntelectualModule)
+        loadChildren: () => import('../comun/propiedad-intelectual/propiedad-intelectual.module').then(m => m.PropiedadIntelectualModule)
       },
       {
         path: 'coordinadores',
