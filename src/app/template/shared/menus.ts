@@ -68,6 +68,22 @@ export const ADMINISTRATOR_MENUS = [
     ]
   },
   {
+    name: 'MENU.USERS',
+    type: 'separator',
+  },
+  {
+    name: 'MENU.ADMIN.COORDINATORS',
+    icon: 'manage_accounts',
+    link: '/administrador/coordinadores',
+    type: 'link'
+  },
+  {
+    name: 'MENU.ADMIN.APPLICANTS',
+    icon: 'person',
+    link: '/administrador/solicitantes',
+    type: 'link'
+  },
+  {
     name: 'MENU.INTELECTUAL_PROPERTIES',
     type: 'separator',
   },
@@ -99,6 +115,15 @@ export const ADMINISTRATOR_MENUS = [
     name: 'MENU.ADMIN.INDUSTRIAL_DESIGNS',
     icon: 'description',
     link: '/administrador/propiedades/diseno-industrial',
+    type: 'link'
+  },
+  {
+    name: 'MENU.REPORTS',
+    type: 'separator',
+  },
+  {
+    name: 'MENU.REPORTS',
+    icon: 'analytics',
     type: 'link'
   }
 ];
