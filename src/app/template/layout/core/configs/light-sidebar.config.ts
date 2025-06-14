@@ -124,7 +124,7 @@ export const LightSidebarConfig: ILayout = {
   },
   scrolltop: {
     componentName: 'scrolltop',
-    display: true,
+    display: false,
   },
   engage: {
     componentName: 'engage',
