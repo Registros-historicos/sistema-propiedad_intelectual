@@ -143,6 +143,39 @@
             <!--end::Select-->
           </div>
           <!--end::Input group-->
+          <!--begin::Input group-->
+          <div class="fv-row mb-7">
+            <!--begin::Label-->
+            <label class="required fw-semibold fs-6 mb-2">Departamento</label>
+            <!--end::Label-->
+            <!--begin::Select-->
+            <select class="form-select form-select-solid" name="departamento" [(ngModel)]="applicantModel.departamento" #departamento="ngModel" required (change)="onDepartamentoChange()">
+              <option value="">Seleccione un departamento...</option>
+              <option *ngFor="let depto of departamentos" [value]="depto">{{ depto }}</option>
+            </select>
+            <div *ngIf="myForm.submitted && myForm.invalid" class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div *ngIf="departamento.errors?.['required']">El departamento es requerido</div>
+            </div>
+            <!--end::Select-->
+          </div>
+          <!--end::Input group-->
+
+          <!--begin::Input group-->
+          <div class="fv-row mb-7">
+            <!--begin::Label-->
+            <label class="required fw-semibold fs-6 mb-2">Programa Educativo</label>
+            <!--end::Label-->
+            <!--begin::Select-->
+            <select class="form-select form-select-solid" name="programa_educativo" [(ngModel)]="applicantModel.programa_educativo" #programaEducativo="ngModel" required [disabled]="!applicantModel.departamento">
+              <option value="">{{ applicantModel.departamento ? 'Seleccione un programa educativo...' : 'Primero seleccione un departamento' }}</option>
+              <option *ngFor="let programa of programasEducativosFiltrados" [value]="programa.nombre">{{ programa.nombre }}</option>
+            </select>
+            <div *ngIf="myForm.submitted && myForm.invalid" class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div *ngIf="programaEducativo.errors?.['required']">El programa educativo es requerido</div>
+            </div>
+            <!--end::Select-->
+          </div>
+          <!--end::Input group-->
 
           <!--begin::Row-->
           <div class="row g-9 mb-7">

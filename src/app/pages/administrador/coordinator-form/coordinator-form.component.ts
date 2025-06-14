@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SwalComponent, SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { Observable } from 'rxjs';
 import { SweetAlertOptions } from 'sweetalert2';
-import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap';
+import {NgbCollapse, NgbDatepicker, NgbInputDatepicker} from '@ng-bootstrap/ng-bootstrap';
 import { SharedModule } from '../../../template/shared/shared.module';
 import {
   CoordinatorService,
@@ -25,9 +25,11 @@ import { NgClass } from '@angular/common';
     CommonModule,
     FormsModule,
     NgbCollapse,
+    NgbDatepicker,
     SharedModule,
     SweetAlert2Module,
-    NgClass
+    NgClass,
+    NgbInputDatepicker
   ],
   styleUrls: ['./coordinator-form.component.scss']
 })
@@ -37,7 +39,7 @@ export class CoordinatorFormComponent implements OnInit {
   isLoading = false;
   isEdit = false;
 
-  coordinatorModel: ICoordinatorModel = {
+  coordinatorModel: ICoordinatorModel & { fecha_inicio_vigencia?: any } = {
     id: 0,
     nombre: '',
     apellidos: '',
@@ -48,7 +50,8 @@ export class CoordinatorFormComponent implements OnInit {
     telefono: '',
     email: '',
     rfc: '',
-    curp: ''
+    curp: '',
+    fecha_inicio_vigencia: null
   };
 
   @ViewChild('noticeSwal')
@@ -156,7 +159,7 @@ export class CoordinatorFormComponent implements OnInit {
         next: () => {
           this.showAlert(successAlert);
           // Redirigir después de mostrar la alerta
-          setTimeout(() => this.router.navigate(['/apps/coordinators']), 1500);
+          setTimeout(() => this.router.navigate(['/administrador/coordinadores']), 1500);
         },
         error: (error) => {
           errorAlert.text = this.extractText(error.error);
@@ -170,7 +173,7 @@ export class CoordinatorFormComponent implements OnInit {
         next: () => {
           this.showAlert(successAlert);
           // Redirigir después de mostrar la alerta
-          setTimeout(() => this.router.navigate(['/apps/coordinators']), 1500);
+          setTimeout(() => this.router.navigate(['/administrador/coordinadores']), 1500);
         },
         error: (error) => {
           errorAlert.text = this.extractText(error.error);

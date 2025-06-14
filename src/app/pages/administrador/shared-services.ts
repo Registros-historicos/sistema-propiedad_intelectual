@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable, of} from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface IInstitucionModel {
   id: number;
@@ -44,6 +45,8 @@ export interface IApplicantModel {
   email: string;
   rfc: string;
   curp: string;
+  departamento: string;
+  programa_educativo: string;
   created_at?: string;
 }
 
@@ -110,8 +113,13 @@ export class InstitucionService {
 })
 export class CoordinatorService {
   private apiUrl = 'api/coordinators';
+  private createdCoordinators: ICoordinatorModel[] = [];
 
   constructor(private http: HttpClient, private institucionService: InstitucionService) {
+  }
+
+  getCreatedCoordinators(): ICoordinatorModel[] {
+    return this.createdCoordinators;
   }
 
   getCoordinators(params: any): Observable<DataTablesResponse> {
@@ -119,10 +127,25 @@ export class CoordinatorService {
   }
 
   getCoordinator(id: number): Observable<ICoordinatorModel> {
+    const localCoordinator = this.createdCoordinators.find(c => c.id === id);
+    if (localCoordinator) {
+      return of(localCoordinator);
+    }
     return this.http.get<ICoordinatorModel>(`${this.apiUrl}/${id}`);
   }
 
   createCoordinator(coordinator: ICoordinatorModel): Observable<ICoordinatorModel> {
+    if (!environment.production) {
+      const maxId = Math.max(...this.createdCoordinators.map(c => c.id || 0), 100);
+      const newCoordinator = {
+        ...coordinator,
+        id: maxId + 1,
+        created_at: new Date().toISOString()
+      };
+      this.createdCoordinators.push(newCoordinator);
+      return of(newCoordinator);
+    }
+
     const formData = this.createFormData(coordinator);
     return this.http.post<ICoordinatorModel>(this.apiUrl, formData);
   }
@@ -160,8 +183,13 @@ export class CoordinatorService {
 })
 export class ApplicantService {
   private apiUrl = 'api/applicants';
+  private createdApplicants: IApplicantModel[] = [];
 
   constructor(private http: HttpClient, private institucionService: InstitucionService) {
+  }
+
+  getCreatedApplicants(): IApplicantModel[] {
+    return this.createdApplicants;
   }
 
   getApplicants(params: any): Observable<DataTablesResponse> {
@@ -169,10 +197,25 @@ export class ApplicantService {
   }
 
   getApplicant(id: number): Observable<IApplicantModel> {
+    const localApplicant = this.createdApplicants.find(a => a.id === id);
+    if (localApplicant) {
+      return of(localApplicant);
+    }
+
     return this.http.get<IApplicantModel>(`${this.apiUrl}/${id}`);
   }
 
   createApplicant(applicant: IApplicantModel): Observable<IApplicantModel> {
+    if (!environment.production) {
+      const maxId = Math.max(...this.createdApplicants.map(a => a.id || 0), 200);
+      const newApplicant = {
+        ...applicant,
+        id: maxId + 1,
+        created_at: new Date().toISOString()
+      };
+      this.createdApplicants.push(newApplicant);
+      return of(newApplicant);
+    }
     return this.http.post<IApplicantModel>(this.apiUrl, applicant);
   }
 
@@ -181,6 +224,14 @@ export class ApplicantService {
   }
 
   deleteApplicant(id: number): Observable<void> {
+    if (!environment.production) {
+      const index = this.createdApplicants.findIndex(a => a.id === id);
+      if (index !== -1) {
+        this.createdApplicants.splice(index, 1);
+      }
+      return of(undefined);
+    }
+
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
@@ -210,6 +261,64 @@ export class ValidationUtils {
     return emailPattern.test(email);
   }
 }
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ProgramaEducativoService {
+  getProgramas(): Observable<IProgramaEducativo[]> {
+    return of(PROGRAMAS_EDUCATIVOS);
+  }
+
+  getProgramasByDepartamento(departamento: string): Observable<IProgramaEducativo[]> {
+    const programasFiltrados = PROGRAMAS_EDUCATIVOS.filter(
+      prog => prog.departamento === departamento
+    );
+    return of(programasFiltrados);
+  }
+}
+
+export const DEPARTAMENTOS = [
+  'Departamento de Ingenierías',
+  'Departamento de Posgrado e Investigación'
+];
+
+export interface IProgramaEducativo {
+  id: number;
+  nombre: string;
+  tipo: string; // 'Ingeniería', 'Maestría', 'Doctorado', 'Especialidad'
+  departamento: string;
+}
+
+export const PROGRAMAS_EDUCATIVOS: IProgramaEducativo[] = [
+  // Departamento de Ingenierías
+  {id: 1, nombre: 'Ingeniería en Semiconductores', tipo: 'Ingeniería', departamento: 'Departamento de Ingenierías'},
+  {id: 2, nombre: 'Ingeniería Informática', tipo: 'Ingeniería', departamento: 'Departamento de Ingenierías'},
+  {id: 3, nombre: 'Ingeniería en Sistemas Computacionales', tipo: 'Ingeniería', departamento: 'Departamento de Ingenierías'},
+  {id: 4, nombre: 'Ingeniería en Ciencia de Datos', tipo: 'Ingeniería', departamento: 'Departamento de Ingenierías'},
+  {id: 5, nombre: 'Ingeniería Eléctrica', tipo: 'Ingeniería', departamento: 'Departamento de Ingenierías'},
+  {id: 6, nombre: 'Ingeniería Mecánica', tipo: 'Ingeniería', departamento: 'Departamento de Ingenierías'},
+  {id: 7, nombre: 'Ingeniería en Gestión Empresarial', tipo: 'Ingeniería', departamento: 'Departamento de Ingenierías'},
+  {id: 8, nombre: 'Ingeniería Electrónica', tipo: 'Ingeniería', departamento: 'Departamento de Ingenierías'},
+  {id: 9, nombre: 'Ingeniería Química', tipo: 'Ingeniería', departamento: 'Departamento de Ingenierías'},
+  {id: 10, nombre: 'Ingeniería Industrial', tipo: 'Ingeniería', departamento: 'Departamento de Ingenierías'},
+  {id: 11, nombre: 'Ingeniería Industrial (en línea)', tipo: 'Ingeniería', departamento: 'Departamento de Ingenierías'},
+
+  // Departamento de Posgrado e Investigación - Maestrías
+  {id: 12, nombre: 'Maestría en Economía Social y Solidaria', tipo: 'Maestría', departamento: 'Departamento de Posgrado e Investigación'},
+  {id: 13, nombre: 'Maestría en Ingeniería Electrónica', tipo: 'Maestría', departamento: 'Departamento de Posgrado e Investigación'},
+  {id: 14, nombre: 'Maestría en Ingeniería Industrial', tipo: 'Maestría', departamento: 'Departamento de Posgrado e Investigación'},
+  {id: 15, nombre: 'Maestría en Ingeniería Administrativa', tipo: 'Maestría', departamento: 'Departamento de Posgrado e Investigación'},
+  {id: 16, nombre: 'Maestría en Sistemas Computacionales', tipo: 'Maestría', departamento: 'Departamento de Posgrado e Investigación'},
+  {id: 17, nombre: 'Maestría en Ciencias de la Ingeniería Química', tipo: 'Maestría', departamento: 'Departamento de Posgrado e Investigación'},
+
+  // Departamento de Posgrado e Investigación - Doctorados
+  {id: 18, nombre: 'Doctorado en Ciencias de la Ingeniería', tipo: 'Doctorado', departamento: 'Departamento de Posgrado e Investigación'},
+  {id: 19, nombre: 'Doctorado en Ciencias de la Ingeniería Química', tipo: 'Doctorado', departamento: 'Departamento de Posgrado e Investigación'},
+
+  // Departamento de Posgrado e Investigación - Especialidades
+  {id: 20, nombre: 'Especialidad en Semiconductores', tipo: 'Especialidad', departamento: 'Departamento de Posgrado e Investigación'}
+];
 
 export const SEXO_OPTIONS = ['Masculino', 'Femenino', 'Otro'];
 
@@ -566,6 +675,7 @@ export const ENTIDADES_FEDERATIVAS_MAP: { [key: number]: { id: number; nombre: s
     {id: 217, nombre: 'Instituto Tecnológico Superior de Zacatecas Norte'},
     {id: 218, nombre: 'Instituto Tecnológico Superior Zacatecas Occidente'}
   ]
+
 };
 
 
