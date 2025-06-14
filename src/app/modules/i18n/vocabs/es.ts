@@ -95,6 +95,7 @@ export const locale = {
       REGISTERS: 'Registros',
       USERS: 'Usuarios',
       INTELECTUAL_PROPERTIES: 'Propiedades Intelectuales',
+      REPORTS: 'Reportes',
       ADMIN: {
         MANAGEMENT: 'Gestión',
         COORDINATORS: 'Coordinadores',
