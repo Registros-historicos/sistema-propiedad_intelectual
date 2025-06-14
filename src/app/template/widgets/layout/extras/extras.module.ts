@@ -11,6 +11,7 @@ import {SearchResultInnerComponent} from "./dropdown-inner/search-result-inner/s
 import {NgbTooltipModule} from "@ng-bootstrap/ng-bootstrap";
 import {FormsModule} from "@angular/forms";
 import { SharedModule } from "../../../shared/shared.module";
+import {MatIcon} from "@angular/material/icon";
 
 @NgModule({
   declarations: [
@@ -20,15 +21,16 @@ import { SharedModule } from "../../../shared/shared.module";
     UserInnerComponent,
     LayoutScrollTopComponent,
   ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    InlineSVGModule,
-    RouterModule,
-    TranslationModule,
-    NgbTooltipModule,
-    SharedModule
-  ],
+    imports: [
+        CommonModule,
+        FormsModule,
+        InlineSVGModule,
+        RouterModule,
+        TranslationModule,
+        NgbTooltipModule,
+        SharedModule,
+        MatIcon
+    ],
   exports: [
     NotificationsInnerComponent,
     QuickLinksInnerComponent,
