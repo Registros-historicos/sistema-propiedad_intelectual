@@ -1,3 +1,49 @@
 :host {
-  height: 100%;
+  width: 100%;
+}
+
+/* Estilos generales para ambos formularios */
+.login-form-container {
+  width: 100%;
+  max-width: 500px;
+  padding: 3rem;
+  background-color: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.05);
+}
+
+/* Asegura que se comporte igual que forgot-password */
+.forgot-password-container {
+  width: 100%;
+  max-width: 500px;
+  padding: 3rem;
+  background-color: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.05);
+}
+
+/* Ajustes del aside (imagen) */
+.login-aside-section,
+.login-aside {
+  background-size: auto; // Que no se escale
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-color: #fff; // opcional: evitar fondo oscuro por defecto
+}
+
+/* Responsive */
+@media (max-width: 991.98px) {
+  .w-lg-50 {
+    width: 100% !important;
+  }
+
+  .login-form-container,
+  .forgot-password-container {
+    padding: 2rem;
+    min-height: auto;
+  }
+
+  .login-aside-section {
+    height: 300px;
+  }
 }

@@ -11,3 +11,65 @@
     }
   }
 }
+
+
+/* Estilos para inputs y botones */
+.form-control-lg {
+  border: 1px solid #e0e3e7;
+
+  &:focus {
+    border-color: #2B3E8C;
+    box-shadow: 0 0 0 3px rgba(43, 62, 140, 0.1);
+  }
+}
+
+.btn-primary {
+  background-color: #2B3E8C;
+  border: none;
+  font-weight: 600;
+  padding: 0.75rem;
+  transition: all 0.3s ease;
+  min-height: 42px; /* Altura mínima consistente */
+  position: relative; /* Para posicionar el contenido */
+
+  &:hover {
+    background-color: darken(#2B3E8C, 7%);
+  }
+
+  &:disabled {
+    background-color: lighten(#2B3E8C, 20%);
+  }
+
+  .login-button-content {
+    display: inline-block;
+    min-width: 120px; /* Ancho mínimo para mantener el tamaño */
+    text-align: center;
+  }
+
+  .indicator-progress {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* Responsive */
+@media (max-width: 991.98px) {
+  .login-main-container {
+    flex-direction: column;
+  }
+
+  .w-lg-50 {
+    width: 100% !important;
+  }
+
+  .login-form-container {
+    padding: 2rem;
+    min-height: 400px;
+  }
+
+  .login-aside-section {
+    min-height: 300px;
+  }
+}
+
