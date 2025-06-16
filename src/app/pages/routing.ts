@@ -34,7 +34,7 @@ const Routing: Routes = [
       },
       {
         path: 'reportes',
-        loadChildren: () => import('./coordinador/reportes/reportes.module').then((m) => m.ReportesModule),
+        loadChildren: () => import('./reportes/reportes.module').then((m) => m.ReportesModule),
       },
       {
         path: 'solicitantes',

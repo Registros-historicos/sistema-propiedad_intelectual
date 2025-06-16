@@ -32,6 +32,10 @@ const routes: Routes = [
         path: 'solicitante/registro',
         loadComponent: () => import('./applicant-form/applicant-form.component').then(m => m.ApplicantFormComponent)
       },
+     {
+        path: 'reportes',
+        loadChildren: () => import('../reportes/reportes.module').then((m) => m.ReportesModule),
+      },
     ]
   }
 ];
