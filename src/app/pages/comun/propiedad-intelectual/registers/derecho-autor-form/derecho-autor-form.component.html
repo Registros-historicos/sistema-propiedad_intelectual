@@ -1,0 +1,232 @@
+<div class="card">
+    <div class="card-header border-0 pt-6">
+        <div class="card-title">
+            <h3>Registrar Derecho de Autor</h3>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <form #myForm="ngForm" (ngSubmit)="onSubmit($event)" class="copyright-form">
+            <div class="d-flex flex-column scroll-y me-n7 pe-7">
+
+                <div class="notice d-flex bg-light-primary rounded border-primary border border-dashed mb-9 p-6">
+                    <app-keenicon name="information" class="fs-2tx text-primary me-4"></app-keenicon>
+                    <div class="d-flex flex-stack flex-grow-1">
+                        <div class="fw-semibold">
+                            <div class="fs-6 text-gray-700">
+                                Complete la información requerida para registrar el derecho de autor.
+                                Todos los campos marcados con (*) son obligatorios.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fw-bold fs-3 rotate collapsible mb-7" data-bs-toggle="collapse" role="button"
+                    (click)="collapse1.toggle()" [attr.aria-expanded]="!isCollapsed1" aria-controls="kt_copyright_info">
+                    <app-keenicon name="document" class="fs-3 me-2"></app-keenicon>
+                    Información de la Obra
+                    <span class="ms-2 rotate-180">
+                        <i class="ki-duotone ki-down fs-3" [ngClass]="{ 'ki-up': !isCollapsed1 }"></i>
+                    </span>
+                </div>
+
+                <div class="collapse show" #collapse1="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
+
+                    <div class="row g-9 mb-7">
+                        <div class="col-md-4 fv-row">
+                            <label class="fw-semibold fs-6 mb-2 text-gray-600">ID de Solicitud</label>
+                            <input type="text" class="form-control form-control-solid bg-light"
+                                [(ngModel)]="copyrightModel.solicitudId" name="solicitudId" readonly />
+                        </div>
+                        <div class="col-md-4 fv-row">
+                            <label class="fw-semibold fs-6 mb-2 text-gray-600">Fecha de Solicitud</label>
+                            <input type="date" class="form-control form-control-solid bg-light"
+                                [(ngModel)]="copyrightModel.fechaSolicitud" name="fechaSolicitud" readonly />
+                        </div>
+                        <div class="col-md-4 fv-row">
+                            <label class="fw-semibold fs-6 mb-2 text-gray-600">Estado del Trámite</label>
+                            <input type="text" class="form-control form-control-solid bg-light" value="En trámite"
+                                readonly />
+                        </div>
+                    </div>
+
+                    <div class="fv-row mb-7">
+                        <label class="required fw-semibold fs-6 mb-2 text-gray-600">Nombre de la Obra</label>
+                        <textarea class="form-control form-control-solid" rows="3"
+                            [(ngModel)]="copyrightModel.nombreObra" name="nombreObra" #nombreObra="ngModel" required
+                            minlength="5" maxlength="500"
+                            placeholder="Ingrese el nombre completo de la obra"></textarea>
+                        <div *ngIf="myForm.submitted && nombreObra.invalid"
+                            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                            <div *ngIf="nombreObra.errors?.['required']">El nombre de la obra es requerido</div>
+                            <div *ngIf="nombreObra.errors?.['minlength']">El nombre debe tener al menos 5 caracteres
+                            </div>
+                            <div *ngIf="nombreObra.errors?.['maxlength']">El nombre no puede exceder 500 caracteres
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-9 mb-7">
+                        <div class="col-md-6 fv-row">
+                            <label class="required fw-semibold fs-6 mb-2 text-gray-600">Solicitante</label>
+                            <input type="text" class="form-control form-control-solid"
+                                [(ngModel)]="copyrightModel.solicitante" name="solicitante" #solicitante="ngModel"
+                                required minlength="3" maxlength="150" placeholder="Nombre completo del solicitante" />
+                            <div *ngIf="myForm.submitted && solicitante.invalid"
+                                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                <div *ngIf="solicitante.errors?.['required']">El solicitante es requerido</div>
+                                <div *ngIf="solicitante.errors?.['minlength']">El nombre debe tener al menos 3
+                                    caracteres</div>
+                                <div *ngIf="solicitante.errors?.['maxlength']">El nombre no puede exceder 150
+                                    caracteres</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 fv-row">
+                            <label class="required fw-semibold fs-6 mb-2 text-gray-600">Autor de la Obra</label>
+                            <input type="text" class="form-control form-control-solid"
+                                [(ngModel)]="copyrightModel.autor" name="autor" #autor="ngModel" required minlength="3"
+                                maxlength="150" placeholder="Nombre completo del autor" />
+                            <div *ngIf="myForm.submitted && autor.invalid"
+                                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                <div *ngIf="autor.errors?.['required']">El autor es requerido</div>
+                                <div *ngIf="autor.errors?.['minlength']">El nombre debe tener al menos 3 caracteres
+                                </div>
+                                <div *ngIf="autor.errors?.['maxlength']">El nombre no puede exceder 150 caracteres
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="fv-row mb-7">
+                        <label class="required fw-semibold fs-6 mb-2 text-gray-600">Correo Electrónico</label>
+                        <input type="email" class="form-control form-control-solid" [(ngModel)]="copyrightModel.correo"
+                            name="correo" #correo="ngModel" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                            maxlength="100" placeholder="correo@ejemplo.com" />
+                        <div *ngIf="myForm.submitted && correo.invalid"
+                            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                            <div *ngIf="correo.errors?.['required']">El correo electrónico es requerido</div>
+                            <div *ngIf="correo.errors?.['pattern']">Ingrese un correo electrónico válido</div>
+                            <div *ngIf="correo.errors?.['maxlength']">El correo no puede exceder 100 caracteres</div>
+                        </div>
+                    </div>
+
+                    <div class="row g-9 mb-7">
+                        <div class="col-md-6 fv-row">
+                            <label class="required fw-semibold fs-6 mb-2 text-gray-600">Estado</label>
+                            <select class="form-control form-control-solid" [(ngModel)]="estadoSeleccionado"
+                                name="estado" #estado="ngModel" required (change)="onEstadoChange()">
+                                <option value="">Seleccione un estado</option>
+                                <option *ngFor="let estado of entidadesFederativas" [value]="estado.id">
+                                    {{ estado.nombre }}
+                                </option>
+                            </select>
+                            <div *ngIf="myForm.submitted && estado.invalid"
+                                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                <div *ngIf="estado.errors?.['required']">El estado es requerido</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 fv-row">
+                            <label class="required fw-semibold fs-6 mb-2 text-gray-600">Institución</label>
+                            <select class="form-control form-control-solid" [(ngModel)]="institucionSeleccionada"
+                                name="institucion" #institucion="ngModel" required [disabled]="!estadoSeleccionado"
+                                (change)="onInstitucionChange()">
+                                <option value="">Seleccione una institución</option>
+                                <option *ngFor="let institucion of institucionesFiltradas" [value]="institucion.id">
+                                    {{ institucion.nombre }}
+                                </option>
+                            </select>
+                            <div *ngIf="myForm.submitted && institucion.invalid"
+                                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                <div *ngIf="institucion.errors?.['required']">La institución es requerida</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="fv-row mb-7">
+                        <label class="required fw-semibold fs-6 mb-2 text-gray-600">Descripción de la Obra</label>
+                        <textarea class="form-control form-control-solid" rows="4"
+                            [(ngModel)]="copyrightModel.descripcion" name="descripcion" #descripcion="ngModel" required
+                            minlength="10" maxlength="1000"
+                            placeholder="Descripción detallada de la obra, su propósito y características principales"></textarea>
+                        <div *ngIf="myForm.submitted && descripcion.invalid"
+                            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                            <div *ngIf="descripcion.errors?.['required']">La descripción es requerida</div>
+                            <div *ngIf="descripcion.errors?.['minlength']">La descripción debe tener al menos 10
+                                caracteres</div>
+                            <div *ngIf="descripcion.errors?.['maxlength']">La descripción no puede exceder 1000
+                                caracteres</div>
+                        </div>
+                        <div class="form-text text-muted">
+                            {{descripcion.value?.length || 0}}/1000 caracteres
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fw-bold fs-3 rotate collapsible mb-7" data-bs-toggle="collapse" role="button"
+                    (click)="collapse2.toggle()" [attr.aria-expanded]="!isCollapsed2"
+                    aria-controls="kt_copyright_documents">
+                    <app-keenicon name="folder" class="fs-3 me-2"></app-keenicon>
+                    Documentación
+                    <span class="ms-2 rotate-180">
+                        <i class="ki-duotone ki-down fs-3" [ngClass]="{ 'ki-up': !isCollapsed2 }"></i>
+                    </span>
+                </div>
+
+                <div class="collapse" #collapse2="ngbCollapse" [(ngbCollapse)]="isCollapsed2">
+                    <div class="card card-flush">
+                        <div class="card-body pt-6">
+
+                            <div class="fv-row mb-7">
+                                <label class="fw-semibold fs-6 mb-2 text-gray-600">Subir Documentos (PDF
+                                    únicamente)</label>
+                                <input type="file" class="form-control form-control-solid"
+                                    (change)="onFileSelected($event)" accept=".pdf" multiple #fileInput />
+                                <div class="form-text text-muted">
+                                    Seleccione uno o varios archivos PDF. Tamaño máximo recomendado: 10MB por archivo.
+                                </div>
+                            </div>
+
+                            <div *ngIf="selectedFiles.length > 0" class="mb-7">
+                                <label class="fw-semibold fs-6 mb-2 text-gray-600">Archivos Seleccionados:</label>
+                                <div class="d-flex flex-column gap-3">
+                                    <div *ngFor="let file of selectedFiles; let i = index"
+                                        class="d-flex align-items-center justify-content-between p-3 bg-light rounded">
+                                        <div class="d-flex align-items-center">
+                                            <app-keenicon name="file-added"
+                                                class="fs-2x text-primary me-3"></app-keenicon>
+                                            <div>
+                                                <div class="fw-bold text-dark">{{ file.name }}</div>
+                                                <div class="text-muted fs-7">{{ (file.size / 1024 / 1024).toFixed(2) }}
+                                                    MB</div>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-light-danger"
+                                            (click)="removeFile(i)">
+                                            <app-keenicon name="trash" class="fs-6"></app-keenicon>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end mt-7">
+                    <button type="button" class="btn btn-light me-3" (click)="onCancel()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+                        <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+                        Registrar Derecho de Autor
+                    </button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<swal #noticeSwal [swalOptions]="swalOptions"></swal>

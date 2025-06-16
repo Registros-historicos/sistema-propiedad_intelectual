@@ -1,10 +1,11 @@
-import {NgModule} from '@angular/core';
-import {RouterModule, Routes} from '@angular/router';
-import {PatenteComponent} from './patente/patente.component';
-import {MarcaComponent} from './marca/marca.component';
-import {ModeloUtilidadComponent} from './modelo-utilidad/modelo-utilidad.component';
-import {DerechoAutorComponent} from './derecho-autor/derecho-autor.component';
-import {DisenoIndustrialComponent} from './diseno-industrial/diseno-industrial.component';
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { PatenteComponent } from './patente/patente.component';
+import { MarcaComponent } from './marca/marca.component';
+import { ModeloUtilidadComponent } from './modelo-utilidad/modelo-utilidad.component';
+import { DerechoAutorComponent } from './derecho-autor/derecho-autor.component';
+import { DisenoIndustrialComponent } from './diseno-industrial/diseno-industrial.component';
+import { PatenteFormComponent } from './registers/patente-form/patente-form.component';
 
 const routes: Routes = [
   {
@@ -31,7 +32,11 @@ const routes: Routes = [
         component: DisenoIndustrialComponent
       }
     ]
-  }
+  },
+  {
+    path: 'registro',
+    loadChildren: () => import('./registers/registers.module').then(m => m.RegistersModule)
+  },
 ];
 
 @NgModule({

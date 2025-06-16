@@ -1,0 +1,213 @@
+<div class="card">
+    <div class="card-header border-0 pt-6">
+        <div class="card-title">
+            <h3>Registrar Patente</h3>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <form #myForm="ngForm" (ngSubmit)="onSubmit($event)" class="patent-form">
+            <div class="d-flex flex-column scroll-y me-n7 pe-7">
+
+                <div class="notice d-flex bg-light-primary rounded border-primary border border-dashed mb-9 p-6">
+                    <app-keenicon name="information" class="fs-2tx text-primary me-4"></app-keenicon>
+                    <div class="d-flex flex-stack flex-grow-1">
+                        <div class="fw-semibold">
+                            <div class="fs-6 text-gray-700">
+                                Complete la información requerida para registrar la patente.
+                                Todos los campos marcados con (*) son obligatorios.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fw-bold fs-3 rotate collapsible mb-7" data-bs-toggle="collapse" role="button"
+                    (click)="collapse1.toggle()" [attr.aria-expanded]="!isCollapsed1" aria-controls="kt_patent_info">
+                    <app-keenicon name="document" class="fs-3 me-2"></app-keenicon>
+                    Información de la Patente
+                    <span class="ms-2 rotate-180">
+                        <i class="ki-duotone ki-down fs-3" [ngClass]="{ 'ki-up': !isCollapsed1 }"></i>
+                    </span>
+                </div>
+
+                <div class="collapse show" #collapse1="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
+
+                    <div class="row g-9 mb-7">
+                        <div class="col-md-4 fv-row">
+                            <label class="fw-semibold fs-6 mb-2 text-gray-600">ID de Solicitud</label>
+                            <input type="text" class="form-control form-control-solid bg-light"
+                                [(ngModel)]="patenteModel.solicitudId" name="solicitudId" readonly />
+                        </div>
+                        <div class="col-md-4 fv-row">
+                            <label class="fw-semibold fs-6 mb-2 text-gray-600">Fecha de Solicitud</label>
+                            <input type="date" class="form-control form-control-solid bg-light"
+                                [(ngModel)]="patenteModel.fechaSolicitud" name="fechaSolicitud" readonly />
+                        </div>
+                        <div class="col-md-4 fv-row">
+                            <label class="fw-semibold fs-6 mb-2 text-gray-600">Estado del Trámite</label>
+                            <input type="text" class="form-control form-control-solid bg-light" value="En trámite"
+                                readonly />
+                        </div>
+                    </div>
+
+                    <div class="fv-row mb-7">
+                        <label class="required fw-semibold fs-6 mb-2 text-gray-600">Nombre de la Patente</label>
+                        <textarea class="form-control form-control-solid" rows="3"
+                            [(ngModel)]="patenteModel.nombrePatente" name="nombrePatente" #nombrePatente="ngModel" required
+                            minlength="5" maxlength="500"
+                            placeholder="Ingrese el nombre completo de la patente"></textarea>
+                        <div *ngIf="myForm.submitted && nombrePatente.invalid"
+                            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                            <div *ngIf="nombrePatente.errors?.['required']">El nombre de la patente es requerido</div>
+                            <div *ngIf="nombrePatente.errors?.['minlength']">El nombre debe tener al menos 5 caracteres
+                            </div>
+                            <div *ngIf="nombrePatente.errors?.['maxlength']">El nombre no puede exceder 500 caracteres
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-9 mb-7">
+                        <div class="col-md-6 fv-row">
+                            <label class="required fw-semibold fs-6 mb-2 text-gray-600">Solicitante</label>
+                            <input type="text" class="form-control form-control-solid"
+                                [(ngModel)]="patenteModel.solicitante" name="solicitante" #solicitante="ngModel"
+                                required minlength="3" maxlength="150" placeholder="Nombre completo del solicitante" />
+                            <div *ngIf="myForm.submitted && solicitante.invalid"
+                                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                <div *ngIf="solicitante.errors?.['required']">El solicitante es requerido</div>
+                                <div *ngIf="solicitante.errors?.['minlength']">El nombre debe tener al menos 3
+                                    caracteres</div>
+                                <div *ngIf="solicitante.errors?.['maxlength']">El nombre no puede exceder 150
+                                    caracteres</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 fv-row">
+                            <label class="required fw-semibold fs-6 mb-2 text-gray-600">Correo Electrónico</label>
+                            <input type="email" class="form-control form-control-solid"
+                                [(ngModel)]="patenteModel.correo" name="correo" #correo="ngModel" required email
+                                placeholder="Correo electrónico del solicitante" />
+                            <div *ngIf="myForm.submitted && correo.invalid"
+                                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                <div *ngIf="correo.errors?.['required']">El correo electrónico es requerido</div>
+                                <div *ngIf="correo.errors?.['email']">Debe ingresar un correo electrónico válido</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-9 mb-7">
+                        <div class="col-md-6 fv-row">
+                            <label class="required fw-semibold fs-6 mb-2 text-gray-600">Entidad Federativa</label>
+                            <select class="form-select form-select-solid" [(ngModel)]="estadoSeleccionado"
+                                (ngModelChange)="onEstadoChange($event)" name="estadoSeleccionado" #estado="ngModel"
+                                required>
+                                <option value="">Selecciona una entidad federativa</option>
+                                <option *ngFor="let entidad of entidadesFederativas" [value]="entidad.id">
+                                    {{entidad.nombre}}
+                                </option>
+                            </select>
+                            <div *ngIf="myForm.submitted && estado.invalid"
+                                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                <div *ngIf="estado.errors?.['required']">La entidad federativa es requerida</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 fv-row">
+                            <label class="required fw-semibold fs-6 mb-2 text-gray-600">Institución</label>
+                            <select class="form-select form-select-solid" [(ngModel)]="institucionSeleccionada"
+                                (ngModelChange)="onInstitucionChange($event)" name="institucionSeleccionada"
+                                #institucion="ngModel" required [disabled]="!estadoSeleccionado">
+                                <option value="">Selecciona una institución</option>
+                                <option *ngFor="let inst of institucionesFiltradas" [value]="inst.id">
+                                    {{inst.nombre}}
+                                </option>
+                            </select>
+                            <div *ngIf="myForm.submitted && institucion.invalid"
+                                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                <div *ngIf="institucion.errors?.['required']">La institución es requerida</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="fv-row mb-7">
+                        <label class="required fw-semibold fs-6 mb-2 text-gray-600">Descripción</label>
+                        <textarea class="form-control form-control-solid" rows="4"
+                            [(ngModel)]="patenteModel.descripcion" name="descripcion" #descripcion="ngModel" required
+                            minlength="10" maxlength="1000"
+                            placeholder="Describa detalladamente la patente, su funcionamiento e innovación..."></textarea>
+                        <div *ngIf="myForm.submitted && descripcion.invalid"
+                            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                            <div *ngIf="descripcion.errors?.['required']">La descripción es requerida</div>
+                            <div *ngIf="descripcion.errors?.['minlength']">La descripción debe tener al menos 10
+                                caracteres</div>
+                            <div *ngIf="descripcion.errors?.['maxlength']">La descripción no puede exceder 1000
+                                caracteres</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="fw-bold fs-3 rotate collapsible mb-7" data-bs-toggle="collapse" role="button"
+                    (click)="collapse2.toggle()" [attr.aria-expanded]="!isCollapsed2"
+                    aria-controls="kt_patent_documents">
+                    <app-keenicon name="folder" class="fs-3 me-2"></app-keenicon>
+                    Documentación
+                    <span class="ms-2 rotate-180">
+                        <i class="ki-duotone ki-down fs-3" [ngClass]="{ 'ki-up': !isCollapsed2 }"></i>
+                    </span>
+                </div>
+
+                <div class="collapse" #collapse2="ngbCollapse" [(ngbCollapse)]="isCollapsed2">
+                    <div class="card card-flush">
+                        <div class="card-body pt-0">
+                            <div class="fv-row mb-7">
+                                <label class="fw-semibold fs-6 mb-2 text-gray-600">Adjuntar Documentos (PDF)</label>
+                                <div class="dropzone-wrapper">
+                                    <input type="file" id="fileInput" class="form-control form-control-solid"
+                                        (change)="onFileSelected($event)" multiple accept=".pdf" />
+                                    <div class="form-text">
+                                        Seleccione uno o varios archivos PDF. Tamaño máximo por archivo: 10MB.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div *ngIf="selectedFiles.length > 0" class="selected-files-list">
+                                <h6 class="fw-bold mb-4">Archivos Seleccionados:</h6>
+                                <div *ngFor="let file of selectedFiles; let i = index"
+                                    class="d-flex align-items-center border border-gray-300 border-dashed rounded p-4 mb-3">
+                                    <div class="symbol symbol-50px me-4">
+                                        <div class="symbol-label bg-light-danger">
+                                            <app-keenicon name="document" class="fs-2 text-danger"></app-keenicon>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="fw-bold text-gray-800 fs-6">{{file.name}}</div>
+                                        <div class="text-muted fs-7">{{(file.size / 1024 / 1024).toFixed(2)}} MB</div>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-light-danger"
+                                        (click)="removeFile(i)">
+                                        <app-keenicon name="cross" class="fs-3"></app-keenicon>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end mt-10">
+                    <button type="button" class="btn btn-light me-3" (click)="onCancel()" [disabled]="isLoading">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+                        <span *ngIf="isLoading" class="spinner-border spinner-border-sm align-middle me-2"></span>
+                        <span *ngIf="!isLoading">Registrar Patente</span>
+                        <span *ngIf="isLoading">Procesando...</span>
+                    </button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<swal #noticeSwal [swalOptions]="swalOptions"></swal>
