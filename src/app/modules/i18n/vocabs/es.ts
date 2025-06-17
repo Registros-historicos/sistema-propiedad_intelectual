@@ -201,7 +201,7 @@ export const locale = {
         MYPROFILE: 'Mi perfil',
         REQUEST: 'Registrar',
         REPORTS: 'Reportes',
-      }
+      },
     },
     AUTH: {
       GENERAL: {

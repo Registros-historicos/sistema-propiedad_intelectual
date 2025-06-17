@@ -238,12 +238,6 @@ export const APPLICANTS_MENU = [
     name: 'MENU.APPLICANT.REQUEST',
     icon: 'element-11',
     type: 'link',
-    link: '/solicitante/registro',
-  },
-  {
-    name: 'MENU.APPLICANT.REPORTS',
-    icon: 'element-11',
-    type: 'link',
-    link: '/solicitante/reportes',
-  },
+    link: '/solicitante/registrar',
+  }
 ];

@@ -1,0 +1,163 @@
+<div class="card card-flush mt-4">
+  <div class="card-body">
+    <div class="d-flex justify-content-start">
+      <button
+        mat-raised-button
+        color="primary"
+        class="btn btn-light-primary"
+        [routerLink]="['/solicitante/registrar']"
+      >
+        Regresar
+      </button>
+    </div>
+    <h1 class="text-center mb-4">Patente</h1>
+    <p class="text-center text-muted fs-6">
+      Complete el formulario con la información requerida para su solicitud
+    </p>
+
+    <div class="separator my-6"></div>
+
+    <form>
+      <!-- Título de la Invención -->
+      <div class="mb-6">
+        <label class="form-label fw-bold fs-6">
+          Título de la Invención <span class="text-danger">*</span>
+        </label>
+        <div class="form-text text-muted fs-7 mb-2">
+          Título claro y conciso de la invención
+        </div>
+        <input
+          type="text"
+          class="form-control form-control-solid"
+          placeholder="Ingrese el título de la invención"
+        />
+      </div>
+
+      <!-- Campo Técnico -->
+      <div class="mb-6">
+        <label class="form-label fw-bold fs-6">
+          Campo Técnico <span class="text-danger">*</span>
+        </label>
+        <div class="form-text text-muted fs-7 mb-2">
+          Seleccione el campo técnico relacionado con la invención
+        </div>
+        <select class="form-select form-select-solid">
+          <option selected disabled>Seleccione un campo técnico</option>
+          <option>Mecánica</option>
+          <option>Eléctrica/Electrónica</option>
+          <option>Química</option>
+          <option>Biotecnología</option>
+          <option>Informática</option>
+          <option>Farmacéutica</option>
+          <option>Otro</option>
+        </select>
+      </div>
+
+      <!-- Descripción Técnica -->
+      <div class="mb-6">
+        <label class="form-label fw-bold fs-6">
+          Descripción Técnica <span class="text-danger">*</span>
+        </label>
+        <div class="form-text text-muted fs-7 mb-2">
+          Describa técnicamente la invención, su funcionamiento y aplicaciones
+        </div>
+        <textarea class="form-control form-control-solid" rows="4"></textarea>
+      </div>
+
+      <div class="separator my-6"></div>
+
+      <!-- Antecedentes Técnicos -->
+      <div class="mb-6">
+        <label class="form-label fw-bold fs-6">
+          Antecedentes Técnicos <span class="text-danger">*</span>
+        </label>
+        <div class="form-text text-muted fs-7 mb-2">
+          Describa el estado de la técnica y los problemas que resuelve su
+          invención
+        </div>
+        <textarea class="form-control form-control-solid" rows="4"></textarea>
+      </div>
+
+      <!-- Reivindicaciones -->
+      <div class="mb-6">
+        <label class="form-label fw-bold fs-6">
+          Reivindicaciones <span class="text-danger">*</span>
+        </label>
+        <div class="form-text text-muted fs-7 mb-2">
+          Liste las características técnicas que definen su invención
+        </div>
+        <textarea class="form-control form-control-solid" rows="4"></textarea>
+      </div>
+
+      <div class="separator my-6"></div>
+
+      <!-- Nombre del Inventor -->
+      <div class="mb-6">
+        <label class="form-label fw-bold fs-6">
+          Nombre del Inventor <span class="text-danger">*</span>
+        </label>
+        <div class="row">
+          <div class="col-md-8 mb-3">
+            <input
+              type="text"
+              class="form-control form-control-solid"
+              placeholder="Nombre completo del inventor"
+            />
+          </div>
+          <div class="col-md-4">
+            <input
+              type="text"
+              class="form-control form-control-solid"
+              placeholder="Nombre del solicitante"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Documentos Adjuntos -->
+      <div class="mb-6">
+        <label class="form-label fw-bold fs-6">
+          Documentos Adjuntos <span class="text-danger">*</span>
+        </label>
+        <div class="border rounded p-4 text-center mb-3 bg-light">
+          <p class="mb-2 text-muted">
+            Arrastre y suelte los archivos aquí o haga clic para seleccionar
+          </p>
+          <button type="button" class="btn btn-outline-primary">
+            Seleccionar Archivos
+          </button>
+          <p class="small text-muted mt-2">
+            Formatos aceptados: PDF, DOC, DOCX, JPG, PNG (máx. 10MB)
+          </p>
+        </div>
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            id="declaracion-patente"
+          />
+          <label
+            class="form-check-label text-muted fs-7"
+            for="declaracion-patente"
+          >
+            Declaro que la invención es nueva, tiene actividad inventiva y es
+            susceptible de aplicación industrial
+          </label>
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="d-flex justify-content-center mt-6 gap-4">
+        <button
+          mat-raised-button
+          [routerLink]="['/solicitante/registrar']"
+          mat-raised-button
+          type="submit"
+          class="btn btn-primary"
+        >
+          Enviar Solicitud
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
