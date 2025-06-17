@@ -1,190 +1,132 @@
-<!--begin::Form-->
-<form class="form w-100" [formGroup]="loginForm" novalidate="novalidate" id="kt_login_signin_form"
-  (ngSubmit)="submit()">
-  <!--begin::Heading-->
-  <div class="text-center mb-11">
-    <h1 class="text-gray-900 fw-bolder mb-3">
-      Sign In
-    </h1>
-    <!--begin::Subtitle-->
-    <div class="text-gray-500 fw-semibold fs-6">
-      Your Social Campaigns
+<!--begin::Main-->
+<div class="d-flex flex-column flex-root">
+  <!--begin::Authentication-->
+  <div class="d-flex flex-column flex-lg-row h-100">
+    <!--begin::Form Section-->
+    <div class="d-flex flex-column flex-lg-row-fluid flex-center w-lg-50 p-10">
+      <!--begin::Form Container-->
+      <div class="d-flex flex-center flex-column flex-lg-row-fluid w-100">
+        <!--begin::Form Box-->
+        <div class="login-form-container p-10">
+          <!--begin::Logo-->
+          <div class="text-center mb-10">
+            <!--<img alt="Logo TECNM" src="assets/media/logos/tecnm.png" class="h-100px" />-->
+            <h1 class="text-gray-900 fw-bolder mb-3" translate="AUTH.LOGIN.TITLE"></h1>
+            <div class="text-gray-900 fw-bold fs-4 mt-2" translate="AUTH.LOGIN.CEPPI"></div>
+          </div>
+          <!--end::Logo-->
+
+          <!--begin::Form-->
+          <form class="form w-100" [formGroup]="loginForm" (ngSubmit)="submit()">
+            <!--begin::Alert-->
+            <div *ngIf="hasError" class="alert alert-danger d-flex align-items-center p-5 mb-10">
+              <i class="fas fa-exclamation-triangle fs-2 me-4"></i>
+              <div class="d-flex flex-column">
+                <span class="fw-bold" translate="AUTH.LOGIN.ERROR"></span>
+                <span translate="AUTH.LOGIN.ERROR_DETAIL"></span>
+              </div>
+            </div>
+            <!--end::Alert-->
+
+            <!--begin::Input grupo-->
+            <div class="fv-row mb-8">
+              <label class="form-label fs-6 fw-bolder text-gray-900" translate="AUTH.LOGIN.USERNAME"></label>
+              <input class="form-control form-control-lg" 
+                    type="text" 
+                    placeholder="usuario@tecnm.mx" 
+                    formControlName="email"
+                    autocomplete="username" />
+              <div *ngIf="f.email.invalid && (f.email.dirty || f.email.touched)" class="text-danger mt-2">
+                <div *ngIf="f.email.errors?.['required']" translate="AUTH.FORGOT.EMAIL.REQUIRED"></div>
+                <div *ngIf="f.email.errors?.['email']" translate="AUTH.FORGOT.EMAIL.INVALID"></div>
+              </div>
+            </div>
+            <!--end::Input grupo-->
+
+            <!--begin::Input contraseña-->
+            <div class="fv-row mb-5">
+              <label class="form-label fs-6 fw-bolder text-gray-900" translate="AUTH.LOGIN.PASSWORD"></label>
+              <input class="form-control form-control-lg" 
+                    type="password" 
+                    placeholder="········" 
+                    formControlName="password"
+                    autocomplete="current-password" />
+              <div *ngIf="f.password.invalid && (f.password.dirty || f.password.touched)" class="text-danger mt-2">
+                <div *ngIf="f.password.errors?.['required']" translate="AUTH.FORGOT.EMAIL.REQUIRED"></div>
+                <div *ngIf="f.password.errors?.['minlength']" translate="AUTH.LOGIN.EPASSWORD"></div>
+              </div>
+            </div>
+            <!--end::Input contraseña-->
+
+            <!--begin::Acciones-->
+            <div class="d-flex flex-stack flex-wrap gap-3 fs-base fw-semibold mb-10">
+              <!--
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="remember" formControlName="remember"/>
+                <label class="form-check-label" for="remember">Recordar mi sesión</label>
+              </div>
+              -->
+              <a routerLink="/auth/forgot-password" class="link-primary fs-6 fw-bold" translate="AUTH.GENERAL.FORGOT_BUTTON">
+                
+              </a>
+            </div>
+            <!--end::Acciones-->
+
+            <!--begin::Submit-->
+            <!--begin::Submit-->
+            <div class="d-grid mb-10">
+              <button type="submit" class="btn btn-primary btn-lg" [disabled]="loginForm.invalid">
+                <span class="login-button-content">
+                  <span *ngIf="!(isLoading$ | async)" translate="AUTH.LOGIN.BUTTON"></span>
+                  <span *ngIf="isLoading$ | async" class="indicator-progress" translate="AUTH.LOGIN.LOADING">
+                    
+                  <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                  </span>
+                </span>
+              </button>
+            </div>
+            <!--end::Submit-->
+            <!--end::Submit-->
+
+            <!--begin::Aviso-->
+            <div class="text-center text-gray-600 fw-semibold fs-7">
+              <span [innerHTML]="'AUTH.GENERAL.ACCEPT_PRIVACY' | translate: { value: '' }"></span>
+              <a href="#" data-bs-toggle="modal" data-bs-target="#kt_modal_privacy" class="link-primary" translate="AUTH.PRIVACY.TITLE"></a>
+            </div>
+            <!--end::Aviso-->
+          </form>
+          <!--end::Form-->
+        </div>
+      </div>
+      <!--end::Form-->
     </div>
-    <!--end::Subtitle--->
-    <!-- <div class="text-gray-500 fw-bold fs-4">
-      New Here?
-      <a
-        routerLink="/auth/registration"
-        id="kt_login_signup"
-        class="link-primary fw-bolder"
-        >{{ "AUTH.GENERAL.SIGNUP_BUTTON" | translate }}</a
-      >
-    </div> -->
-  </div>
-  <!--end::Heading-->
+    <!--end::Body-->
 
-  <!--begin::Login options-->
-  <div class="row g-3 mb-9">
-    <!--begin::Col-->
-    <div class="col-md-6">
-      <!--begin::Google link--->
-      <a href="#"
-        class="btn btn-flex btn-outline btn-text-gray-700 btn-active-color-primary bg-state-light flex-center text-nowrap w-100">
-        <img alt="Logo" src="./assets/media/svg/brand-logos/google-icon.svg" class="h-15px me-3" />
-        Sign in with Google
-      </a>
-      <!--end::Google link--->
+    <!--
+    <div class="d-flex flex-lg-row-fluid w-lg-50 login-aside-section"
+        style="background-image: url('./assets/media/logos/bg-tecnm.jpg')">
     </div>
-    <!--end::Col-->
-
-    <!--begin::Col-->
-    <div class="col-md-6">
-      <!--begin::Google link--->
-      <a href="#"
-        class="btn btn-flex btn-outline btn-text-gray-700 btn-active-color-primary bg-state-light flex-center text-nowrap w-100">
-        <img alt="Logo" src="./assets/media/svg/brand-logos/apple-black.svg" class="theme-light-show h-15px me-3" />
-        <img alt="Logo" src="./assets/media/svg/brand-logos/apple-black-dark.svg" class="theme-dark-show h-15px me-3" />
-        Sign in with Apple
-      </a>
-      <!--end::Google link--->
-    </div>
-    <!--end::Col-->
+    -->
+    
   </div>
-  <!--end::Login options-->
+  <!--end::Authentication-->
+</div>
+<!--end::Main-->
 
-  <!--begin::Separator-->
-  <div class="separator separator-content my-14">
-    <span class="w-125px text-gray-500 fw-semibold fs-7">Or with email</span>
-  </div>
-  <!--end::Separator-->
-
-  <!-- begin::Alert info-->
-  <ng-container *ngIf="!hasError">
-    <div class="mb-10 bg-light-info p-8 rounded">
-      <div class="text-info">
-        Use account <strong>{{ defaultAuth.email }}</strong> and password
-        <strong>{{ defaultAuth.password }}</strong> to continue.
+<!-- Modal de privacidad -->
+<div class="modal fade" id="kt_modal_privacy" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered mw-650px">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="fw-bold" translate="AUTH.PRIVACY.TITLE"></h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body py-5 px-10">
+        <p translate="AUTH.PRIVACY.CONTENT"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" translate="AUTH.PRIVACY.ACCEPT"></button>
       </div>
     </div>
-  </ng-container>
-  <!-- end::Alert info-->
-
-
-  <!-- begin::Alert error-->
-  <ng-container *ngIf="hasError">
-    <div class="mb-lg-15 alert alert-danger">
-      <div class="alert-text font-weight-bold">
-        The login details are incorrect
-      </div>
-    </div>
-  </ng-container>
-  <!-- end::Alert error-->
-
-  <!--begin::Form group-->
-  <div class="fv-row mb-8">
-    <label class="form-label fs-6 fw-bolder text-gray-900">Email</label>
-    <input class="form-control bg-transparent" type="email" name="email" formControlName="email" autocomplete="off"
-      [ngClass]="{
-        'is-invalid': loginForm.controls['email'].invalid,
-        'is-valid': loginForm.controls['email'].valid
-      }" />
-    <ng-container [ngTemplateOutlet]="formError" [ngTemplateOutletContext]="{
-        validation: 'required',
-        message: 'Email is required',
-        control: loginForm.controls['email']
-      }"></ng-container>
-    <ng-container [ngTemplateOutlet]="formError" [ngTemplateOutletContext]="{
-        validation: 'email',
-        message: 'Email is invalid',
-        control: loginForm.controls['email']
-      }"></ng-container>
-    <ng-container [ngTemplateOutlet]="formError" [ngTemplateOutletContext]="{
-        validation: 'minLength',
-        message: 'Email should have at least 3 symbols',
-        control: loginForm.controls['email']
-      }"></ng-container>
-    <ng-container [ngTemplateOutlet]="formError" [ngTemplateOutletContext]="{
-        validation: 'maxLength',
-        message: 'Email should have maximum 360 symbols',
-        control: loginForm.controls['email']
-      }"></ng-container>
   </div>
-  <!--end::Form group-->
-
-  <!--begin::Form group-->
-  <div class="fv-row mb-3">
-
-    <label class="form-label fw-bolder text-gray-900 fs-6 mb-0">Password</label>
-
-    <input class="form-control bg-transparent" type="password" name="password" autocomplete="off"
-      formControlName="password" [ngClass]="{
-        'is-invalid': loginForm.controls['password'].invalid,
-        'is-valid': loginForm.controls['password'].valid
-      }" />
-    <ng-container [ngTemplateOutlet]="formError" [ngTemplateOutletContext]="{
-        validation: 'required',
-        message: 'Password is required',
-        control: loginForm.controls['password']
-      }"></ng-container>
-    <ng-container [ngTemplateOutlet]="formError" [ngTemplateOutletContext]="{
-        validation: 'minlength',
-        message: 'Password should have at least 3 symbols',
-        control: loginForm.controls['password']
-      }"></ng-container>
-    <ng-container [ngTemplateOutlet]="formError" [ngTemplateOutletContext]="{
-        validation: 'maxLength',
-        message: 'Password should have maximum 100 symbols',
-        control: loginForm.controls['password']
-      }"></ng-container>
-
-  </div>
-  <!--end::Form group-->
-
-  <!--begin::Wrapper-->
-  <div class="d-flex flex-stack flex-wrap gap-3 fs-base fw-semibold mb-8">
-    <div></div>
-
-    <!--begin::Link-->
-    <a routerLink="/auth/forgot-password" class="link-primary">
-      Forgot Password ?
-    </a>
-    <!--end::Link-->
-  </div>
-  <!--end::Wrapper-->
-
-  <!--begin::Action-->
-  <div class="d-grid mb-10">
-    <button type="submit" id="kt_sign_in_submit" class="btn btn-primary" [disabled]="loginForm.invalid">
-      <ng-container *ngIf="isLoading$ | async">
-        <span class="indicator-progress" [style.display]="'block'">
-          Please wait...
-          <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
-        </span>
-      </ng-container>
-      <ng-container *ngIf="(isLoading$ | async) === false">
-        <span class="indicator-label">Continue</span>
-      </ng-container>
-    </button>
-  </div>
-
-  <div class="text-gray-500 text-center fw-semibold fs-6">
-    Not a Member yet?
-
-    <a routerLink="/auth/registration" class="link-primary">
-      Sign up
-    </a>
-  </div>
-
-  <!--end::Action-->
-</form>
-<!--end::Form-->
-
-<ng-template #formError let-control="control" let-message="message" let-validation="validation">
-  <ng-container *ngIf="control.hasError(validation) && (control.dirty || control.touched)">
-    <div class="fv-plugins-message-container">
-      <span role="alert">
-        {{ message }}
-      </span>
-    </div>
-  </ng-container>
-</ng-template>
+</div>
