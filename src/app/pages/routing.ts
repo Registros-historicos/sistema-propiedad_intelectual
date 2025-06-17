@@ -21,10 +21,10 @@ const Routing: Routes = [
         loadChildren: () => import('./solicitante/registrar/registrar.module').then((m) => m.RegistrarModule),
       },
       {
-        path: '',
-        redirectTo: 'dashboard',
-        pathMatch: 'full'
-      }
+        path: 'reportes',
+        loadChildren: () => import('./reportes/reportes.module').then((m) => m.ReportesModule),
+      },
+
     ]
   },
   {
