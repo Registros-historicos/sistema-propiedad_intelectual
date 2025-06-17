@@ -129,7 +129,7 @@ export const locale = {
         SUBMIT_BUTTON: 'Enviar',
         NO_ACCOUNT: 'No tienes una cuenta?',
         SIGNUP_BUTTON: 'Regístrate',
-        FORGOT_BUTTON: 'Se te olvidó tu contraseña',
+        FORGOT_BUTTON: '¿Olvidaste tu contraseña?',
         BACK_BUTTON: 'Espalda',
         PRIVACY: 'Intimidad',
         LEGAL: 'Legal',
