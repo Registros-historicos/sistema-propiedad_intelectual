@@ -1,10 +1,14 @@
-import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {DataTablesResponse} from '../../../administrador/shared-services';
-import {Config} from 'datatables.net';
-import {IndustrialDesignsService} from '../../../../api/services/industrial-design.service';
-import {SwalComponent} from '@sweetalert2/ngx-sweetalert2';
-import {SweetAlertOptions} from 'sweetalert2';
+import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { DataTablesResponse, ENTIDADES_FEDERATIVAS_DATA, ENTIDADES_FEDERATIVAS_MAP } from '../../../administrador/shared-services';
+import { Config } from 'datatables.net';
+import { IndustrialDesignsService } from '../../../../api/services/industrial-design.service';
+import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { SweetAlertOptions } from 'sweetalert2';
 import moment from 'moment';
+import { FederalEntity } from 'src/app/api/models/entity.model';
+import { IDisIndModel } from 'src/app/api/models/dis-ind.model';
+import { Observable } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-diseno-industrial',
@@ -15,7 +19,9 @@ export class DisenoIndustrialComponent implements OnInit, AfterViewInit, OnDestr
   isCollapsed1 = false;
   isCollapsed2 = true;
 
-  isLoading = false;
+  pageLength: number = 10;
+  dtInstance: any;
+  lengthMenu: number[] = [5, 10, 15, 20];
 
   applicants: DataTablesResponse;
 
@@ -28,9 +34,34 @@ export class DisenoIndustrialComponent implements OnInit, AfterViewInit, OnDestr
 
   swalOptions: SweetAlertOptions = {};
 
+  placeholder: string = '';
+
+  aDisInd: Observable<IDisIndModel>
+  disIndModel: IDisIndModel = {
+    id: 0,
+    solicitudId: "",
+    nombreDisInd: "",
+    solicitante: "",
+    fechaSolicitud: "",
+    estatus: "En trámite",
+    descripcion: "",
+    institucion: "",
+    correo: "",
+    documentos: [""]
+  };
+
+  entidadesFederativas: FederalEntity[] = ENTIDADES_FEDERATIVAS_DATA
+  institucionesFiltradas: any[] = []
+  estadoSeleccionado: number | null = null
+  institucionSeleccionada: number | null = null
+
+  selectedFile: File | null = null;
+  isViewMode: boolean = true;
+
   constructor(
     private service: IndustrialDesignsService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private translate: TranslateService
   ) {
   }
 
@@ -38,25 +69,58 @@ export class DisenoIndustrialComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   ngOnInit(): void {
+    this.placeholder = this.translate.instant('TABLE.PLACEHOLDER_SEARCH')
+
     this.datatableConfig = {
       serverSide: true,
+      lengthMenu: this.lengthMenu,
+      pageLength: this.pageLength,
+      language: {
+        info: this.translate.instant('TABLE.PAG_INFO'),
+        infoFiltered: this.translate.instant('TABLE.PAG_INFO_FILTERED'),
+        processing: this.translate.instant('TABLE.PROCESSING'),
+        emptyTable: this.translate.instant('TABLE.EMPTY_TABLE'),
+        infoEmpty: this.translate.instant('TABLE.PAG_INFO_EMPTY'),
+        zeroRecords: this.translate.instant('TABLE.ZERO_RECORDS'),
+      },
       /* ajax: (dataTablesParameters: any, callback) => {
         this.applicantService.getApplicants(dataTablesParameters).subscribe(resp => {
           callback(resp);
         });
       },*/
       ajax: (dataTablesParameters: any, callback) => {
-        this.service.getIndustrialDesigns(dataTablesParameters).subscribe(resp => {
-          callback(resp);
+        this.service.getIndustrialDesigns(dataTablesParameters).subscribe({
+          next: (resp) => {
+            callback(resp);
+          },
+          error: (error) => {
+            console.error('Error loading data:', error);
+            callback({
+              draw: dataTablesParameters.draw,
+              recordsTotal: 0,
+              recordsFiltered: 0,
+              data: []
+            });
+          }
         });
       },
       columns: [
         {
-          title: 'Nombre del solicitante', data: 'solicitante_nombre', render: function (data, type, full) {
+          title: this.translate.instant('TABLE.APPLICANT_NAME'),
+          data: 'solicitante',
+          render: (data, type, full) => {
             const colorClasses = ['success', 'info', 'warning', 'danger'];
             const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
 
-            const initials = (data[0] + (full.solicitante_apellidos ? full.solicitante_apellidos[0] : '')).toUpperCase();
+            const nameParts = data.split(' ').filter((part: string) => part.length > 0 && !part.endsWith('.'));
+
+            let initials = '';
+            if (nameParts.length >= 2) {
+              initials = (nameParts[0][0] + nameParts[1][0]).toUpperCase();
+            } else if (nameParts.length === 1) {
+              initials = (nameParts[0][0] + nameParts[0][1]).toUpperCase();
+            }
+
             const symbolLabel = `
               <div class="symbol-label fs-3 bg-light-${randomColorClass} text-${randomColorClass}">
                 ${initials}
@@ -65,43 +129,113 @@ export class DisenoIndustrialComponent implements OnInit, AfterViewInit, OnDestr
 
             const nameAndEmail = `
               <div class="d-flex flex-column" data-action="view" data-id="${full.id}">
-                <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${data} ${full.solicitante_apellidos}</a>
-                <span>${full.solicitante_email}</span>
+                <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${data}</a>
+                <span class="text-muted">${full.correo || ''}</span>
               </div>
             `;
 
             return `
-              <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" data-action="view" data-id="${full.id}">
-                <a href="javascript:;">
-                  ${symbolLabel}
-                </a>
+              <div class="d-flex align-items-center">
+                <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" data-action="view" data-id="${full.id}">
+                  <a href="javascript:;">
+                    ${symbolLabel}
+                  </a>
+                </div>
+                ${nameAndEmail}
               </div>
-              ${nameAndEmail}
             `;
-          }
+          },
         },
         {
-          title: 'Titulo del trabajo', data: 'titulo'
+          title: this.translate.instant('TABLE.WORK_TITLE'),
+          data: 'nombreDisInd',
+          render: (data) => {
+            return `<span class="fw-bold fs-6 text-gray-800">${data || ''}</span>`;
+          },
         },
         {
-          title: 'Institución', data: 'institucion_adscripcion'
+          title: this.translate.instant('TABLE.INSTITUTION'),
+          data: 'institucion',
+          render: (data) => {
+            return `<span class="fw-semibold text-gray-600">${data || ''}</span>`;
+          },
         },
         {
-          title: 'Fecha de Solicitud', data: 'fecha_presentacion', render: function (data) {
-            return moment(data).format('DD MMM YYYY, hh:mm a');
-          }
+          title: this.translate.instant('TABLE.DATE'),
+          data: 'fechaSolicitud',
+          render: (data) => {
+            return `<span class="fw-semibold text-gray-600">${moment(data).format('DD-MM-YYYY')}</span>`;
+          },
         }
       ],
-      createdRow: function (row, data, dataIndex) {
+      createdRow: (row, data, dataIndex) => {
         const $row = $(row);
         $row.attr('data-action', 'view');
+        $row.attr('data-id', 0);
         $row.addClass('cursor-pointer');
-        $('td:eq(0)', row).addClass('d-flex align-items-center');
-        $('td:eq(1)', row).addClass('fw-bold fs-6 text-gray-800 mb-1');
-        $('td:eq(2)', row).addClass('fw-semibold text-gray-600');
-        $('td:eq(3)', row).addClass('fw-semibold text-gray-600');
       },
+      initComplete: (settings, json) => {
+        this.dtInstance = settings.oInstance.api()
+        this.cdr.detectChanges();
+      }
     };
+  }
+
+  onPageLengthChange(event: any): void {
+    const newLength = parseInt(event.target.value);
+    this.pageLength = newLength;
+
+    if (this.dtInstance) {
+      this.dtInstance.page.len(newLength).draw();
+    } else {
+      this.reloadEvent.emit(true);
+    }
+  }
+
+  onEstadoChange(estadoId: number): void {
+    this.estadoSeleccionado = estadoId;
+    this.institucionSeleccionada = null;
+    this.disIndModel.institucion = '';
+
+    if (estadoId && ENTIDADES_FEDERATIVAS_MAP[estadoId]) {
+      this.institucionesFiltradas = ENTIDADES_FEDERATIVAS_MAP[estadoId];
+    } else {
+      this.institucionesFiltradas = [];
+    }
+  }
+
+  onInstitucionChange(institucionId: number): void {
+    this.institucionSeleccionada = institucionId;
+
+    if (institucionId) {
+      const institucion = this.institucionesFiltradas.find(inst => inst.id === institucionId);
+      if (institucion) {
+        this.disIndModel.institucion = institucion.nombre;
+      }
+    } else {
+      this.disIndModel.institucion = '';
+    }
+  }
+
+  private inicializarSeleccionesDesdeDisInd(): void {
+    if (this.disIndModel.institucion) {
+      for (const [estadoId, instituciones] of Object.entries(ENTIDADES_FEDERATIVAS_MAP)) {
+        const institucionEncontrada = instituciones.find((inst: { nombre: string; }) => inst.nombre === this.disIndModel.institucion);
+        if (institucionEncontrada) {
+          this.estadoSeleccionado = Number(estadoId);
+          this.institucionesFiltradas = instituciones;
+          this.institucionSeleccionada = institucionEncontrada.id;
+          break;
+        }
+      }
+    }
+  }
+
+  resetFormularioInstitucion(): void {
+    this.estadoSeleccionado = null;
+    this.institucionSeleccionada = null;
+    this.institucionesFiltradas = [];
+    this.disIndModel.institucion = '';
   }
 
   delete(id: number) {
@@ -110,14 +244,12 @@ export class DisenoIndustrialComponent implements OnInit, AfterViewInit, OnDestr
     });
   }
 
-  edit(id: number) {
-    this.showAlert(
-      {
-        icon: 'info',
-        title: 'Editar Solicitud con ID: ' + id,
-        text: 'Función en desarrollo'
-      }
-    );
+  view(id: number) {
+    this.service.getIndustrialDesign(id).subscribe((disInd: IDisIndModel) => {
+      this.disIndModel = { ...disInd };
+      this.inicializarSeleccionesDesdeDisInd();
+      this.isViewMode = true;
+    });
   }
 
   create() {
@@ -144,6 +276,50 @@ export class DisenoIndustrialComponent implements OnInit, AfterViewInit, OnDestr
     }, swalOptions);
     this.cdr.detectChanges();
     this.noticeSwal.fire();
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file && file.type === 'application/pdf') {
+      this.selectedFile = {
+        name: file.name,
+        size: file.size,
+        type: file.type
+      } as File;
+    } else if (file) {
+      const errorAlert: SweetAlertOptions = {
+        icon: 'error',
+        title: 'Error!',
+        text: 'Solo se permiten archivos PDF',
+      };
+      this.showAlert(errorAlert);
+      event.target.value = '';
+    }
+  }
+
+  downloadDocument(documentName: string): void {
+    console.log('Descargando documento:', documentName);
+  }
+
+  closeForm(modal: any) {
+    modal.dismiss('cancel');
+
+    this.disIndModel = {
+      id: 0,
+      solicitudId: '',
+      nombreDisInd: '',
+      solicitante: '',
+      correo: '',
+      fechaSolicitud: '',
+      institucion: '',
+      estatus: 'En trámite',
+      descripcion: '',
+      documentos: []
+    };
+
+    this.estadoSeleccionado = 0;
+    this.institucionSeleccionada = 0;
+    this.institucionesFiltradas = [];
   }
 
   ngOnDestroy(): void {

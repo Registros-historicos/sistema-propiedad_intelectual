@@ -11,7 +11,12 @@ export const locale = {
         UTILITY_MODEL: 'Registrar modelo de utilidad',
         COPYRIGHT: 'Registrar derecho de autor',
         INDUSTRIAL_DESIGN: 'Registrar diseño industrial',
-      }
+      },
+      CONFIRM: "Confirmar",
+      CANCEL: "Cancelar",
+      CLOSE: 'Cerrar',
+      DOWNLOAD: 'Descargar',
+      SEE: 'Ver',
     },
     TABLE: {
       ACTIONS: {
@@ -20,10 +25,85 @@ export const locale = {
         DELETE: 'Eliminar',
         VIEW: 'Ver'
       },
-      APPLICANT_NAME: "Nombre del solicitante",
-      WORK_TITLE: "Título del trabajo",
+      APPLICANT_NAME: "Solicitante",
+      WORK_TITLE: "Título",
       INSTITUTION: "Institución",
-      DATE: "Fecha de solicitud"
+      DATE: "Fecha de solicitud",
+      PAG_INFO: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+      PAG_INFO_FILTERED: "(filtrados de _MAX_ registros totales)",
+      PAG_INFO_EMPTY: "Mostrando 0 a 0 de 0 registros",
+      PROCESSING: "Cargando datos",
+      EMPTY_TABLE: "No se encontraron registros",
+      PLACEHOLDER_SEARCH: "Buscar...",
+      ZERO_RECORDS: 'No se encontraron coincidencias',
+      PAGE_LENGTH: {
+        LABEL: "Mostrar:",
+        RECORDS: "registros"
+      },
+      MARK: {
+        NAME: 'Denominación',
+        IMAGE: 'Logo',
+        APPLICATION_TYPE: 'Tipo de solicitud',
+        APPLICANT: 'Titular',
+        DATE: 'Fecha de presentación'
+      }
+    },
+    MODAL: {
+      TITLE: 'Detalles',
+      INFO: {
+        TITLE: 'Información de Solo Lectura',
+        BODY: 'Los detalles se muestran únicamente para consulta.'
+      },
+      FORM: {
+        PATENT: {
+          NAME: 'Nombre de la patente'
+        },
+        MARK: {
+          NAME: 'Denominación',
+          RECORD: 'Expediente',
+          IMAGE: 'Logo',
+          APPLICATION_TYPE: 'Tipo de solicitud',
+          APPLICANT: 'Titular',
+          DATE: 'Fecha de presentación',
+          DATE_GRANT: 'Fecha de concesión',
+          DATE_COMPLETION: 'Fecha de terminación',
+          DATE_START: 'Inicio de uso',
+          IMAGE_INFO: 'Imagen de la marca',
+          FORMALITIES: {
+            LABEL: 'Trámites',
+            ENTRY_FOLIO: 'Folio de entrada:',
+            YEAR_RECEPTION: 'Año de recepción:',
+            START_DATE: 'Fecha de inicio:',
+            COMPLETION_DATE: 'Fecha de conclusión:'
+          },
+          FORMALITIES_EMPTY: 'No hay trámites registrados'
+        },
+        COPYRIGHT: {
+          NAME: 'Nombre de la obra',
+        },
+        APPLICANT: 'Solicitante',
+        EMAIL: 'Correo electrónico',
+        DATE: 'Fecha de solicitud',
+        STATUS: 'Estatus',
+        FEDERAL_ENTITY: {
+          LABEL: 'Entidad Federativa',
+          OPTIONS_LABEL: 'Seleccione una entidad federativa'
+        },
+        INSTITUTION: {
+          LABEL: 'Institución',
+          OPTIONS_LABEL: 'Seleccione una institución',
+        },
+        DESCRIPTION: 'Descripción',
+        DOCUMENTATION: 'Documentación',
+        DOCUMENTATION_EMPTY: 'No hay documentos adjuntos'
+      }
+    },
+    ALERT: {
+      DELETE: {
+        TITLE: "¿Estás seguro de eliminar este registro?",
+        BODY: "Esta acción no se puede deshacer",
+        SUCCESS: "Registro eliminado"
+      }
     },
     GRAPHICS: {
       TITLES: {

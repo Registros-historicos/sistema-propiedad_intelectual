@@ -1,10 +1,14 @@
-import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {DataTablesResponse} from '../../../administrador/shared-services';
-import {Config} from 'datatables.net';
-import {SwalComponent} from '@sweetalert2/ngx-sweetalert2';
-import {SweetAlertOptions} from 'sweetalert2';
-import {TrademarksService} from '../../../../api/services/trademarks.service';
+import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { DataTablesResponse } from '../../../administrador/shared-services';
+import { Config } from 'datatables.net';
+import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { SweetAlertOptions } from 'sweetalert2';
+import { TrademarksService } from '../../../../api/services/trademarks.service';
 import moment from 'moment';
+import { NgForm } from '@angular/forms';
+import { TranslateService } from '@ngx-translate/core';
+import { Observable } from 'rxjs';
+import { DatosMarca } from 'src/app/api/models/marca.model';
 
 @Component({
   selector: 'app-marca',
@@ -17,6 +21,11 @@ export class MarcaComponent implements OnInit, AfterViewInit, OnDestroy {
 
   isLoading = false;
 
+  placeholder: string = '';
+  pageLength: number = 10;
+  dtInstance: any;
+  lengthMenu: number[] = [5, 10, 15, 20];
+
   applicants: DataTablesResponse;
 
   datatableConfig: Config = {};
@@ -28,67 +37,128 @@ export class MarcaComponent implements OnInit, AfterViewInit, OnDestroy {
 
   swalOptions: SweetAlertOptions = {};
 
+  aMarca: Observable<DatosMarca>
+  marcaModel: DatosMarca = {
+    denominacion: "",
+    expediente: 0,
+    registro: 0,
+    fechaPresentacion: "",
+    fechaConcesion: "",
+    fechaTerminacion: "",
+    tipoSolicitud: "",
+    inicioUso: "",
+    marca: "",
+    productosServicios: [],
+    titular: "",
+    tramites: []
+  };
+
+  isViewMode: boolean = true;
+
   constructor(
     private service: TrademarksService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private translate: TranslateService
   ) {
   }
 
   ngAfterViewInit(): void {
   }
 
+  onEntidadChange() { }
+
   ngOnInit(): void {
+    this.placeholder = this.translate.instant('TABLE.PLACEHOLDER_SEARCH')
+
     this.datatableConfig = {
       serverSide: true,
+      lengthMenu: this.lengthMenu,
+      pageLength: this.pageLength,
+      language: {
+        info: this.translate.instant('TABLE.PAG_INFO'),
+        infoFiltered: this.translate.instant('TABLE.PAG_INFO_FILTERED'),
+        processing: this.translate.instant('TABLE.PROCESSING'),
+        emptyTable: this.translate.instant('TABLE.EMPTY_TABLE'),
+        infoEmpty: this.translate.instant('TABLE.PAG_INFO_EMPTY'),
+        zeroRecords: this.translate.instant('TABLE.ZERO_RECORDS'),
+      },
       /* ajax: (dataTablesParameters: any, callback) => {
         this.applicantService.getApplicants(dataTablesParameters).subscribe(resp => {
           callback(resp);
         });
       },*/
       ajax: (dataTablesParameters: any, callback) => {
-        this.service.getTrademarks(dataTablesParameters).subscribe(resp => {
-          callback(resp);
+        this.service.getTrademarks(dataTablesParameters).subscribe({
+          next: (resp) => {
+            callback(resp);
+          },
+          error: (error) => {
+            console.error('Error loading data:', error);
+            callback({
+              draw: dataTablesParameters.draw,
+              recordsTotal: 0,
+              recordsFiltered: 0,
+              data: []
+            });
+          }
         });
       },
       columns: [
         {
-          title: 'Nombre del solicitante', data: 'solicitante_nombre', render: function (data, type, full) {
+          title: this.translate.instant('TABLE.MARK.NAME'),
+          data: 'denominacion',
+          render: function (data, type, full) {
+            const initials = (data[0] + (full.titular.nombre ? full.titular.nombre[0] : '')).toUpperCase();
             const colorClasses = ['success', 'info', 'warning', 'danger'];
             const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
 
-            const initials = (data[0] + (full.solicitante_apellidos ? full.solicitante_apellidos[0] : '')).toUpperCase();
             const symbolLabel = `
               <div class="symbol-label fs-3 bg-light-${randomColorClass} text-${randomColorClass}">
                 ${initials}
-              </div>
-            `;
+              </div>`;
 
-            const nameAndEmail = `
-              <div class="d-flex flex-column" data-action="view" data-id="${full.id}">
-                <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${data} ${full.solicitante_apellidos}</a>
-                <span>${full.solicitante_email}</span>
-              </div>
-            `;
+            const nameAndHolder = `
+              <div class="d-flex flex-column" data-action="view" data-id="${full.registro}">
+                <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${data}</a>
+              </div>`;
 
             return `
-              <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" data-action="view" data-id="${full.id}">
+              <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" data-action="view" data-id="${full.registro}">
                 <a href="javascript:;">
                   ${symbolLabel}
                 </a>
               </div>
-              ${nameAndEmail}
+              ${nameAndHolder}
             `;
           }
         },
         {
-          title: 'Titulo del trabajo', data: 'titulo'
+          title: this.translate.instant('TABLE.MARK.IMAGE'),
+          data: 'marca',
+          render: function (url: string, type, full) {
+            return `
+              <div class="text-center">
+                <img src="${url}"
+                    alt="${full.denominacion}"
+                    style="width: 50px; height: 50px; object-fit: contain;"
+                    onerror="this.onerror=null;this.src='https://via.placeholder.com/50?text=No+Image';" />
+              </div>
+            `;
+          }
         },
         {
-          title: 'Institución', data: 'institucion_adscripcion'
+          title: this.translate.instant('TABLE.MARK.APPLICATION_TYPE'),
+          data: 'tipoSolicitud'
         },
         {
-          title: 'Fecha de Solicitud', data: 'fecha_presentacion', render: function (data) {
-            return moment(data).format('DD MMM YYYY, hh:mm a');
+          title: this.translate.instant('TABLE.MARK.APPLICANT'),
+          data: 'titular',
+        },
+        {
+          title: this.translate.instant('TABLE.MARK.DATE'),
+          data: 'fechaPresentacion',
+          render: function (data: string) {
+            return `<span class="fw-semibold text-gray-600">${moment(data, 'DD/MM/YYYY').format('DD-MM-YYYY')}</span>`;
           }
         }
       ],
@@ -101,12 +171,34 @@ export class MarcaComponent implements OnInit, AfterViewInit, OnDestroy {
         $('td:eq(2)', row).addClass('fw-semibold text-gray-600');
         $('td:eq(3)', row).addClass('fw-semibold text-gray-600');
       },
+      initComplete: (settings, json) => {
+        this.dtInstance = settings.oInstance.api()
+        this.cdr.detectChanges();
+      }
     };
+  }
+
+  onPageLengthChange(event: any): void {
+    const newLength = parseInt(event.target.value);
+    this.pageLength = newLength;
+
+    if (this.dtInstance) {
+      this.dtInstance.page.len(newLength).draw();
+    } else {
+      this.reloadEvent.emit(true);
+    }
   }
 
   delete(id: number) {
     this.service.deleteTrademark(id).subscribe(() => {
       this.reloadEvent.emit(true);
+    });
+  }
+
+  view(id: number) {
+    this.service.getTrademark(id).subscribe((marca: DatosMarca) => {
+      this.marcaModel = { ...marca };
+      this.isViewMode = true;
     });
   }
 
@@ -146,7 +238,54 @@ export class MarcaComponent implements OnInit, AfterViewInit, OnDestroy {
     this.noticeSwal.fire();
   }
 
+  closeForm(modal: any) {
+    modal.dismiss('cancel');
+
+    this.marcaModel = {
+      denominacion: '',
+      fechaPresentacion: '',
+      tipoSolicitud: '',
+      marca: '',
+      productosServicios: [],
+      titular: ''
+    };
+  }
+
   ngOnDestroy(): void {
     this.reloadEvent.unsubscribe();
+  }
+
+  onSubmit(event: Event, myForm: NgForm) {
+    if (myForm && myForm.invalid) {
+      return;
+    }
+
+    this.isLoading = true;
+
+    const successAlert: SweetAlertOptions = {
+      icon: 'success',
+      title: 'Éxito!',
+      text: 'Coordinador actualizado exitosamente!',
+    };
+    const errorAlert: SweetAlertOptions = {
+      icon: 'error',
+      title: 'Error!',
+      text: '',
+    };
+
+    const completeFn = () => {
+      this.isLoading = false;
+    };
+
+    const updateFn = () => {
+
+    };
+
+    const createFn = () => {
+
+    };
+
+    updateFn();
+
   }
 }
