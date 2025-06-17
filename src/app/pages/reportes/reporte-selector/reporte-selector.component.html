@@ -1,0 +1,17 @@
+<div class="reportes-container">
+  <h2>Reportes disponibles</h2>
+
+  <div class="card-grid">
+    <div
+      class="card reporte-card"
+      *ngFor="let reporte of reportes"
+      [ngClass]="reporte.color"
+      (click)="verReporte(reporte.archivo)"
+    >
+      <span class="material-icons icono-reporte">{{ reporte.icono }}</span>
+      <h3>{{ reporte.titulo }}</h3>
+      <p>{{ reporte.descripcion }}</p>
+      <button>Ver Reporte</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,16 @@
+<div class="visor-container">
+  <h2>{{ archivoTitulo}}</h2>
+
+  <div class="visor-wrapper">
+    <object
+      [data]="archivo | safeUrl"
+      type="application/pdf"
+      class="visor-pdf"
+    >
+      <p>
+        Tu navegador no puede mostrar este PDF. 
+        <a [href]="archivo" target="_blank" rel="noopener">Descargar PDF</a>
+      </p>
+    </object>
+  </div>
+</div>

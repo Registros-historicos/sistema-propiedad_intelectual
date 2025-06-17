@@ -124,6 +124,7 @@ export const ADMINISTRATOR_MENUS = [
   {
     name: 'MENU.REPORTS',
     icon: 'analytics',
+    link: '/administrador/reportes',
     type: 'link'
   }
 ];
