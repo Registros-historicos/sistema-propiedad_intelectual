@@ -7,45 +7,7 @@ const Routing: Routes = [
   },
   {
     path: 'coordinador',
-    children: [
-      {
-        path: 'dashboard',
-        loadChildren: () => import('./coordinador/dashboard/dashboard.module').then((m) => m.DashboardModule),
-      },
-      {
-        path: 'derechos-autor',
-        loadChildren: () => import('./coordinador/derechos-autor/derechos-autor.module').then((m) => m.DerechosAutorModule),
-      },
-      {
-        path: 'diseno-industrial',
-        loadChildren: () => import('./coordinador/diseno-industrial/diseno-industrial.module').then((m) => m.DisenoIndustrialModule),
-      },
-      {
-        path: 'marca',
-        loadChildren: () => import('./coordinador/marca/marca.module').then((m) => m.MarcaModule),
-      },
-      {
-        path: 'modelos-utilidad',
-        loadChildren: () => import('./coordinador/modelos-utilidad/modelos-utilidad.module').then((m) => m.ModelosUtilidadModule),
-      },
-      {
-        path: 'patentes',
-        loadChildren: () => import('./coordinador/patentes/patentes.module').then((m) => m.PatentesModule),
-      },
-      {
-        path: 'reportes',
-        loadChildren: () => import('./reportes/reportes.module').then((m) => m.ReportesModule),
-      },
-      {
-        path: 'solicitantes',
-        loadChildren: () => import('./coordinador/solicitantes/solicitantes.module').then((m) => m.SolicitantesModule),
-      },
-      {
-        path: '',
-        redirectTo: 'dashboard',
-        pathMatch: 'full'
-      }
-    ]
+    loadChildren: () => import('./coordinador/coordinador.module').then((m) => m.CoordinadorModule)
   },
   {
     path: 'solicitante',

@@ -10,6 +10,9 @@ import { DisenoIndustrialComponent } from './diseno-industrial/diseno-industrial
 import {CrudModule} from '../../../modules/crud/crud.module';
 import {SharedModule} from '../../../template/shared/shared.module';
 import {TranslationModule} from '../../../modules/i18n';
+import { FormsModule } from '@angular/forms';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
 
 
 @NgModule({
@@ -22,10 +25,13 @@ import {TranslationModule} from '../../../modules/i18n';
   ],
   imports: [
     CommonModule,
+    FormsModule,
     PropiedadIntelectualRoutingModule,
     CrudModule,
     SharedModule,
-    TranslationModule
+    TranslationModule,
+    SweetAlert2Module.forChild(),
+    NgbCollapseModule,
   ]
 })
 export class PropiedadIntelectualModule { }

@@ -1,0 +1,229 @@
+<div class="card">
+    <div class="card-header border-0 pt-6">
+        <div class="card-title">
+            <h3>Registrar Modelo de Utilidad</h3>
+        </div>
+        <div class="card-toolbar">
+            <button type="button" class="btn btn-light me-3" (click)="navigateBack()">
+                <app-keenicon name="arrow-left" class="fs-2"></app-keenicon>
+                Regresar
+            </button>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <form #myForm="ngForm" (ngSubmit)="onSubmit($event)" class="utility-model-form">
+            <div class="d-flex flex-column scroll-y me-n7 pe-7">
+
+                <div class="notice d-flex bg-light-primary rounded border-primary border border-dashed mb-9 p-6">
+                    <app-keenicon name="information" class="fs-2tx text-primary me-4"></app-keenicon>
+                    <div class="d-flex flex-stack flex-grow-1">
+                        <div class="fw-semibold">
+                            <div class="fs-6 text-gray-700">
+                                Complete la información requerida para registrar el modelo de utilidad.
+                                Todos los campos marcados con (*) son obligatorios.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fw-bold fs-3 rotate collapsible mb-7" data-bs-toggle="collapse" role="button"
+                    (click)="toggleCollapse(1)" [attr.aria-expanded]="!isCollapsed1" aria-controls="kt_modutil_info">
+                    <app-keenicon name="gear" class="fs-3 me-2"></app-keenicon>
+                    Información del Modelo de Utilidad
+                    <span class="ms-2 rotate-180">
+                        <i class="ki-duotone ki-down fs-3" [ngClass]="{ 'ki-up': !isCollapsed1 }"></i>
+                    </span>
+                </div>
+
+                <div class="collapse show" [ngClass]="{ 'show': !isCollapsed1 }">
+
+                    <div class="row g-9 mb-7">
+                        <div class="col-md-4 fv-row">
+                            <label class="fw-semibold fs-6 mb-2 text-gray-600">ID de Solicitud</label>
+                            <input type="text" class="form-control form-control-solid bg-light"
+                                [(ngModel)]="modUtilModel.solicitudId" name="solicitudId" readonly />
+                        </div>
+                        <div class="col-md-4 fv-row">
+                            <label class="fw-semibold fs-6 mb-2 text-gray-600">Fecha de Solicitud</label>
+                            <input type="date" class="form-control form-control-solid bg-light"
+                                [(ngModel)]="modUtilModel.fechaSolicitud" name="fechaSolicitud" readonly />
+                        </div>
+                        <div class="col-md-4 fv-row">
+                            <label class="fw-semibold fs-6 mb-2 text-gray-600">Estado del Trámite</label>
+                            <input type="text" class="form-control form-control-solid bg-light" value="En trámite"
+                                readonly />
+                        </div>
+                    </div>
+
+                    <div class="fv-row mb-7">
+                        <label class="required fw-semibold fs-6 mb-2 text-gray-600">Nombre del Modelo de
+                            Utilidad</label>
+                        <textarea class="form-control form-control-solid" rows="3"
+                            [(ngModel)]="modUtilModel.nombreModUtil" name="nombreModUtil" #nombreModUtil="ngModel"
+                            required minlength="5" maxlength="500"
+                            placeholder="Ingrese el nombre completo del modelo de utilidad"></textarea>
+                        <div *ngIf="myForm.submitted && nombreModUtil.invalid"
+                            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                            <div *ngIf="nombreModUtil.errors?.['required']">El nombre del modelo de utilidad es
+                                requerido</div>
+                            <div *ngIf="nombreModUtil.errors?.['minlength']">El nombre debe tener al menos 5 caracteres
+                            </div>
+                            <div *ngIf="nombreModUtil.errors?.['maxlength']">El nombre no puede exceder 500 caracteres
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-9 mb-7">
+                        <div class="col-md-6 fv-row">
+                            <label class="required fw-semibold fs-6 mb-2 text-gray-600">Solicitante</label>
+                            <input type="text" class="form-control form-control-solid"
+                                [(ngModel)]="modUtilModel.solicitante" name="solicitante" #solicitante="ngModel"
+                                required minlength="3" maxlength="150" placeholder="Nombre completo del solicitante" />
+                            <div *ngIf="myForm.submitted && solicitante.invalid"
+                                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                <div *ngIf="solicitante.errors?.['required']">El solicitante es requerido</div>
+                                <div *ngIf="solicitante.errors?.['minlength']">El nombre debe tener al menos 3
+                                    caracteres</div>
+                                <div *ngIf="solicitante.errors?.['maxlength']">El nombre no puede exceder 150 caracteres
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 fv-row">
+                            <label class="required fw-semibold fs-6 mb-2 text-gray-600">Correo Electrónico</label>
+                            <input type="email" class="form-control form-control-solid"
+                                [(ngModel)]="modUtilModel.correo" name="correo" #correo="ngModel" required email
+                                placeholder="ejemplo@correo.com" />
+                            <div *ngIf="myForm.submitted && correo.invalid"
+                                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                <div *ngIf="correo.errors?.['required']">El correo electrónico es requerido</div>
+                                <div *ngIf="correo.errors?.['email']">Ingrese un correo electrónico válido</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-9 mb-7">
+                        <div class="col-md-6 fv-row">
+                            <label class="required fw-semibold fs-6 mb-2 text-gray-600">Entidad Federativa</label>
+                            <select class="form-select form-select-solid" [(ngModel)]="estadoSeleccionado"
+                                (ngModelChange)="onEstadoChange($event)" name="entidadFederativa"
+                                #entidadFederativa="ngModel" required>
+                                <option value="">Seleccione una entidad federativa</option>
+                                <option *ngFor="let entidad of entidadesFederativas" [value]="entidad.id">
+                                    {{entidad.nombre}}
+                                </option>
+                            </select>
+                            <div *ngIf="myForm.submitted && entidadFederativa.invalid"
+                                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                <div *ngIf="entidadFederativa.errors?.['required']">La entidad federativa es requerida
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 fv-row">
+                            <label class="required fw-semibold fs-6 mb-2 text-gray-600">Institución</label>
+                            <select class="form-select form-select-solid" [(ngModel)]="institucionSeleccionada"
+                                (ngModelChange)="onInstitucionChange($event)" name="institucion" #institucion="ngModel"
+                                required [disabled]="!estadoSeleccionado">
+                                <option value="">Seleccione una institución</option>
+                                <option *ngFor="let institucion of institucionesFiltradas" [value]="institucion.id">
+                                    {{institucion.nombre}}
+                                </option>
+                            </select>
+                            <div *ngIf="myForm.submitted && institucion.invalid"
+                                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                <div *ngIf="institucion.errors?.['required']">La institución es requerida</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="fv-row mb-7">
+                        <label class="required fw-semibold fs-6 mb-2 text-gray-600">Descripción</label>
+                        <textarea class="form-control form-control-solid" rows="4"
+                            [(ngModel)]="modUtilModel.descripcion" name="descripcion" #descripcion="ngModel" required
+                            minlength="10" maxlength="1000"
+                            placeholder="Describa detalladamente el modelo de utilidad, su funcionamiento y aplicaciones"></textarea>
+                        <div *ngIf="myForm.submitted && descripcion.invalid"
+                            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                            <div *ngIf="descripcion.errors?.['required']">La descripción es requerida</div>
+                            <div *ngIf="descripcion.errors?.['minlength']">La descripción debe tener al menos 10
+                                caracteres</div>
+                            <div *ngIf="descripcion.errors?.['maxlength']">La descripción no puede exceder 1000
+                                caracteres</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="fw-bold fs-3 rotate collapsible mb-7" data-bs-toggle="collapse" role="button"
+                    (click)="toggleCollapse(2)" [attr.aria-expanded]="!isCollapsed2"
+                    aria-controls="kt_modutil_documents">
+                    <app-keenicon name="folder" class="fs-3 me-2"></app-keenicon>
+                    Documentos de Soporte
+                    <span class="ms-2 rotate-180">
+                        <i class="ki-duotone ki-down fs-3" [ngClass]="{ 'ki-up': !isCollapsed2 }"></i>
+                    </span>
+                </div>
+
+                <div class="collapse" [ngClass]="{ 'show': !isCollapsed2 }">
+
+                    <div class="notice d-flex bg-light-warning rounded border-warning border border-dashed mb-7 p-6">
+                        <app-keenicon name="information" class="fs-2tx text-warning me-4"></app-keenicon>
+                        <div class="d-flex flex-stack flex-grow-1">
+                            <div class="fw-semibold">
+                                <div class="fs-6 text-gray-700">
+                                    Solo se permiten archivos PDF. Puede adjuntar múltiples documentos como diagramas,
+                                    planos técnicos, especificaciones, etc.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="fv-row mb-7">
+                        <label class="fw-semibold fs-6 mb-2 text-gray-600">Adjuntar Documentos</label>
+                        <input type="file" class="form-control form-control-solid" accept=".pdf" multiple
+                            (change)="onFileSelected($event)" />
+                        <div class="form-text">Seleccione uno o más archivos PDF</div>
+                    </div>
+
+                    <div *ngIf="selectedFiles.length > 0" class="fv-row mb-7">
+                        <label class="fw-semibold fs-6 mb-2 text-gray-600">Archivos Seleccionados</label>
+                        <div class="card card-bordered">
+                            <div class="card-body p-4">
+                                <div *ngFor="let file of selectedFiles; let i = index"
+                                    class="d-flex align-items-center justify-content-between border-bottom py-3">
+                                    <div class="d-flex align-items-center">
+                                        <app-keenicon name="file-text" class="fs-2 text-primary me-3"></app-keenicon>
+                                        <div>
+                                            <div class="fw-bold text-gray-800">{{file.name}}</div>
+                                            <div class="text-muted fs-7">{{getFileSize(file.size)}}</div>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-light-danger" (click)="removeFile(i)">
+                                        <app-keenicon name="trash" class="fs-3"></app-keenicon>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="d-flex justify-content-end mt-10">
+                    <button type="button" class="btn btn-light me-3" (click)="resetForm()">
+                        Limpiar Formulario
+                    </button>
+                    <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+                        <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+                        <span *ngIf="isLoading">Registrando...</span>
+                        <span *ngIf="!isLoading">Registrar Modelo de Utilidad</span>
+                    </button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<swal #noticeSwal [swalOptions]="swalOptions"></swal>

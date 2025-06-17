@@ -39,31 +39,31 @@ export const ADMINISTRATOR_MENUS = [
         name: 'BUTTON.NEW.PATENT',
         icon: 'description',
         type: 'link',
-        link: '/administrador/propiedades/patente/registro',
+        link: '/administrador/propiedades/registro/patente',
       },
       {
         name: 'BUTTON.NEW.TRADEMARK',
         icon: 'description',
         type: 'link',
-        link: '/administrador/propiedades/marca/registro',
+        link: '/administrador/propiedades/registro/marca',
       },
       {
         name: 'BUTTON.NEW.UTILITY_MODEL',
         icon: 'description',
         type: 'link',
-        link: '/administrador/propiedades/modelo-utilidad/registro',
+        link: '/administrador/propiedades/registro/modelo-utilidad',
       },
       {
         name: 'BUTTON.NEW.COPYRIGHT',
         icon: 'description',
         type: 'link',
-        link: '/administrador/propiedades/derecho-autor/registro',
+        link: '/administrador/propiedades/registro/derecho-autor',
       },
       {
         name: 'BUTTON.NEW.INDUSTRIAL_DESIGN',
         icon: 'description',
         type: 'link',
-        link: '/administrador/propiedades/diseno-industrial/registro',
+        link: '/administrador/propiedades/registro/diseno-industrial',
       }
     ]
   },
@@ -125,6 +125,101 @@ export const ADMINISTRATOR_MENUS = [
     name: 'MENU.REPORTS',
     icon: 'analytics',
     link: '/administrador/reportes',
+    type: 'link'
+  }
+];
+
+export const COORDINATOR_MENUS = [
+  {
+    name: 'MENU.DASHBOARD',
+    icon: 'dashboard',
+    link: '/coordinador/dashboard',
+    type: 'link',
+  },
+  {
+    name: 'MENU.REGISTERS',
+    icon: 'add',
+    type: 'separator'
+  },
+  {
+    name: 'MENU.INTELECTUAL_PROPERTIES',
+    icon: 'note_add',
+    type: 'dropdown',
+    children: [
+      {
+        name: 'BUTTON.NEW.PATENT',
+        icon: 'description',
+        type: 'link',
+        link: '/coordinador/propiedades/registro/patente',
+      },
+      {
+        name: 'BUTTON.NEW.TRADEMARK',
+        icon: 'description',
+        type: 'link',
+        link: '/coordinador/propiedades/registro/marca',
+      },
+      {
+        name: 'BUTTON.NEW.UTILITY_MODEL',
+        icon: 'description',
+        type: 'link',
+        link: '/coordinador/propiedades/registro/modelo-utilidad',
+      },
+      {
+        name: 'BUTTON.NEW.COPYRIGHT',
+        icon: 'description',
+        type: 'link',
+        link: '/coordinador/propiedades/registro/derecho-autor',
+      },
+      {
+        name: 'BUTTON.NEW.INDUSTRIAL_DESIGN',
+        icon: 'description',
+        type: 'link',
+        link: '/coordinador/propiedades/registro/diseno-industrial',
+      }
+    ]
+  },
+  {
+    name: 'MENU.USERS',
+    type: 'separator',
+  },
+  {
+    name: 'MENU.ADMIN.APPLICANTS',
+    icon: 'person',
+    link: '/coordinador/solicitantes',
+    type: 'link'
+  },
+  {
+    name: 'MENU.INTELECTUAL_PROPERTIES',
+    type: 'separator',
+  },
+  {
+    name: 'MENU.COORD.PATENTS',
+    icon: 'description',
+    link: '/coordinador/propiedades/patente',
+    type: 'link'
+  },
+  {
+    name: 'MENU.COORD.TRADEMARKS',
+    icon: 'description',
+    link: '/coordinador/propiedades/marca',
+    type: 'link'
+  },
+  {
+    name: 'MENU.COORD.UTILITY_MODELS',
+    icon: 'description',
+    link: '/coordinador/propiedades/modelo-utilidad',
+    type: 'link'
+  },
+  {
+    name: 'MENU.COORD.COPYRIGHTS',
+    icon: 'description',
+    link: '/coordinador/propiedades/derecho-autor',
+    type: 'link'
+  },
+  {
+    name: 'MENU.COORD.INDUSTRIAL_DESIGNS',
+    icon: 'description',
+    link: '/coordinador/propiedades/diseno-industrial',
     type: 'link'
   }
 ];
