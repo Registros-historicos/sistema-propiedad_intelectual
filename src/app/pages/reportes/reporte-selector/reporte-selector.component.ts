@@ -29,8 +29,8 @@ export class ReporteSelectorComponent implements OnInit {
   }
 
   verReporte(archivo: string): void {
-    //this.router.navigate([archivo], { relativeTo: this.route });
-    window.open(`assets/reportes/${archivo}`, '_blank');
+    this.router.navigate([archivo], { relativeTo: this.route });
+    //window.open(`assets/reportes/${archivo}`, '_blank');
 
   }
 }
