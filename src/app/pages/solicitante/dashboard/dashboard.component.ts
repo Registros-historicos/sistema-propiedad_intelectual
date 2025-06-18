@@ -14,6 +14,8 @@ import moment from 'moment/moment';
 import { TranslateService } from '@ngx-translate/core';
 import { getCSSVariableValue } from 'src/app/template/kt/_utils';
 import { APPLICANTS_REQUEST_DATA } from 'src/app/api/data/applicant.data';
+import { DerechosAutorComponent } from '../registrar/derechos-autor/derechos-autor.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-dashboard',
@@ -29,6 +31,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild('noticeSwal')
   noticeSwal!: SwalComponent;
+  @ViewChild('formModal') formModal: any;
 
   swalOptions: SweetAlertOptions = {};
 
@@ -43,10 +46,20 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   solicitudesRegistradas: number = 0;
   solicitudesConObservaciones: number = 0;
   solicitudesAprobadas: number = 0;
+  solicitudSeleccionada: any = null;
+
+  // Variables de estado
+  isCollapsed1 = false;
+  isCollapsed2 = true;
+  estadoSeleccionado: number | null = null;
+  institucionSeleccionada: number | null = null;
+  selectedFile: File | null = null;
+  isViewMode: boolean = true;
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -258,13 +271,21 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  editarSolicitud(event: any): void {
-    this.showAlert({
-      title: 'Editar solicitud',
-      text: `Editar: ${event.titulo}`,
-      icon: 'info',
-      confirmButtonText: 'Aceptar',
-    });
+  editarSolicitud(id: number): void {
+    // Encuentra la solicitud seleccionada
+    const solicitud = this.solicitudes.find((sol) => sol.id === id);
+
+    if (solicitud) {
+      this.solicitudSeleccionada = solicitud;
+
+      // Abre el modal y pasa los datos de la solicitud seleccionada
+      this.dialog.open(DerechosAutorComponent, {
+        width: '800px',
+        data: { solicitud: this.solicitudSeleccionada },
+      });
+    } else {
+      console.error('Solicitud no encontrada');
+    }
   }
 
   showAlert(swalOptions: SweetAlertOptions): void {
@@ -280,6 +301,25 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     );
     this.cdr.detectChanges();
     this.noticeSwal.fire();
+  }
+
+  view(id: number): void {
+    const solicitud = this.solicitudes.find((sol) => sol.id === id);
+
+    if (solicitud) {
+      this.solicitudSeleccionada = solicitud;
+
+      this.dialog.open(DerechosAutorComponent, {
+        width: '800px',
+        data: { solicitud: this.solicitudSeleccionada },
+      });
+    } else {
+      console.error('Solicitud no encontrada');
+    }
+  }
+
+  downloadDocument(documentName: string): void {
+    console.log('Descargando documento:', documentName);
   }
 
   ngAfterViewInit(): void {}
