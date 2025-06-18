@@ -1,6 +1,6 @@
 import { IAplicantModel } from '../models/applicant.model';
 
-export const COPYRIGHT_DATA: IAplicantModel[] = [
+export const APPLICANTS_REQUEST_DATA: IAplicantModel[] = [
   {
     id: 1,
     titulo: 'Sistema de Gestión Ambiental',
