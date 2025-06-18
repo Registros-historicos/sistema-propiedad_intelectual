@@ -1,19 +1,33 @@
 <div class="container">
   <!-- Header -->
-  <div class="d-flex justify-content-between align-items-start mb-5">
-    <div>
-      <h1 class="fw-bold text-gray-800 display-4">Juan Pérez Hernandez</h1>
-      <p class="text-gray-800 mb-2 fs-5">
-        <strong>Institución:</strong> Instituto Tecnológico de Orizaba
-      </p>
-      <p class="text-gray-800 mb-2 fs-5">
-        <strong>Tipo de Institución:</strong> Federativa
-      </p>
-      <p class="text-gray-800 mb-2 fs-5"><strong>Estado:</strong> Veracruz</p>
-      <p class="text-gray-800 mb-2 fs-5"><strong>Puesto:</strong> Doctor</p>
-    </div>
-    <div>
-      <button class="btn btn-lg btn-primary">Registrar Solicitud</button>
+  <div class="card-body pb-0">
+    <div class="d-flex align-items-start mb-5">
+      <!-- Avatar -->
+      <div class="symbol symbol-75px me-5 mt-2">
+        <img
+          src="./assets/media/avatars/300-25.jpg"
+          alt="Avatar"
+          class="rounded-circle"
+        />
+      </div>
+      <!-- Info -->
+      <div class="d-flex flex-column justify-content-center">
+        <h1 class="fw-bold text-gray-800 display-5 mb-0">
+          Jorge Díaz Hernández
+        </h1>
+        <p class="text-gray-500 fw-bold mb-1">
+          <strong>Institución:</strong> Instituto Tecnológico de Orizaba
+        </p>
+        <p class="text-gray-500 fw-bold mb-1">
+          <strong>Tipo de Institución:</strong> Federativa
+        </p>
+        <p class="text-gray-500 fw-bold mb-1">
+          <strong>Estado:</strong> Veracruz
+        </p>
+        <p class="text-gray-500 fw-bold mb-1">
+          <strong>Puesto:</strong> Doctor
+        </p>
+      </div>
     </div>
   </div>
 
@@ -41,82 +55,32 @@
   <div class="row mb-5">
     <div class="col-md-12">
       <div class="card">
-        <div class="card-body">
-          <h3 class="fw-bold text-gray-800 text-center">
-            Distribución por Tipo
-          </h3>
-          <div class="chart-container" style="height: 300px">
-            <div
-              style="
-                display: flex;
-                align-items: flex-end;
-                justify-content: space-around;
-                height: 100%;
-                border: 1px solid #ccc;
-                padding: 10px;
-              "
+        <div class="card-header border-0 pt-5">
+          <h3 class="card-title align-items-start flex-column">
+            <span class="card-label fw-bolder fs-3 mb-1"
+              >Distribución de Solicitudes</span
             >
-              <div
-                style="
-                  width: 15%;
-                  height: 60%;
-                  background-color: #007bff;
-                  text-align: center;
-                  color: white;
-                  font-weight: bold;
-                "
-              >
-                Derechos de autor
-              </div>
-              <div
-                style="
-                  width: 15%;
-                  height: 80%;
-                  background-color: #28a745;
-                  text-align: center;
-                  color: white;
-                  font-weight: bold;
-                "
-              >
-                Patente
-              </div>
-              <div
-                style="
-                  width: 15%;
-                  height: 50%;
-                  background-color: #ffc107;
-                  text-align: center;
-                  color: white;
-                  font-weight: bold;
-                "
-              >
-                Modelo de utilidad
-              </div>
-              <div
-                style="
-                  width: 15%;
-                  height: 40%;
-                  background-color: #17a2b8;
-                  text-align: center;
-                  color: white;
-                  font-weight: bold;
-                "
-              >
-                Diseño industrial
-              </div>
-              <div
-                style="
-                  width: 15%;
-                  height: 70%;
-                  background-color: #dc3545;
-                  text-align: center;
-                  color: white;
-                  font-weight: bold;
-                "
-              >
-                Marca
-              </div>
-            </div>
+            <span class="text-muted fw-bold fs-7"
+              >Estado actual de las solicitudes</span
+            >
+          </h3>
+        </div>
+        <div class="card-body">
+          <div #chartRef id="dashboard_chart" [style.height]="'350px'">
+            <apx-chart
+              [series]="chartOptions.series"
+              [chart]="chartOptions.chart"
+              [xaxis]="chartOptions.xaxis"
+              [yaxis]="chartOptions.yaxis"
+              [dataLabels]="chartOptions.dataLabels"
+              [stroke]="chartOptions.stroke"
+              [legend]="chartOptions.legend"
+              [fill]="chartOptions.fill"
+              [states]="chartOptions.states"
+              [tooltip]="chartOptions.tooltip"
+              [colors]="chartOptions.colors"
+              [plotOptions]="chartOptions.plotOptions"
+            ></apx-chart>
           </div>
         </div>
       </div>
@@ -125,72 +89,115 @@
 
   <!-- Mis Solicitudes -->
   <div class="card">
-    <div class="card-header mt-5">
-      <h3 class="fw-bold text-gray-800">Mis Solicitudes</h3>
+    <!-- Header -->
+    <div class="card-header border-0 pt-5">
+      <h3 class="card-title align-items-start flex-column">
+        <span class="card-label fw-bolder fs-3 mb-1">Mis Solicitudes</span>
+      </h3>
+      <!-- Paginador: Selector de cantidad por página -->
+      <div class="card-toolbar">
+        <div class="d-flex align-items-center">
+          <label class="form-label text-gray-600 me-3 mb-0">Mostrar:</label>
+          <select
+            class="form-select form-select-sm form-select-solid w-75px"
+            [(ngModel)]="pageLength"
+            (ngModelChange)="onPageLengthChange()"
+          >
+            <option *ngFor="let length of lengthMenu" [value]="length">
+              {{ length }}
+            </option>
+          </select>
+        </div>
+      </div>
     </div>
-    <div class="card-body">
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>Tipo</th>
-            <th>Estado</th>
-            <th>Fecha</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Patente</td>
-            <td><span class="badge badge-light-warning">En trámite</span></td>
-            <td>2025-06-01</td>
-            <td>
-              <button class="btn btn-sm btn-primary">Ver Detalles</button>
-            </td>
-          </tr>
-          <tr>
-            <td>Marca</td>
-            <td><span class="badge badge-light-primary">Registrada</span></td>
-            <td>2025-05-28</td>
-            <td>
-              <button class="btn btn-sm btn-primary">Ver Detalles</button>
-            </td>
-          </tr>
-          <tr>
-            <td>Modelo de utilidad</td>
-            <td>
-              <span class="badge badge-light-danger"
-                >Trámite con Observaciones</span
-              >
-            </td>
-            <td>2025-05-20</td>
-            <td>
-              <button class="btn btn-sm btn-primary">Ver Detalles</button>
-            </td>
-          </tr>
-          <tr>
-            <td>Diseño industrial</td>
-            <td><span class="badge badge-light-success">Aprobada</span></td>
-            <td>2025-06-10</td>
-            <td>
-              <button class="btn btn-sm btn-primary">Ver Detalles</button>
-            </td>
-          </tr>
-          <tr>
-            <td>Derechos de autor</td>
-            <td>
-              <span
-                class="badge"
-                style="background-color: #b0bec5; color: white"
-                >Concluida</span
-              >
-            </td>
-            <td>2025-06-15</td>
-            <td>
-              <button class="btn btn-sm btn-primary">Ver Detalles</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+
+    <!-- Body -->
+    <div class="card-body py-3">
+      <div class="table-responsive">
+        <table
+          class="table table-row-bordered table-row-gray-100 align-middle gs-0 gy-3"
+        >
+          <thead>
+            <tr class="fw-bolder text-muted">
+              <th class="min-w-150px">Tipo</th>
+              <th class="min-w-200px">Título de la Propiedad Intelectual</th>
+              <th class="min-w-140px">Estado</th>
+              <th class="min-w-120px">Fecha</th>
+              <th class="min-w-150px text-end">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let solicitud of pagedSolicitudes">
+              <td>
+                <span class="text-gray-900 fw-bolder text-hover-primary fs-6">
+                  {{ solicitud.tipo }}
+                </span>
+              </td>
+              <td>
+                <span class="text-gray-900 fw-bolder text-hover-primary fs-6">
+                  {{ solicitud.titulo }}
+                </span>
+              </td>
+              <td>
+                <span
+                  class="badge"
+                  [ngClass]="{
+                    'badge-light-primary': solicitud.estado === 'Registrada',
+                    'badge-light-warning': solicitud.estado === 'En trámite',
+                    'badge-light-danger':
+                      solicitud.estado === 'Trámite con Observaciones',
+                    'badge-light-success': solicitud.estado === 'Aprobada'
+                  }"
+                >
+                  {{ solicitud.estado }}
+                </span>
+              </td>
+              <td>
+                <span
+                  class="text-gray-900 fw-bolder text-hover-primary d-block mb-1 fs-6"
+                >
+                  {{ solicitud.fecha }}
+                </span>
+              </td>
+              <td class="text-end">
+                <button
+                  class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-2"
+                  (click)="verDetalles(solicitud)"
+                >
+                  <app-keenicon name="eye" class="fs-3"></app-keenicon>
+                </button>
+                <button
+                  class="btn btn-icon btn-bg-light btn-active-color-warning btn-sm"
+                  (click)="editarSolicitud(solicitud)"
+                >
+                  <app-keenicon name="pencil" class="fs-3"></app-keenicon>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- Paginador: Navegación de páginas -->
+      <div
+        class="d-flex justify-content-end align-items-center mt-3"
+        *ngIf="totalPages > 1"
+      >
+        <button
+          class="btn btn-sm btn-light me-2"
+          [disabled]="currentPage === 1"
+          (click)="goToPage(currentPage - 1)"
+        >
+          Anterior
+        </button>
+        <span class="me-2">Página {{ currentPage }} de {{ totalPages }}</span>
+        <button
+          class="btn btn-sm btn-light"
+          [disabled]="currentPage === totalPages"
+          (click)="goToPage(currentPage + 1)"
+        >
+          Siguiente
+        </button>
+      </div>
     </div>
   </div>
 </div>
