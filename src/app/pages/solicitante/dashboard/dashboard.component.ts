@@ -6,6 +6,7 @@ import {
   OnDestroy,
   OnInit,
   ViewChild,
+  TemplateRef,
 } from '@angular/core';
 import { Config } from 'datatables.net';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
@@ -15,7 +16,10 @@ import { TranslateService } from '@ngx-translate/core';
 import { getCSSVariableValue } from 'src/app/template/kt/_utils';
 import { APPLICANTS_REQUEST_DATA } from 'src/app/api/data/applicant.data';
 import { DerechosAutorComponent } from '../registrar/derechos-autor/derechos-autor.component';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog'; // Usado para abrir el modal
+import { ApplicantsService } from 'src/app/api/services/applicant.service';
+import { IAplicantModel } from 'src/app/api/models/applicant.model';
+import { Subscription } from 'rxjs'; // Importado para manejar las suscripciones
 
 @Component({
   selector: 'app-dashboard',
@@ -31,7 +35,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild('noticeSwal')
   noticeSwal!: SwalComponent;
-  @ViewChild('formModal') formModal: any;
+  @ViewChild('formModal') formModalRef!: TemplateRef<any>;
 
   swalOptions: SweetAlertOptions = {};
 
@@ -39,31 +43,34 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   chartOptions: any;
 
-  // Estadísticas
   totalSolicitudes: number = 0;
   solicitudesPendientes: number = 0;
   solicitudesEnTramite: number = 0;
   solicitudesRegistradas: number = 0;
   solicitudesConObservaciones: number = 0;
   solicitudesAprobadas: number = 0;
-  solicitudSeleccionada: any = null;
 
-  // Variables de estado
+  solicitudSeleccionada: IAplicantModel | undefined;
+
   isCollapsed1 = false;
   isCollapsed2 = true;
   estadoSeleccionado: number | null = null;
   institucionSeleccionada: number | null = null;
   selectedFile: File | null = null;
-  isViewMode: boolean = true;
+  isViewMode: boolean = false;
+
+  private applicantSubscription: Subscription | undefined;
 
   constructor(
     private cdr: ChangeDetectorRef,
     private translate: TranslateService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private service: ApplicantsService
   ) {}
 
   ngOnInit(): void {
     this.solicitudes = APPLICANTS_REQUEST_DATA.map((applicant) => ({
+      id: applicant.id,
       tipo: applicant.titulo,
       titulo: applicant.descripcion,
       estado: applicant.estado,
@@ -111,19 +118,24 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
             )}</span>`,
         },
       ],
-      createdRow: (row, data, dataIndex) => {
+      createdRow: (row, data: any, dataIndex) => {
         const $row = $(row);
         $row.attr('data-action', 'view');
-        $row.attr('data-id', dataIndex);
+        $row.attr('data-id', data.id);
         $row.addClass('cursor-pointer');
       },
       initComplete: (settings, json) => {
         this.dtInstance = settings.oInstance.api();
         this.cdr.detectChanges();
+        $(this.dtInstance.table().body()).on('click', 'tr', (event: any) => {
+          const rowData = this.dtInstance.row(event.currentTarget).data();
+          if (rowData && rowData.id) {
+            this.view(rowData.id);
+          }
+        });
       },
     };
 
-    // Datos de ejemplo para la gráfica
     const solicitudesData = [
       { tipo: 'DA', data: [12, 18, 24, 19, 15, 21] },
       { tipo: 'PA', data: [8, 12, 15, 11, 9, 14] },
@@ -132,7 +144,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       { tipo: 'MA', data: [45, 52, 48, 56, 63, 59] },
     ];
 
-    // Calcula el total de solicitudes y pendientes
     this.totalSolicitudes = solicitudesData.reduce(
       (acc, item) => acc + item.data.reduce((sum, val) => sum + val, 0),
       0
@@ -141,7 +152,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       (solicitud) => solicitud.estado === 'Pendiente'
     ).length;
 
-    // Calcula totales por estado
     this.solicitudesEnTramite = this.solicitudes.filter(
       (solicitud) => solicitud.estado === 'En trámite'
     ).length;
@@ -272,13 +282,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   editarSolicitud(id: number): void {
-    // Encuentra la solicitud seleccionada
     const solicitud = this.solicitudes.find((sol) => sol.id === id);
 
     if (solicitud) {
       this.solicitudSeleccionada = solicitud;
 
-      // Abre el modal y pasa los datos de la solicitud seleccionada
       this.dialog.open(DerechosAutorComponent, {
         width: '800px',
         data: { solicitud: this.solicitudSeleccionada },
@@ -303,28 +311,29 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.noticeSwal.fire();
   }
 
-  view(id: number): void {
-    const solicitud = this.solicitudes.find((sol) => sol.id === id);
-
-    if (solicitud) {
-      this.solicitudSeleccionada = solicitud;
-
-      this.dialog.open(DerechosAutorComponent, {
-        width: '800px',
-        data: { solicitud: this.solicitudSeleccionada },
-      });
-    } else {
-      console.error('Solicitud no encontrada');
+  view(id: number) {
+    if (this.applicantSubscription) {
+      this.applicantSubscription.unsubscribe();
     }
-  }
 
-  downloadDocument(documentName: string): void {
-    console.log('Descargando documento:', documentName);
+    this.applicantSubscription = this.service.getApplicant(id).subscribe(
+      (applicantData: IAplicantModel) => {
+        this.solicitudSeleccionada = { ...applicantData };
+        this.isViewMode = true;
+      },
+      (error) => {
+        console.error('Error al cargar la solicitud:', error);
+        this.solicitudSeleccionada = undefined;
+      }
+    );
   }
 
   ngAfterViewInit(): void {}
 
   ngOnDestroy(): void {
+    if (this.applicantSubscription) {
+      this.applicantSubscription.unsubscribe();
+    }
     this.reloadEvent.unsubscribe();
   }
 }
