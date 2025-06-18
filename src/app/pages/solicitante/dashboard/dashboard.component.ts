@@ -1,10 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { WidgetsModule } from '../../../template/widgets/content/widgets/widgets.module';
-import { ModalsModule } from '../../../template/widgets/layout/modals/modals.module';
-import { NgApexchartsModule } from 'ng-apexcharts';
-import { SharedModule } from 'src/app/template/shared/shared.module';
+import { Component, OnInit, OnDestroy, EventEmitter, ViewChild } from '@angular/core';
+import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { SweetAlertOptions } from 'sweetalert2';
 import { getCSSVariableValue } from 'src/app/template/kt/_utils';
 
 /**
@@ -12,19 +8,28 @@ import { getCSSVariableValue } from 'src/app/template/kt/_utils';
  *
  * Componente principal del dashboard del solicitante.
  * Muestra estadísticas, gráficos y una tabla paginada de solicitudes.
- *
- * Buenas prácticas:
- * - Documenta cada método y propiedad pública.
- * - Mantén la lógica de paginación separada y clara.
- * - Usa nombres descriptivos para variables y métodos.
- * - Incluye comentarios para fragmentos de lógica compleja.
  */
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
+  /**
+   * Instancia de DataTables (si aplica).
+   */
+  dtInstance: any;
+
+  /**
+   * Evento para recargar la tabla de solicitudes.
+   */
+  reloadEvent: EventEmitter<boolean> = new EventEmitter();
+
+  /**
+   * Configuración para el componente <app-crud>.
+   */
+  datatableConfig: any = {};
+
   /**
    * Opciones de configuración para el gráfico de barras.
    */
@@ -41,7 +46,7 @@ export class DashboardComponent implements OnInit {
   pageLength: number = 10;
 
   /**
-   * Página actual del paginador.
+   * Página current del paginador.
    */
   currentPage: number = 1;
 
@@ -231,17 +236,66 @@ export class DashboardComponent implements OnInit {
     },
   ];
 
+  /**
+   * Total de solicitudes (para estadísticas).
+   */
   totalSolicitudes: number = 0;
+
+  /**
+   * Total de solicitudes pendientes.
+   */
   solicitudesPendientes: number = 0;
+
+  /**
+   * Total de solicitudes en trámite.
+   */
   solicitudesEnTramite: number = 0;
+
+  /**
+   * Total de solicitudes registradas.
+   */
   solicitudesRegistradas: number = 0;
+
+  /**
+   * Total de solicitudes con observaciones.
+   */
   solicitudesConObservaciones: number = 0;
+
+  /**
+   * Total de solicitudes aprobadas.
+   */
   solicitudesAprobadas: number = 0;
+
+  /**
+   * Referencia al componente SweetAlert2 para mostrar alertas.
+   */
+  @ViewChild('noticeSwal') noticeSwal!: SwalComponent;
+
+  /**
+   * Opciones para la alerta SweetAlert2.
+   */
+  swalOptions: SweetAlertOptions = {};
 
   /**
    * Inicializa el componente, configura el gráfico y la paginación.
    */
   ngOnInit(): void {
+    // Configuración de la tabla para <app-crud>
+    this.datatableConfig = {
+      data: this.solicitudes,
+      lengthMenu: this.lengthMenu,
+      pageLength: this.pageLength,
+      columns: [
+        { title: 'Tipo', data: 'tipo' },
+        { title: 'Título', data: 'titulo' },
+        { title: 'Estado', data: 'estado' },
+        { title: 'Fecha', data: 'fecha' },
+      ],
+      initComplete: (settings: any, json: any) => {
+        // Puedes guardar la instancia si lo necesitas
+      }
+    };
+
     // Datos de ejemplo para la gráfica
     const solicitudesData = [
       { tipo: 'DA', data: [12, 18, 24, 19, 15, 21] },
@@ -278,11 +332,13 @@ export class DashboardComponent implements OnInit {
     this.updatePagedSolicitudes();
   }
 
+  /**
+   * Devuelve las opciones de configuración para el gráfico de barras.
+   * @param height Altura del gráfico en píxeles.
+   */
   getChartOptions(height: number) {
     const labelColor = getCSSVariableValue('--bs-gray-500');
     const borderColor = getCSSVariableValue('--bs-gray-200');
-    const baseColor = getCSSVariableValue('--bs-primary');
-    const secondaryColor = getCSSVariableValue('--bs-gray-300');
     const seriesColors = [
       getCSSVariableValue('--bs-primary'),
       getCSSVariableValue('--bs-success'),
@@ -293,34 +349,17 @@ export class DashboardComponent implements OnInit {
 
     return {
       series: [
-        {
-          name: 'DA',
-          data: [12, 18, 24, 19, 15, 21],
-        },
-        {
-          name: 'PA',
-          data: [8, 12, 15, 11, 9, 14],
-        },
-        {
-          name: 'MU',
-          data: [25, 32, 28, 35, 41, 38],
-        },
-        {
-          name: 'DI',
-          data: [6, 9, 11, 8, 12, 10],
-        },
-        {
-          name: 'MA',
-          data: [45, 52, 48, 56, 63, 59],
-        },
+        { name: 'DA', data: [12, 18, 24, 19, 15, 21] },
+        { name: 'PA', data: [8, 12, 15, 11, 9, 14] },
+        { name: 'MU', data: [25, 32, 28, 35, 41, 38] },
+        { name: 'DI', data: [6, 9, 11, 8, 12, 10] },
+        { name: 'MA', data: [45, 52, 48, 56, 63, 59] },
       ],
       chart: {
         fontFamily: 'inherit',
         type: 'bar',
         height: height,
-        toolbar: {
-          show: false,
-        },
+        toolbar: { show: false },
       },
       plotOptions: {
         bar: {
@@ -329,12 +368,8 @@ export class DashboardComponent implements OnInit {
           borderRadius: 5,
         },
       },
-      legend: {
-        show: false,
-      },
-      dataLabels: {
-        enabled: false,
-      },
+      legend: { show: false },
+      dataLabels: { enabled: false },
       stroke: {
         show: true,
         width: 2,
@@ -342,12 +377,8 @@ export class DashboardComponent implements OnInit {
       },
       xaxis: {
         categories: ['Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul'],
-        axisBorder: {
-          show: false,
-        },
-        axisTicks: {
-          show: false,
-        },
+        axisBorder: { show: false },
+        axisTicks: { show: false },
         labels: {
           style: {
             colors: labelColor,
@@ -370,55 +401,28 @@ export class DashboardComponent implements OnInit {
           },
         },
       },
-      fill: {
-        opacity: 1,
-      },
+      fill: { opacity: 1 },
       states: {
-        normal: {
-          filter: {
-            type: 'none',
-            value: 0,
-          },
-        },
-        hover: {
-          filter: {
-            type: 'none',
-            value: 0,
-          },
-        },
+        normal: { filter: { type: 'none', value: 0 } },
+        hover: { filter: { type: 'none', value: 0 } },
         active: {
           allowMultipleDataPointsSelection: false,
-          filter: {
-            type: 'none',
-            value: 0,
-          },
+          filter: { type: 'none', value: 0 },
         },
       },
       tooltip: {
-        style: {
-          fontSize: '12px',
-        },
+        style: { fontSize: '12px' },
         y: {
           formatter: function (val: number) {
             return val + ' solicitudes';
           },
         },
       },
-      colors: [
-        seriesColors[0],
-        seriesColors[1],
-        seriesColors[2],
-        seriesColors[3],
-        seriesColors[4],
-      ],
+      colors: seriesColors,
       grid: {
         borderColor: borderColor,
         strokeDashArray: 4,
-        yaxis: {
-          lines: {
-            show: true,
-          },
-        },
+        yaxis: { lines: { show: true } },
       },
     };
   }
@@ -434,24 +438,23 @@ export class DashboardComponent implements OnInit {
   }
 
   /**
-   * Muestra un alert para editar la solicitud seleccionada.
-   * @param solicitud Solicitud a editar
+   * Evento al cambiar la cantidad de elementos por página desde el selector.
+   * Actualiza la propiedad pageLength y recarga la tabla.
+   * @param event Evento del select
    */
-  editarSolicitud(solicitud: any): void {
-    alert(
-      `Editar solicitud:\nTipo: ${solicitud.tipo}\nTítulo: ${solicitud.titulo}\nEstado: ${solicitud.estado}\nFecha: ${solicitud.fecha}`
-    );
-    // Aquí puedes implementar la lógica para abrir un formulario de edición o realizar otra acción
-  }
+  onPageLengthChange(event: any): void {
+    const newLength = parseInt(event.target.value, 10);
+    this.pageLength = newLength;
 
-  /**
-   * Evento al cambiar la cantidad de elementos por página.
-   * Reinicia la página actual y actualiza la paginación.
-   * @param event Evento del select (opcional, por compatibilidad con el template)
-   */
-  onPageLengthChange(): void {
-    this.currentPage = 1;
-    this.updatePagedSolicitudes();
+    if (this.dtInstance) {
+      // Si tienes instancia de DataTables, actualiza y redibuja
+      this.dtInstance.page.len(newLength).draw();
+    } else {
+      // Si no, actualiza la paginación manual y recarga la tabla
+      this.currentPage = 1; // Opcional: regresa a la primera página
+      this.updatePagedSolicitudes();
+      this.reloadEvent.emit(true); // Si usas <app-crud>
+    }
   }
 
   /**
@@ -487,4 +490,48 @@ export class DashboardComponent implements OnInit {
     const end = start + this.pageLength;
     this.pagedSolicitudes = visibles.slice(start, end);
   }
+
+  /**
+   * Muestra una alerta de confirmación para eliminar una solicitud.
+   * @param event Evento de eliminación recibido de <app-crud>
+   */
+  delete(event: any): void {
+    this.showAlert({
+      title: '¿Estás seguro?',
+      text: 'Esta acción eliminará la solicitud.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    });
+  }
+
+  /**
+   * Muestra una alerta informativa para editar una solicitud.
+   * @param event Evento de edición recibido de <app-crud>
+   */
+  editarSolicitud(event: any): void {
+    this.showAlert({
+      title: 'Editar solicitud',
+      text: `Editar: ${event.titulo}`,
+      icon: 'info',
+      confirmButtonText: 'Aceptar'
+    });
+  }
+
+  /**
+   * Muestra una alerta personalizada usando SweetAlert2.
+   * @param options Opciones de la alerta
+   */
+  showAlert(options: SweetAlertOptions): void {
+    this.swalOptions = options;
+    setTimeout(() => {
+      this.noticeSwal.fire();
+    });
+  }
+
+  /**
+   * Limpieza de recursos al destruir el componente.
+   */
+  ngOnDestroy(): void {}
 }

@@ -7,6 +7,8 @@ import { WidgetsModule } from '../../../template/widgets/content/widgets/widgets
 import { ModalsModule } from '../../../template/widgets/layout/modals/modals.module';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { SharedModule } from 'src/app/template/shared/shared.module';
+import { CrudModule } from 'src/app/modules/crud/crud.module'; // <-- IMPORTANTE
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2'; // <-- IMPORTANTE
 
 @NgModule({
   declarations: [DashboardComponent],
@@ -17,6 +19,8 @@ import { SharedModule } from 'src/app/template/shared/shared.module';
     ModalsModule,
     NgApexchartsModule,
     SharedModule,
+    CrudModule, // <-- AGREGA ESTO
+    SweetAlert2Module, // <-- Y ESTO
     RouterModule.forChild([
       {
         path: '',
