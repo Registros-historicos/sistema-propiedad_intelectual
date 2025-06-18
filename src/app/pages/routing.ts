@@ -1,16 +1,23 @@
 import { Routes } from '@angular/router';
+import { RoleGuard } from '../guards/role.guard';
 
 const Routing: Routes = [
   {
     path: 'dashboard',
+    canActivate: [RoleGuard],
+    data: { roles: ['administrador', 'coordinador', 'solicitante'] },
     loadChildren: () => import('./dashboard/dashboard.module').then((m) => m.DashboardModule),
   },
   {
     path: 'coordinador',
+    canActivate: [RoleGuard],
+    data: { roles: ['coordinador'] },
     loadChildren: () => import('./coordinador/coordinador.module').then((m) => m.CoordinadorModule)
   },
   {
     path: 'solicitante',
+    canActivate: [RoleGuard],
+    data: { roles: ['solicitante'] },
     children: [
       {
         path: 'dashboard',
@@ -29,6 +36,8 @@ const Routing: Routes = [
   },
   {
     path: 'administrador',
+    canActivate: [RoleGuard],
+    data: { roles: ['administrador'] },
     loadChildren: () => import('./administrador/administrador.module').then((m) => m.AdministradorModule),
   },
   {
