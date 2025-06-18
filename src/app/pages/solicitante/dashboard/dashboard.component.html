@@ -33,24 +33,70 @@
 
   <!-- Estadísticas -->
   <div class="row mb-5">
-    <div class="col-md-6">
+    <div class="col-md-4">
       <div class="card">
         <div class="card-body text-center">
           <h3 class="fw-bold text-gray-800">Total Solicitudes</h3>
-          <span class="fs-1 fw-bolder text-primary">120</span>
+          <span class="fs-1 fw-bolder text-primary">{{
+            totalSolicitudes
+          }}</span>
         </div>
       </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-4">
       <div class="card">
         <div class="card-body text-center">
           <h3 class="fw-bold text-gray-800">Solicitudes Pendientes</h3>
-          <span class="fs-1 fw-bolder text-warning">15</span>
+          <span class="fs-1 fw-bolder text-warning">{{
+            solicitudesPendientes
+          }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body text-center">
+          <h3 class="fw-bold text-gray-800">En trámite</h3>
+          <span class="fs-1 fw-bolder text-info">{{
+            solicitudesEnTramite
+          }}</span>
         </div>
       </div>
     </div>
   </div>
 
+  <div class="row mb-5">
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body text-center">
+          <h3 class="fw-bold text-gray-800">Registrada</h3>
+          <span class="fs-1 fw-bolder text-success">{{
+            solicitudesRegistradas
+          }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body text-center">
+          <h3 class="fw-bold text-gray-800">Trámite con Observaciones</h3>
+          <span class="fs-1 fw-bolder text-danger">{{
+            solicitudesConObservaciones
+          }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body text-center">
+          <h3 class="fw-bold text-gray-800">Aprobada</h3>
+          <span class="fs-1 fw-bolder text-primary">{{
+            solicitudesAprobadas
+          }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
   <!-- Gráficos -->
   <div class="row mb-5">
     <div class="col-md-12">
