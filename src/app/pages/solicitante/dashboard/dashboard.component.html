@@ -142,7 +142,7 @@
           <select
             class="form-select form-select-sm form-select-solid w-75px"
             [(ngModel)]="pageLength"
-            (ngModelChange)="onPageLengthChange()"
+            ((change)="onPageLengthChange($event)"
           >
             <option *ngFor="let length of lengthMenu" [value]="length">
               {{ length }}
@@ -153,92 +153,16 @@
     </div>
 
     <!-- Body -->
-    <div class="card-body py-3">
-      <div class="table-responsive">
-        <table
-          class="table table-row-bordered table-row-gray-100 align-middle gs-0 gy-3"
-        >
-          <thead>
-            <tr class="fw-bolder text-muted">
-              <th class="min-w-150px">Tipo</th>
-              <th class="min-w-200px">Título de la Propiedad Intelectual</th>
-              <th class="min-w-140px">Estado</th>
-              <th class="min-w-120px">Fecha</th>
-              <th class="min-w-150px text-end">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let solicitud of pagedSolicitudes">
-              <td>
-                <span class="text-gray-900 fw-bolder text-hover-primary fs-6">
-                  {{ solicitud.tipo }}
-                </span>
-              </td>
-              <td>
-                <span class="text-gray-900 fw-bolder text-hover-primary fs-6">
-                  {{ solicitud.titulo }}
-                </span>
-              </td>
-              <td>
-                <span
-                  class="badge"
-                  [ngClass]="{
-                    'badge-light-primary': solicitud.estado === 'Registrada',
-                    'badge-light-warning': solicitud.estado === 'En trámite',
-                    'badge-light-danger':
-                      solicitud.estado === 'Trámite con Observaciones',
-                    'badge-light-success': solicitud.estado === 'Aprobada'
-                  }"
-                >
-                  {{ solicitud.estado }}
-                </span>
-              </td>
-              <td>
-                <span
-                  class="text-gray-900 fw-bolder text-hover-primary d-block mb-1 fs-6"
-                >
-                  {{ solicitud.fecha }}
-                </span>
-              </td>
-              <td class="text-end">
-                <button
-                  class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-2"
-                  (click)="verDetalles(solicitud)"
-                >
-                  <app-keenicon name="eye" class="fs-3"></app-keenicon>
-                </button>
-                <button
-                  class="btn btn-icon btn-bg-light btn-active-color-warning btn-sm"
-                  (click)="editarSolicitud(solicitud)"
-                >
-                  <app-keenicon name="pencil" class="fs-3"></app-keenicon>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <!-- Paginador: Navegación de páginas -->
-      <div
-        class="d-flex justify-content-end align-items-center mt-3"
-        *ngIf="totalPages > 1"
-      >
-        <button
-          class="btn btn-sm btn-light me-2"
-          [disabled]="currentPage === 1"
-          (click)="goToPage(currentPage - 1)"
-        >
-          Anterior
-        </button>
-        <span class="me-2">Página {{ currentPage }} de {{ totalPages }}</span>
-        <button
-          class="btn btn-sm btn-light"
-          [disabled]="currentPage === totalPages"
-          (click)="goToPage(currentPage + 1)"
-        >
-          Siguiente
-        </button>
-      </div>
+    <div class="card-body pt-0">
+      <app-crud
+        [datatableConfig]="datatableConfig"
+        route="/apps/solicitudes"
+        (deleteEvent)="delete($event)"
+        (editEvent)="editarSolicitud($event)"
+        [reload]="reloadEvent"
+      ></app-crud>
+
+      <swal #noticeSwal [swalOptions]="swalOptions"></swal>
     </div>
   </div>
 </div>
