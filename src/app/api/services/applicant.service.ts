@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { IAplicantModel } from '../models/applicant.model';
+import { APPLICANTS_REQUEST_DATA } from '../data/applicant.data';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ApplicantsService {
-  private applicants: IAplicantModel[] = [];
+  private applicants: IAplicantModel[] = [...APPLICANTS_REQUEST_DATA];
 
   constructor() {}
 
