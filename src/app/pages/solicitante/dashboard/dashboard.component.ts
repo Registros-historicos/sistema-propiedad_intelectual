@@ -5,6 +5,7 @@ import { WidgetsModule } from '../../../template/widgets/content/widgets/widgets
 import { ModalsModule } from '../../../template/widgets/layout/modals/modals.module';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { SharedModule } from 'src/app/template/shared/shared.module';
+import { getCSSVariableValue } from 'src/app/template/kt/_utils';
 
 /**
  * DashboardComponent
@@ -230,54 +231,196 @@ export class DashboardComponent implements OnInit {
     },
   ];
 
+  totalSolicitudes: number = 0;
+  solicitudesPendientes: number = 0;
+  solicitudesEnTramite: number = 0;
+  solicitudesRegistradas: number = 0;
+  solicitudesConObservaciones: number = 0;
+  solicitudesAprobadas: number = 0;
+
   /**
    * Inicializa el componente, configura el gráfico y la paginación.
    */
   ngOnInit(): void {
-    this.chartOptions = {
+    // Datos de ejemplo para la gráfica
+    const solicitudesData = [
+      { tipo: 'DA', data: [12, 18, 24, 19, 15, 21] },
+      { tipo: 'PA', data: [8, 12, 15, 11, 9, 14] },
+      { tipo: 'MU', data: [25, 32, 28, 35, 41, 38] },
+      { tipo: 'DI', data: [6, 9, 11, 8, 12, 10] },
+      { tipo: 'MA', data: [45, 52, 48, 56, 63, 59] },
+    ];
+
+    // Calcula el total de solicitudes y pendientes
+    this.totalSolicitudes = solicitudesData.reduce(
+      (acc, item) => acc + item.data.reduce((sum, val) => sum + val, 0),
+      0
+    );
+    this.solicitudesPendientes = this.solicitudes.filter(
+      (solicitud) => solicitud.estado === 'Pendiente'
+    ).length;
+
+    // Calcula totales por estado
+    this.solicitudesEnTramite = this.solicitudes.filter(
+      (solicitud) => solicitud.estado === 'En trámite'
+    ).length;
+    this.solicitudesRegistradas = this.solicitudes.filter(
+      (solicitud) => solicitud.estado === 'Registrada'
+    ).length;
+    this.solicitudesConObservaciones = this.solicitudes.filter(
+      (solicitud) => solicitud.estado === 'Trámite con Observaciones'
+    ).length;
+    this.solicitudesAprobadas = this.solicitudes.filter(
+      (solicitud) => solicitud.estado === 'Aprobada'
+    ).length;
+
+    this.chartOptions = this.getChartOptions(350);
+    this.updatePagedSolicitudes();
+  }
+
+  getChartOptions(height: number) {
+    const labelColor = getCSSVariableValue('--bs-gray-500');
+    const borderColor = getCSSVariableValue('--bs-gray-200');
+    const baseColor = getCSSVariableValue('--bs-primary');
+    const secondaryColor = getCSSVariableValue('--bs-gray-300');
+    const seriesColors = [
+      getCSSVariableValue('--bs-primary'),
+      getCSSVariableValue('--bs-success'),
+      getCSSVariableValue('--bs-warning'),
+      getCSSVariableValue('--bs-danger'),
+      getCSSVariableValue('--bs-info'),
+    ];
+
+    return {
       series: [
         {
-          name: 'Solicitudes',
-          data: [70, 15, 20, 10, 5], // Datos de ejemplo
+          name: 'DA',
+          data: [12, 18, 24, 19, 15, 21],
+        },
+        {
+          name: 'PA',
+          data: [8, 12, 15, 11, 9, 14],
+        },
+        {
+          name: 'MU',
+          data: [25, 32, 28, 35, 41, 38],
+        },
+        {
+          name: 'DI',
+          data: [6, 9, 11, 8, 12, 10],
+        },
+        {
+          name: 'MA',
+          data: [45, 52, 48, 56, 63, 59],
         },
       ],
       chart: {
+        fontFamily: 'inherit',
         type: 'bar',
-        height: 350,
-      },
-      xaxis: {
-        categories: [
-          'Aprobadas',
-          'Pendientes',
-          'En trámite',
-          'Observaciones',
-          'Concluidas',
-        ],
-      },
-      colors: ['#28a745', '#ffc107', '#007bff', '#dc3545', '#b0bec5'],
-      dataLabels: {
-        enabled: true,
+        height: height,
+        toolbar: {
+          show: false,
+        },
       },
       plotOptions: {
         bar: {
-          distributed: true,
+          horizontal: false,
+          columnWidth: '30%',
+          borderRadius: 5,
         },
+      },
+      legend: {
+        show: false,
+      },
+      dataLabels: {
+        enabled: false,
       },
       stroke: {
         show: true,
         width: 2,
         colors: ['transparent'],
       },
+      xaxis: {
+        categories: ['Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul'],
+        axisBorder: {
+          show: false,
+        },
+        axisTicks: {
+          show: false,
+        },
+        labels: {
+          style: {
+            colors: labelColor,
+            fontSize: '12px',
+          },
+        },
+      },
+      yaxis: {
+        title: {
+          text: 'Total de solicitudes',
+          style: {
+            color: labelColor,
+            fontSize: '12px',
+          },
+        },
+        labels: {
+          style: {
+            colors: labelColor,
+            fontSize: '12px',
+          },
+        },
+      },
+      fill: {
+        opacity: 1,
+      },
+      states: {
+        normal: {
+          filter: {
+            type: 'none',
+            value: 0,
+          },
+        },
+        hover: {
+          filter: {
+            type: 'none',
+            value: 0,
+          },
+        },
+        active: {
+          allowMultipleDataPointsSelection: false,
+          filter: {
+            type: 'none',
+            value: 0,
+          },
+        },
+      },
       tooltip: {
+        style: {
+          fontSize: '12px',
+        },
         y: {
           formatter: function (val: number) {
-            return `${val} solicitudes`;
+            return val + ' solicitudes';
+          },
+        },
+      },
+      colors: [
+        seriesColors[0],
+        seriesColors[1],
+        seriesColors[2],
+        seriesColors[3],
+        seriesColors[4],
+      ],
+      grid: {
+        borderColor: borderColor,
+        strokeDashArray: 4,
+        yaxis: {
+          lines: {
+            show: true,
           },
         },
       },
     };
-
-    this.updatePagedSolicitudes();
   }
 
   /**
