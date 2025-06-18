@@ -69,13 +69,15 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.solicitudes = APPLICANTS_REQUEST_DATA.map((applicant) => ({
-      id: applicant.id,
-      tipo: applicant.titulo,
-      titulo: applicant.descripcion,
-      estado: applicant.estado,
-      fecha: applicant.fechaSolicitud,
-    }));
+    this.solicitudes = APPLICANTS_REQUEST_DATA.map(
+      (applicant: IAplicantModel) => ({
+        id: applicant.id,
+        tipo: applicant.titulo,
+        titulo: applicant.descripcion,
+        estado: applicant.estado,
+        fecha: applicant.fechaSolicitud,
+      })
+    );
 
     this.datatableConfig = {
       serverSide: false,
@@ -137,33 +139,68 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     };
 
     const solicitudesData = [
-      { tipo: 'DA', data: [12, 18, 24, 19, 15, 21] },
-      { tipo: 'PA', data: [8, 12, 15, 11, 9, 14] },
-      { tipo: 'MU', data: [25, 32, 28, 35, 41, 38] },
-      { tipo: 'DI', data: [6, 9, 11, 8, 12, 10] },
-      { tipo: 'MA', data: [45, 52, 48, 56, 63, 59] },
+      { tipo: 'DA', estado: 'Pendiente', data: [8, 12, 10, 10, 8, 12] },
+      { tipo: 'PA', estado: 'En trámite', data: [4, 6, 8, 6, 4, 6] },
+      { tipo: 'MU', estado: 'Registrada', data: [12, 14, 10, 12, 14, 12] },
+      {
+        tipo: 'DI',
+        estado: 'Trámite con Observaciones',
+        data: [4, 6, 4, 4, 6, 4],
+      },
+      { tipo: 'MA', estado: 'Aprobada', data: [16, 20, 16, 20, 16, 20] },
     ];
+
+    const totalDataPoints = 150;
+    const scaleFactor =
+      totalDataPoints /
+      solicitudesData.reduce(
+        (acc, item) => acc + item.data.reduce((sum, val) => sum + val, 0),
+        0
+      );
+
+    solicitudesData.forEach((item) => {
+      item.data = item.data.map((val) => Math.round(val * scaleFactor));
+    });
 
     this.totalSolicitudes = solicitudesData.reduce(
       (acc, item) => acc + item.data.reduce((sum, val) => sum + val, 0),
       0
     );
-    this.solicitudesPendientes = this.solicitudes.filter(
-      (solicitud) => solicitud.estado === 'Pendiente'
-    ).length;
 
-    this.solicitudesEnTramite = this.solicitudes.filter(
-      (solicitud) => solicitud.estado === 'En trámite'
-    ).length;
-    this.solicitudesRegistradas = this.solicitudes.filter(
-      (solicitud) => solicitud.estado === 'Registrada'
-    ).length;
-    this.solicitudesConObservaciones = this.solicitudes.filter(
-      (solicitud) => solicitud.estado === 'Trámite con Observaciones'
-    ).length;
-    this.solicitudesAprobadas = this.solicitudes.filter(
-      (solicitud) => solicitud.estado === 'Aprobada'
-    ).length;
+    this.solicitudesPendientes = solicitudesData
+      .filter((item) => item.estado === 'Pendiente')
+      .reduce(
+        (acc, item) => acc + item.data.reduce((sum, val) => sum + val, 0),
+        0
+      );
+
+    this.solicitudesEnTramite = solicitudesData
+      .filter((item) => item.estado === 'En trámite')
+      .reduce(
+        (acc, item) => acc + item.data.reduce((sum, val) => sum + val, 0),
+        0
+      );
+
+    this.solicitudesRegistradas = solicitudesData
+      .filter((item) => item.estado === 'Registrada')
+      .reduce(
+        (acc, item) => acc + item.data.reduce((sum, val) => sum + val, 0),
+        0
+      );
+
+    this.solicitudesConObservaciones = solicitudesData
+      .filter((item) => item.estado === 'Trámite con Observaciones')
+      .reduce(
+        (acc, item) => acc + item.data.reduce((sum, val) => sum + val, 0),
+        0
+      );
+
+    this.solicitudesAprobadas = solicitudesData
+      .filter((item) => item.estado === 'Aprobada')
+      .reduce(
+        (acc, item) => acc + item.data.reduce((sum, val) => sum + val, 0),
+        0
+      );
 
     this.chartOptions = this.getChartOptions(350);
   }
