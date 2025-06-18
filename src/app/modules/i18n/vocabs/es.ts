@@ -36,6 +36,8 @@ export const locale = {
       EMPTY_TABLE: "No se encontraron registros",
       PLACEHOLDER_SEARCH: "Buscar...",
       ZERO_RECORDS: 'No se encontraron coincidencias',
+      TYPE_REQUEST: "Tipo de solicitud",
+      STATUS_REQUEST: "Estatus",
       PAGE_LENGTH: {
         LABEL: "Mostrar:",
         RECORDS: "registros"

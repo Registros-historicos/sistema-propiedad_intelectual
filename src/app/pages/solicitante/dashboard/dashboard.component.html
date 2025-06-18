@@ -142,7 +142,7 @@
           <select
             class="form-select form-select-sm form-select-solid w-75px"
             [(ngModel)]="pageLength"
-            ((change)="onPageLengthChange($event)"
+            (change)="onPageLengthChange($event)"
           >
             <option *ngFor="let length of lengthMenu" [value]="length">
               {{ length }}
