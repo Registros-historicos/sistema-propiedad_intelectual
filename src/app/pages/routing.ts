@@ -32,7 +32,6 @@ const Routing: Routes = [
         loadChildren: () => import('./solicitante/registrar/derechos-autor/derechos-autor.module').then((m) => m.DerechosAutorModule),
       },
       {
-
         path: 'registrar/patente',
         loadChildren: () => import('./solicitante/registrar/patente/patente.module').then((m) => m.PatenteModule),
       },
