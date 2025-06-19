@@ -373,4 +373,5 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.reloadEvent.unsubscribe();
   }
+
 }
