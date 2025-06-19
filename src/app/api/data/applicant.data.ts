@@ -293,8 +293,4 @@ export const APPLICANTS_REQUEST_DATA: IAplicantModel[] = [
     institucion: 'Ministerio de Cultura',
     correo: 'ivan.paredes@mincultura.gob',
   },
-<<<<<<< HEAD
 ];
-=======
-];
->>>>>>> b318a6fcf5fd1cd069b00797741a9d87cce657ff

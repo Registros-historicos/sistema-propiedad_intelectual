@@ -128,8 +128,4 @@ export class ApplicantsService {
       }, 500);
     });
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> b318a6fcf5fd1cd069b00797741a9d87cce657ff
