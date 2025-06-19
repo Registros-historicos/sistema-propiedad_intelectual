@@ -1,8 +1,28 @@
 <!--begin::Theme mode-->
+<!-- ❌ COMENTADO: Cambio de tema deshabilitado -->
+<!--
 <div class="app-navbar-item" [ngClass]="itemClass">
   <app-theme-mode-switcher [toggleBtnClass]="btnClass" toggleBtnClass="{`btn-active-light-primary btn-custom ${toolbarButtonHeightClass}`}"></app-theme-mode-switcher>
 </div>
+-->
 <!--end::Theme mode-->
+
+<!-- 🆕 NUEVO: Saludo personalizado con fecha -->
+<div class="app-navbar-item me-3" [ngClass]="itemClass">
+  <div *ngIf="user$ | async as user" class="d-flex align-items-center">
+    <div class="d-flex flex-column text-end me-3">
+      <!-- Nombre del usuario -->
+      <span class="text-gray-800 fw-bold fs-7">
+        Hola, {{ user.fullname }}! 👋
+      </span>
+      <!-- Fecha actual -->
+      <span class="text-muted fs-8">
+        {{ currentDate | date:'dd-MM-yyyy' }}
+      </span>
+    </div>
+  </div>
+</div>
+<!-- end::Saludo personalizado -->
 
 <!--begin::User menu-->
 <div class="app-navbar-item" [ngClass]="itemClass">
