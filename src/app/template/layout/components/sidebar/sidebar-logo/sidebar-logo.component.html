@@ -1,15 +1,16 @@
 <!--begin::Logo image-->
-<a routerLink="/dashboard">
+<a class="cursor-pointer" (click)="redirected()">
   <ng-container *ngIf="currentLayoutType === 'dark-sidebar'">
-    <img alt="Logo" src="./assets/media/logos/default-dark.svg" class="h-25px app-sidebar-logo-default" />
+    <img alt="Logo" src="./assets/media/logos/" class="h-60px app-sidebar-logo-default" />
   </ng-container>
   <ng-container *ngIf="currentLayoutType !== 'dark-sidebar'">
-    <img alt="Logo" src="./assets/media/logos/default.svg" class="h-25px app-sidebar-logo-default theme-light-show" />
-    <img alt="Logo" src="./assets/media/logos/default-dark.svg"
+    <img alt="Logo" src="./assets/media/logos/logo_ceppi.png" class="h-60px app-sidebar-logo-default theme-light-show me-5" />
+    <span class="fs-2 fw-bolder app-sidebar-logo-default">CEPPI</span>
+    <img alt="Logo" src="./assets/media/logos/logo_ceppi.png"
       class="h-25px app-sidebar-logo-default theme-dark-show" />
   </ng-container>
 
-  <img alt="Logo" src="./assets/media/logos/default-small.svg" class="h-20px app-sidebar-logo-minimize" />
+  <img alt="Logo" src="./assets/media/logos/logo_ceppi.png" class="h-40px app-sidebar-logo-minimize" />
 </a>
 <!--end::Logo image-->
 
