@@ -18,52 +18,15 @@ export const ADMINISTRATOR_MENUS = [
 
       {
         name: 'BUTTON.NEW.COORDINATOR',
-        icon: 'manage_accounts',
+        icon: 'person',
         type: 'link',
         link: '/administrador/coordinador/registro',
       },
       {
         name: 'BUTTON.NEW.APPLICANT',
-        icon: 'person',
+        icon: 'person_add',
         type: 'link',
         link: '/administrador/solicitante/registro',
-      }
-    ]
-  },
-  {
-    name: 'MENU.INTELECTUAL_PROPERTIES',
-    icon: 'note_add',
-    type: 'dropdown',
-    children: [
-      {
-        name: 'BUTTON.NEW.PATENT',
-        icon: 'description',
-        type: 'link',
-        link: '/administrador/propiedades/registro/patente',
-      },
-      {
-        name: 'BUTTON.NEW.TRADEMARK',
-        icon: 'description',
-        type: 'link',
-        link: '/administrador/propiedades/registro/marca',
-      },
-      {
-        name: 'BUTTON.NEW.UTILITY_MODEL',
-        icon: 'description',
-        type: 'link',
-        link: '/administrador/propiedades/registro/modelo-utilidad',
-      },
-      {
-        name: 'BUTTON.NEW.COPYRIGHT',
-        icon: 'description',
-        type: 'link',
-        link: '/administrador/propiedades/registro/derecho-autor',
-      },
-      {
-        name: 'BUTTON.NEW.INDUSTRIAL_DESIGN',
-        icon: 'description',
-        type: 'link',
-        link: '/administrador/propiedades/registro/diseno-industrial',
       }
     ]
   },
@@ -73,13 +36,13 @@ export const ADMINISTRATOR_MENUS = [
   },
   {
     name: 'MENU.ADMIN.COORDINATORS',
-    icon: 'manage_accounts',
+    icon: 'person',
     link: '/administrador/coordinadores',
     type: 'link'
   },
   {
     name: 'MENU.ADMIN.APPLICANTS',
-    icon: 'person',
+    icon: 'person_add',
     link: '/administrador/solicitantes',
     type: 'link'
   },
@@ -89,31 +52,31 @@ export const ADMINISTRATOR_MENUS = [
   },
   {
     name: 'MENU.ADMIN.PATENTS',
-    icon: 'description',
+    icon: 'emoji_objects',
     link: '/administrador/propiedades/patente',
     type: 'link'
   },
   {
     name: 'MENU.ADMIN.TRADEMARKS',
-    icon: 'description',
+    icon: 'branding_watermark',
     link: '/administrador/propiedades/marca',
     type: 'link'
   },
   {
     name: 'MENU.ADMIN.UTILITY_MODELS',
-    icon: 'description',
+    icon: 'construction',
     link: '/administrador/propiedades/modelo-utilidad',
     type: 'link'
   },
   {
     name: 'MENU.ADMIN.COPYRIGHTS',
-    icon: 'description',
+    icon: 'copyright',
     link: '/administrador/propiedades/derecho-autor',
     type: 'link'
   },
   {
     name: 'MENU.ADMIN.INDUSTRIAL_DESIGNS',
-    icon: 'description',
+    icon: 'architecture',
     link: '/administrador/propiedades/diseno-industrial',
     type: 'link'
   },
@@ -123,7 +86,7 @@ export const ADMINISTRATOR_MENUS = [
   },
   {
     name: 'MENU.REPORTS',
-    icon: 'analytics',
+    icon: 'bar_chart',
     link: '/administrador/reportes',
     type: 'link'
   }
@@ -148,19 +111,19 @@ export const COORDINATOR_MENUS = [
     children: [
       {
         name: 'BUTTON.NEW.PATENT',
-        icon: 'description',
+        icon: 'emoji_objects',
         type: 'link',
         link: '/coordinador/propiedades/registro/patente',
       },
       {
         name: 'BUTTON.NEW.TRADEMARK',
-        icon: 'description',
+        icon: 'branding_watermark',
         type: 'link',
         link: '/coordinador/propiedades/registro/marca',
       },
       {
         name: 'BUTTON.NEW.UTILITY_MODEL',
-        icon: 'description',
+        icon: 'construction',
         type: 'link',
         link: '/coordinador/propiedades/registro/modelo-utilidad',
       },
@@ -184,7 +147,7 @@ export const COORDINATOR_MENUS = [
   },
   {
     name: 'MENU.ADMIN.APPLICANTS',
-    icon: 'person',
+    icon: 'person_add',
     link: '/coordinador/solicitantes',
     type: 'link'
   },
@@ -194,31 +157,31 @@ export const COORDINATOR_MENUS = [
   },
   {
     name: 'MENU.COORD.PATENTS',
-    icon: 'description',
+    icon: 'emoji_objects',
     link: '/coordinador/propiedades/patente',
     type: 'link'
   },
   {
     name: 'MENU.COORD.TRADEMARKS',
-    icon: 'description',
+    icon: 'branding_watermark',
     link: '/coordinador/propiedades/marca',
     type: 'link'
   },
   {
     name: 'MENU.COORD.UTILITY_MODELS',
-    icon: 'description',
+    icon: 'construction',
     link: '/coordinador/propiedades/modelo-utilidad',
     type: 'link'
   },
   {
     name: 'MENU.COORD.COPYRIGHTS',
-    icon: 'description',
+    icon: 'copyright',
     link: '/coordinador/propiedades/derecho-autor',
     type: 'link'
   },
   {
     name: 'MENU.COORD.INDUSTRIAL_DESIGNS',
-    icon: 'description',
+    icon: 'architecture',
     link: '/coordinador/propiedades/diseno-industrial',
     type: 'link'
   },
@@ -228,7 +191,7 @@ export const COORDINATOR_MENUS = [
   },
   {
     name: 'MENU.REPORTS',
-    icon: 'analytics',
+    icon: 'bar_chart',
     link: '/coordinador/reportes',
     type: 'link'
   }
@@ -253,7 +216,7 @@ export const APPLICANTS_MENU = [
   },
   {
     name: 'MENU.APPLICANT.REPORTS',
-    icon: 'element-11',
+    icon: 'bar_chart',
     type: 'link',
     link: '/solicitante/reportes',
   },

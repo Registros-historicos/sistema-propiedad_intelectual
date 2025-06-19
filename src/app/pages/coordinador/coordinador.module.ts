@@ -11,6 +11,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { CoordinadorRoutingModule } from './coordinador-routing.module';
 import { NgApexchartsModule } from 'ng-apexcharts';
+import {MatIcon} from "@angular/material/icon";
 
 
 @NgModule({
@@ -31,7 +32,8 @@ import { NgApexchartsModule } from 'ng-apexcharts';
         DropdownMenusModule,
         TranslationModule,
         TranslateModule,
-        NgApexchartsModule
+        NgApexchartsModule,
+        MatIcon
     ],
     providers: []
 })

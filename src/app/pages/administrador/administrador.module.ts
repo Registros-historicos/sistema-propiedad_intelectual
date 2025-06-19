@@ -15,6 +15,7 @@ import {SharedModule} from '../../template/shared/shared.module';
 import {DropdownMenusModule} from '../../template/widgets';
 import {TranslationModule} from '../../modules/i18n';
 import {TranslateModule} from '@ngx-translate/core';
+import {MatIcon} from '@angular/material/icon';
 
 
 @NgModule({
@@ -39,6 +40,7 @@ import {TranslateModule} from '@ngx-translate/core';
     DropdownMenusModule,
     TranslationModule,
     TranslateModule,
+    MatIcon,
   ],
   providers: [
     CoordinatorService,
