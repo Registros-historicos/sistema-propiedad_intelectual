@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import {CoordinatorListingComponent} from './coordinator-listing/coordinator-listing.component';
-import {ApplicantListingComponent} from './applicant-listing/applicant-listing.component';
-import {AdminDashboardComponent} from './admin-dashboard/admin-dashboard.component';
+import { CoordinatorListingComponent } from './coordinator-listing/coordinator-listing.component';
+import { ApplicantListingComponent } from './applicant-listing/applicant-listing.component';
+import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
 
 const routes: Routes = [
   {
@@ -32,9 +32,13 @@ const routes: Routes = [
         path: 'solicitante/registro',
         loadComponent: () => import('./applicant-form/applicant-form.component').then(m => m.ApplicantFormComponent)
       },
-     {
+      {
         path: 'reportes',
         loadChildren: () => import('../reportes/reportes.module').then((m) => m.ReportesModule),
+      },
+      {
+        path: 'perfil',
+        loadChildren: () => import('../../modules/profile/profile.module').then((m) => m.ProfileModule),
       },
     ]
   }

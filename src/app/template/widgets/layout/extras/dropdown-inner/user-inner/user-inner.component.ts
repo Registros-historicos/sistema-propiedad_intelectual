@@ -3,6 +3,7 @@ import { Observable, Subscription } from 'rxjs';
 import { TranslationService } from '../../../../../../modules/i18n';
 import { AuthService, UserType } from '../../../../../../modules/auth';
 import { TranslateService } from '@ngx-translate/core';
+import { Router } from '@angular/router';
 
 interface LanguageFlag {
   lang: string;
@@ -28,8 +29,9 @@ export class UserInnerComponent implements OnInit, OnDestroy {
   constructor(
     private auth: AuthService,
     private translationService: TranslationService,
-    private translate: TranslateService
-  ) {}
+    private translate: TranslateService,
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
     this.user$ = this.auth.currentUserSubject.asObservable();
@@ -92,6 +94,24 @@ export class UserInnerComponent implements OnInit, OnDestroy {
         language.active = false;
       }
     });
+  }
+
+  redirected() {
+    const role = parseInt(localStorage.getItem('role') ?? '0');
+
+    switch (role) {
+      case 1:
+        this.router.navigate(['/administrador/perfil']);
+        break;
+      case 2:
+        this.router.navigate(['/coordinador/perfil']);
+        break;
+      case 3:
+        this.router.navigate(['/solicitante/perfil']);
+        break;
+      default:
+        break;
+    }
   }
 
   ngOnDestroy() {
