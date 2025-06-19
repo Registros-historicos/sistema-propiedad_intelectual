@@ -221,3 +221,4 @@ export const APPLICANTS_MENU = [
     link: '/solicitante/reportes',
   },
 ];
+

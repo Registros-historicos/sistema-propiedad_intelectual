@@ -28,13 +28,27 @@ const Routing: Routes = [
         loadChildren: () => import('./solicitante/registrar/registrar.module').then((m) => m.RegistrarModule),
       },
       {
-        path: 'reportes',
-        loadChildren: () => import('./reportes/reportes.module').then((m) => m.ReportesModule),
+        path: 'registrar/derechos-autor',
+        loadChildren: () => import('./solicitante/registrar/derechos-autor/derechos-autor.module').then((m) => m.DerechosAutorModule),
       },
       {
-        path: 'perfil',
-        loadChildren: () => import('../modules/profile/profile.module').then((m) => m.ProfileModule),
+
+        path: 'registrar/patente',
+        loadChildren: () => import('./solicitante/registrar/patente/patente.module').then((m) => m.PatenteModule),
       },
+      {
+        path: 'registrar/modelo-utilidad',
+        loadChildren: () => import('./solicitante/registrar/modelo-utilidad/modelo-utilidad.module').then((m) => m.ModeloUtilidadModule),
+      },
+      {
+        path: 'reportes',
+        loadChildren: () => import('./solicitante/reportes/reportes.module').then((m) => m.ReporteModule),
+      },
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      }
     ]
   },
   {
