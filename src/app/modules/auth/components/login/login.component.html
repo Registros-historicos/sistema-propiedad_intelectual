@@ -1,5 +1,12 @@
 <!--begin::Main-->
 <div class="d-flex flex-column flex-root">
+  <!-- Loader de pantalla completa -->
+  <div *ngIf="showFullscreenLoader" class="fullscreen-loader">
+    <div class="loader-content" translate="AUTH.LOGIN.LOADING">
+      <span class="indicator-progress"></span>
+      <span class="spinner-border spinner-border-lg align-middle ms-2"></span>
+    </div>
+  </div>
   <!--begin::Authentication-->
   <div class="d-flex flex-column flex-lg-row h-100">
     <!--begin::Form Section-->
@@ -78,10 +85,9 @@
               <button type="submit" class="btn btn-primary btn-lg" [disabled]="loginForm.invalid">
                 <span class="login-button-content">
                   <span *ngIf="!(isLoading$ | async)" translate="AUTH.LOGIN.BUTTON"></span>
-                  <span *ngIf="isLoading$ | async" class="indicator-progress" translate="AUTH.LOGIN.LOADING">
-                    
+                  <!--<span *ngIf="isLoading$ | async" class="indicator-progress" translate="AUTH.LOGIN.LOADING">
                   <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
-                  </span>
+                  </span>-->
                 </span>
               </button>
             </div>

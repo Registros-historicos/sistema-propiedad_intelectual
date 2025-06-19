@@ -228,7 +228,7 @@ export const locale = {
         ERROR_DETAIL: 'Verifica tu usuario y contraseña',
         USERNAME: 'Usuario',
         PASSWORD: 'Contraseña',
-        LOADING: 'Validando',
+        LOADING: 'Por favor espere',
       },
       FORGOT: {
         TITLE: '¿Olvidaste tu contraseña?',
