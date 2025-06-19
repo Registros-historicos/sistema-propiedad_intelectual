@@ -231,14 +231,20 @@ export const APPLICANTS_MENU = [
   },
   {
     name: 'MENU.APPLICANT.MYPROFILE',
-    icon: 'profile-user',
+    icon: 'person',
     type: 'link',
     link: '/solicitante/dashboard',
   },
   {
     name: 'MENU.APPLICANT.REQUEST',
-    icon: 'element-11',
+    icon: 'description',
     type: 'link',
     link: '/solicitante/registrar',
+  },
+  {
+    name: 'MENU.REPORTS',
+    icon: 'analytics',
+    link: 'solicitante/reportes',
+    type: 'link'
   }
 ];
