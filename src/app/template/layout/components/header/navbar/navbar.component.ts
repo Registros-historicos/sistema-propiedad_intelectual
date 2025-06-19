@@ -4,29 +4,45 @@ import { AuthService, UserType } from 'src/app/modules/auth';
 import { menuReinitialization } from 'src/app/template/kt/kt-helpers';
 
 @Component({
-	selector: 'app-navbar',
-	templateUrl: './navbar.component.html',
-	styleUrls: ['./navbar.component.scss'],
+  selector: 'app-navbar',
+  templateUrl: './navbar.component.html',
+  styleUrls: ['./navbar.component.scss'],
 })
 export class NavbarComponent implements OnInit, AfterViewInit {
-	@Input() appHeaderDefaulMenuDisplay: boolean;
-	@Input() isRtl: boolean;
+  @Input() appHeaderDefaulMenuDisplay: boolean;
+  @Input() isRtl: boolean;
 
-	itemClass: string = 'ms-1 ms-lg-3';
-	btnClass: string = 'btn btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-primary w-35px h-35px w-md-40px h-md-40px';
-	userAvatarClass: string = 'symbol-35px symbol-md-40px';
-	btnIconClass: string = 'fs-2 fs-md-1';
-	
-	user$: Observable<UserType>;
+  itemClass: string = 'ms-1 ms-lg-3';
+  btnClass: string = 'btn btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-primary w-35px h-35px w-md-40px h-md-40px';
+  userAvatarClass: string = 'symbol-35px symbol-md-40px';
+  btnIconClass: string = 'fs-2 fs-md-1';
 
-	constructor(private auth: AuthService) { }
+  user$: Observable<UserType>;
+  currentDate: Date = new Date();
 
-	ngAfterViewInit(): void {
-		menuReinitialization();
-	}
+  constructor(private auth: AuthService) { }
 
-	ngOnInit(): void {
-		this.user$ = this.auth.currentUserSubject.asObservable();
-	}
+  ngAfterViewInit(): void {
+    menuReinitialization();
+  }
 
+  ngOnInit(): void {
+    this.user$ = this.auth.currentUserSubject.asObservable();
+    this.updateCurrentDate();
+  }
+
+  private updateCurrentDate(): void {
+    this.currentDate = new Date();
+
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(now.getDate() + 1);
+    tomorrow.setHours(0, 0, 1, 0);
+
+    const msUntilMidnight = tomorrow.getTime() - now.getTime();
+
+    setTimeout(() => {
+      this.updateCurrentDate();
+    }, msUntilMidnight);
+  }
 }
