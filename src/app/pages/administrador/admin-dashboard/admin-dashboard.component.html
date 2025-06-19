@@ -1,12 +1,22 @@
 <div class="row g-5 g-xl-8">
   <div class="col-xl-6">
     <div class="card card-xl-stretch mb-xl-8">
-      <!-- begin::Header -->
       <div class="card-header border-0 pt-5">
         <h3 class="card-title align-items-start flex-column">
           <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.FEDERAL_INSTITUTIONS"></span>
           <span class="text-muted mt-1 fw-bold fs-7" translate="GRAPHICS.TITLES.REQUEST"></span>
         </h3>
+        <div class="card-toolbar">
+          <!-- begin::Menu -->
+          <!--          <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary"-->
+          <!--                  data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-flip="top-end">-->
+          <!--            <app-keenicon name="category" class="fs-2"></app-keenicon>-->
+          <!--          </button>-->
+          <!-- begin::Menu 1 -->
+          <!--          <app-dropdown-menu1></app-dropdown-menu1>-->
+          <!-- end::Menu 1 -->
+          <!-- end::Menu -->
+        </div>
       </div>
       <!-- end::Header -->
       <!-- begin::Body -->
@@ -14,90 +24,151 @@
         <!-- begin::Table container -->
         <div class="table-responsive">
           <!-- begin::Table -->
-          <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+          <table class="table align-middle gs-0 gy-5">
             <!-- begin::Table head -->
             <thead>
-            <tr class="fw-bolder text-muted">
-              <th class="min-w-150px"><span translate="GRAPHICS.TITLES.APPLICATION_TYPE"></span></th>
-              <th class="min-w-200px text-center"><span translate="GRAPHICS.TITLES.REQUEST"></span></th>
+            <tr>
+              <th class="p-0 w-50px"></th>
+              <th class="p-0 min-w-200px"></th>
+              <th class="p-0 min-w-100px"></th>
+              <th class="p-0 min-w-40px"></th>
             </tr>
             </thead>
             <!-- end::Table head -->
             <!-- begin::Table body -->
             <tbody>
             <tr>
+              <th>
+                <div class="symbol symbol-50px me-2">
+                  <span class="symbol-label">
+                    <mat-icon fontIcon="emoji_objects"></mat-icon>
+                  </span>
+                </div>
+              </th>
               <td>
-                <div class="d-flex align-items-center">
-                  <div class="symbol symbol-45px me-5">
-                    <app-keenicon name="institution" class="fs-2"></app-keenicon>
-                  </div>
-                  <div class="d-flex justify-content-start flex-column">
-                    <span class="text-gray-900 fw-bolder fs-6" translate="MENU.ADMIN.PATENTS"></span>
+                <span class="text-gray-900 fw-bolder mb-1 fs-6"
+                      translate="MENU.COORD.PATENTS"></span>
+              </td>
+              <td>
+                <div class="d-flex flex-column w-100 me-2">
+                  <div class="d-flex flex-stack mb-2">
+                    <span class="me-2 fs-6 fw-bold text-primary">1200 <span translate="GRAPHICS.TITLES.REQUEST"></span></span>
                   </div>
                 </div>
               </td>
-              <td class="text-center">
-                <span class="text-muted fw-bold">1200 <span translate="GRAPHICS.TITLES.REQUEST"></span></span>
+              <td class="text-end">
+                <a routerLink="/administrador/propiedades/patente"
+                   class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
+                  <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
+                </a>
               </td>
             </tr>
             <tr>
+              <th>
+                <div class="symbol symbol-50px me-2">
+                  <span class="symbol-label">
+                    <mat-icon fontIcon="branding_watermark"></mat-icon>
+                  </span>
+                </div>
+              </th>
               <td>
-                <div class="d-flex align-items-center">
-                  <div class="symbol symbol-45px me-5">
-                    <app-keenicon name="trademark" class="fs-2"></app-keenicon>
-                  </div>
-                  <div class="d-flex justify-content-start flex-column">
-                    <span class="text-gray-900 fw-bolder fs-6" translate="MENU.ADMIN.TRADEMARKS"></span>
+                <span class="text-gray-900 fw-bolder mb-1 fs-6"
+                      translate="MENU.COORD.TRADEMARKS"></span>
+              </td>
+              <td>
+                <div class="d-flex flex-column w-100 me-2">
+                  <div class="d-flex flex-stack mb-2">
+                    <span class="me-2 fs-6 fw-bold text-primary">800 <span
+                      translate="GRAPHICS.TITLES.REQUEST"></span></span>
                   </div>
                 </div>
               </td>
-              <td class="text-center">
-                <span class="text-muted fw-bold">800 <span translate="GRAPHICS.TITLES.REQUEST"></span></span>
+              <td class="text-end">
+                <a routerLink="/administrador/propiedades/marca"
+                   class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
+                  <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
+                </a>
               </td>
             </tr>
             <tr>
+              <th>
+                <div class="symbol symbol-50px me-2">
+                  <span class="symbol-label">
+                    <mat-icon fontIcon="construction"></mat-icon>
+                  </span>
+                </div>
+              </th>
               <td>
-                <div class="d-flex align-items-center">
-                  <div class="symbol symbol-45px me-5">
-                    <app-keenicon name="utility-model" class="fs-2"></app-keenicon>
-                  </div>
-                  <div class="d-flex justify-content-start flex-column">
-                    <span class="text-gray-900 fw-bolder fs-6" translate="MENU.ADMIN.UTILITY_MODELS"></span>
+                <span class="text-gray-900 fw-bolder mb-1 fs-6"
+                      translate="MENU.COORD.UTILITY_MODELS"></span>
+              </td>
+              <td>
+                <div class="d-flex flex-column w-100 me-2">
+                  <div class="d-flex flex-stack mb-2">
+                    <span class="me-2 fs-6 fw-bold text-primary">600 <span
+                      translate="GRAPHICS.TITLES.REQUEST"></span></span>
                   </div>
                 </div>
               </td>
-              <td class="text-center">
-                <span class="text-muted fw-bold">600 <span translate="GRAPHICS.TITLES.REQUEST"></span></span>
+              <td class="text-end">
+                <a routerLink="/administrador/propiedades/modelo-utilidad"
+                   class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
+                  <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
+                </a>
               </td>
             </tr>
             <tr>
+              <th>
+                <div class="symbol symbol-50px me-2">
+                  <span class="symbol-label">
+                    <mat-icon fontIcon="copyright"></mat-icon>
+                  </span>
+                </div>
+              </th>
               <td>
-                <div class="d-flex align-items-center">
-                  <div class="symbol symbol-45px me-5">
-                    <app-keenicon name="copyright" class="fs-2"></app-keenicon>
-                  </div>
-                  <div class="d-flex justify-content-start flex-column">
-                    <span class="text-gray-900 fw-bolder fs-6" translate="MENU.ADMIN.COPYRIGHTS"></span>
+                <span class="text-gray-900 fw-bolder mb-1 fs-6"
+                      translate="MENU.COORD.COPYRIGHTS"></span>
+              </td>
+              <td>
+                <div class="d-flex flex-column w-100 me-2">
+                  <div class="d-flex flex-stack mb-2">
+                    <span class="me-2 fs-6 fw-bold text-primary">400 <span
+                      translate="GRAPHICS.TITLES.REQUEST"></span></span>
                   </div>
                 </div>
               </td>
-              <td class="text-center">
-                <span class="text-muted fw-bold">400 <span translate="GRAPHICS.TITLES.REQUEST"></span></span>
+              <td class="text-end">
+                <a routerLink="/administrador/propiedades/derecho-autor"
+                   class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
+                  <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
+                </a>
               </td>
             </tr>
             <tr>
+              <th>
+                <div class="symbol symbol-50px me-2">
+                  <span class="symbol-label">
+                    <mat-icon fontIcon="architecture"></mat-icon>
+                  </span>
+                </div>
+              </th>
               <td>
-                <div class="d-flex align-items-center">
-                  <div class="symbol symbol-45px me-5">
-                    <app-keenicon name="industrial-design" class="fs-2"></app-keenicon>
-                  </div>
-                  <div class="d-flex justify-content-start flex-column">
-                    <span class="text-gray-900 fw-bolder fs-6" translate="MENU.ADMIN.INDUSTRIAL_DESIGNS"></span>
+                <span class="text-gray-900 fw-bolder mb-1 fs-6"
+                      translate="MENU.COORD.INDUSTRIAL_DESIGNS"></span>
+              </td>
+              <td>
+                <div class="d-flex flex-column w-100 me-2">
+                  <div class="d-flex flex-stack mb-2">
+                    <span class="me-2 fs-6 fw-bold text-primary">300 <span
+                      translate="GRAPHICS.TITLES.REQUEST"></span></span>
                   </div>
                 </div>
               </td>
-              <td class="text-center">
-                <span class="text-muted fw-bold">300 <span translate="GRAPHICS.TITLES.REQUEST"></span></span>
+              <td class="text-end">
+                <a routerLink="/administrador/propiedades/diseno-industrial"
+                   class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
+                  <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
+                </a>
               </td>
             </tr>
             </tbody>
@@ -107,18 +178,27 @@
         </div>
         <!-- end::Table container -->
       </div>
-      <!-- begin::Body -->
     </div>
   </div>
 
   <div class="col-xl-6">
     <div class="card card-xl-stretch mb-xl-8">
-      <!-- begin::Header -->
       <div class="card-header border-0 pt-5">
         <h3 class="card-title align-items-start flex-column">
-          <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.CENTRALIZED_INSTITUTIONS"></span>
+          <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.FEDERAL_INSTITUTIONS"></span>
           <span class="text-muted mt-1 fw-bold fs-7" translate="GRAPHICS.TITLES.REQUEST"></span>
         </h3>
+        <div class="card-toolbar">
+          <!-- begin::Menu -->
+          <!--          <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary"-->
+          <!--                  data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-flip="top-end">-->
+          <!--            <app-keenicon name="category" class="fs-2"></app-keenicon>-->
+          <!--          </button>-->
+          <!-- begin::Menu 1 -->
+          <!--          <app-dropdown-menu1></app-dropdown-menu1>-->
+          <!-- end::Menu 1 -->
+          <!-- end::Menu -->
+        </div>
       </div>
       <!-- end::Header -->
       <!-- begin::Body -->
@@ -126,90 +206,152 @@
         <!-- begin::Table container -->
         <div class="table-responsive">
           <!-- begin::Table -->
-          <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+          <table class="table align-middle gs-0 gy-5">
             <!-- begin::Table head -->
             <thead>
-            <tr class="fw-bolder text-muted">
-              <th class="min-w-150px"><span translate="GRAPHICS.TITLES.APPLICATION_TYPE"></span></th>
-              <th class="min-w-200px text-center"><span translate="GRAPHICS.TITLES.REQUEST"></span></th>
+            <tr>
+              <th class="p-0 w-50px"></th>
+              <th class="p-0 min-w-200px"></th>
+              <th class="p-0 min-w-100px"></th>
+              <th class="p-0 min-w-40px"></th>
             </tr>
             </thead>
             <!-- end::Table head -->
             <!-- begin::Table body -->
             <tbody>
             <tr>
+              <th>
+                <div class="symbol symbol-50px me-2">
+                  <span class="symbol-label">
+                    <mat-icon fontIcon="emoji_objects"></mat-icon>
+                  </span>
+                </div>
+              </th>
               <td>
-                <div class="d-flex align-items-center">
-                  <div class="symbol symbol-45px me-5">
-                    <app-keenicon name="institution" class="fs-2"></app-keenicon>
-                  </div>
-                  <div class="d-flex justify-content-start flex-column">
-                    <span class="text-gray-900 fw-bolder fs-6" translate="MENU.ADMIN.PATENTS"></span>
+                <span class="text-gray-900 fw-bolder mb-1 fs-6"
+                      translate="MENU.COORD.PATENTS"></span>
+              </td>
+              <td>
+                <div class="d-flex flex-column w-100 me-2">
+                  <div class="d-flex flex-stack mb-2">
+                    <span class="me-2 fs-6 fw-bold text-primary">600 <span
+                      translate="GRAPHICS.TITLES.REQUEST"></span></span>
                   </div>
                 </div>
               </td>
-              <td class="text-center">
-                <span class="text-muted fw-bold">600 <span translate="GRAPHICS.TITLES.REQUEST"></span></span>
+              <td class="text-end">
+                <a routerLink="/administrador/propiedades/patente"
+                   class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
+                  <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
+                </a>
               </td>
             </tr>
             <tr>
+              <th>
+                <div class="symbol symbol-50px me-2">
+                  <span class="symbol-label">
+                    <mat-icon fontIcon="branding_watermark"></mat-icon>
+                  </span>
+                </div>
+              </th>
               <td>
-                <div class="d-flex align-items-center">
-                  <div class="symbol symbol-45px me-5">
-                    <app-keenicon name="trademark" class="fs-2"></app-keenicon>
-                  </div>
-                  <div class="d-flex justify-content-start flex-column">
-                    <span class="text-gray-900 fw-bolder fs-6" translate="MENU.ADMIN.TRADEMARKS"></span>
+                <span class="text-gray-900 fw-bolder mb-1 fs-6"
+                      translate="MENU.COORD.TRADEMARKS"></span>
+              </td>
+              <td>
+                <div class="d-flex flex-column w-100 me-2">
+                  <div class="d-flex flex-stack mb-2">
+                    <span class="me-2 fs-6 fw-bold text-primary">400 <span
+                      translate="GRAPHICS.TITLES.REQUEST"></span></span>
                   </div>
                 </div>
               </td>
-              <td class="text-center">
-                <span class="text-muted fw-bold">400 <span translate="GRAPHICS.TITLES.REQUEST"></span></span>
+              <td class="text-end">
+                <a routerLink="/administrador/propiedades/marca"
+                   class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
+                  <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
+                </a>
               </td>
             </tr>
             <tr>
+              <th>
+                <div class="symbol symbol-50px me-2">
+                  <span class="symbol-label">
+                    <mat-icon fontIcon="construction"></mat-icon>
+                  </span>
+                </div>
+              </th>
               <td>
-                <div class="d-flex align-items-center">
-                  <div class="symbol symbol-45px me-5">
-                    <app-keenicon name="utility-model" class="fs-2"></app-keenicon>
-                  </div>
-                  <div class="d-flex justify-content-start flex-column">
-                    <span class="text-gray-900 fw-bolder fs-6" translate="MENU.ADMIN.UTILITY_MODELS"></span>
+                <span class="text-gray-900 fw-bolder mb-1 fs-6"
+                      translate="MENU.COORD.UTILITY_MODELS"></span>
+              </td>
+              <td>
+                <div class="d-flex flex-column w-100 me-2">
+                  <div class="d-flex flex-stack mb-2">
+                    <span class="me-2 fs-6 fw-bold text-primary">300 <span
+                      translate="GRAPHICS.TITLES.REQUEST"></span></span>
                   </div>
                 </div>
               </td>
-              <td class="text-center">
-                <span class="text-muted fw-bold">300 <span translate="GRAPHICS.TITLES.REQUEST"></span></span>
+              <td class="text-end">
+                <a routerLink="/administrador/propiedades/modelo-utilidad"
+                   class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
+                  <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
+                </a>
               </td>
             </tr>
             <tr>
+              <th>
+                <div class="symbol symbol-50px me-2">
+                  <span class="symbol-label">
+                    <mat-icon fontIcon="copyright"></mat-icon>
+                  </span>
+                </div>
+              </th>
               <td>
-                <div class="d-flex align-items-center">
-                  <div class="symbol symbol-45px me-5">
-                    <app-keenicon name="copyright" class="fs-2"></app-keenicon>
-                  </div>
-                  <div class="d-flex justify-content-start flex-column">
-                    <span class="text-gray-900 fw-bolder fs-6" translate="MENU.ADMIN.COPYRIGHTS"></span>
+                <span class="text-gray-900 fw-bolder mb-1 fs-6"
+                      translate="MENU.COORD.COPYRIGHTS"></span>
+              </td>
+              <td>
+                <div class="d-flex flex-column w-100 me-2">
+                  <div class="d-flex flex-stack mb-2">
+                    <span class="me-2 fs-6 fw-bold text-primary">200 <span
+                      translate="GRAPHICS.TITLES.REQUEST"></span></span>
                   </div>
                 </div>
               </td>
-              <td class="text-center">
-                <span class="text-muted fw-bold">200 <span translate="GRAPHICS.TITLES.REQUEST"></span></span>
+              <td class="text-end">
+                <a routerLink="/administrador/propiedades/derecho-autor"
+                   class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
+                  <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
+                </a>
               </td>
             </tr>
             <tr>
+              <th>
+                <div class="symbol symbol-50px me-2">
+                  <span class="symbol-label">
+                    <mat-icon fontIcon="architecture"></mat-icon>
+                  </span>
+                </div>
+              </th>
               <td>
-                <div class="d-flex align-items-center">
-                  <div class="symbol symbol-45px me-5">
-                    <app-keenicon name="industrial-design" class="fs-2"></app-keenicon>
-                  </div>
-                  <div class="d-flex justify-content-start flex-column">
-                    <span class="text-gray-900 fw-bolder fs-6" translate="MENU.ADMIN.INDUSTRIAL_DESIGNS"></span>
+                <span class="text-gray-900 fw-bolder mb-1 fs-6"
+                      translate="MENU.COORD.INDUSTRIAL_DESIGNS"></span>
+              </td>
+              <td>
+                <div class="d-flex flex-column w-100 me-2">
+                  <div class="d-flex flex-stack mb-2">
+                    <span class="me-2 fs-6 fw-bold text-primary">150 <span
+                      translate="GRAPHICS.TITLES.REQUEST"></span></span>
                   </div>
                 </div>
               </td>
-              <td class="text-center">
-                <span class="text-muted fw-bold">150 <span translate="GRAPHICS.TITLES.REQUEST"></span></span>
+              <td class="text-end">
+                <a routerLink="/administrador/propiedades/diseno-industrial"
+                   class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
+                  <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
+                </a>
               </td>
             </tr>
             </tbody>
@@ -219,7 +361,6 @@
         </div>
         <!-- end::Table container -->
       </div>
-      <!-- begin::Body -->
     </div>
   </div>
 </div>
@@ -254,6 +395,7 @@
             <thead>
             <tr>
               <th class="p-0 min-w-150px"></th>
+              <th class="p-0 min-w-200px"></th>
               <th class="p-0 min-w-125px"></th>
             </tr>
             </thead>
@@ -268,17 +410,34 @@
                         <app-keenicon name="institution" class="fs-2"></app-keenicon>
                       </div>
                       <div class="d-flex justify-content-start flex-column">
-                        <span class="text-gray-900 fw-bolder fs-6">{{ $index + 1 }}. {{ institution.name | titlecase }}</span>
+                                    <span class="text-gray-900 fw-bolder fs-6">{{ $index + 1 }}
+                                      . {{ institution.name | titlecase }}</span>
                       </div>
                     </div>
                   </td>
+                  <td class="text-end">
+                    @for (tag of institution.tags; track $index) {
+                      <span class="badge fw-bold me-1"
+                            [ngClass]="{
+                              'badge-light-danger': tag === 'PATENTS',
+                              'badge-light-info': tag === 'MA',
+                              'badge-light-warning': tag === 'MU',
+                              'badge-light-success': tag === 'DA',
+                              'badge-light-primary': tag === 'DI'
+                            }">
+                        {{ tag }}
+                      </span>
+                    }
+                  </td>
                   <td class="text-center">
-                    <span class="text-muted fw-bold">{{ institution.value }} <span translate="GRAPHICS.TITLES.REQUEST"></span></span>
+                                <span class="text-muted fw-bold">{{ institution.value }} <span
+                                  translate="GRAPHICS.TITLES.REQUEST"></span></span>
                   </td>
                 </tr>
               } @empty {
                 <tr>
-                  <td colspan="2" class="text-center text-muted"><span translate="GRAPHICS.LEGENDS.NO_FEDERAL_INSTITUTIONS"></span></td>
+                  <td colspan="2" class="text-center text-muted"><span
+                    translate="GRAPHICS.LEGENDS.NO_FEDERAL_INSTITUTIONS"></span></td>
                 </tr>
               }
             </tbody>
@@ -321,6 +480,7 @@
             <thead>
             <tr>
               <th class="p-0 min-w-150px"></th>
+              <th class="p-0 min-w-200px"></th>
               <th class="p-0 min-w-125px"></th>
             </tr>
             </thead>
@@ -335,17 +495,34 @@
                         <app-keenicon name="institution" class="fs-2"></app-keenicon>
                       </div>
                       <div class="d-flex justify-content-start flex-column">
-                        <span class="text-gray-900 fw-bolder fs-6">{{ $index + 1 }}. {{ institution.name | titlecase }}</span>
+                        <span class="text-gray-900 fw-bolder fs-6">{{ $index + 1 }}
+                          . {{ institution.name | titlecase }}</span>
                       </div>
                     </div>
                   </td>
+                  <td class="text-end">
+                    @for (tag of institution.tags; track $index) {
+                      <span class="badge fw-bold me-1"
+                            [ngClass]="{
+                              'badge-light-danger': tag === 'PATENTS',
+                              'badge-light-info': tag === 'MA',
+                              'badge-light-warning': tag === 'MU',
+                              'badge-light-success': tag === 'DA',
+                              'badge-light-primary': tag === 'DI'
+                            }">
+                        {{ tag }}
+                      </span>
+                    }
+                  </td>
                   <td class="text-center">
-                    <span class="text-muted fw-bold">{{ institution.value }} <span translate="GRAPHICS.TITLES.REQUEST"></span></span>
+                    <span class="text-muted fw-bold">{{ institution.value }} <span
+                      translate="GRAPHICS.TITLES.REQUEST"></span></span>
                   </td>
                 </tr>
               } @empty {
                 <tr>
-                  <td colspan="2" class="text-center text-muted"><span translate="GRAPHICS.LEGENDS.NO_CENTRALIZED_INSTITUTIONS"></span></td>
+                  <td colspan="2" class="text-center text-muted"><span
+                    translate="GRAPHICS.LEGENDS.NO_CENTRALIZED_INSTITUTIONS"></span></td>
                 </tr>
               }
             </tbody>
@@ -390,6 +567,7 @@
             <thead>
             <tr>
               <th class="p-0 min-w-150px"></th>
+              <th class="p-0 min-w-200px"></th>
               <th class="p-0 min-w-125px"></th>
             </tr>
             </thead>
@@ -404,17 +582,34 @@
                         <app-keenicon name="institution" class="fs-2"></app-keenicon>
                       </div>
                       <div class="d-flex justify-content-start flex-column">
-                        <span class="text-gray-900 fw-bolder fs-6">{{ $index + 1 }}. {{ entity.name | titlecase }}</span>
+                        <span class="text-gray-900 fw-bolder fs-6">{{ $index + 1 }}
+                          . {{ entity.name | titlecase }}</span>
                       </div>
                     </div>
                   </td>
+                  <td class="text-end">
+                    @for (tag of entity.tags; track $index) {
+                      <span class="badge fw-bold me-1"
+                            [ngClass]="{
+                              'badge-light-danger': tag === 'PATENTS',
+                              'badge-light-info': tag === 'MA',
+                              'badge-light-warning': tag === 'MU',
+                              'badge-light-success': tag === 'DA',
+                              'badge-light-primary': tag === 'DI'
+                            }">
+                        {{ tag }}
+                      </span>
+                    }
+                  </td>
                   <td class="text-center">
-                    <span class="text-muted fw-bold">{{ entity.value }} <span translate="GRAPHICS.TITLES.REQUEST"></span></span>
+                    <span class="text-muted fw-bold">{{ entity.value }} <span
+                      translate="GRAPHICS.TITLES.REQUEST"></span></span>
                   </td>
                 </tr>
               } @empty {
                 <tr>
-                  <td colspan="2" class="text-center text-muted"><span translate="GRAPHICS.LEGENDS.NO_FEDERAL_ENTITIES"></span></td>
+                  <td colspan="2" class="text-center text-muted"><span
+                    translate="GRAPHICS.LEGENDS.NO_FEDERAL_ENTITIES"></span></td>
                 </tr>
               }
             </tbody>
