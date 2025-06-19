@@ -15,7 +15,7 @@ export class UsersTable {
       occupation: 'CEO',
       companyName: 'Keenthemes',
       phone: '456669067890',
-      language: 'en',
+      language: 'es',
       timeZone: 'International Date Line West',
       website: 'https://keenthemes.com',
       communication: {
@@ -51,7 +51,7 @@ export class UsersTable {
       occupation: 'Deputy Head of Keenthemes in New York office',
       companyName: 'Keenthemes',
       phone: '456669067891',
-      language: 'en',
+      language: 'es',
       timeZone: 'International Date Line West',
       communication: {
         email: true,
@@ -86,7 +86,7 @@ export class UsersTable {
       occupation: 'CFO',
       companyName: 'Keenthemes',
       phone: '456669067892',
-      language: 'en',
+      language: 'es',
       timeZone: 'International Date Line West',
       communication: {
         email: true,
