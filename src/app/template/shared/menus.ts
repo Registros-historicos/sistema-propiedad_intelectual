@@ -221,6 +221,16 @@ export const COORDINATOR_MENUS = [
     icon: 'description',
     link: '/coordinador/propiedades/diseno-industrial',
     type: 'link'
+  },
+  {
+    name: 'MENU.REPORTS',
+    type: 'separator',
+  },
+  {
+    name: 'MENU.REPORTS',
+    icon: 'analytics',
+    link: '/coordinador/reportes',
+    type: 'link'
   }
 ];
 
