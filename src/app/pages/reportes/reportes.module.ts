@@ -5,6 +5,7 @@ import { VisorPdfComponent } from './visor-pdf/visor-pdf.component';
 import { ReportesRoutingModule } from './reportes-routing.module';
 import { SharedModule } from '../../template/shared/shared.module';
 import { SafeUrlPipe } from "../../template/shared/pipes/safe-url.pipe";
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 
 
@@ -16,6 +17,8 @@ import { SafeUrlPipe } from "../../template/shared/pipes/safe-url.pipe";
   imports: [
     CommonModule,
     ReportesRoutingModule,
-    SharedModule]
+    SharedModule,
+    MatProgressBarModule
+  ]
 })
 export class ReportesModule {}

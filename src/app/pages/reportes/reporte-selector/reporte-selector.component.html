@@ -14,4 +14,18 @@
       <button>Ver Reporte</button>
     </div>
   </div>
+
+
+  <div *ngIf="isLoading" class="custom-loading-overlay">
+    <div class="custom-loading-box">
+      <p class="loading-text">
+        Generando reporte
+        <span class="loading-dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      </p>
+    </div>
+  </div>
 </div>
