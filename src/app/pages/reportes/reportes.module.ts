@@ -6,6 +6,7 @@ import { ReportesRoutingModule } from './reportes-routing.module';
 import { SharedModule } from '../../template/shared/shared.module';
 import { SafeUrlPipe } from "../../template/shared/pipes/safe-url.pipe";
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { TranslateModule } from '@ngx-translate/core';
 
 
 
@@ -18,7 +19,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     CommonModule,
     ReportesRoutingModule,
     SharedModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    TranslateModule.forChild(),
   ]
 })
 export class ReportesModule {}
