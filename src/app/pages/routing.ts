@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { RoleGuard } from '../guards/role.guard';
+import { Error503Component } from '../modules/errors/error503/error503.component';
 
 const Routing: Routes = [
   {
@@ -38,6 +39,14 @@ const Routing: Routes = [
       {
         path: 'registrar/modelo-utilidad',
         loadChildren: () => import('./solicitante/registrar/modelo-utilidad/modelo-utilidad.module').then((m) => m.ModeloUtilidadModule),
+      },
+      {
+        path: 'registrar/variedad-vegetal',
+        component: Error503Component
+   },
+      {
+        path: 'registrar/secreto-industrial',
+        component: Error503Component
       },
       {
         path: 'reportes',
