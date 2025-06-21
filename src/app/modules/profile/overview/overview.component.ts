@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { MatIconRegistry } from '@angular/material/icon';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-overview',
@@ -7,7 +9,12 @@ import { Component, OnInit } from '@angular/core';
 export class OverviewComponent implements OnInit {
   userProfile: any = {};
 
-  constructor() {}
+  constructor(private iconRegistry: MatIconRegistry, private sanitizer: DomSanitizer) {
+    this.iconRegistry.addSvgIcon('linkedin', this.sanitizer.bypassSecurityTrustResourceUrl('./assets/media/svg/social-logos/linkedin.svg'));
+    this.iconRegistry.addSvgIcon('facebook', this.sanitizer.bypassSecurityTrustResourceUrl('./assets/media/svg/social-logos/facebook.svg'));
+    this.iconRegistry.addSvgIcon('twitter', this.sanitizer.bypassSecurityTrustResourceUrl('./assets/media/svg/social-logos/twitter.svg'));
+    this.iconRegistry.addSvgIcon('instagram', this.sanitizer.bypassSecurityTrustResourceUrl('./assets/media/svg/social-logos/instagram.svg'));
+  }
 
   ngOnInit(): void {
     this.loadUserProfile();
