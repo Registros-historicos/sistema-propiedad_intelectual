@@ -1,5 +1,6 @@
 <div class="registro-container">
-  <h2>Registro de nuevos usuarios</h2>
+  <h2>{{ 'USER_REGISTER.TITLE' | translate }}</h2>
+  <p>{{ 'USER_REGISTER.DESCRIPTION' | translate }}</p>
 
   <div class="card-grid">
     <div
@@ -9,10 +10,10 @@
       (click)="verRegistro(registro.ruta)"
     >
       <span class="material-icons icono-registro">{{ registro.icono }}</span>
-      <h3>{{ registro.titulo }}</h3>
-      <p>{{ registro.descripcion }}</p>
+      <h3>{{ registro.titulo | translate }}</h3>
+      <p>{{ registro.descripcion | translate }}</p>
 
-      <button>Ver registro</button>
+      <button>{{ 'USER_REGISTER.REGISTER' | translate }}</button>
     </div>
   </div>
 </div>

@@ -3,13 +3,15 @@ import { Component } from '@angular/core';
 import { SharedModule } from 'src/app/template/shared/shared.module';
 import { RegistroCard, REGISTROS_POR_ROL } from './constants/registro-usuario.constant';
 import { Router, ActivatedRoute } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-register',
   standalone: true,
   imports: [
       CommonModule,
-      SharedModule
+      SharedModule,
+      TranslateModule,
     ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss'

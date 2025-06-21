@@ -327,6 +327,19 @@ export const locale = {
       LANGUAGE: 'Idioma',
       SETTINGS: 'Configuración',
       SIGN_OUT: 'Cerrar Sesión'
+    },
+    USER_REGISTER: {
+      TITLE: 'Registro de Nuevos Usuarios',
+      DESCRIPTION: 'Registra nuevos usuarios en el sistema. Selecciona el tipo de usuario que deseas registrar y completa los campos requeridos.',
+      REGISTER: 'Registrar',
+      COORDINATOR: {
+        TITLE: 'Registro de Coordinador',
+        DESCRIPTION: 'Registra un nuevo coordinador en el sistema.',
+      },
+      GUEST: {
+        TITLE: 'Registro de Solicitante',
+        DESCRIPTION: 'Registra un nuevo solicitante en el sistema.',
+      },
     }
   }
 };

@@ -8,15 +8,15 @@ export interface RegistroCard {
 
 export const REGISTROS_POR_ROL: { [key: string]: RegistroCard } = {
   'coordinador': {
-    titulo: 'Registro de Coordinadores',
-    descripcion: 'Registra nuevos coordinadores en el sistema.',
+    titulo: 'USER_REGISTER.COORDINATOR.TITLE',
+    descripcion: 'USER_REGISTER.COORDINATOR.DESCRIPTION',
     color: 'sky',
     icono: 'person_add',
     ruta: '/administrador/coordinador/registro',
   },
   'solicitante': {
-    titulo: 'Registro de Solicitantes',
-    descripcion: 'Registra nuevos solicitantes en el sistema.',
+    titulo: 'USER_REGISTER.GUEST.TITLE',
+    descripcion: 'USER_REGISTER.GUEST.DESCRIPTION',
     color: 'peach',
     icono: 'person_add_alt',
     ruta: '/administrador/solicitante/registro',
