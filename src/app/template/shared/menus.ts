@@ -13,22 +13,8 @@ export const ADMINISTRATOR_MENUS = [
   {
     name: 'MENU.USERS',
     icon: 'person_add',
-    type: 'dropdown',
-    children: [
-
-      {
-        name: 'BUTTON.NEW.COORDINATOR',
-        icon: 'person',
-        type: 'link',
-        link: '/administrador/coordinador/registro',
-      },
-      {
-        name: 'BUTTON.NEW.APPLICANT',
-        icon: 'person_add',
-        type: 'link',
-        link: '/administrador/solicitante/registro',
-      }
-    ]
+    link: '/administrador/registro',
+    type: 'link',
   },
   {
     name: 'MENU.USERS',
