@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SwalComponent, SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { Observable } from 'rxjs';
@@ -6,6 +6,8 @@ import { SweetAlertOptions } from 'sweetalert2';
 import moment from 'moment';
 import { Config } from 'datatables.net';
 import { Router } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { TranslateService } from '@ngx-translate/core';
 import {
   ApplicantService,
   IApplicantModel,
@@ -13,7 +15,9 @@ import {
   DataTablesResponse,
   ENTIDADES_FEDERATIVAS,
   SEXO_OPTIONS,
-  InstitucionService, DEPARTAMENTOS, PROGRAMAS_EDUCATIVOS
+  InstitucionService,
+  DEPARTAMENTOS,
+  PROGRAMAS_EDUCATIVOS
 } from '../shared-services';
 import { CrudModule } from '../../../modules/crud/crud.module';
 import { SharedModule } from '../../../template/shared/shared.module';
@@ -39,7 +43,16 @@ export class ApplicantListingComponent implements OnInit, OnDestroy {
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
   lengthMenu: number[] = [5, 10, 15, 20];
   pageLength: number = 10;
-  dtInstance: any; // Para almacenar la instancia de DataTables
+  dtInstance: any;
+  selectedApplicant: IApplicantModel | null = null;
+  entidadesFederativas = ENTIDADES_FEDERATIVAS;
+  sexoOptions = SEXO_OPTIONS;
+  departamentos = DEPARTAMENTOS;
+  programasEducativos = PROGRAMAS_EDUCATIVOS;
+  programasEducativosFiltrados: any[] = [];
+  placeholder: string = '';
+
+  private cachedMockApplicants: IApplicantModel[] | null = null;
 
   @ViewChild('noticeSwal')
   noticeSwal!: SwalComponent;
@@ -50,19 +63,29 @@ export class ApplicantListingComponent implements OnInit, OnDestroy {
     private applicantService: ApplicantService,
     private institucionService: InstitucionService,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+    private modalService: NgbModal,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
+    this.placeholder = this.translate.instant('TABLE.PLACEHOLDER_SEARCH');
+
     this.datatableConfig = {
       serverSide: true,
       lengthMenu: this.lengthMenu,
       pageLength: this.pageLength,
+      language: {
+        info: this.translate.instant('TABLE.PAG_INFO'),
+        infoFiltered: this.translate.instant('TABLE.PAG_INFO_FILTERED'),
+        processing: this.translate.instant('TABLE.PROCESSING'),
+        emptyTable: this.translate.instant('TABLE.EMPTY_TABLE'),
+        infoEmpty: this.translate.instant('TABLE.PAG_INFO_EMPTY'),
+        zeroRecords: this.translate.instant('TABLE.ZERO_RECORDS'),
+      },
       ajax: (dataTablesParameters: any, callback) => {
-        // Para desarrollo: usar datos mock
         if (environment.production === false) {
-          const mockData = this.generateMockApplicants();
-          // Aplicar paginación manualmente
+          const mockData = this.getMockApplicants();
           const start = dataTablesParameters.start;
           const length = dataTablesParameters.length;
           const paginatedData = mockData.slice(start, start + length);
@@ -79,9 +102,9 @@ export class ApplicantListingComponent implements OnInit, OnDestroy {
           });
         }
       },
-      // Añadir este callback para guardar la instancia de la tabla
       initComplete: (settings, json) => {
         this.dtInstance = settings.oInstance.api();
+        this.cdr.detectChanges();
       },
       columns: [
         {
@@ -139,10 +162,8 @@ export class ApplicantListingComponent implements OnInit, OnDestroy {
     this.pageLength = newLength;
 
     if (this.dtInstance) {
-      // Actualizar la configuración y redibujar
       this.dtInstance.page.len(newLength).draw();
     } else {
-      // Si no hay instancia, forzar recarga
       this.reloadEvent.emit(true);
     }
   }
@@ -153,8 +174,72 @@ export class ApplicantListingComponent implements OnInit, OnDestroy {
     });
   }
 
-  navigateToEdit(id: number) {
-    this.router.navigate(['/administrador/solicitante/editar', id]);
+  async navigateToEdit(id: number, modalTemplate: TemplateRef<any>) {
+    try {
+      if (environment.production) {
+        this.applicantService.getApplicant(id).subscribe({
+          next: (applicant) => {
+            this.selectedApplicant = { ...applicant };
+            this.updateProgramasEducativosFiltrados();
+            this.modalService.open(modalTemplate, { size: 'lg' });
+          },
+          error: (err) => {
+            this.showAlert({
+              title: 'Error',
+              text: 'No se pudo cargar la información del solicitante',
+              icon: 'error'
+            });
+          }
+        });
+      } else {
+        const allApplicants = this.getMockApplicants();
+        const numericId = Number(id);
+        const stringId = String(id);
+
+        const foundWithOriginal = allApplicants.find(a => a.id === id);
+        const foundWithNumber = allApplicants.find(a => a.id === numericId);
+        const foundWithString = allApplicants.find(a => String(a.id) === stringId);
+        const foundWithDoubleEqual = allApplicants.find(a => a.id == id);
+
+        const foundApplicant = foundWithOriginal || foundWithNumber || foundWithDoubleEqual || foundWithString;
+
+        if (foundApplicant) {
+          this.selectedApplicant = { ...foundApplicant };
+          this.updateProgramasEducativosFiltrados();
+          this.cdr.detectChanges();
+          const modalRef = this.modalService.open(modalTemplate, { size: 'lg' });
+        } else {
+          this.showAlert({
+            title: 'No encontrado',
+            text: `El solicitante con ID ${id} no existe`,
+            icon: 'warning'
+          });
+        }
+      }
+    } catch (error) {
+      this.showAlert({
+        title: 'Error',
+        text: 'Ocurrió un error inesperado al cargar el solicitante',
+        icon: 'error'
+      });
+    }
+  }
+
+  onDepartamentoChange() {
+    this.updateProgramasEducativosFiltrados();
+    if (this.selectedApplicant) {
+      this.selectedApplicant.programa_educativo = '';
+    }
+  }
+
+  private updateProgramasEducativosFiltrados() {
+    if (this.selectedApplicant && this.selectedApplicant.departamento) {
+      this.programasEducativosFiltrados = this.programasEducativos.filter(
+        p => p.departamento === this.selectedApplicant!.departamento
+      );
+    } else {
+      this.programasEducativosFiltrados = [];
+    }
   }
 
   navigateToCreate() {
@@ -181,11 +266,22 @@ export class ApplicantListingComponent implements OnInit, OnDestroy {
     this.reloadEvent.unsubscribe();
   }
 
+  private getMockApplicants(): IApplicantModel[] {
+    if (this.cachedMockApplicants === null) {
+      this.cachedMockApplicants = this.generateMockApplicants();
+    }
+    return this.cachedMockApplicants;
+  }
+
+  public clearMockCache(): void {
+    this.cachedMockApplicants = null;
+  }
+
   private generateMockApplicants(): IApplicantModel[] {
     const sexos = SEXO_OPTIONS;
     const mockApplicants: IApplicantModel[] = [];
-    const nombres = ['Juan', 'María', 'Pedro', 'Ana', 'Luis', 'Laura'];
-    const apellidos = ['García', 'López', 'Martínez', 'Hernández', 'González', 'Rodríguez'];
+    const nombres = ['Juan', 'María', 'Pedro', 'Ana', 'Luis', 'Laura', 'Carlos', 'Sofia', 'Miguel', 'Carmen'];
+    const apellidos = ['García', 'López', 'Martínez', 'Hernández', 'González', 'Rodríguez', 'Pérez', 'Sánchez', 'Ramírez', 'Torres'];
 
     const todasLasInstituciones = this.institucionService.getMockInstituciones();
 
@@ -199,39 +295,56 @@ export class ApplicantListingComponent implements OnInit, OnDestroy {
 
     const entidadesConInstituciones = Object.keys(institucionesPorEntidad);
 
-    for (let i = 1; i <= 200; i++) {
-      const nombre = nombres[Math.floor(Math.random() * nombres.length)];
-      const apellido = apellidos[Math.floor(Math.random() * apellidos.length)];
+    const createdApplicants = this.applicantService.getCreatedApplicants();
 
-      const entidad = entidadesConInstituciones[Math.floor(Math.random() * entidadesConInstituciones.length)];
+    createdApplicants.forEach(applicant => {
+      const applicantWithNumericId = {
+        ...applicant,
+        id: Number(applicant.id)
+      };
+      mockApplicants.push(applicantWithNumericId);
+    });
+
+    let seedCounter = 54321;
+    const seededRandom = () => {
+      seedCounter = (seedCounter * 9301 + 49297) % 233280;
+      return seedCounter / 233280;
+    };
+
+    for (let i = 1; i <= 200; i++) {
+      const nombre = nombres[Math.floor(seededRandom() * nombres.length)];
+      const apellido = apellidos[Math.floor(seededRandom() * apellidos.length)];
+
+      const entidad = entidadesConInstituciones[Math.floor(seededRandom() * entidadesConInstituciones.length)];
 
       const institucionesEntidad = institucionesPorEntidad[entidad];
-      const institucion = institucionesEntidad[Math.floor(Math.random() * institucionesEntidad.length)];
-      const departamento = DEPARTAMENTOS[Math.floor(Math.random() * DEPARTAMENTOS.length)];
+      const institucion = institucionesEntidad[Math.floor(seededRandom() * institucionesEntidad.length)];
+      const departamento = DEPARTAMENTOS[Math.floor(seededRandom() * DEPARTAMENTOS.length)];
       const programas = PROGRAMAS_EDUCATIVOS.filter(p => p.departamento === departamento);
       const programaEducativo = programas.length > 0
-        ? programas[Math.floor(Math.random() * programas.length)].nombre
+        ? programas[Math.floor(seededRandom() * programas.length)].nombre
         : '';
-      const createdApplicants = this.applicantService.getCreatedApplicants();
-      mockApplicants.push(...createdApplicants);
 
+      const mockId = Number(2000 + i);
 
-      mockApplicants.push({
-        id: i,
+      const newApplicant: IApplicantModel = {
+        id: mockId,
         nombre: nombre,
         apellidos: apellido,
-        edad: Math.floor(Math.random() * 30) + 25,
+        edad: Math.floor(seededRandom() * 30) + 18,
         entidad_federativa: entidad,
         institucion_adscripcion: institucion.nombre,
-        sexo: sexos[Math.floor(Math.random() * sexos.length)],
-        telefono: `55${Math.floor(10000000 + Math.random() * 90000000)}`,
+        sexo: sexos[Math.floor(seededRandom() * sexos.length)],
+        telefono: `55${Math.floor(10000000 + seededRandom() * 90000000)}`,
         email: `${nombre.toLowerCase()}.${apellido.toLowerCase()}@example.com`,
-        rfc: `RFC${Math.floor(100000000000 + Math.random() * 900000000000)}`,
-        curp: `CURP${Math.floor(1000000000000000 + Math.random() * 9000000000000000)}`,
+        rfc: `RFC${Math.floor(100000000000 + seededRandom() * 900000000000)}`,
+        curp: `CURP${Math.floor(1000000000000000 + seededRandom() * 9000000000000000)}`,
         departamento: departamento,
         programa_educativo: programaEducativo,
-        created_at: new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000).toISOString()
-      });
+        created_at: new Date(Date.now() - Math.floor(seededRandom() * 30) * 24 * 60 * 60 * 1000).toISOString()
+      };
+
+      mockApplicants.push(newApplicant);
     }
 
     return mockApplicants;
