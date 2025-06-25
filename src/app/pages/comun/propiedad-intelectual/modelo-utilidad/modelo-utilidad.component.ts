@@ -1,14 +1,17 @@
-import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {SweetAlertOptions} from 'sweetalert2';
-import {DataTablesResponse, ENTIDADES_FEDERATIVAS_DATA, ENTIDADES_FEDERATIVAS_MAP} from '../../../administrador/shared-services';
-import {Config} from 'datatables.net';
-import {SwalComponent} from '@sweetalert2/ngx-sweetalert2';
-import {UtilityModelsService} from '../../../../api/services/utility-models.service';
+import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { SweetAlertOptions } from 'sweetalert2';
+import { DataTablesResponse, ENTIDADES_FEDERATIVAS_DATA, ENTIDADES_FEDERATIVAS_MAP } from '../../../administrador/shared-services';
+import { Config } from 'datatables.net';
+import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { UtilityModelsService } from '../../../../api/services/utility-models.service';
 import moment from 'moment';
 import { Observable } from 'rxjs';
 import { IModUtilModel } from 'src/app/api/models/mod-util.model';
 import { FederalEntity } from 'src/app/api/models/entity.model';
 import { TranslateService } from '@ngx-translate/core';
+
+// 🆕 Definir tipo para el estatus
+type EstatusModUtil = 'Registrada' | 'En trámite' | 'Trámite con observaciones' | 'Aprobada' | 'Concluida';
 
 @Component({
   selector: 'app-modelo-utilidad',
@@ -48,7 +51,8 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
     descripcion: "",
     institucion: "",
     correo: "",
-    documentos: [""]
+    documentos: [""],
+    observaciones: ""
   };
 
   entidadesFederativas: FederalEntity[] = ENTIDADES_FEDERATIVAS_DATA
@@ -58,6 +62,28 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
 
   selectedFile: File | null = null;
   isViewMode: boolean = true;
+
+  // 🆕 Nuevas propiedades para el modo de edición
+  isEditingStatus: boolean = false;
+  isSaving: boolean = false;
+  statusError: boolean = false;
+  editedStatus: string = '';
+  editedObservations: string = '';
+  originalStatus: string = '';
+  originalObservations: string = '';
+
+  // 🆕 SOLUCIÓN 2: Key para forzar recreación del select
+  editingSelectKey: boolean = false;
+
+  // Mantener la propiedad existente para compatibilidad
+  observacionesChanged: boolean = false;
+
+  // 🆕 Secuencia de estados (mantener para referencia)
+  private secuenciaEstados: { [key in EstatusModUtil]?: EstatusModUtil } = {
+    'Registrada': 'En trámite',
+    'En trámite': 'Concluida',
+    'Trámite con observaciones': 'En trámite'
+  };
 
   constructor(
     private service: UtilityModelsService,
@@ -85,7 +111,6 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
         zeroRecords: this.translate.instant('TABLE.ZERO_RECORDS'),
       },
       ajax: (dataTablesParameters: any, callback) => {
-
         this.service.getModUtiles(dataTablesParameters).subscribe({
           next: (resp) => {
             callback(resp);
@@ -246,6 +271,300 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
       this.modUtilModel = { ...modUtil };
       this.inicializarSeleccionesDesdeModUtil();
       this.isViewMode = true;
+      this.observacionesChanged = false;
+      this.resetEditMode();
+    });
+  }
+
+  // 🆕 Obtener clase CSS para el badge de estatus
+  getStatusBadgeClass(status: string): string {
+    const statusClasses: { [key: string]: string } = {
+      'En trámite': 'badge-light-info',
+      'Trámite con observaciones': 'badge-light-warning',
+      'Aprobada': 'badge-light-success',
+      'Registrada': 'badge-light-primary',
+      'Concluida': 'badge-light-secondary'
+    };
+    return statusClasses[status] || 'badge-light-secondary';
+  }
+
+  /**
+   * Obtener las opciones válidas de estatus según el estado actual
+   */
+  getValidStatusOptions(): { value: EstatusModUtil, label: string }[] {
+    const currentStatus = this.modUtilModel.estatus;
+
+    switch(currentStatus) {
+      case 'Registrada':
+        return [
+          { value: 'En trámite', label: 'En trámite' },
+          { value: 'Trámite con observaciones', label: 'Trámite con observaciones' }
+        ];
+
+      case 'Trámite con observaciones':
+        return [
+          { value: 'En trámite', label: 'En trámite' }
+        ];
+
+      case 'En trámite':
+        return [
+          { value: 'Aprobada', label: 'Aprobada' }
+        ];
+
+      case 'Aprobada':
+        return [
+          { value: 'Concluida', label: 'Concluida' }
+        ];
+
+      case 'Concluida':
+        return [];
+
+      default:
+        return [];
+    }
+  }
+
+  /**
+   * Verificar si el estatus actual permite edición
+   */
+  canEditStatus(): boolean {
+    return this.getValidStatusOptions().length > 0;
+  }
+
+  // 🔧 SOLUCIÓN 2: Método enableEditMode actualizado
+  enableEditMode(): void {
+    this.isEditingStatus = true;
+    this.originalStatus = this.modUtilModel.estatus;
+    this.originalObservations = this.modUtilModel.observaciones || '';
+
+    // 🆕 Destruir el select y recrearlo
+    this.editingSelectKey = false;
+    this.editedStatus = '';
+    this.editedObservations = this.originalObservations;
+    this.statusError = false;
+
+    // 🆕 Recrear el select en el siguiente ciclo
+    setTimeout(() => {
+      this.editingSelectKey = true;
+      this.cdr.detectChanges();
+    }, 10);
+  }
+
+  // 🔧 SOLUCIÓN 2: Método resetEditMode actualizado
+  private resetEditMode(): void {
+    this.isEditingStatus = false;
+    this.editingSelectKey = false; // 🆕 Resetear key
+    this.editedStatus = '';
+    this.editedObservations = this.originalObservations;
+    this.statusError = false;
+    this.isSaving = false;
+  }
+
+  // 🆕 Verificar si hay cambios
+  private hasChanges(): boolean {
+    return this.editedStatus !== this.originalStatus ||
+      this.editedObservations !== this.originalObservations;
+  }
+
+  // 🆕 Validar formulario
+  private validateForm(): boolean {
+    this.statusError = false;
+
+    if (!this.editedStatus || this.editedStatus.trim() === '') {
+      this.statusError = true;
+      return false;
+    }
+
+    return true;
+  }
+
+  // 🆕 Guardar cambios
+  saveChanges(): void {
+    if (!this.validateForm()) {
+      const alertaError: SweetAlertOptions = {
+        icon: 'error',
+        title: 'Error de validación',
+        text: 'Por favor selecciona un estatus válido',
+        customClass: {
+          confirmButton: 'btn btn-danger'
+        }
+      };
+      this.showAlert(alertaError);
+      return;
+    }
+
+    // Mostrar confirmación
+    const alertaConfirmacion: SweetAlertOptions = {
+      icon: 'question',
+      title: '¿Confirmar cambios?',
+      html: `
+        <div class="text-start">
+          <p><strong>Estatus:</strong> ${this.editedStatus}</p>
+          <p><strong>Observaciones:</strong></p>
+          <p class="text-muted">${this.editedObservations || 'Sin observaciones'}</p>
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'Sí, guardar',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        confirmButton: 'btn btn-success',
+        cancelButton: 'btn btn-secondary'
+      }
+    };
+
+    import('sweetalert2').then(Swal => {
+      Swal.default.fire(alertaConfirmacion).then((result) => {
+        if (result.isConfirmed) {
+          this.performSave();
+        }
+      });
+    });
+  }
+
+  // 🆕 Realizar el guardado
+  private performSave(): void {
+    this.isSaving = true;
+
+    const updateData = {
+      estatus: this.editedStatus as EstatusModUtil,
+      observaciones: this.editedObservations
+    };
+
+    this.service.updateModUtilStatusAndObservations(this.modUtilModel.id, updateData).subscribe({
+      next: (response) => {
+        this.isSaving = false;
+
+        // Actualizar el modelo local
+        this.modUtilModel.estatus = updateData.estatus;
+        this.modUtilModel.observaciones = updateData.observaciones;
+
+        // Actualizar valores originales
+        this.originalStatus = this.editedStatus;
+        this.originalObservations = this.editedObservations;
+
+        // Salir del modo edición
+        this.isEditingStatus = false;
+
+        // Mostrar éxito
+        const alertaExito: SweetAlertOptions = {
+          icon: 'success',
+          title: '¡Éxito!',
+          text: 'Los cambios se han guardado correctamente',
+          timer: 2000,
+          showConfirmButton: false
+        };
+        this.showAlert(alertaExito);
+
+        // Recargar tabla
+        this.reloadEvent.emit(true);
+      },
+      error: (error) => {
+        this.isSaving = false;
+        console.error('Error al guardar:', error);
+
+        const alertaError: SweetAlertOptions = {
+          icon: 'error',
+          title: 'Error al guardar',
+          text: 'Ocurrió un error al intentar guardar los cambios',
+          customClass: {
+            confirmButton: 'btn btn-danger'
+          }
+        };
+        this.showAlert(alertaError);
+      }
+    });
+  }
+
+  // MÉTODOS EXISTENTES (mantener para compatibilidad)
+
+  editarEstatus(): void {
+    const estadoActual = this.modUtilModel.estatus;
+    const siguienteEstado = this.secuenciaEstados[estadoActual];
+
+    if (!siguienteEstado) {
+      const alertaError: SweetAlertOptions = {
+        icon: 'warning',
+        title: 'Aviso',
+        text: 'Este estatus no puede ser modificado o ya se encuentra en el estado final.',
+      };
+      this.showAlert(alertaError);
+      return;
+    }
+
+    const alertaConfirmacion: SweetAlertOptions = {
+      icon: 'question',
+      title: '¿Actualizar estatus?',
+      text: `¿Deseas cambiar el estatus de "${estadoActual}" a "${siguienteEstado}"?`,
+      showCancelButton: true,
+      confirmButtonText: 'Sí, actualizar',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        confirmButton: 'btn btn-primary',
+        cancelButton: 'btn btn-light'
+      }
+    };
+
+    import('sweetalert2').then(Swal => {
+      Swal.default.fire(alertaConfirmacion).then((result) => {
+        if (result.isConfirmed) {
+          this.actualizarEstatus(siguienteEstado);
+        }
+      });
+    });
+  }
+
+  private actualizarEstatus(nuevoEstatus: EstatusModUtil): void {
+    this.service.updateModUtilStatus(this.modUtilModel.id, nuevoEstatus).subscribe({
+      next: (response) => {
+        this.modUtilModel.estatus = nuevoEstatus;
+
+        const alertaExito: SweetAlertOptions = {
+          icon: 'success',
+          title: '¡Actualizado!',
+          text: `El estatus ha sido actualizado a "${nuevoEstatus}"`,
+        };
+        this.showAlert(alertaExito);
+
+        this.reloadEvent.emit(true);
+      },
+      error: (error) => {
+        console.error('Error al actualizar estatus:', error);
+        const alertaError: SweetAlertOptions = {
+          icon: 'error',
+          title: 'Error',
+          text: 'Hubo un problema al actualizar el estatus. Inténtalo de nuevo.',
+        };
+        this.showAlert(alertaError);
+      }
+    });
+  }
+
+  onObservacionesChange(): void {
+    this.observacionesChanged = true;
+  }
+
+  guardarObservaciones(): void {
+    this.service.updateModUtilObservations(this.modUtilModel.id, this.modUtilModel.observaciones || '').subscribe({
+      next: (response) => {
+        const alertaExito: SweetAlertOptions = {
+          icon: 'success',
+          title: '¡Guardado!',
+          text: 'Las observaciones han sido guardadas correctamente.',
+        };
+        this.showAlert(alertaExito);
+        this.observacionesChanged = false;
+        this.reloadEvent.emit(true);
+      },
+      error: (error) => {
+        console.error('Error al guardar observaciones:', error);
+        const alertaError: SweetAlertOptions = {
+          icon: 'error',
+          title: 'Error',
+          text: 'Hubo un problema al guardar las observaciones.',
+        };
+        this.showAlert(alertaError);
+      }
     });
   }
 
@@ -289,6 +608,14 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   closeForm(modal: any) {
+    if (this.isEditingStatus) {
+      this.resetEditMode();
+    }
+
+    this.performCloseForm(modal);
+  }
+
+  private performCloseForm(modal: any): void {
     modal.dismiss('cancel');
 
     this.modUtilModel = {
@@ -301,12 +628,15 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
       institucion: '',
       estatus: 'En trámite',
       descripcion: '',
-      documentos: []
+      documentos: [],
+      observaciones: ''
     };
 
     this.estadoSeleccionado = 0;
     this.institucionSeleccionada = 0;
     this.institucionesFiltradas = [];
+    this.observacionesChanged = false;
+    this.resetEditMode();
   }
 
   ngOnDestroy(): void {

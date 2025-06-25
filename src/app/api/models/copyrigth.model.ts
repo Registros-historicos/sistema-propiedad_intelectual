@@ -10,4 +10,5 @@ export interface ICopyrightModel {
     institucion: string;
     correo: string;
     documentos?: string[];
+    observaciones?: string;
 }

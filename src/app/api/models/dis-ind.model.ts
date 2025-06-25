@@ -9,4 +9,6 @@ export interface IDisIndModel {
     institucion: string;
     correo: string;
     documentos?: string[];
+    observaciones?: string;
+
 }
