@@ -1,14 +1,17 @@
-import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {CopyrightsService} from '../../../../api/services/copyright.service';
-import {DataTablesResponse, ENTIDADES_FEDERATIVAS_DATA, ENTIDADES_FEDERATIVAS_MAP} from '../../../administrador/shared-services';
-import {Config} from 'datatables.net';
-import {SwalComponent} from '@sweetalert2/ngx-sweetalert2';
-import {SweetAlertOptions} from 'sweetalert2';
+import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { CopyrightsService } from '../../../../api/services/copyright.service';
+import { DataTablesResponse, ENTIDADES_FEDERATIVAS_DATA, ENTIDADES_FEDERATIVAS_MAP } from '../../../administrador/shared-services';
+import { Config } from 'datatables.net';
+import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { SweetAlertOptions } from 'sweetalert2';
 import moment from 'moment';
 import { FederalEntity } from 'src/app/api/models/entity.model';
 import { Observable } from 'rxjs';
 import { ICopyrightModel } from 'src/app/api/models/copyrigth.model';
 import { TranslateService } from '@ngx-translate/core';
+
+// 🆕 Definir tipo para el estado
+type EstadoCopyright = 'Registrada' | 'En trámite' | 'Trámite con observaciones' | 'Aprobada' | 'Concluida';
 
 @Component({
   selector: 'app-derecho-autor',
@@ -49,7 +52,8 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
     descripcion: "",
     institucion: "",
     correo: "",
-    documentos: [""]
+    documentos: [""],
+    observaciones: ""
   };
 
   entidadesFederativas: FederalEntity[] = ENTIDADES_FEDERATIVAS_DATA
@@ -59,7 +63,29 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
 
   selectedFile: File | null = null;
   isViewMode: boolean = true;
-  
+
+  // 🆕 Nuevas propiedades para el modo de edición
+  isEditingStatus: boolean = false;
+  isSaving: boolean = false;
+  statusError: boolean = false;
+  editedStatus: string = '';
+  editedObservations: string = '';
+  originalStatus: string = '';
+  originalObservations: string = '';
+
+  // 🆕 SOLUCIÓN 2: Key para forzar recreación del select
+  editingSelectKey: boolean = false;
+
+  // Mantener la propiedad existente para compatibilidad
+  observacionesChanged: boolean = false;
+
+  // 🆕 Secuencia de estados (mantener para referencia)
+  private secuenciaEstados: { [key in EstadoCopyright]?: EstadoCopyright } = {
+    'Registrada': 'En trámite',
+    'En trámite': 'Concluida',
+    'Trámite con observaciones': 'En trámite'
+  };
+
   constructor(
     private service: CopyrightsService,
     private cdr: ChangeDetectorRef,
@@ -85,11 +111,6 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
         infoEmpty: this.translate.instant('TABLE.PAG_INFO_EMPTY'),
         zeroRecords: this.translate.instant('TABLE.ZERO_RECORDS'),
       },
-      /* ajax: (dataTablesParameters: any, callback) => {
-        this.applicantService.getApplicants(dataTablesParameters).subscribe(resp => {
-          callback(resp);
-        });
-      },*/
       ajax: (dataTablesParameters: any, callback) => {
         this.service.getCopyrights(dataTablesParameters).subscribe({
           next: (resp) => {
@@ -108,7 +129,8 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       columns: [
         {
-          title: this.translate.instant('TABLE.APPLICANT_NAME'), data: 'solicitante',
+          title: this.translate.instant('TABLE.APPLICANT_NAME'),
+          data: 'solicitante',
           render: (data, type, full) => {
             const colorClasses = ['success', 'info', 'warning', 'danger'];
             const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
@@ -148,25 +170,32 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
           },
         },
         {
-          title: this.translate.instant('TABLE.WORK_TITLE'), data: 'nombreObra'
+          title: this.translate.instant('TABLE.WORK_TITLE'),
+          data: 'nombreObra',
+          render: (data) => {
+            return `<span class="fw-bold fs-6 text-gray-800">${data || ''}</span>`;
+          },
         },
         {
-          title: this.translate.instant('TABLE.INSTITUTION'), data: 'institucion'
+          title: this.translate.instant('TABLE.INSTITUTION'),
+          data: 'institucion',
+          render: (data) => {
+            return `<span class="fw-semibold text-gray-600">${data || ''}</span>`;
+          },
         },
         {
-          title: this.translate.instant('TABLE.DATE'), data: 'fechaSolicitud', render: function (data) {
+          title: this.translate.instant('TABLE.DATE'),
+          data: 'fechaSolicitud',
+          render: (data) => {
             return `<span class="fw-semibold text-gray-600">${moment(data).format('DD-MM-YYYY')}</span>`;
-          }
+          },
         }
       ],
-      createdRow: function (row, data, dataIndex) {
+      createdRow: (row, data, dataIndex) => {
         const $row = $(row);
         $row.attr('data-action', 'view');
+        $row.attr('data-id', 0);
         $row.addClass('cursor-pointer');
-        $('td:eq(0)', row).addClass('d-flex align-items-center');
-        $('td:eq(1)', row).addClass('fw-bold fs-6 text-gray-800 mb-1');
-        $('td:eq(2)', row).addClass('fw-semibold text-gray-600');
-        $('td:eq(3)', row).addClass('fw-semibold text-gray-600');
       },
       initComplete: (settings, json) => {
         this.dtInstance = settings.oInstance.api()
@@ -243,6 +272,300 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
       this.copyrightModel = { ...copyright };
       this.inicializarSeleccionesDesdeDerechoAutor();
       this.isViewMode = true;
+      this.observacionesChanged = false;
+      this.resetEditMode();
+    });
+  }
+
+  // 🆕 Obtener clase CSS para el badge de estado
+  getStatusBadgeClass(status: string): string {
+    const statusClasses: { [key: string]: string } = {
+      'En trámite': 'badge-light-info',
+      'Trámite con observaciones': 'badge-light-warning',
+      'Aprobada': 'badge-light-success',
+      'Registrada': 'badge-light-primary',
+      'Concluida': 'badge-light-secondary'
+    };
+    return statusClasses[status] || 'badge-light-secondary';
+  }
+
+  /**
+   * Obtener las opciones válidas de estado según el estado actual
+   */
+  getValidStatusOptions(): { value: EstadoCopyright, label: string }[] {
+    const currentStatus = this.copyrightModel.estado;
+
+    switch(currentStatus) {
+      case 'Registrada':
+        return [
+          { value: 'En trámite', label: 'En trámite' },
+          { value: 'Trámite con observaciones', label: 'Trámite con observaciones' }
+        ];
+
+      case 'Trámite con observaciones':
+        return [
+          { value: 'En trámite', label: 'En trámite' }
+        ];
+
+      case 'En trámite':
+        return [
+          { value: 'Aprobada', label: 'Aprobada' }
+        ];
+
+      case 'Aprobada':
+        return [
+          { value: 'Concluida', label: 'Concluida' }
+        ];
+
+      case 'Concluida':
+        return [];
+
+      default:
+        return [];
+    }
+  }
+
+  /**
+   * Verificar si el estado actual permite edición
+   */
+  canEditStatus(): boolean {
+    return this.getValidStatusOptions().length > 0;
+  }
+
+  // 🔧 SOLUCIÓN 2: Método enableEditMode actualizado
+  enableEditMode(): void {
+    this.isEditingStatus = true;
+    this.originalStatus = this.copyrightModel.estado;
+    this.originalObservations = this.copyrightModel.observaciones || '';
+
+    // 🆕 Destruir el select y recrearlo
+    this.editingSelectKey = false;
+    this.editedStatus = '';
+    this.editedObservations = this.originalObservations;
+    this.statusError = false;
+
+    // 🆕 Recrear el select en el siguiente ciclo
+    setTimeout(() => {
+      this.editingSelectKey = true;
+      this.cdr.detectChanges();
+    }, 10);
+  }
+
+  // 🔧 SOLUCIÓN 2: Método resetEditMode actualizado
+  private resetEditMode(): void {
+    this.isEditingStatus = false;
+    this.editingSelectKey = false; // 🆕 Resetear key
+    this.editedStatus = '';
+    this.editedObservations = this.originalObservations;
+    this.statusError = false;
+    this.isSaving = false;
+  }
+
+  // 🆕 Verificar si hay cambios
+  private hasChanges(): boolean {
+    return this.editedStatus !== this.originalStatus ||
+      this.editedObservations !== this.originalObservations;
+  }
+
+  // 🆕 Validar formulario
+  private validateForm(): boolean {
+    this.statusError = false;
+
+    if (!this.editedStatus || this.editedStatus.trim() === '') {
+      this.statusError = true;
+      return false;
+    }
+
+    return true;
+  }
+
+  // 🆕 Guardar cambios
+  saveChanges(): void {
+    if (!this.validateForm()) {
+      const alertaError: SweetAlertOptions = {
+        icon: 'error',
+        title: 'Error de validación',
+        text: 'Por favor selecciona un estado válido',
+        customClass: {
+          confirmButton: 'btn btn-danger'
+        }
+      };
+      this.showAlert(alertaError);
+      return;
+    }
+
+    // Mostrar confirmación
+    const alertaConfirmacion: SweetAlertOptions = {
+      icon: 'question',
+      title: '¿Confirmar cambios?',
+      html: `
+        <div class="text-start">
+          <p><strong>Estado:</strong> ${this.editedStatus}</p>
+          <p><strong>Observaciones:</strong></p>
+          <p class="text-muted">${this.editedObservations || 'Sin observaciones'}</p>
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'Sí, guardar',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        confirmButton: 'btn btn-success',
+        cancelButton: 'btn btn-secondary'
+      }
+    };
+
+    import('sweetalert2').then(Swal => {
+      Swal.default.fire(alertaConfirmacion).then((result) => {
+        if (result.isConfirmed) {
+          this.performSave();
+        }
+      });
+    });
+  }
+
+  // 🆕 Realizar el guardado
+  private performSave(): void {
+    this.isSaving = true;
+
+    const updateData = {
+      estado: this.editedStatus as EstadoCopyright,
+      observaciones: this.editedObservations
+    };
+
+    this.service.updateCopyrightStatusAndObservations(this.copyrightModel.id, updateData).subscribe({
+      next: (response) => {
+        this.isSaving = false;
+
+        // Actualizar el modelo local
+        this.copyrightModel.estado = updateData.estado;
+        this.copyrightModel.observaciones = updateData.observaciones;
+
+        // Actualizar valores originales
+        this.originalStatus = this.editedStatus;
+        this.originalObservations = this.editedObservations;
+
+        // Salir del modo edición
+        this.isEditingStatus = false;
+
+        // Mostrar éxito
+        const alertaExito: SweetAlertOptions = {
+          icon: 'success',
+          title: '¡Éxito!',
+          text: 'Los cambios se han guardado correctamente',
+          timer: 2000,
+          showConfirmButton: false
+        };
+        this.showAlert(alertaExito);
+
+        // Recargar tabla
+        this.reloadEvent.emit(true);
+      },
+      error: (error) => {
+        this.isSaving = false;
+        console.error('Error al guardar:', error);
+
+        const alertaError: SweetAlertOptions = {
+          icon: 'error',
+          title: 'Error al guardar',
+          text: 'Ocurrió un error al intentar guardar los cambios',
+          customClass: {
+            confirmButton: 'btn btn-danger'
+          }
+        };
+        this.showAlert(alertaError);
+      }
+    });
+  }
+
+  // MÉTODOS EXISTENTES (mantener para compatibilidad)
+
+  editarEstado(): void {
+    const estadoActual = this.copyrightModel.estado;
+    const siguienteEstado = this.secuenciaEstados[estadoActual];
+
+    if (!siguienteEstado) {
+      const alertaError: SweetAlertOptions = {
+        icon: 'warning',
+        title: 'Aviso',
+        text: 'Este estado no puede ser modificado o ya se encuentra en el estado final.',
+      };
+      this.showAlert(alertaError);
+      return;
+    }
+
+    const alertaConfirmacion: SweetAlertOptions = {
+      icon: 'question',
+      title: '¿Actualizar estado?',
+      text: `¿Deseas cambiar el estado de "${estadoActual}" a "${siguienteEstado}"?`,
+      showCancelButton: true,
+      confirmButtonText: 'Sí, actualizar',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        confirmButton: 'btn btn-primary',
+        cancelButton: 'btn btn-light'
+      }
+    };
+
+    import('sweetalert2').then(Swal => {
+      Swal.default.fire(alertaConfirmacion).then((result) => {
+        if (result.isConfirmed) {
+          this.actualizarEstado(siguienteEstado);
+        }
+      });
+    });
+  }
+
+  private actualizarEstado(nuevoEstado: EstadoCopyright): void {
+    this.service.updateCopyrightStatus(this.copyrightModel.id, nuevoEstado).subscribe({
+      next: (response) => {
+        this.copyrightModel.estado = nuevoEstado;
+
+        const alertaExito: SweetAlertOptions = {
+          icon: 'success',
+          title: '¡Actualizado!',
+          text: `El estado ha sido actualizado a "${nuevoEstado}"`,
+        };
+        this.showAlert(alertaExito);
+
+        this.reloadEvent.emit(true);
+      },
+      error: (error) => {
+        console.error('Error al actualizar estado:', error);
+        const alertaError: SweetAlertOptions = {
+          icon: 'error',
+          title: 'Error',
+          text: 'Hubo un problema al actualizar el estado. Inténtalo de nuevo.',
+        };
+        this.showAlert(alertaError);
+      }
+    });
+  }
+
+  onObservacionesChange(): void {
+    this.observacionesChanged = true;
+  }
+
+  guardarObservaciones(): void {
+    this.service.updateCopyrightObservations(this.copyrightModel.id, this.copyrightModel.observaciones || '').subscribe({
+      next: (response) => {
+        const alertaExito: SweetAlertOptions = {
+          icon: 'success',
+          title: '¡Guardado!',
+          text: 'Las observaciones han sido guardadas correctamente.',
+        };
+        this.showAlert(alertaExito);
+        this.observacionesChanged = false;
+        this.reloadEvent.emit(true);
+      },
+      error: (error) => {
+        console.error('Error al guardar observaciones:', error);
+        const alertaError: SweetAlertOptions = {
+          icon: 'error',
+          title: 'Error',
+          text: 'Hubo un problema al guardar las observaciones.',
+        };
+        this.showAlert(alertaError);
+      }
     });
   }
 
@@ -296,6 +619,14 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   closeForm(modal: any) {
+    if (this.isEditingStatus) {
+      this.resetEditMode();
+    }
+
+    this.performCloseForm(modal);
+  }
+
+  private performCloseForm(modal: any): void {
     modal.dismiss('cancel');
 
     this.copyrightModel = {
@@ -309,12 +640,15 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
       institucion: '',
       estado: 'En trámite',
       descripcion: '',
-      documentos: []
+      documentos: [],
+      observaciones: ''
     };
 
     this.estadoSeleccionado = 0;
     this.institucionSeleccionada = 0;
     this.institucionesFiltradas = [];
+    this.observacionesChanged = false;
+    this.resetEditMode();
   }
 
   ngOnDestroy(): void {

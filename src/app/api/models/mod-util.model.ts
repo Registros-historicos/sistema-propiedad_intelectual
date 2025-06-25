@@ -9,4 +9,6 @@ export interface IModUtilModel {
     institucion: string;
     correo: string;
     documentos?: string[];
+    observaciones?: string;
+
 }
