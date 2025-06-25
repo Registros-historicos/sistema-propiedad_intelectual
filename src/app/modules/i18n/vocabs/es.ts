@@ -11,6 +11,8 @@ export const locale = {
         UTILITY_MODEL: 'Registrar modelo de utilidad',
         COPYRIGHT: 'Registrar derecho de autor',
         INDUSTRIAL_DESIGN: 'Registrar diseño industrial',
+        VEGETAL_VARIETY: 'Registrar variedad vegetal',
+        INDUSTRIAL_SECRET: 'Registrar secreto industrial',
       },
       CONFIRM: "Confirmar",
       CANCEL: "Cancelar",
@@ -142,7 +144,9 @@ export const locale = {
         TRADEMARKS: "MA",
         UTILITY_MODELS: 'MU',
         COPYRIGHTS: 'DA',
-        INDUSTRIAL_DESIGNS: 'DI'
+        INDUSTRIAL_DESIGNS: 'DI',
+        VEGETAL_VARIETIES: 'VA',
+        INDUSTRIAL_SECRETS: 'SE'
       }
     },
     ACADEMIC_LEVEL: {
@@ -187,7 +191,9 @@ export const locale = {
         TRADEMARKS: 'Marcas',
         UTILITY_MODELS: 'Modelos de Utilidad',
         COPYRIGHTS: 'Derechos de Autor',
-        INDUSTRIAL_DESIGNS: 'Diseños Industriales'
+        INDUSTRIAL_DESIGNS: 'Diseños Industriales',
+        VEGETAL_VARIETIES: 'Variedades Vegetales',
+        INDUSTRIAL_SECRETS: 'Secretos Industriales'
       },
       COORD: {
         APPLICANTS: 'Solicitantes',
@@ -197,7 +203,9 @@ export const locale = {
         MANAGEMENT: 'Gestión',
         PATENTS: 'Patentes',
         TRADEMARKS: 'Marcas',
-        UTILITY_MODELS: 'Modelos de Utilidad'
+        UTILITY_MODELS: 'Modelos de Utilidad',
+        VEGETAL_VARIETIES: 'Variedades Vegetales',
+        INDUSTRIAL_SECRETS: 'Secretos Industriales',
       },
       APPLICANT: {
         MYPROFILE: 'Perfil',
@@ -329,6 +337,45 @@ export const locale = {
       SETTINGS: 'Configuración',
       SIGN_OUT: 'Cerrar Sesión'
     },
+    ERROR: {
+      NOTAVAILABLE: {
+        TITLE: "Funcionalidad no disponible",
+        DESCRIPTION: "Lo sentimos, esta funcionalidad no está disponible en este momento. Por favor, inténtelo de nuevo más tarde o contacte con el soporte técnico si el problema persiste.",
+        BACK_TO_HOME: "Volver al inicio"
+      }
+    },
+    GUEST: {
+    REGISTER: {
+      COPYRIGHT: {
+        TITLE: 'Derechos de Autor',
+        DESCRIPTION: 'Protección de obras literarias, artísticas, musicales, audiovisuales y programas de software'
+      },
+      PATENT: {
+        TITLE: 'Patente',
+        DESCRIPTION: 'Protección de invenciones con aplicación industrial'
+      },
+      UTILITY_MODEL: {
+        TITLE: 'Modelo de Utilidad',
+        DESCRIPTION: 'Protección de objetos, utensilios o herramientas mejoradas'
+      },
+      INDUSTRIAL_DESIGN: {
+        TITLE: 'Diseño Industrial',
+        DESCRIPTION: 'Protección del aspecto ornamental de productos industriales'
+      },
+      TRADEMARK: {
+        TITLE: 'Marca',
+        DESCRIPTION: 'Protección de signos distintivos comerciales'
+      },
+      PLANT_VARIETY: {
+        TITLE: 'Variedad Vegetal',
+        DESCRIPTION: 'Protección de nuevas variedades de plantas'
+      },
+      INDUSTRIAL_SECRET: {
+        TITLE: 'Secretos Industriales',
+        DESCRIPTION: 'Protección de secretos comerciales y de información confidencial'
+      }
+    }
+    },
     USER_REGISTER: {
       TITLE: 'Registro de Nuevos Usuarios',
       DESCRIPTION: 'Registra nuevos usuarios en el sistema. Selecciona el tipo de usuario que deseas registrar y completa los campos requeridos.',
@@ -342,5 +389,5 @@ export const locale = {
         DESCRIPTION: 'Registra un nuevo solicitante en el sistema.',
       },
     }
-  }
+  },
 };

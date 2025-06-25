@@ -65,6 +65,18 @@ export const ADMINISTRATOR_MENUS = [
     icon: 'architecture',
     link: '/administrador/propiedades/diseno-industrial',
     type: 'link'
+  }, 
+  {
+    name: 'MENU.ADMIN.VEGETAL_VARIETIES',
+    icon: 'eco',
+    link: '/administrador/propiedades/variedad-vegetal',
+    type: 'link'
+  },
+  {
+    name: 'MENU.ADMIN.INDUSTRIAL_SECRETS',
+    icon: 'lock',
+    link: '/administrador/propiedades/secreto-industrial',
+    type: 'link'
   },
   {
     name: 'MENU.REPORTS',
@@ -146,6 +158,19 @@ export const COORDINATOR_MENUS = [
     name: 'MENU.COORD.INDUSTRIAL_DESIGNS',
     icon: 'architecture',
     link: '/coordinador/propiedades/diseno-industrial',
+    type: 'link'
+  },
+   
+  {
+    name: 'MENU.COORD.VEGETAL_VARIETIES',
+    icon: 'eco',
+    link: '/coordinador/propiedades/variedad-vegetal',
+    type: 'link'
+  },
+  {
+    name: 'MENU.COORD.INDUSTRIAL_SECRETS',
+    icon: 'lock',
+    link: '/coordinador/propiedades/secreto-industrial',
     type: 'link'
   },
   {

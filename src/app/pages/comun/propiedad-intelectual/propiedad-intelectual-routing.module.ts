@@ -6,6 +6,7 @@ import { ModeloUtilidadComponent } from './modelo-utilidad/modelo-utilidad.compo
 import { DerechoAutorComponent } from './derecho-autor/derecho-autor.component';
 import { DisenoIndustrialComponent } from './diseno-industrial/diseno-industrial.component';
 import { PatenteFormComponent } from './registers/patente-form/patente-form.component';
+import { Error503Component } from 'src/app/modules/errors/error503/error503.component';
 
 const routes: Routes = [
   {
@@ -30,6 +31,14 @@ const routes: Routes = [
       {
         path: 'diseno-industrial',
         component: DisenoIndustrialComponent
+      },
+      {
+        path: 'variedad-vegetal',
+        component: Error503Component
+      },
+      {
+        path: 'secreto-industrial',
+        component: Error503Component
       }
     ]
   },
