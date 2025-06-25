@@ -11,22 +11,22 @@ export type Rol = 'admin' | 'coordinador' | 'solicitante';
 export const REPORTES_POR_ROL: Record<Rol, ReporteCard[]> = {
     admin: [
     {
-      titulo: 'Institución',
-      descripcion: 'Reporte de instituciones registradas.',
+      titulo: 'REPORTS.ADMIN.INSTITUTION.TITLE',
+      descripcion: 'REPORTS.ADMIN.INSTITUTION.DESCRIPTION',
       archivo: 'reporte-instituciones.pdf',
       color: 'blue',
       icono: 'school' 
     },
     {
-      titulo: 'Entidad Federativa',
-      descripcion: 'Reporte por estados.',
+      titulo: 'REPORTS.ADMIN.STATE.TITLE',
+      descripcion: 'REPORTS.ADMIN.STATE.DESCRIPTION',
       archivo: 'reporte-entidad.pdf',
       color: 'green',
       icono: 'map' 
     },
     {
-      titulo: 'Federal o Descentralizado',
-      descripcion: 'Reporte clasificado.',
+      titulo: 'REPORTS.ADMIN.TYPE.TITLE',
+      descripcion: 'REPORTS.ADMIN.TYPE.DESCRIPTION',
       archivo: 'reporte-clasificacion.pdf',
       color: 'orange',
       icono: 'apartment' 
@@ -34,36 +34,36 @@ export const REPORTES_POR_ROL: Record<Rol, ReporteCard[]> = {
   ],
   coordinador: [
     {
-      titulo: 'Departamento',
-      descripcion: 'Reporte de departamentos.',
+      titulo: 'REPORTS.COORDINATOR.DEPARTMENT.TITLE',
+      descripcion: 'REPORTS.COORDINATOR.DEPARTMENT.DESCRIPTION',
       archivo: 'reporte-departamentos.pdf',
       color: 'purple',
       icono: 'domain' 
     },
     {
-      titulo: 'Investigador',
-      descripcion: 'Reporte de investigadores.',
+      titulo: 'REPORTS.COORDINATOR.RESEARCHER.TITLE',
+      descripcion: 'REPORTS.COORDINATOR.RESEARCHER.DESCRIPTION',
       archivo: 'reporte-investigadores.pdf',
       color: 'red',
       icono: 'science' 
     },
     {
-      titulo: 'Cuerpo Académico',
-      descripcion: 'Reporte de cuerpos académicos.',
+      titulo: 'REPORTS.COORDINATOR.ACADEMIC.TITLE',
+      descripcion: 'REPORTS.COORDINATOR.ACADEMIC.DESCRIPTION',
       archivo: 'reporte-cuerpo-academico.pdf',
       color: 'pink',
       icono: 'group' 
     },
     {
-      titulo: 'Programa Educativo',
-      descripcion: 'Reporte de programas educativos.',
+      titulo: 'REPORTS.COORDINATOR.PROGRAM.TITLE',
+      descripcion: 'REPORTS.COORDINATOR.PROGRAM.DESCRIPTION',
       archivo: 'reporte-programa-educativo.pdf',
       color: 'blue',
       icono: 'menu_book' 
     },
     {
-      titulo: 'Fecha',
-      descripcion: 'Reporte filtrado por fechas.',
+      titulo: 'REPORTS.COORDINATOR.DATE.TITLE',
+      descripcion: 'REPORTS.COORDINATOR.DATE.DESCRIPTION',
       archivo: 'reporte-fecha-coordinador.pdf',
       color: 'teal',
       icono: 'event' 
@@ -71,15 +71,15 @@ export const REPORTES_POR_ROL: Record<Rol, ReporteCard[]> = {
   ],
   solicitante: [
     {
-      titulo: 'Fecha',
-      descripcion: 'Reporte de mis solicitudes por fecha.',
+      titulo: 'REPORTS.GUEST.DATE.TITLE',
+      descripcion: 'REPORTS.GUEST.DATE.DESCRIPTION',
       archivo: 'reporte-fecha-solicitante.pdf',
       color: 'green',
       icono: 'calendar_today' 
     },
     {
-      titulo: 'Tipo de Solicitud',
-      descripcion: 'Reporte por tipo de solicitud.',
+      titulo: 'REPORTS.GUEST.TYPE.TITLE',
+      descripcion: 'REPORTS.GUEST.TYPE.DESCRIPTION',
       archivo: 'reporte-tipo-solicitud.pdf',
       color: 'orange',
       icono: 'assignment'

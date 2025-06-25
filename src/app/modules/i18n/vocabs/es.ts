@@ -283,6 +283,60 @@ export const locale = {
         INVALID_FIELD: 'Field is not valid',
       }
     },
+    REPORTS:{
+      TITLE: 'Reportes disponibles',
+      DESC: 'Genera reportes de las solicitudes registradas',
+      BUTTON: 'Generar Reporte',
+      LOADING: 'Generando Reporte',
+      ADMIN: {
+        INSTITUTION: {
+          TITLE: 'Instituciones',
+          DESCRIPTION: 'Reporte de instituciones registradas.'
+        },
+        STATE: {
+          TITLE: 'Entidad Federativa',
+          DESCRIPTION: 'Reporte por entidad federativa.'
+        },
+        TYPE: {
+          TITLE: 'Federal o Centralizado',
+          DESCRIPTION: 'Reporte clasificado por tipo de institución.'
+        }
+      },
+      COORDINATOR: {
+        DEPARTMENT: {
+          TITLE: 'Departamento',
+          DESCRIPTION: 'Reporte por departamento.'
+        },
+        RESEARCHER: {
+          TITLE: 'Investigador',
+          DESCRIPTION: 'Reporte por investigador.'
+        },
+        ACADEMIC: {
+          TITLE: 'Cuerpo Académico',
+          DESCRIPTION: 'Reporte por cuerpo académico.'
+        },
+        PROGRAM: {
+          TITLE: 'Programa Educativo',
+          DESCRIPTION: 'Reporte por programa educativo.'
+        },
+        DATE: {
+          TITLE: 'Fecha de Solicitud',
+          DESCRIPTION: 'Reporte por fecha de solicitud.'
+        }
+      },
+      GUEST: {
+        DATE: {
+          TITLE: 'Fecha de Solicitud',
+          DESCRIPTION: 'Reporte por fecha de solicitud.'
+        },
+        TYPE: {
+          TITLE: 'Tipo de Solicitud',
+          DESCRIPTION: 'Reporte por tipo de solicitud.'
+        },
+        
+      },
+
+    },
     ECOMMERCE: {
       COMMON: {
         SELECTED_RECORDS_COUNT: 'Selected records count: ',
