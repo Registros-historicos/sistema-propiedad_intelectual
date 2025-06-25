@@ -1,9 +1,9 @@
-import {  AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild  } from '@angular/core';
-import {  SweetAlertOptions  } from 'sweetalert2';
-import {  DataTablesResponse, ENTIDADES_FEDERATIVAS_DATA, ENTIDADES_FEDERATIVAS_MAP  } from '../../../administrador/shared-services';
-import {  Config  } from 'datatables.net';
-import {  SwalComponent  } from '@sweetalert2/ngx-sweetalert2';
-import {  UtilityModelsService  } from '../../../../api/services/utility-models.service';
+import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { SweetAlertOptions } from 'sweetalert2';
+import { DataTablesResponse, ENTIDADES_FEDERATIVAS_DATA, ENTIDADES_FEDERATIVAS_MAP } from '../../../administrador/shared-services';
+import { Config } from 'datatables.net';
+import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { UtilityModelsService } from '../../../../api/services/utility-models.service';
 import moment from 'moment';
 import { Observable } from 'rxjs';
 import { IModUtilModel } from 'src/app/api/models/mod-util.model';
@@ -278,6 +278,18 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
     });
   }
 
+  follow(id: number) {
+    this.isViewMode = false;
+    this.cdr.detectChanges();
+
+    this.service.getModUtil(id).subscribe((modUtil: IModUtilModel) => {
+      this.modUtilModel = { ...modUtil };
+      this.inicializarSeleccionesDesdeModUtil();
+      this.observacionesChanged = false;
+      this.resetEditMode();
+    });
+  }
+
   // 🆕 Obtener clase CSS para el badge de estatus
   getStatusBadgeClass(status: string): string {
     const statusClasses: { [key: string]: string } = {
@@ -296,7 +308,7 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
   getValidStatusOptions(): { value: EstatusModUtil, label: string }[] {
     const currentStatus = this.modUtilModel.estatus;
 
-    switch(currentStatus) {
+    switch (currentStatus) {
       case 'Registrada':
         return [
           { value: 'En trámite', label: 'En trámite' },
