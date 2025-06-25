@@ -75,7 +75,8 @@ export class TrademarksService {
             tipoSolicitud: '',
             marca: '',
             productosServicios: [],
-            titular: ''
+            titular: '',
+            estatus: 'Registrada'
           })
         }
         observer.complete();

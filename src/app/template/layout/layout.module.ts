@@ -40,6 +40,7 @@ import { ReportsComponent } from './components/toolbar/reports/reports.component
 import { SaasComponent } from './components/toolbar/saas/saas.component';
 import {SharedModule} from "../shared/shared.module";
 import {MatIcon} from '@angular/material/icon';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 const routes: Routes = [
   {
@@ -88,7 +89,8 @@ const routes: Routes = [
     TranslateModule,
     ThemeModeModule,
     SharedModule,
-    MatIcon
+    MatIcon,
+    SweetAlert2Module.forRoot()
   ],
   exports: [RouterModule],
 })

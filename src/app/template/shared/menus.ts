@@ -118,8 +118,7 @@ export const COORDINATOR_MENUS = [
       {
         name: 'BUTTON.NEW.TRADEMARK',
         icon: 'branding_watermark',
-        type: 'link',
-        link: '/coordinador/propiedades/registro/marca',
+        type: 'not-implemented',
       },
       {
         name: 'BUTTON.NEW.UTILITY_MODEL',

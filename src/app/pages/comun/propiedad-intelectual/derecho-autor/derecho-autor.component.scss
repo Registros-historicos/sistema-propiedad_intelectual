@@ -1,0 +1,157 @@
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 2rem;
+}
+
+.timeline-item:last-child {
+    padding-bottom: 0;
+}
+
+.timeline-line {
+    position: absolute;
+    left: -30px;
+    top: 40px;
+    bottom: -2rem;
+    width: 2px;
+    background: #e1e3ea;
+}
+
+.timeline-item:last-child .timeline-line {
+    display: none;
+}
+
+.timeline-icon {
+    position: absolute;
+    left: -50px;
+    top: 0;
+    z-index: 2;
+}
+
+.timeline-content {
+    background: #f8f9fa;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-left: 1rem;
+    border-left: 3px solid #e1e3ea;
+}
+
+.timeline-item.active .timeline-content {
+    border-left-color: #009ef7;
+    background: #f1f8ff;
+}
+
+.timeline-item.completed .timeline-content {
+    border-left-color: #50cd89;
+    background: #f8fff8;
+}
+
+.timeline-item.pending .timeline-content {
+    border-left-color: #ffc700;
+    background: #fffdf1;
+}
+
+.timeline-item.observation .timeline-content {
+    border-left-color: #f1416c;
+    background: #fff5f8;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.status-badge.current {
+    background: #009ef7;
+    color: white;
+}
+
+.status-badge.completed {
+    background: #50cd89;
+    color: white;
+}
+
+.status-badge.pending {
+    background: #ffc700;
+    color: #1b1b29;
+}
+
+.status-badge.observation {
+    background: #f1416c;
+    color: white;
+}
+
+.progress-indicator {
+    height: 6px;
+    background: #e1e3ea;
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 1rem 0;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #009ef7 0%, #50cd89 100%);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.next-steps {
+    background: #ffffff;
+    border: 1px solid #e1e3ea;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+
+.next-steps ul {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.next-steps li {
+    margin-bottom: 0.5rem;
+    color: #5e6278;
+}
+
+.tracking-header {
+    background: transparent;
+    border: 1px dashed #000;
+    color: #000;
+    border-radius: 0.75rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.tracking-header h4 {
+    color: #000;
+    margin-bottom: 0.5rem;
+}
+
+.modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
