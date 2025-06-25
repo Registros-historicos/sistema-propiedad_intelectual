@@ -40,6 +40,10 @@ const routes: Routes = [
         path: 'perfil',
         loadChildren: () => import('../../modules/profile/profile.module').then((m) => m.ProfileModule),
       },
+      {
+        path: 'registro',
+        loadComponent: () => import('./register/register.component').then(m => m.RegisterComponent)
+      }
     ]
   }
 ];
