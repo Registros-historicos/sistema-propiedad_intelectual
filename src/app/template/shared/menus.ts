@@ -105,40 +105,17 @@ export const COORDINATOR_MENUS = [
     type: 'separator'
   },
   {
-    name: 'MENU.INTELECTUAL_PROPERTIES',
-    icon: 'note_add',
+    name: 'MENU.USERS',
+    icon: 'person_add',
     type: 'dropdown',
     children: [
+
       {
-        name: 'BUTTON.NEW.PATENT',
-        icon: 'emoji_objects',
+        name: 'BUTTON.NEW.APPLICANT',
+        icon: 'person_add',
         type: 'link',
-        link: '/coordinador/propiedades/registro/patente',
+        link: '/coordinador/solicitante/registro',
       },
-      {
-        name: 'BUTTON.NEW.TRADEMARK',
-        icon: 'branding_watermark',
-        type: 'link',
-        link: '/coordinador/propiedades/registro/marca',
-      },
-      {
-        name: 'BUTTON.NEW.UTILITY_MODEL',
-        icon: 'construction',
-        type: 'link',
-        link: '/coordinador/propiedades/registro/modelo-utilidad',
-      },
-      {
-        name: 'BUTTON.NEW.COPYRIGHT',
-        icon: 'description',
-        type: 'link',
-        link: '/coordinador/propiedades/registro/derecho-autor',
-      },
-      {
-        name: 'BUTTON.NEW.INDUSTRIAL_DESIGN',
-        icon: 'description',
-        type: 'link',
-        link: '/coordinador/propiedades/registro/diseno-industrial',
-      }
     ]
   },
   {

@@ -14,6 +14,7 @@ import {
   WidgetsModule,
 } from '../../template/widgets';
 import { SharedModule } from "../../template/shared/shared.module";
+import { MatIcon } from '@angular/material/icon';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import { SharedModule } from "../../template/shared/shared.module";
     DropdownMenusModule,
     WidgetsModule,
     CardsModule,
-    SharedModule
+    SharedModule,
+    MatIcon
   ],
 })
 export class ProfileModule {}
