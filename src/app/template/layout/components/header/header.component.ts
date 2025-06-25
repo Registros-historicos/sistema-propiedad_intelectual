@@ -134,6 +134,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.unsubscribe.push(routerSubscription);
   }
 
+  isProfileRoute(): boolean {
+    const url = this.router.url;
+    return url.includes('/perfil');
+  }
+
   ngOnDestroy() {
     this.unsubscribe.forEach((sb) => sb.unsubscribe());
   }

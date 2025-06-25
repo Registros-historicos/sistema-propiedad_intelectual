@@ -112,7 +112,18 @@ export const COORDINATOR_MENUS = [
         name: 'BUTTON.NEW.APPLICANT',
         icon: 'person_add',
         type: 'link',
-        link: '/coordinador/solicitante/registro',
+        link: '/coordinador/propiedades/registro/patente',
+      },
+      {
+        name: 'BUTTON.NEW.TRADEMARK',
+        icon: 'branding_watermark',
+        type: 'not-implemented',
+      },
+      {
+        name: 'BUTTON.NEW.UTILITY_MODEL',
+        icon: 'construction',
+        type: 'link',
+        link: '/coordinador/propiedades/registro/modelo-utilidad',
       },
     ]
   },

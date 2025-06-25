@@ -28,7 +28,8 @@ export class MarcaFormComponent implements OnInit {
     inicioUso: '',
     marca: '',
     productosServicios: [],
-    titular: ''
+    titular: '',
+    estatus: 'Registrada'
   };
 
   tiposSolicitud: string[] = [

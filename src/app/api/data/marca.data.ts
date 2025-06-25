@@ -11,6 +11,7 @@ export const MARK_DATA: DatosMarca[] = [
     tipoSolicitud: "PUBLICACIÓN DE NOMBRE COMERCIAL",
     inicioUso: "10/12/1940",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/PC198800000680?fallback=CAVALIER",
+    estatus: "Aprobada",
     productosServicios: [
       { clase: 39, descripcion: "FABRICACION Y COMPRA VENTA DE PRENDAS DE VESTIR" },
       { clase: 42, descripcion: "FABRICACION Y COMPRA VENTA DE PRENDAS DE VESTIR" }
@@ -33,6 +34,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "08/10/2030",
     tipoSolicitud: "PUBLICACIÓN DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/PC198500000003?fallback=TAG",
+    estatus: "Aprobada",
     productosServicios: [
       { clase: 42, descripcion: "PRESTACION DE SERVICIO DE ALINEAMIENTO Y BALANCEO, ROTACION Y CAMBIO DE NEUMATICOS." },
       { clase: 75, descripcion: "PRESTACION DE SERVICIO DE ALINEAMIENTO Y BALANCEO, ROTACION Y CAMBIO DE NEUMATICOS." }
@@ -59,6 +61,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "19/08/2025",
     tipoSolicitud: "PUBLICACIÓN DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/PC198500000004?fallback=METALSA",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "FABICACION Y COMERCIALIZACION DE TODA CLASE PARTES PARA TODO TIPO DE VEHICULOS ASI COMO LA FABRICACION DE BASTIDORES AUTOMOTRICES, ETC." },
       { clase: 75, descripcion: "FABICACION Y COMERCIALIZACION DE TODA CLASE PARTES PARA TODO TIPO DE VEHICULOS ASI COMO LA FABRICACION DE BASTIDORES AUTOMOTRICES, ETC." }
@@ -81,6 +84,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: undefined,
     tipoSolicitud: "MARCAS NOTORIAS",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/MN201800000031?fallback=ANCE",
+    estatus: "En trámite",
     productosServicios: [
       { clase: 42, descripcion: "MARCA NOTORIA, REGISTRO BASE 1761532, EXPEDIENTE MN 1096/2018 (T-1) 11698, OFICIO 56783" }
     ],
@@ -96,6 +100,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "01/10/2000",
     tipoSolicitud: "REGISTRO DE MARCA",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/RM198500000033?fallback=SISTEMA%20EMPRESARIAL%20DE%20VIAJES%20AMERICAN%20EXPRESS",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "ALOJAMIENTO ALBERGUE Y COMIDA POR HOTELES, PENSIONES, CAMPAMENTOS TURISTICOS, HOGARES TURISTICOS, GRANJAS-PENSION (CASAS DE LABRANZA PARA TURISTAS), CASAS DE REPOSO Y CASAS DE CONVALECENCIA. RESTAURANTES-RESTAURANTES DE AUTOSERVICIO, CANTINAS, CENTROS NOCTURNOS BARES." },
       { clase: 66, descripcion: "SERVICIOS PRESTADOS PARA ALOJAMIENTO Y COMIDA POR HOTELES." }
@@ -115,6 +120,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "14/11/2015",
     tipoSolicitud: "PUBLICACIÓN DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/PC198500000034?fallback=MULTIVISION%20AUDIOVISUAL,%20S.A.",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "COMPRA VENTA Y COMISIONES, REPRESENTACIONES, EXPORTACION, IMPORTACION, PROYECCION, ORGANIZACION Y REALIZACION DE ACTIVIDADES AUDIOVISUALES." },
       { clase: 75, descripcion: "COMPRA VENTA Y COMISIONES, REPRESENTACIONES, EXPORTACION, IMPORTACION, PROYECCION, ORGANIZACION Y REALIZACION DE ACTIVIDADES AUDIOVISUALES." }
@@ -135,6 +141,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: undefined,
     tipoSolicitud: "MARCAS NOTORIAS",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/MN202100000036?fallback=SYSCOM",
+    estatus: "En trámite",
     productosServicios: [
       { clase: 9, descripcion: "M.N.861/2019(T-2)11244 FOLIO 16196" },
       { clase: 42, descripcion: "M.N.861/2019(T-2)11244 FOLIO 16196" }
@@ -151,6 +158,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "17/04/2016",
     tipoSolicitud: "REGISTRO DE AVISO COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/RA198600000037?fallback=EL%20MEJOR%20TRATO",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "SERVICIOS DE UNA AGENCIA DE VIAJES" },
       { clase: 43, descripcion: "SERVICIOS DE UNA AGENCIA DE VIAJES" },
@@ -174,6 +182,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "18/11/2025",
     tipoSolicitud: "PUBLICACIÓN DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/PC198500000038?fallback=FIMESA",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "FABRICACION COMPRA-VENTA Y/O ARMADO DE APARATOS DE MEDICIO ELECTRICOS, ELECTROMACANICOS, ELECTRONICOS Y LAS PARTES RELACIONADAS CON LOS MISMOS." },
       { clase: 75, descripcion: "FABRICACION COMPRA-VENTA Y/O ARMADO DE APARATOS DE MEDICIO ELECTRICOS, ELECTROMACANICOS, ELECTRONICOS Y LAS PARTES RELACIONADAS CON LOS MISMOS." }
@@ -193,6 +202,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "23/11/1990",
     tipoSolicitud: "PUBLICACIÓN DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/PC198500000048?fallback=ROYAL%20MAYAN%20BEACH%20CLUB",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "TEJIDOS DE PUNTO, MALLA Y TELAS." }
     ],
@@ -211,6 +221,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "02/12/2025",
     tipoSolicitud: "PUBLICACIÓN DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/PC198500000049?fallback=CONVERMEX",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "MANUFACTURA, COMPRAR, VENDER DISTRIBUIR EN GENERAL NEGOCIARCON TODA CLASE DE ARTICULOS ELABORADOS CON POLIETILENO ETC." },
       { clase: 75, descripcion: "MANUFACTURA, COMPRAR, VENDER DISTRIBUIR EN GENERAL NEGOCIARCON TODA CLASE DE ARTICULOS ELABORADOS CON POLIETILENO ETC." }
@@ -230,6 +241,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: undefined,
     tipoSolicitud: "MARCAS NOTORIAS",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/MN202400000058?fallback=INSTITUTO%20NACIONAL%20DE%20MEDICINA%20GENÓMICA",
+    estatus: "En trámite",
     productosServicios: [
       { clase: 42, descripcion: "M.N.729/2024(T-2)9239 FOLIO 020618" }
     ],
@@ -245,6 +257,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: undefined,
     tipoSolicitud: "MARCAS NOTORIAS",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/MN202400000060?fallback=EMA",
+    estatus: "En trámite",
     productosServicios: [
       { clase: 42, descripcion: "MN2565/2023(T-4)31729 FOLIO 041354" }
     ],
@@ -260,6 +273,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "24/12/2025",
     tipoSolicitud: "PUBLICACIÓN DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/PC198500000067?fallback=LATINOAMERICANA%20DE%20CONCRETOS%20SA%20DE%20CV",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "CONSTRUCCIONES DE TODA CLASE DE OBRAS PUBLICAS Y PRIVADAS DEINGENIERIA, ARQUITECTURA, COMERCIO DE CONCRETO." },
       { clase: 75, descripcion: "CONSTRUCCIONES DE TODA CLASE DE OBRAS PUBLICAS Y PRIVADAS DEINGENIERIA, ARQUITECTURA, COMERCIO DE CONCRETO." }
@@ -278,6 +292,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "31/01/2026",
     tipoSolicitud: "PUBLICACIÓN DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/PC198600000086?fallback=COMPAÑIA%20COMERCIAL%20CIMACO",
+    estatus: "Aprobada",
     productosServicios: [
       { clase: 42, descripcion: "COMPRA-VENTA DE ARTICULOS PARA EL HOGAR EN GENERAL, REFACCIONES AUTOMOTRICES, MUEBLES PARA OFICINA, PERFUMERIA, VENTA DE REGALOS, JOYERIA, APARATOS ELECTRICOS Y ELECTRONICOS" },
       { clase: 75, descripcion: "COMPRA-VENTA DE ARTICULOS PARA EL HOGAR EN GENERAL ETC." }
@@ -296,6 +311,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "20/02/2026",
     tipoSolicitud: "PUBLICACIÓN DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/PC198600000093?fallback=MIGUEL",
+    estatus: "Aprobada",
     productosServicios: [
       { clase: 42, descripcion: "A LA EXPLOTACION DE CAFE Y RESTAURANT" },
       { clase: 75, descripcion: "A LA EXPLOTACION DE CAFE Y RESTAURANT" }
@@ -315,6 +331,7 @@ export const MARK_DATA: DatosMarca[] = [
     tipoSolicitud: "PUBLICACIÓN DE NOMBRE COMERCIAL",
     inicioUso: "17/09/1986",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/PC198600000110?fallback=LA%20CASITA",
+    estatus: "Aprobada",
     productosServicios: [
       { clase: 42, descripcion: "FABRICACION, VENTA DE PASTELES Y GALLETAS." },
       { clase: 75, descripcion: "FABRICACION, VENTA DE PASTELES Y GALLETAS." }
@@ -333,6 +350,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "19/03/2021",
     tipoSolicitud: "PUBLICACIÓN DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/PC198600000111?fallback=TECNICA%20QUIMICA",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "PRODUCCION Y VENTA DE REACTIVOS Y PRODUCTOS QUIMICOS" },
       { clase: 75, descripcion: "SERVICIOS NO CLASIFICADOS." }
@@ -352,6 +370,7 @@ export const MARK_DATA: DatosMarca[] = [
     tipoSolicitud: "PUBLICACIÓN DE NOMBRE COMERCIAL",
     inicioUso: "13/01/1979",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/PC198600000117?fallback=INDUSTRIAS%20TUK",
+    estatus: "Aprobada",
     productosServicios: [
       { clase: 42, descripcion: "FABRICACION DE TODA CLASE DE CINTAS ADHESIVAS" }
     ],
@@ -369,6 +388,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "25/04/2011",
     tipoSolicitud: "PUBLICACIÓN DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/PC198600000122?fallback=CASA%20GOENAGA",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "FABRICACION, ELEABORACION, MAQUILA Y DISTRIBUCION DE VINOS Y LICORES, Y OTROS PRODUCTOS COMESTIBLES" },
       { clase: 75, descripcion: "FABRICACION, ELEABORACION, MAQUILA Y DISTRIBUCION DE VINOS Y LICORES, ETC." }
@@ -387,6 +407,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "09/05/2031",
     tipoSolicitud: "PUBLICACIÓN DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/PC198500000126?fallback=ALMEX",
+    estatus: "Aprobada",
     productosServicios: [
       { clase: 42, descripcion: "ELABORACION DE TODA CLASE DE PRODUCTOS DERIVADOS DEL MAIZ Y LA CELEBRACION DE TODA CLASE DE CONTRATOS CON RELACION A LASMISMAS." },
       { clase: 75, descripcion: "ELABORACION DE TODA CLASE DE PRODUCTOS DERIVADOS DEL MAIZ Y LA CELEBRACION DE TODA CLASE DE CONTRATOS CON RELACION A LASMISMAS." }
@@ -405,6 +426,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "28/05/2001",
     tipoSolicitud: "PUBLICACIÓN DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/PC198600000139?fallback=INTERNATIONAL%20KITCHENS",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "FABRICACION Y COMPRA VENTA DE TODA CLASE DE MUEBLES." }
     ],
@@ -422,6 +444,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "02/10/2025",
     tipoSolicitud: "REGISTRO DE MARCA",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/RM198500000140?fallback=A%20ARIES",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 35, descripcion: "SOLO NEGOCIOS, AYUDA EN LA DIRECCION O EXPLOTACION DE UNA EMPRESA COMERCIAL O INDUSTRIAL Y CONTABILIDAD, COMERCIALIZACION DE ALMACENES DE VENTAS AL MAYOREO, MENUDEO Y VENTA LIBRE." },
       { clase: 36, descripcion: "SOLO AGENCIAS ADUANALES" },
@@ -441,6 +464,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "27/01/2027",
     tipoSolicitud: "REGISTRO DE AVISO COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/RA198700000144?fallback=CON%20AMOR%20PARA%20SU%20AMOR",
+    estatus: "Aprobada",
     productosServicios: [
       { clase: 35, descripcion: "PUBLICIDAD; DIRECCION DE NEGOCIOS; ADMINISTRACION DE NEGOCIOS; TRABAJOS DE OFICINA." },
       { clase: 42, descripcion: "TEJIDOS DE PUNTO, MALLA Y TELAS." }
@@ -459,6 +483,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "31/07/2011",
     tipoSolicitud: "REGISTRO DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198600000163?fallback=K.%20J%20QUINN%20DE%20MEXICO",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "MANUFACTURA, COMERCIO, PROCESAMIENTO, DISEÑO, EMPAQUE ENVASEI MPORTACION O EXPORTACION DE TODA CLASE DE PRODUCTOS QUIMICOS Y ARTICULOS DE PLASTICO, PIEL, CUERO." },
       { clase: 75, descripcion: "MANUFACTURA, COMERCIO, PROCESAMIENTO, DISEÑO, EMPAQUE ENVASEIMPORTACION O EXPORTACION DE TODA CLASE DE PRODUCTOS QUIMICOS Y ARTICULOS DE PLASTICO ETC." }
@@ -477,6 +502,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "08/08/2011",
     tipoSolicitud: "PUBLICACIÓN DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/PC198600000170?fallback=GAMA%20COMPUTO",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "COMPRA VENTA, DISTRIBUCION, FABRICACION, MAQUILA, IMPORTACION, EXPORTACION,COMISION, MEDIACION, REPRESENTACION, INTALACION ASESORIA Y MANTENIMIENTO EN GENERAL DE EQUIPO ELECTRICO Y EQUIPO DE COMPUTO, DE AIRE ACONDICIONADO, CONTRA INSENDIO Y MAQUINARIA EN GENERAL." },
       { clase: 75, descripcion: "COMPRA VENTA, DISTRIBUCION, FABRICACION, MAQUILA, ETC. ASESORIA Y MANTENIMIENTO EN GENERAL DE EQUIPO ELECTRICO Y EQUIPO DE COMPUTO, DE AIRE ACONDICIONADO, CONTRA INSENDIO Y MAQUINARIA EN GENERAL." }
@@ -495,6 +521,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "11/08/2026",
     tipoSolicitud: "PUBLICACIÓN DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/PC198600000173?fallback=BISQUETS%20OBREGON",
+    estatus: "Aprobada",
     productosServicios: [
       { clase: 42, descripcion: "CAFETERIA." },
       { clase: 75, descripcion: "CAFETERIA." }
@@ -513,6 +540,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "20/08/2011",
     tipoSolicitud: "REGISTRO DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198600000178?fallback=ZENIT",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "FABRICACION, COMPRA Y VENTA DE TODA CLASE DE CALZADO." },
       { clase: 75, descripcion: "FABRICACIO, COMPRA VENTA DE TODA CLASE DE CALZADO." }
@@ -531,6 +559,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "27/10/2031",
     tipoSolicitud: "REGISTRO DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198600000229?fallback=GRUPO%20CYDSA,%20S.A.%20DE%20C.V.",
+    estatus: "Aprobada",
     productosServicios: [
       { clase: 42, descripcion: "PRESTACION DE SERVICIOS DE CARACTER TECNICO, CONTABLE, LEGAL Y CUALESQUIERA OTRO DE CARACTER ADMINISTRATIVO." },
       { clase: 75, descripcion: "PRESTACION DE SERVICIOS DE CARACTER TECNICO, CONTABLE, LEGAL Y CUALESQUIERA OTRO DE CARACTER ADMINISTRATIVO." }
@@ -550,6 +579,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "11/08/1990",
     tipoSolicitud: "REGISTRO DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198600000241?fallback=EL%20NIDO",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "RESTAURANTE BAR." },
       { clase: 75, descripcion: "RESTAURANTE BAR." }
@@ -569,6 +599,7 @@ export const MARK_DATA: DatosMarca[] = [
     tipoSolicitud: "REGISTRO DE NOMBRE COMERCIAL",
     inicioUso: "28/03/1985",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198600000266?fallback=DULCIPAN%20SA%20DE%20CV",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "FABRICACION Y COMPRA VENTA EXPORTACION E IMPORTACION COMERCIALIZACION DE TODA CLASE DE PANES" },
       { clase: 75, descripcion: "FABRICACION Y COMPRA VENTA EXPORTACION E IMPORTACION COMERCIALIZACION DE TODA CLASE DE PANES" }
@@ -588,6 +619,7 @@ export const MARK_DATA: DatosMarca[] = [
     tipoSolicitud: "REGISTRO DE NOMBRE COMERCIAL",
     inicioUso: "27/11/1957",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198600000307?fallback=LINDAVISTA",
+    estatus: "Aprobada",
     productosServicios: [
       { clase: 42, descripcion: "COMPRA VENTA DE TERRENOS Y CONSTRUCCION DE CASAS" },
       { clase: 75, descripcion: "COMPRA VENTA DE TERRENOS Y CONSTRUCCION DE CASAS" }
@@ -606,6 +638,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "24/12/2031",
     tipoSolicitud: "REGISTRO DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198600000308?fallback=FUTURAMA",
+    estatus: "Aprobada",
     productosServicios: [
       { clase: 42, descripcion: "COMPRA, VENTA, PERMUTA, CONSTRUCCION, FRACCIONAMIENTO Y URBANIZACION DE MUEBLES, INCLUYENDO LA CREACION DE TODA CLASE DE CLUBES DEPORTIVOS" },
       { clase: 75, descripcion: "COMPRA, VENTA, PERMUTA, CONSTRUCCION, FRACCIONAMIENTO Y URBANIZACION DE MUEBLES." }
@@ -624,6 +657,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "21/08/2022",
     tipoSolicitud: "REGISTRO DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198700000381?fallback=100%25%20NATURAL",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "ELABORACION Y VENTA DE JUGOS, LICUADOS, TORTAS Y FRUTAS NATURALES." },
       { clase: 75, descripcion: "ELABORACION Y VENTA DE JUGOS, LICUADOS, TORTAS Y FRUTAS NATURALES." }
@@ -644,6 +678,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "22/04/2027",
     tipoSolicitud: "REGISTRO DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198700000382?fallback=LYNIS",
+    estatus: "Aprobada",
     productosServicios: [
       { clase: 42, descripcion: "RESTAURANTE Y CAFETERIA" },
       { clase: 75, descripcion: "RESTAURANTE Y CAFETERIA" }
@@ -664,6 +699,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "27/05/2012",
     tipoSolicitud: "REGISTRO DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198700000398?fallback=LA%20GRAN%20SOCIEDAD",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "COMPRA VENTA DE ARTICULOS DEPORTIVOS, ARTICULOS DE VIAJE Y VARIOS Y EXPENDEDOR AUTORIZADO DE PRONOSTICOS DEPORTIVOS." },
       { clase: 75, descripcion: "COMPRA-VENTA DE ARTICULOS DEPORTIVOS, ARTICULOS DE VIAJE Y VARIOS Y EXPENDEDOR AUTORIZADO DE PRONOSTICOS DEPORTIVOS." }
@@ -682,6 +718,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "26/06/2012",
     tipoSolicitud: "REGISTRO DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198700000418?fallback=INDUSTRIAS%20RESISTOL",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "FABRICACION, COMERCIALIZACION DE ADHESIVOS Y PEGAMENTOS" },
       { clase: 75, descripcion: "FABRICACION, COMERCIALIZACION DE ADHESICOS Y PEGAMENTOS" }
@@ -702,6 +739,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "21/07/2012",
     tipoSolicitud: "REGISTRO DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198700000435?fallback=FARMACIA%20SANCHEZ",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "COMPRA VENTA DE PRODUCTOS MEDICINALES DE TOCADOR, QUIMICOS, DE REGALOS Y DE ARTICULOS CONEXOS" },
       { clase: 75, descripcion: "COMPRA VENTA DE PRODUCTOS MEDICINALES DE TOCADOR, QUIMICOS, DE REGALOS Y DE ARTICULOS CONEXOS" }
@@ -721,6 +759,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "21/07/2032",
     tipoSolicitud: "REGISTRO DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198700000436?fallback=SUPER%20DIESEL%20S.A.",
+    estatus: "Aprobada",
     productosServicios: [
       { clase: 42, descripcion: "COMPRA-VENTA, COMERCIO Y SERVICIO EN GENERAL DE MOTORES DIESEL." }
     ],
@@ -739,6 +778,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "09/10/2000",
     tipoSolicitud: "REGISTRO DE MARCA",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/M198500339021?fallback=PLAZA",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "ALOJAMIENTO ALBERGUE Y COMIDA POR HOTELES, PENSIONES, CAMPAMENTOS TURISTICOS, HOGARES TURISTICOS, GRANJAS-PENSION (CASAS DE LABRANZA PARA TURISTAS), CASAS DE REPOSO Y CASAS DE CONVALECENCIA. RESTAURANTES-RESTAURANTES DE AUTOSERVICIO, CANTINAS, CENTROS NOCTURNOS BARES." },
       { clase: 66, descripcion: "SERVICIOS PRESTADOS PARA ALOJAMIENTO, ALOJAMIENTO Y COMIDAPOR HOTELES, PENSIONES Y CAMPAMENTOS TURISTICOS. ASI MISMO,SE COMPRENDEN LOS SERVICIOS PRESTADOS PARA PROCURAR ALIMEN-TOS Y BEBIDAS PREPARADAS PARA EL CONSUMO, ESTO ES POR MEDIODE RESTAURANTES, CENTROS NOCTURNOS, CANTINAS Y BARES." }
@@ -757,6 +797,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "30/07/2032",
     tipoSolicitud: "REGISTRO DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198700000445?fallback=SMURFIT%20CARTON%20Y%20PAPEL%20DE%20MEXICO",
+    estatus: "Aprobada",
     productosServicios: [
       { clase: 42, descripcion: "fabricación y venta de toda clase de papel, carton y artículos corrugados." }
     ],
@@ -774,6 +815,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "31/07/2012",
     tipoSolicitud: "REGISTRO DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198700000447?fallback=MAQUILAS%20TOK-TOK",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "MAQUILA, COMPRAVENTA, IMPORTACION, EXPORTACION, FABRICACION, COMISION, CONSIGNACION DE FIBRAS DE ALGODON, SINTETICAS Y ARTIFICIALES, MAQUILLAJE, DESPERDICIOS INDUSTRIALES Y PRODUCTOS FARMACEUTICOS." }
     ],
@@ -791,6 +833,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "12/08/2012",
     tipoSolicitud: "REGISTRO DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198700000452?fallback=BMG%20ARIOLA",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "PRODUCCION, DISTRBUCION Y VENTA DE TODA CLASE DE DISCO Y CASSETES." },
       { clase: 75, descripcion: "PRODUCCION, DISTRBUCION Y VENTA DE TODA CLASE DE DISCO Y CASSETES." }
@@ -813,6 +856,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "12/08/2012",
     tipoSolicitud: "REGISTRO DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198700000453?fallback=SONOPRESS%20INTERNACIONAL",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "PRODUCCION, DISTRBUCION Y VENTA DE TODA CLASE DE DISCO Y CASSETES." },
       { clase: 75, descripcion: "PRODUCCION, DISTRBUCION Y VENTA DE TODA CLASE DE DISCO Y CASSETES." }
@@ -833,6 +877,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "10/10/2000",
     tipoSolicitud: "REGISTRO DE MARCA",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/M198500328060?fallback=FANDANGO",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "ALOJAMIENTO ALBERGUE Y COMIDA POR HOTELES, PENSIONES, CAMPAMENTOS TURISTICOS, HOGARES TURISTICOS, GRANJAS-PENSION (CASAS DE LABRANZA PARA TURISTAS), CASAS DE REPOSO Y CASAS DE CONVALECENCIA. RESTAURANTES-RESTAURANTES DE AUTOSERVICIO, CANTINAS, CENTROS NOCTURNOS BARES." },
       { clase: 66, descripcion: "SERVICIOS PRESTADOS PARA ALOJAMIENTO Y COMIDA POR HOTELES, PENSIONES Y CAMPAMENTOS TURISTICOS , ETC." }
@@ -852,6 +897,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "10/10/2030",
     tipoSolicitud: "REGISTRO DE MARCA",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/M198500339074?fallback=INSPECTOR%20GENERAL%20NETWORK",
+    estatus: "Aprobada",
     productosServicios: [
       { clase: 42, descripcion: "SERVICIOS DE ASESORAMIENTO PARA INCREMENTAR LAS HABILIDADES PERSONALES Y AUMENTAR LA COCIENCIA DEL INDIVIDUO." }
     ],
@@ -878,6 +924,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "10/10/2000",
     tipoSolicitud: "REGISTRO DE MARCA",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/M198500323895?fallback=A",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 35, descripcion: "SOLO NEGOCIOS, AYUDA EN LA DIRECCION O EXPLOTACION DE UNA EMPRESA COMERCIAL O INDUSTRIAL." },
       { clase: 36, descripcion: "SOLO AGENCIAS ADUANALES Y CONTABILIDAD." },
@@ -900,6 +947,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "10/10/2000",
     tipoSolicitud: "REGISTRO DE MARCA",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/M198500324870?fallback=A",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 35, descripcion: "SOLO DECORACION DE ESCAPARATES." },
       { clase: 37, descripcion: "SOLO CONSTRUCCIONES." },
@@ -922,6 +970,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "21/10/2002",
     tipoSolicitud: "REGISTRO DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198700000497?fallback=ZAPIAN",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "TEJIDOS DE PUNTO, MALLA Y TELAS." }
     ],
@@ -940,6 +989,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "16/11/2032",
     tipoSolicitud: "PUBLICACIÓN DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198700000523?fallback=KRYSTAL",
+    estatus: "Aprobada",
     productosServicios: [
       { clase: 42, descripcion: "RESTAURACION (ALIMENTACION); ALOJAMIENTO TEMPORAL; CUIDADOS MEDICOS; DE HIGIENE Y DE BELLEZA; SERVICIOS VETERINARIOS Y DE AGRICULTURA; SERVICIOS JURIDICOS, INVESTIGACION CIENTIFICA E INDUSTRIAL; PROGRAMACION DE ORDENADORES; SERVICIOS QUE NO PUEDAN SER CLASIFICADOS EN OTRAS CLASES." },
       { clase: 75, descripcion: "PRESTACION DE SERVICIOS HOTELEROS Y TURISTICOS, ASI COMO DE RESTAURANTES, CENTROS DE REUNION Y DE ENTRETENIMIENTO" }
@@ -967,6 +1017,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "19/11/2012",
     tipoSolicitud: "REGISTRO DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198700000527?fallback=CASA%20CERAMICA%20Y%20ACABADOS",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "COMPRA VENTA DE MUEBLES Y ACABADOS PARA BAÑO" },
       { clase: 75, descripcion: "COMPRA VENTA DE MUEBLES Y ACABADOS PARA BAÑO EN GRAL." }
@@ -988,6 +1039,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "03/12/2012",
     tipoSolicitud: "REGISTRO DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198700000540?fallback=BURBUJAS",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "COMPRA Y VENTA DE CALZADO EN GENERAL" },
       { clase: 75, descripcion: "COMPRA Y VENTA DE CALZADO EN GENERAL" }
@@ -1012,6 +1064,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "07/12/2022",
     tipoSolicitud: "REGISTRO DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198700000544?fallback=WINGSPORT",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "TIENDAS DE ARTICULOS DEPORTIVOS Y ROPA DEPORTIVA" }
     ],
@@ -1034,6 +1087,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "07/12/2012",
     tipoSolicitud: "REGISTRO DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198700000545?fallback=WINGS",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "TIENDA DEPARTAMENTAL (CENTRO COMERCIAL)" },
       { clase: 75, descripcion: "TIENDAS DE ARTICULOS DEPORTIVOS Y ROPA DEPORTIVA" }
@@ -1054,6 +1108,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "08/12/2012",
     tipoSolicitud: "REGISTRO DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198700000548?fallback=PYROLAC, S..A",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "PRODUCCION Y VENTA DE PINTURAS, ESMALTES, LACAS Y SIMILARES" },
       { clase: 75, descripcion: "PRODUCCION Y VENTA DE PINTURAS, ESMALTES, LACAS Y SIMILARES" }
@@ -1074,6 +1129,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "23/12/2022",
     tipoSolicitud: "REGISTRO DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198700000566?fallback=FANTASIAS MIGUEL",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "VENTA DE ARTICULOS DE JOYERIA DE FANTASIA FINA BISUTERIA Y DE ADORNOS Y REGALOS" },
       { clase: 75, descripcion: "VENTA DE ARTICULOS DE JOYERIA DE FANTASIA FINA BISUTERIA Y DE ADORNOS Y REGALOS" }
@@ -1096,6 +1152,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "25/01/2013",
     tipoSolicitud: "REGISTRO DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198800000578?fallback=CICLOMUNDO",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "FABRICACION, VENTA Y DISTRIBUCION DE TODA CLASE DE JUEGOS, JUGUETES Y ART. DE DEPORTE" },
       { clase: 75, descripcion: "FABRICACION, VENTA Y DISTRIBUCION DE TODA CLASE DE JUEGOS, JUGUETES Y ART. DE DEPORTE" }
@@ -1116,6 +1173,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "26/01/2023",
     tipoSolicitud: "REGISTRO DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198800000579?fallback=CHERRY",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "FABRICACION, MANUFACTURA Y COMPRA-VENTA DE TODA CLASE DE VESTUARIO." },
       { clase: 75, descripcion: "FABRICACION, MANUFACTURA Y COMPRA-VENTA DE TODA CLASE DE VESTUARIO." }
@@ -1139,6 +1197,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "04/02/2033",
     tipoSolicitud: "PUBLICACIÓN DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198800000586?fallback=NICOS",
+    estatus: "Aprobada",
     productosServicios: [
       { clase: 42, descripcion: "RESTAURANTE CON VENTA DE VINOS Y LICORES Y SERVICIOS RELACIONADOS." },
       { clase: 75, descripcion: "RESTAURANTE CON VENTA DE VINOS Y LICORES Y SERVICIOS RELACIONADOS." }
@@ -1165,6 +1224,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "25/02/2023",
     tipoSolicitud: "REGISTRO DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198800000604?fallback=CIUDAD DE PARIS",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 42, descripcion: "COMPRAVENTA DE ROPA, ARTICULOS PARA EL HOGAR, ARTICULOS DE BELLEZA, ARTICULOS ELECTRICOS, BEBES, DAMAS, PERFUMES, CRISTALERIA." },
       { clase: 75, descripcion: "COMPRAVENTA DE ROPA, ARTICULOS PARA EL HOGAR, ARTICULOS DE BELLEZA, ARTICULOS ELECTRICOS, BEBES, DAMAS, PERFUMES, CRISTALERIA." }
@@ -1192,6 +1252,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "14/10/2005",
     tipoSolicitud: "REGISTRO DE MARCA",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/M198500000615?fallback=CITITRADE",
+    estatus: "Concluida",
     productosServicios: [
       { clase: 35, descripcion: "SOLO NEGOCIOS, AYUDA EN LA DIRECCION O EXPLOTACION DE UNA EMPRESA COMERCIAL O INDUSTRIAL." },
       { clase: 36, descripcion: "SOLO AGENCIAS ADUANALES Y CONTABILIDAD." },
@@ -1215,6 +1276,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "11/03/2033",
     tipoSolicitud: "PUBLICACIÓN DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198800000617?fallback=KENFAB",
+    estatus: "Aprobada",
     productosServicios: [
       { clase: 42, descripcion: "INDUSTRIA METAL MECANICA Y FABRICACION DE PARTES Y COMPONENTES AUTOMOTRICES AGRICOLAS INDUSTRIALES" },
       { clase: 75, descripcion: "INDUSTRIA METAL MECANICA Y FABRICACION DE PARTES Y COMPONENTES AUTOMOTRICES AGRICOLAS INDUSTRIALES" }
@@ -1238,6 +1300,7 @@ export const MARK_DATA: DatosMarca[] = [
     fechaTerminacion: "18/03/2033",
     tipoSolicitud: "PUBLICACIÓN DE NOMBRE COMERCIAL",
     marca: "https://prod.impi.static.tmv.io/lm/tmimage_trim96/MX/NC198800000627?fallback=ATLETICOS",
+    estatus: "Aprobada",
     productosServicios: [
       { clase: 42, descripcion: "COMPRA VENTA DE ROPA Y CALZADO DEPORTIVOS ASI COMO ARTICULOS Y ACCESORIOS DEPORTIVOS" }
     ],

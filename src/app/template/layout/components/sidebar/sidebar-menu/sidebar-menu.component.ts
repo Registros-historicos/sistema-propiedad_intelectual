@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import {ADMINISTRATOR_MENUS, APPLICANTS_MENU, COORDINATOR_MENUS} from '../../../../shared/menus';
+import { SweetAlertOptions } from 'sweetalert2';
+import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 
 @Component({
   selector: 'app-sidebar-menu',
@@ -8,6 +10,17 @@ import {ADMINISTRATOR_MENUS, APPLICANTS_MENU, COORDINATOR_MENUS} from '../../../
 })
 export class SidebarMenuComponent implements OnInit {
   protected menuItems: any[] = [];
+
+  @ViewChild('notImplementedSwal')
+  notImplementedSwal!: SwalComponent;
+
+  notImplementedSwalOptions: SweetAlertOptions = {
+    buttonsStyling: false,
+    confirmButtonText: "Entendido",
+    customClass: {
+      confirmButton: "btn btn-primary"
+    }
+  };
 
   constructor() { }
 
@@ -27,6 +40,11 @@ export class SidebarMenuComponent implements OnInit {
       default:
         break;
     }
+  }
+
+  showNotImplementedModal(): void {
+    console.log('Not implemented action triggered');
+    this.notImplementedSwal.fire();
   }
 
   protected readonly Array = Array;
