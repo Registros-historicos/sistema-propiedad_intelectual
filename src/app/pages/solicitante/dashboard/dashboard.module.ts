@@ -7,26 +7,32 @@ import { WidgetsModule } from '../../../template/widgets/content/widgets/widgets
 import { ModalsModule } from '../../../template/widgets/layout/modals/modals.module';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { SharedModule } from 'src/app/template/shared/shared.module';
-import { CrudModule } from 'src/app/modules/crud/crud.module'; // <-- IMPORTANTE
-import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2'; // <-- IMPORTANTE
+import { CrudModule } from 'src/app/modules/crud/crud.module';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+import { DropdownMenusModule } from '../../../template/widgets/content/dropdown-menus/dropdown-menus.module';
+import { MatIconModule } from '@angular/material/icon';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   declarations: [DashboardComponent],
   imports: [
     CommonModule,
+    MatIconModule,
     FormsModule,
     WidgetsModule,
     ModalsModule,
     NgApexchartsModule,
     SharedModule,
-    CrudModule, // <-- AGREGA ESTO
-    SweetAlert2Module, // <-- Y ESTO
+    CrudModule,
+    SweetAlert2Module,
     RouterModule.forChild([
       {
         path: '',
         component: DashboardComponent,
       },
     ]),
+    DropdownMenusModule,
+    TranslateModule,
   ],
 })
 export class DashboardModule {}

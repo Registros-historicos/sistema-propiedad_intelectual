@@ -24,6 +24,10 @@ const Routing: Routes = [
         loadChildren: () => import('./solicitante/dashboard/dashboard.module').then((m) => m.DashboardModule),
       },
       {
+        path: 'perfil',
+        loadChildren: () => import('./solicitante/profile/profile.module').then((m) => m.ProfileModule),
+      },
+      {
         path: 'registrar',
         loadChildren: () => import('./solicitante/registrar/registrar.module').then((m) => m.RegistrarModule),
       },

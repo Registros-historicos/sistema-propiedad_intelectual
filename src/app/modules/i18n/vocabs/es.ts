@@ -200,9 +200,10 @@ export const locale = {
         UTILITY_MODELS: 'Modelos de Utilidad'
       },
       APPLICANT: {
-        MYPROFILE: 'Mi perfil',
+        MYPROFILE: 'Perfil',
         REQUEST: 'Registrar',
         REPORTS: 'Reportes',
+        REGISTER: "Registros",
       },
     },
     AUTH: {

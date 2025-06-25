@@ -162,20 +162,35 @@ export const COORDINATOR_MENUS = [
 
 export const APPLICANTS_MENU = [
   {
-    name: 'MENU.ADMIN.MANAGEMENT',
+    name: 'MENU.DASHBOARD',
+    icon: 'dashboard',
+    link: '/solicitante/dashboard',
+    type: 'link',
+  },
+  {
+    name: 'MENU.APPLICANT.MYPROFILE',
     type: 'separator',
   },
   {
     name: 'MENU.APPLICANT.MYPROFILE',
     icon: 'person',
     type: 'link',
-    link: '/solicitante/dashboard',
+    link: '/solicitante/perfil',
+  },
+  {
+    name: 'MENU.APPLICANT.REGISTER',
+    icon: 'add',
+    type: 'separator'
   },
   {
     name: 'MENU.APPLICANT.REQUEST',
     icon: 'description',
     type: 'link',
     link: '/solicitante/registrar',
+  },
+  {
+    name: 'MENU.REPORTS',
+    type: 'separator',
   },
   {
     name: 'MENU.REPORTS',

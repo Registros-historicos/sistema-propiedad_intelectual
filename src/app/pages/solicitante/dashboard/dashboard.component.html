@@ -1,305 +1,133 @@
-<div class="container">
-  <!-- Header -->
-  <div class="card-body pb-0">
-    <div class="d-flex align-items-start mb-5">
-      <!-- Avatar -->
-      <div class="symbol symbol-75px me-5 mt-2">
-        <img
-          src="./assets/media/avatars/300-25.jpg"
-          alt="Avatar"
-          class="rounded-circle"
-        />
-      </div>
-      <!-- Info -->
-      <div class="d-flex flex-column justify-content-center">
-        <h1 class="fw-bold text-gray-800 display-5 mb-0">
-          Jorge Díaz Hernández
-        </h1>
-        <p class="text-gray-500 fw-bold mb-1">
-          <strong>Institución:</strong> Instituto Tecnológico de Orizaba
-        </p>
-        <p class="text-gray-500 fw-bold mb-1">
-          <strong>Tipo de Institución:</strong> Federativa
-        </p>
-        <p class="text-gray-500 fw-bold mb-1">
-          <strong>Estado:</strong> Veracruz
-        </p>
-        <p class="text-gray-500 fw-bold mb-1">
-          <strong>Puesto:</strong> Doctor
-        </p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Estadísticas -->
-  <div class="row mb-5">
-    <div class="col-md-4">
-      <div class="card">
-        <div class="card-body text-center">
-          <h3 class="fw-bold text-gray-800">Total Solicitudes</h3>
-          <span class="fs-1 fw-bolder text-primary">{{
-            totalSolicitudes
-          }}</span>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card">
-        <div class="card-body text-center">
-          <h3 class="fw-bold text-gray-800">Solicitudes Pendientes</h3>
-          <span class="fs-1 fw-bolder text-warning">{{
-            solicitudesPendientes
-          }}</span>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card">
-        <div class="card-body text-center">
-          <h3 class="fw-bold text-gray-800">En trámite</h3>
-          <span class="fs-1 fw-bolder text-info">{{
-            solicitudesEnTramite
-          }}</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="row mb-5">
-    <div class="col-md-4">
-      <div class="card">
-        <div class="card-body text-center">
-          <h3 class="fw-bold text-gray-800">Registrada</h3>
-          <span class="fs-1 fw-bolder text-success">{{
-            solicitudesRegistradas
-          }}</span>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card">
-        <div class="card-body text-center">
-          <h3 class="fw-bold text-gray-800">Trámite con Observaciones</h3>
-          <span class="fs-1 fw-bolder text-danger">{{
-            solicitudesConObservaciones
-          }}</span>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card">
-        <div class="card-body text-center">
-          <h3 class="fw-bold text-gray-800">Aprobada</h3>
-          <span class="fs-1 fw-bolder text-primary">{{
-            solicitudesAprobadas
-          }}</span>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- Gráficos -->
-  <div class="row mb-5">
-    <div class="col-md-12">
-      <div class="card">
-        <div class="card-header border-0 pt-5">
-          <h3 class="card-title align-items-start flex-column">
-            <span class="card-label fw-bolder fs-3 mb-1">Mis Solicitudes</span>
-          </h3>
-        </div>
-        <div class="card-body">
-          <div #chartRef id="dashboard_chart" [style.height]="'350px'">
-            <apx-chart
-              [series]="chartOptions.series"
-              [chart]="chartOptions.chart"
-              [xaxis]="chartOptions.xaxis"
-              [yaxis]="chartOptions.yaxis"
-              [dataLabels]="chartOptions.dataLabels"
-              [stroke]="chartOptions.stroke"
-              [legend]="chartOptions.legend"
-              [fill]="chartOptions.fill"
-              [states]="chartOptions.states"
-              [tooltip]="chartOptions.tooltip"
-              [colors]="chartOptions.colors"
-              [plotOptions]="chartOptions.plotOptions"
-            ></apx-chart>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Mis Solicitudes -->
-  <div class="card">
-    <!-- Header -->
-    <div class="card-header border-0 pt-5">
-      <h3 class="card-title align-items-start flex-column">
-        <span class="card-label fw-bolder fs-3 mb-1">Mis Solicitudes</span>
-      </h3>
-      <!-- Paginador: Selector de cantidad por página -->
-      <div class="card-toolbar">
-        <div class="d-flex align-items-center">
-          <label class="form-label text-gray-600 me-3 mb-0">Mostrar:</label>
-          <select
-            class="form-select form-select-sm form-select-solid w-75px"
-            [(ngModel)]="pageLength"
-            (change)="onPageLengthChange($event)"
+<div class="row d-flex align-items-stretch">
+  <div class="col-xl-6 d-flex">
+    <!-- begin::Header -->
+    <div class="card card-xl-stretch mb-xl-8 h-100 w-100">
+      <div class="card-header border-0 pt-5">
+        <h3 class="card-title align-items-start flex-column">
+          <span
+            class="card-label fw-bolder fs-3 mb-1"
+            translate="GRAPHICS.TITLES.REQUEST_TYPES"
+          ></span>
+          <span
+            class="text-muted fw-bold fs-7"
+            translate="GRAPHICS.SUBTITLES.REGISTER"
+          ></span>
+        </h3>
+        <div class="card-toolbar">
+          <!-- begin::Menu -->
+          <button
+            type="button"
+            class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary"
+            data-kt-menu-trigger="click"
+            data-kt-menu-placement="bottom-end"
+            data-kt-menu-flip="top-end"
           >
-            <option *ngFor="let length of lengthMenu" [value]="length">
-              {{ length }}
-            </option>
-          </select>
+            <app-keenicon name="category" class="fs-2"></app-keenicon>
+          </button>
+
+          <app-dropdown-menu1></app-dropdown-menu1>
+        </div>
+      </div>
+
+      <div class="card-body py-3">
+        <div class="table-responsive">
+          <table class="table align-middle gs-0 gy-5">
+            <thead>
+              <tr>
+                <th class="p-0 w-50px"></th>
+                <th class="p-0 min-w-200px"></th>
+                <th class="p-0 min-w-100px"></th>
+                <th class="p-0 min-w-40px"></th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let tipo of tiposSolicitudes">
+                <th>
+                  <div class="symbol symbol-50px me-2">
+                    <span class="symbol-label">
+                      <mat-icon fontIcon="{{ tipo.icono }}"></mat-icon>
+                    </span>
+                  </div>
+                </th>
+                <td>
+                  <span class="text-gray-900 fw-bolder mb-1 fs-6">{{
+                    tipo.nombre
+                  }}</span>
+                </td>
+                <td>
+                  <div class="d-flex flex-column w-100 me-2">
+                    <div class="d-flex flex-stack mb-2">
+                      <span class="me-2 fs-6 fw-bold text-primary"
+                        >{{ tipo.total }} solicitudes</span
+                      >
+                    </div>
+                  </div>
+                </td>
+                <td class="text-end">
+                  <a
+                    href="#"
+                    class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary"
+                  >
+                    <app-keenicon
+                      name="arrow-right"
+                      class="fs-2"
+                    ></app-keenicon>
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Body -->
-    <div class="card-body pt-0">
-      <app-crud
-        [datatableConfig]="datatableConfig"
-        route="/apps/solicitudes"
-        (deleteEvent)="delete($event)"
-        (viewEvent)="view($event)"
-        [reload]="reloadEvent"
-        [modal]="formModal"
-      >
-      </app-crud>
+  <div class="col-12 col-lg-6 d-flex">
+    <div class="card h-100 w-100">
+      <div class="card-header border-0 pt-5">
+        <h3 class="card-title align-items-start flex-column">
+          <span
+            class="card-label fw-bolder fs-3 mb-1"
+            translate="GRAPHICS.TITLES.REQUEST"
+          ></span>
+          <span
+            class="text-muted fw-bold fs-7"
+            translate="GRAPHICS.SUBTITLES.MONTHS"
+          ></span>
+        </h3>
 
-      <swal #noticeSwal [swalOptions]="swalOptions"></swal>
-    </div>
-
-    <!-- Modal -->
-    <ng-template #formModal let-modal>
-      <div class="modal-header">
-        <h3 class="modal-title">Detalles de la Solicitud</h3>
-        <button
-          type="button"
-          class="btn-close"
-          aria-label="Close"
-          (click)="modal.dismiss('Cross click')"
-        ></button>
-      </div>
-
-      <div class="modal-body">
-        <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-650px">
-          <div
-            class="notice d-flex bg-light-info rounded border-info border border-dashed mb-7 p-6"
+        <div class="card-toolbar">
+          <button
+            type="button"
+            class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary"
+            data-kt-menu-trigger="click"
+            data-kt-menu-placement="bottom-end"
+            data-kt-menu-flip="top-end"
           >
-            <app-keenicon
-              name="information-5"
-              class="fs-2tx text-info me-4"
-            ></app-keenicon>
-            <div class="d-flex flex-stack flex-grow-1">
-              <div class="fw-semibold">
-                <h4 class="text-gray-900 fw-bold">
-                  Información de la Solicitud
-                </h4>
-                <div class="fs-6 text-gray-700">
-                  Aquí puedes ver los detalles de la solicitud seleccionada.
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="fv-row mb-7">
-            <label class="fw-semibold fs-6 mb-2 text-gray-600">Título</label>
-            <textarea
-              type="text"
-              class="form-control form-control-solid bg-light"
-              [value]="solicitudSeleccionada?.titulo"
-              readonly
-              style="resize: none; overflow: hidden"
-              rows="auto"
-            ></textarea>
-          </div>
-
-          <div class="row g-9 mb-7">
-            <div class="fv-row col-md-6">
-              <label class="fw-semibold fs-6 mb-2 text-gray-600"
-                >Solicitante</label
-              >
-              <input
-                type="text"
-                class="form-control form-control-solid bg-light"
-                [value]="solicitudSeleccionada?.solicitante"
-                readonly
-              />
-            </div>
-
-            <div class="fv-row col-md-6">
-              <label class="fw-semibold fs-6 mb-2 text-gray-600">Correo</label>
-              <input
-                type="email"
-                class="form-control form-control-solid bg-light"
-                [value]="solicitudSeleccionada?.correo"
-                readonly
-              />
-            </div>
-          </div>
-
-          <div class="row g-9 mb-7">
-            <div class="fv-row col-md-6">
-              <label class="fw-semibold fs-6 mb-2 text-gray-600"
-                >Fecha de Solicitud</label
-              >
-              <input
-                type="text"
-                class="form-control form-control-solid bg-light"
-                [value]="solicitudSeleccionada?.fechaSolicitud"
-                readonly
-              />
-            </div>
-
-            <div class="fv-row col-md-6">
-              <label class="fw-semibold fs-6 mb-2 text-gray-600">Estado</label>
-              <div
-                class="form-control form-control-solid d-flex align-items-center"
-              >
-                <span
-                  class="badge"
-                  [ngClass]="{
-                    'badge-light-success':
-                      solicitudSeleccionada?.estado === 'Aprobada',
-                    'badge-light-primary':
-                      solicitudSeleccionada?.estado === 'Registrada',
-                    'badge-light-warning':
-                      solicitudSeleccionada?.estado === 'En trámite',
-                    'badge-light-danger':
-                      solicitudSeleccionada?.estado ===
-                      'Trámite con observaciones',
-                    'badge-light-info':
-                      solicitudSeleccionada?.estado === 'Concluida'
-                  }"
-                  class="fs-7 fw-bold"
-                >
-                  {{ solicitudSeleccionada?.estado }}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div class="fv-row mb-7">
-            <label class="fw-semibold fs-6 mb-2 text-gray-600"
-              >Descripción</label
-            >
-            <textarea
-              class="form-control form-control-solid bg-light"
-              [value]="solicitudSeleccionada?.descripcion"
-              rows="3"
-              readonly
-            ></textarea>
-          </div>
+            <app-keenicon name="category" class="fs-2"></app-keenicon>
+          </button>
+          <app-dropdown-menu1></app-dropdown-menu1>
         </div>
       </div>
-
-      <div class="modal-footer">
-        <button
-          type="button"
-          class="btn btn-primary"
-          (click)="modal.dismiss('Close click')"
-        >
-          Cerrar
-        </button>
+      <div class="card-body">
+        <div #chartRef id="dashboard_chart" [style.height]="'350px'">
+          <apx-chart
+            [series]="chartOptions.series"
+            [chart]="chartOptions.chart"
+            [xaxis]="chartOptions.xaxis"
+            [yaxis]="chartOptions.yaxis"
+            [dataLabels]="chartOptions.dataLabels"
+            [stroke]="chartOptions.stroke"
+            [legend]="chartOptions.legend"
+            [fill]="chartOptions.fill"
+            [states]="chartOptions.states"
+            [tooltip]="chartOptions.tooltip"
+            [colors]="chartOptions.colors"
+            [plotOptions]="chartOptions.plotOptions"
+          ></apx-chart>
+        </div>
       </div>
-    </ng-template>
+    </div>
   </div>
 </div>
