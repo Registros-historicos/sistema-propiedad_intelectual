@@ -272,6 +272,9 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isViewMode = true;
     this.cdr.detectChanges();
 
+    this.isViewMode = true;
+    this.cdr.detectChanges();
+
     this.service.getPatent(id).subscribe((patente: IPatentModel) => {
       this.patenteModel = { ...patente };
       this.inicializarSeleccionesDesdePatente();
@@ -648,8 +651,6 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     this.estadoSeleccionado = 0;
     this.institucionSeleccionada = 0;
     this.institucionesFiltradas = [];
-    this.observacionesChanged = false;
-    this.resetEditMode();
   }
 
   getStatusOrder(status: string): number {

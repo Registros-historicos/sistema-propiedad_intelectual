@@ -1,9 +1,9 @@
-import {  AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild  } from '@angular/core';
-import {  SweetAlertOptions  } from 'sweetalert2';
-import {  DataTablesResponse, ENTIDADES_FEDERATIVAS_DATA, ENTIDADES_FEDERATIVAS_MAP  } from '../../../administrador/shared-services';
-import {  Config  } from 'datatables.net';
-import {  SwalComponent  } from '@sweetalert2/ngx-sweetalert2';
-import {  UtilityModelsService  } from '../../../../api/services/utility-models.service';
+import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { SweetAlertOptions } from 'sweetalert2';
+import { DataTablesResponse, ENTIDADES_FEDERATIVAS_DATA, ENTIDADES_FEDERATIVAS_MAP } from '../../../administrador/shared-services';
+import { Config } from 'datatables.net';
+import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { UtilityModelsService } from '../../../../api/services/utility-models.service';
 import moment from 'moment';
 import { Observable } from 'rxjs';
 import { IModUtilModel } from 'src/app/api/models/mod-util.model';
@@ -647,8 +647,6 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
     this.estadoSeleccionado = 0;
     this.institucionSeleccionada = 0;
     this.institucionesFiltradas = [];
-    this.observacionesChanged = false;
-    this.resetEditMode();
   }
 
   getStatusOrder(status: string): number {

@@ -278,11 +278,11 @@ export class DisenoIndustrialComponent implements OnInit, AfterViewInit, OnDestr
     this.isViewMode = false;
     this.cdr.detectChanges();
 
+    this.isViewMode = true;
+    this.cdr.detectChanges();
     this.service.getIndustrialDesign(id).subscribe((disInd: IDisIndModel) => {
       this.disIndModel = { ...disInd };
       this.inicializarSeleccionesDesdeDisInd();
-      this.observacionesChanged = false;
-      this.resetEditMode();
     });
   }
 
@@ -655,8 +655,6 @@ export class DisenoIndustrialComponent implements OnInit, AfterViewInit, OnDestr
     this.estadoSeleccionado = 0;
     this.institucionSeleccionada = 0;
     this.institucionesFiltradas = [];
-    this.observacionesChanged = false;
-    this.resetEditMode();
   }
 
   getStatusOrder(status: string): number {
