@@ -53,8 +53,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     descripcion: "",
     institucion: "",
     correo: "",
-    documentos: [""],
-    observaciones: ""
+    documentos: [""]
   };
 
   entidadesFederativas: FederalEntity[] = ENTIDADES_FEDERATIVAS_DATA
@@ -112,7 +111,13 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         infoEmpty: this.translate.instant('TABLE.PAG_INFO_EMPTY'),
         zeroRecords: this.translate.instant('TABLE.ZERO_RECORDS'),
       },
+      /* ajax: (dataTablesParameters: any, callback) => {
+        this.applicantService.getApplicants(dataTablesParameters).subscribe(resp => {
+          callback(resp);
+        });
+      },*/
       ajax: (dataTablesParameters: any, callback) => {
+
         this.service.getPatents(dataTablesParameters).subscribe({
           next: (resp) => {
             callback(resp);
@@ -606,6 +611,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         type: file.type
       } as File;
     } else if (file) {
+      // Mostrar error si no es PDF
       const errorAlert: SweetAlertOptions = {
         icon: 'error',
         title: 'Error!',
@@ -621,14 +627,6 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   closeForm(modal: any) {
-    if (this.isEditingStatus) {
-      this.resetEditMode();
-    }
-
-    this.performCloseForm(modal);
-  }
-
-  private performCloseForm(modal: any): void {
     modal.dismiss('cancel');
 
     this.patenteModel = {
@@ -641,15 +639,12 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       institucion: '',
       estatus: 'En trámite',
       descripcion: '',
-      documentos: [],
-      observaciones: ''
+      documentos: []
     };
 
     this.estadoSeleccionado = 0;
     this.institucionSeleccionada = 0;
     this.institucionesFiltradas = [];
-    this.observacionesChanged = false;
-    this.resetEditMode();
   }
 
   getStatusOrder(status: string): number {

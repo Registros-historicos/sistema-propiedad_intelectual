@@ -51,8 +51,7 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
     descripcion: "",
     institucion: "",
     correo: "",
-    documentos: [""],
-    observaciones: ""
+    documentos: [""]
   };
 
   entidadesFederativas: FederalEntity[] = ENTIDADES_FEDERATIVAS_DATA
@@ -111,6 +110,7 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
         zeroRecords: this.translate.instant('TABLE.ZERO_RECORDS'),
       },
       ajax: (dataTablesParameters: any, callback) => {
+
         this.service.getModUtiles(dataTablesParameters).subscribe({
           next: (resp) => {
             callback(resp);
@@ -610,14 +610,6 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   closeForm(modal: any) {
-    if (this.isEditingStatus) {
-      this.resetEditMode();
-    }
-
-    this.performCloseForm(modal);
-  }
-
-  private performCloseForm(modal: any): void {
     modal.dismiss('cancel');
 
     this.modUtilModel = {
@@ -630,8 +622,7 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
       institucion: '',
       estatus: 'En trámite',
       descripcion: '',
-      documentos: [],
-      observaciones: ''
+      documentos: []
     };
 
     this.estadoSeleccionado = 0;

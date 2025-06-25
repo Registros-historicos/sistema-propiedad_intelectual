@@ -50,8 +50,7 @@ export class DisenoIndustrialComponent implements OnInit, AfterViewInit, OnDestr
     descripcion: "",
     institucion: "",
     correo: "",
-    documentos: [""],
-    observaciones: ""
+    documentos: [""]
   };
 
   entidadesFederativas: FederalEntity[] = ENTIDADES_FEDERATIVAS_DATA
@@ -109,6 +108,11 @@ export class DisenoIndustrialComponent implements OnInit, AfterViewInit, OnDestr
         infoEmpty: this.translate.instant('TABLE.PAG_INFO_EMPTY'),
         zeroRecords: this.translate.instant('TABLE.ZERO_RECORDS'),
       },
+      /* ajax: (dataTablesParameters: any, callback) => {
+        this.applicantService.getApplicants(dataTablesParameters).subscribe(resp => {
+          callback(resp);
+        });
+      },*/
       ajax: (dataTablesParameters: any, callback) => {
         this.service.getIndustrialDesigns(dataTablesParameters).subscribe({
           next: (resp) => {
@@ -628,14 +632,6 @@ export class DisenoIndustrialComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   closeForm(modal: any) {
-    if (this.isEditingStatus) {
-      this.resetEditMode();
-    }
-
-    this.performCloseForm(modal);
-  }
-
-  private performCloseForm(modal: any): void {
     modal.dismiss('cancel');
 
     this.disIndModel = {
@@ -648,8 +644,7 @@ export class DisenoIndustrialComponent implements OnInit, AfterViewInit, OnDestr
       institucion: '',
       estatus: 'En trámite',
       descripcion: '',
-      documentos: [],
-      observaciones: ''
+      documentos: []
     };
 
     this.estadoSeleccionado = 0;

@@ -1125,7 +1125,7 @@ export const locale = {
         INDUSTRIAL_SECRETS: 'Secretos Industriales',
       },
       APPLICANT: {
-        MYPROFILE: 'Perfil',
+        MYPROFILE: 'Mi perfil',
         REQUEST: 'Registrar',
         REPORTS: 'Reportes',
         REGISTER: "Registros",
