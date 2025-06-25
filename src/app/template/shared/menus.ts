@@ -65,7 +65,7 @@ export const ADMINISTRATOR_MENUS = [
     icon: 'architecture',
     link: '/administrador/propiedades/diseno-industrial',
     type: 'link'
-  }, 
+  },
   {
     name: 'MENU.ADMIN.VEGETAL_VARIETIES',
     icon: 'eco',
@@ -105,16 +105,8 @@ export const COORDINATOR_MENUS = [
   {
     name: 'MENU.USERS',
     icon: 'person_add',
-    type: 'dropdown',
-    children: [
-
-      {
-        name: 'BUTTON.NEW.APPLICANT',
-        icon: 'person_add',
-        type: 'link',
-        link: '/coordinador/solicitante/registro',
-      },
-    ]
+    link: '/coordinador/registro',
+    type: 'link',
   },
   {
     name: 'MENU.USERS',
@@ -160,7 +152,7 @@ export const COORDINATOR_MENUS = [
     link: '/coordinador/propiedades/diseno-industrial',
     type: 'link'
   },
-   
+
   {
     name: 'MENU.COORD.VEGETAL_VARIETIES',
     icon: 'eco',
