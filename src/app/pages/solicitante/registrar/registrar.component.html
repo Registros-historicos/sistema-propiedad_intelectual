@@ -1,221 +1,24 @@
-<div class="container my-5">
-  <h2 class="text-center mb-4" style="font-size: 2.5rem">
-    Registro de Propiedad Intelectual
-  </h2>
-  <p class="text-center mb-5" style="font-size: 1.25rem">
-    Seleccione el tipo de propiedad intelectual que desea registrar
+<div class="registrar-container">
+  <h2>Registro de Propiedad Intelectual</h2>
+  <p>
+    Aquí puedes registrar tu propiedad intelectual. Selecciona el tipo de
+    propiedad que deseas registrar y completa el formulario correspondiente.
   </p>
 
-  <div class="row g-4 justify-content-center mt-6">
-    <div class="col-12 col-md-6 col-lg-4 d-flex mb-8">
-      <div
-        class="card p-4 text-center border-0 shadow-sm flex-fill"
-        style="background-color: #e0f2f7"
-      >
-        <div
-          class="card-body d-flex flex-column align-items-center justify-content-between"
-        >
-          <div
-            class="icon-circle mb-3"
-            style="
-              background-color: #c7e8f5;
-              border-radius: 50%;
-              width: 60px;
-              height: 60px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-            "
-          >
-            <span
-              class="material-icons"
-              style="font-size: 2.5rem; color: #2196f3"
-            >
-              description
-            </span>
-          </div>
-          <h5 class="card-title fw-bold">Derechos de Autor</h5>
-          <p class="card-text mb-8">
-            Protección de obras literarias, artísticas, musicales, audiovisuales
-            y programas de software
-          </p>
-          <button
-            class="btn w-100 mt-auto"
-            style="background-color: #2196f3; color: white"
-            routerLink="/solicitante/registrar/derechos-autor"
-          >
-            Iniciar Registro
-          </button>
-        </div>
-      </div>
-    </div>
 
-    <div class="col-12 col-md-6 col-lg-4 d-flex mb-8">
-      <div
-        class="card p-4 text-center border-0 shadow-sm flex-fill"
-        style="background-color: #e6ffe6"
-      >
-        <div
-          class="card-body d-flex flex-column align-items-center justify-content-between"
-        >
-          <div
-            class="icon-circle mb-3"
-            style="
-              background-color: #d1ffd1;
-              border-radius: 50%;
-              width: 60px;
-              height: 60px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-            "
-          >
-            <span
-              class="material-icons"
-              style="font-size: 2.5rem; color: #4caf50"
-            >
-              lightbulb
-            </span>
-          </div>
-          <h5 class="card-title fw-bold">Patente</h5>
-          <p class="card-text mb-8">
-            Protección de invenciones con aplicación industrial
-          </p>
-          <button
-            class="btn w-100 mt-auto"
-            style="background-color: #4caf50; color: white"
-            routerLink="/solicitante/registrar/patente"
-          >
-            Iniciar Registro
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-12 col-md-6 col-lg-4 d-flex mb-8">
-      <div
-        class="card p-4 text-center border-0 shadow-sm flex-fill"
-        style="background-color: #fff3e0"
-      >
-        <div
-          class="card-body d-flex flex-column align-items-center justify-content-between"
-        >
-          <div
-            class="icon-circle mb-3"
-            style="
-              background-color: #ffe0b2;
-              border-radius: 50%;
-              width: 60px;
-              height: 60px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-            "
-          >
-            <span
-              class="material-icons"
-              style="font-size: 2.5rem; color: #ff9800"
-            >
-              construction
-            </span>
-          </div>
-          <h5 class="card-title fw-bold">Modelo de Utilidad</h5>
-          <p class="card-text mb-8">
-            Protección de objetos, utensilios o herramientas mejoradas
-          </p>
-          <button
-            class="btn w-100 mt-auto"
-            style="background-color: #ff9800; color: white"
-            routerLink="/solicitante/registrar/modelo-utilidad"
-          >
-            Iniciar Registro
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-12 col-md-6 col-lg-4 d-flex mb-8">
-      <div
-        class="card p-4 text-center border-0 shadow-sm flex-fill"
-        style="background-color: #f3e0f7"
-      >
-        <div
-          class="card-body d-flex flex-column align-items-center justify-content-between"
-        >
-          <div
-            class="icon-circle mb-3"
-            style="
-              background-color: #e0b2ff;
-              border-radius: 50%;
-              width: 60px;
-              height: 60px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-            "
-          >
-            <span
-              class="material-icons"
-              style="font-size: 2.5rem; color: #9c27b0"
-            >
-              design_services
-            </span>
-          </div>
-          <h5 class="card-title fw-bold">Diseño Industrial</h5>
-          <p class="card-text mb-8">
-            Protección del aspecto ornamental de productos industriales
-          </p>
-          <button
-            class="btn w-100 mt-auto"
-            style="background-color: #9c27b0; color: white"
-            routerLink="/solicitante/registrar/derechos-autor"
-          >
-            Iniciar Registro
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-12 col-md-6 col-lg-4 d-flex mb-8">
-      <div
-        class="card p-4 text-center border-0 shadow-sm flex-fill"
-        style="background-color: #ffe0e6"
-      >
-        <div
-          class="card-body d-flex flex-column align-items-center justify-content-between"
-        >
-          <div
-            class="icon-circle mb-3"
-            style="
-              background-color: #ffb2cc;
-              border-radius: 50%;
-              width: 60px;
-              height: 60px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-            "
-          >
-            <span
-              class="material-icons"
-              style="font-size: 2.5rem; color: #e91e63"
-            >
-              branding_watermark
-            </span>
-          </div>
-          <h5 class="card-title fw-bold">Marca</h5>
-          <p class="card-text mb-8">
-            Protección de signos distintivos comerciales
-          </p>
-          <button
-            class="btn w-100 mt-auto"
-            style="background-color: #e91e63; color: white"
-            routerLink="/solicitante/registrar/derechos-autor"
-          >
-            Iniciar Registro
-          </button>
-        </div>
-      </div>
+  <div class="card-grid">
+    <div
+      class="card registro-card"
+      *ngFor="let registro of registros"
+      [ngClass]="registro.claseColor"
+      (click)="verRegistro(registro.ruta)"
+    >
+      <span class="material-icons icono-reporte">{{ registro.icono }}</span>
+      <h3>{{ registro.tituloKey | translate }}</h3>
+      <p>{{ registro.descripcionKey | translate }}</p>
+      <button>Registrar</button>
     </div>
   </div>
+
+
 </div>
