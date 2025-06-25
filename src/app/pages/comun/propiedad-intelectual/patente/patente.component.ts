@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { DataTablesResponse } from '../../../administrador/shared-services';
 import { Config } from 'datatables.net';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
@@ -53,8 +53,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     descripcion: "",
     institucion: "",
     correo: "",
-    documentos: [""],
-    observaciones: ""
+    documentos: [""]
   };
 
   entidadesFederativas: FederalEntity[] = ENTIDADES_FEDERATIVAS_DATA
@@ -112,7 +111,13 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         infoEmpty: this.translate.instant('TABLE.PAG_INFO_EMPTY'),
         zeroRecords: this.translate.instant('TABLE.ZERO_RECORDS'),
       },
+      /* ajax: (dataTablesParameters: any, callback) => {
+        this.applicantService.getApplicants(dataTablesParameters).subscribe(resp => {
+          callback(resp);
+        });
+      },*/
       ajax: (dataTablesParameters: any, callback) => {
+
         this.service.getPatents(dataTablesParameters).subscribe({
           next: (resp) => {
             callback(resp);
@@ -269,10 +274,21 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   view(id: number) {
+    this.isViewMode = true;
+    this.cdr.detectChanges();
+
     this.service.getPatent(id).subscribe((patente: IPatentModel) => {
       this.patenteModel = { ...patente };
       this.inicializarSeleccionesDesdePatente();
-      this.isViewMode = true;
+    });
+  }
+
+  follow(id: number) {
+    this.isViewMode = false;
+    this.cdr.detectChanges();
+
+    this.service.getPatent(id).subscribe((patente: IPatentModel) => {
+      this.patenteModel = { ...patente };
       this.observacionesChanged = false;
       this.resetEditMode();
     });
@@ -595,6 +611,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         type: file.type
       } as File;
     } else if (file) {
+      // Mostrar error si no es PDF
       const errorAlert: SweetAlertOptions = {
         icon: 'error',
         title: 'Error!',
@@ -610,14 +627,6 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   closeForm(modal: any) {
-    if (this.isEditingStatus) {
-      this.resetEditMode();
-    }
-
-    this.performCloseForm(modal);
-  }
-
-  private performCloseForm(modal: any): void {
     modal.dismiss('cancel');
 
     this.patenteModel = {
@@ -630,15 +639,59 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       institucion: '',
       estatus: 'En trámite',
       descripcion: '',
-      documentos: [],
-      observaciones: ''
+      documentos: []
     };
 
     this.estadoSeleccionado = 0;
     this.institucionSeleccionada = 0;
     this.institucionesFiltradas = [];
-    this.observacionesChanged = false;
-    this.resetEditMode();
+  }
+
+  getStatusOrder(status: string): number {
+    const statusOrder: { [key: string]: number } = {
+      'Registrada': 1,
+      'En trámite': 2,
+      'Trámite con observaciones': 2.5,
+      'Aprobada': 4,
+      'Concluida': 5
+    };
+
+    return statusOrder[status] || 0;
+  }
+
+  getStatusProgress(status: string): number {
+    const order = this.getStatusOrder(status);
+    const maxOrder = 5;
+    return Math.round((order / maxOrder) * 100);
+  }
+
+  getStatusDescription(status: string): string {
+    const translationKeys: { [key: string]: string } = {
+      'Registrada': 'MODAL.FOLLOW_UP.DESCRIPTIONS.REGISTERED',
+      'En trámite': 'MODAL.FOLLOW_UP.DESCRIPTIONS.IN_PROCESS',
+      'Trámite con observaciones': 'MODAL.FOLLOW_UP.DESCRIPTIONS.WITH_OBSERVATIONS',
+      'Aprobada': 'MODAL.FOLLOW_UP.DESCRIPTIONS.APPROVED',
+      'Concluida': 'MODAL.FOLLOW_UP.DESCRIPTIONS.COMPLETED'
+    };
+
+    const translationKey = translationKeys[status];
+    if (translationKey) {
+      return this.translate.instant(translationKey);
+    }
+
+    return 'Estado no reconocido.';
+  }
+
+  getStatusIcon(status: string): string {
+    const statusIcons: { [key: string]: string } = {
+      'Registrada': 'document',
+      'En trámite': 'timer',
+      'Trámite con observaciones': 'information',
+      'Aprobada': 'check',
+      'Concluida': 'check-circle'
+    };
+
+    return statusIcons[status] || 'document';
   }
 
   ngOnDestroy(): void {

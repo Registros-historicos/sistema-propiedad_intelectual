@@ -5,10 +5,24 @@ export interface ICopyrightModel {
     solicitante: string;
     autor: string;
     fechaSolicitud: string;
-    estado: 'Registrada' | 'En trámite' | 'Trámite con observaciones' | 'Aprobada' | 'Concluida';
+    estado: string;
     descripcion: string;
     institucion: string;
     correo: string;
     documentos?: string[];
     observaciones?: string;
+    modalidadSolicitud?: string;
+    nacionalidad?: string;
+    celular?: string;
+    domicilio?: string;
+    curpRfc?: string;
+    rama?: string;
+    esDerivada?: string;
+    tipoDerivada?: string;
+    datosObraPrimigenia?: string;
+    urlObra?: string;
+    sintesisObra?: string;
+    declaracionOriginalidad?: boolean;
+    declaracionVeracidad?: boolean;
+    declaracionTitularidad?: boolean;
 }

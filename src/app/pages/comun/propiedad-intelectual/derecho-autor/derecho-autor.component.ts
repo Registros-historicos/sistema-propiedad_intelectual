@@ -1,9 +1,9 @@
-import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { CopyrightsService } from '../../../../api/services/copyright.service';
-import { DataTablesResponse, ENTIDADES_FEDERATIVAS_DATA, ENTIDADES_FEDERATIVAS_MAP } from '../../../administrador/shared-services';
-import { Config } from 'datatables.net';
-import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
-import { SweetAlertOptions } from 'sweetalert2';
+import {  AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild  } from '@angular/core';
+import {  CopyrightsService  } from '../../../../api/services/copyright.service';
+import {  DataTablesResponse, ENTIDADES_FEDERATIVAS_DATA, ENTIDADES_FEDERATIVAS_MAP  } from '../../../administrador/shared-services';
+import {  Config  } from 'datatables.net';
+import {  SwalComponent  } from '@sweetalert2/ngx-sweetalert2';
+import {  SweetAlertOptions  } from 'sweetalert2';
 import moment from 'moment';
 import { FederalEntity } from 'src/app/api/models/entity.model';
 import { Observable } from 'rxjs';
@@ -52,8 +52,7 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
     descripcion: "",
     institucion: "",
     correo: "",
-    documentos: [""],
-    observaciones: ""
+    documentos: [""]
   };
 
   entidadesFederativas: FederalEntity[] = ENTIDADES_FEDERATIVAS_DATA
@@ -64,7 +63,7 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedFile: File | null = null;
   isViewMode: boolean = true;
 
-  // 🆕 Nuevas propiedades para el modo de edición
+   // 🆕 Nuevas propiedades para el modo de edición
   isEditingStatus: boolean = false;
   isSaving: boolean = false;
   statusError: boolean = false;
@@ -111,6 +110,11 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
         infoEmpty: this.translate.instant('TABLE.PAG_INFO_EMPTY'),
         zeroRecords: this.translate.instant('TABLE.ZERO_RECORDS'),
       },
+      /* ajax: (dataTablesParameters: any, callback) => {
+        this.applicantService.getApplicants(dataTablesParameters).subscribe(resp => {
+          callback(resp);
+        });
+      },*/
       ajax: (dataTablesParameters: any, callback) => {
         this.service.getCopyrights(dataTablesParameters).subscribe({
           next: (resp) => {
@@ -129,8 +133,7 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       columns: [
         {
-          title: this.translate.instant('TABLE.APPLICANT_NAME'),
-          data: 'solicitante',
+          title: this.translate.instant('TABLE.APPLICANT_NAME'), data: 'solicitante',
           render: (data, type, full) => {
             const colorClasses = ['success', 'info', 'warning', 'danger'];
             const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
@@ -170,32 +173,25 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
           },
         },
         {
-          title: this.translate.instant('TABLE.WORK_TITLE'),
-          data: 'nombreObra',
-          render: (data) => {
-            return `<span class="fw-bold fs-6 text-gray-800">${data || ''}</span>`;
-          },
+          title: this.translate.instant('TABLE.WORK_TITLE'), data: 'nombreObra'
         },
         {
-          title: this.translate.instant('TABLE.INSTITUTION'),
-          data: 'institucion',
-          render: (data) => {
-            return `<span class="fw-semibold text-gray-600">${data || ''}</span>`;
-          },
+          title: this.translate.instant('TABLE.INSTITUTION'), data: 'institucion'
         },
         {
-          title: this.translate.instant('TABLE.DATE'),
-          data: 'fechaSolicitud',
-          render: (data) => {
+          title: this.translate.instant('TABLE.DATE'), data: 'fechaSolicitud', render: function (data) {
             return `<span class="fw-semibold text-gray-600">${moment(data).format('DD-MM-YYYY')}</span>`;
-          },
+          }
         }
       ],
-      createdRow: (row, data, dataIndex) => {
+      createdRow: function (row, data, dataIndex) {
         const $row = $(row);
         $row.attr('data-action', 'view');
-        $row.attr('data-id', 0);
         $row.addClass('cursor-pointer');
+        $('td:eq(0)', row).addClass('d-flex align-items-center');
+        $('td:eq(1)', row).addClass('fw-bold fs-6 text-gray-800 mb-1');
+        $('td:eq(2)', row).addClass('fw-semibold text-gray-600');
+        $('td:eq(3)', row).addClass('fw-semibold text-gray-600');
       },
       initComplete: (settings, json) => {
         this.dtInstance = settings.oInstance.api()
@@ -268,10 +264,21 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   view(id: number) {
+    this.isViewMode = true;
+    this.cdr.detectChanges();
     this.service.getCopyright(id).subscribe((copyright: ICopyrightModel) => {
       this.copyrightModel = { ...copyright };
       this.inicializarSeleccionesDesdeDerechoAutor();
-      this.isViewMode = true;
+    });
+  }
+
+  follow(id: number) {
+    this.isViewMode = false;
+    this.cdr.detectChanges();
+
+    this.service.getCopyright(id).subscribe((copyright: ICopyrightModel) => {
+      this.copyrightModel = { ...copyright };
+      this.inicializarSeleccionesDesdeDerechoAutor();
       this.observacionesChanged = false;
       this.resetEditMode();
     });
@@ -481,7 +488,7 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
 
   editarEstado(): void {
     const estadoActual = this.copyrightModel.estado;
-    const siguienteEstado = this.secuenciaEstados[estadoActual];
+    const siguienteEstado = this.secuenciaEstados[estadoActual as EstadoCopyright];
 
     if (!siguienteEstado) {
       const alertaError: SweetAlertOptions = {
@@ -619,14 +626,6 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   closeForm(modal: any) {
-    if (this.isEditingStatus) {
-      this.resetEditMode();
-    }
-
-    this.performCloseForm(modal);
-  }
-
-  private performCloseForm(modal: any): void {
     modal.dismiss('cancel');
 
     this.copyrightModel = {
@@ -640,8 +639,7 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
       institucion: '',
       estado: 'En trámite',
       descripcion: '',
-      documentos: [],
-      observaciones: ''
+      documentos: []
     };
 
     this.estadoSeleccionado = 0;
@@ -649,6 +647,53 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
     this.institucionesFiltradas = [];
     this.observacionesChanged = false;
     this.resetEditMode();
+  }
+
+  getStatusOrder(status: string): number {
+    const statusOrder: { [key: string]: number } = {
+      'Registrada': 1,
+      'En trámite': 2,
+      'Trámite con observaciones': 2.5,
+      'Aprobada': 4,
+      'Concluida': 5
+    };
+
+    return statusOrder[status] || 0;
+  }
+
+  getStatusProgress(status: string): number {
+    const order = this.getStatusOrder(status);
+    const maxOrder = 5;
+    return Math.round((order / maxOrder) * 100);
+  }
+
+  getStatusDescription(status: string): string {
+    const translationKeys: { [key: string]: string } = {
+      'Registrada': 'MODAL.FOLLOW_UP.DESCRIPTIONS.REGISTERED',
+      'En trámite': 'MODAL.FOLLOW_UP.DESCRIPTIONS.IN_PROCESS',
+      'Trámite con observaciones': 'MODAL.FOLLOW_UP.DESCRIPTIONS.WITH_OBSERVATIONS',
+      'Aprobada': 'MODAL.FOLLOW_UP.DESCRIPTIONS.APPROVED',
+      'Concluida': 'MODAL.FOLLOW_UP.DESCRIPTIONS.COMPLETED'
+    };
+
+    const translationKey = translationKeys[status];
+    if (translationKey) {
+      return this.translate.instant(translationKey);
+    }
+
+    return 'Estado no reconocido.';
+  }
+
+  getStatusIcon(status: string): string {
+    const statusIcons: { [key: string]: string } = {
+      'Registrada': 'document',
+      'En trámite': 'timer',
+      'Trámite con observaciones': 'information',
+      'Aprobada': 'check',
+      'Concluida': 'check-circle'
+    };
+
+    return statusIcons[status] || 'document';
   }
 
   ngOnDestroy(): void {

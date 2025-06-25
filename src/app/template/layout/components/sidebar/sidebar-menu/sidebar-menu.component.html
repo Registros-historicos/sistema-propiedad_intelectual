@@ -77,8 +77,26 @@
           </div>
         </div>
       }
+      <!-- Not Implemented -->
+      @if (item.type === 'not-implemented') {
+      <div class="menu-item">
+        <a class="menu-link without-sub" (click)="showNotImplementedModal()" style="cursor: pointer;">
+        <span class="menu-icon">
+          <mat-icon [fontIcon]="item.icon"></mat-icon>
+        </span>
+          <span class="menu-title" [translate]="item.name"></span>
+        </a>
+      </div>
+      }
     }
   </div>
   <!--end::Menu-->
 </div>
 <!--end::Menu wrapper-->
+
+<swal #notImplementedSwal [swalOptions]="notImplementedSwalOptions" 
+  title="Página no disponible" 
+  text="Esta funcionalidad aún no está disponible" 
+  icon="info"
+  [customClass]="{confirmButton: 'btn btn-primary'}">
+</swal>

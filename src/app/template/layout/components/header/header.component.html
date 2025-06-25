@@ -4,7 +4,7 @@
     <div class="app-sidebar-collapse-d-flex align-items-center me-3">
       <!--begin::sidebar toggle-->
       <div class="btn btn-icon w-auto px-0 btn-color-muted btn-active-icon-primary" data-kt-toggle="true"
-           data-kt-toggle-target="body" data-kt-toggle-mode="on" data-kt-toggle-name="app-sidebar-collapse">
+        data-kt-toggle-target="body" data-kt-toggle-mode="on" data-kt-toggle-name="app-sidebar-collapse">
         <app-keenicon name="double-right" class="fs-1"></app-keenicon>
       </div>
       <!--end::sidebar toggle-->
@@ -34,13 +34,13 @@
       <a routerLink="/dashboard">
         <ng-container *ngIf="currentLayoutType === 'dark-header'">
           <img alt="Logo" src="./assets/media/logos/default-dark.svg"
-               class="h-20px h-lg-30px app-sidebar-logo-default" />
+            class="h-20px h-lg-30px app-sidebar-logo-default" />
         </ng-container>
         <ng-container *ngIf="currentLayoutType !== 'dark-header'">
           <img alt="Logo" src="./assets/media/logos/default.svg"
-               class="h-20px h-lg-30px app-sidebar-logo-default theme-light-show" />
+            class="h-20px h-lg-30px app-sidebar-logo-default theme-light-show" />
           <img alt="Logo" src="./assets/media/logos/default-dark.svg"
-               class="h-20px h-lg-30px app-sidebar-logo-default theme-dark-show" />
+            class="h-20px h-lg-30px app-sidebar-logo-default theme-dark-show" />
         </ng-container>
       </a>
     </div>
@@ -49,20 +49,30 @@
 
   <!--begin::Header wrapper-->
   <div class="d-flex align-items-stretch justify-content-between flex-lg-grow-1" id="kt_app_header_wrapper">
+    <div class="d-none">
+      <a class="menu-link" [ngClass]="{'active': isProfileRoute()}" routerLink="/administrador/perfil">
+        <span class="menu-title" translate="KEYWORDS.MY_PROFILE"></span>
+      </a>
+      <a class="menu-link" [ngClass]="{'active': isProfileRoute()}" routerLink="/coordinador/perfil">
+        <span class="menu-title" translate="KEYWORDS.MY_PROFILE"></span>
+      </a>
+      <a class="menu-link" [ngClass]="{'active': isProfileRoute()}" routerLink="/solicitante/perfil">
+        <span class="menu-title" translate="KEYWORDS.MY_PROFILE"></span>
+      </a>
+    </div>
+
     <ng-container *ngIf="appHeaderDefaultContent === 'menu' && appHeaderDefaulMenuDisplay">
       <!--begin::Menu wrapper-->
-      <div class="
-    app-header-menu
-    app-header-mobile-drawer
-    align-items-stretch
-" data-kt-drawer="true" data-kt-drawer-name="app-header-menu" data-kt-drawer-activate="{default: true, lg: false}"
-           data-kt-drawer-overlay="true" data-kt-drawer-width="225px" data-kt-drawer-direction="end"
-           data-kt-drawer-toggle="#kt_app_header_menu_toggle" data-kt-swapper="true"
-           data-kt-swapper-mode="{default: 'append', lg: 'prepend'}"
-           data-kt-swapper-parent="{default: '#kt_app_body', lg: '#kt_app_header_wrapper'}">
+      <div class="app-header-menu app-header-mobile-drawer align-items-stretch" data-kt-drawer="true"
+        data-kt-drawer-name="app-header-menu" data-kt-drawer-activate="{default: true, lg: false}"
+        data-kt-drawer-overlay="true" data-kt-drawer-width="225px" data-kt-drawer-direction="end"
+        data-kt-drawer-toggle="#kt_app_header_menu_toggle" data-kt-swapper="true"
+        data-kt-swapper-mode="{default: 'append', lg: 'prepend'}"
+        data-kt-swapper-parent="{default: '#kt_app_body', lg: '#kt_app_header_wrapper'}">
         <ng-container>
           <app-page-title [appPageTitleDirection]="'column'" [appPageTitleBreadcrumb]="true"
-                          [appPageTitleDescription]="false" class="page-title d-flex flex-wrap me-3 flex-column justify-content-center">
+            [appPageTitleDescription]="false"
+            class="page-title d-flex flex-wrap me-3 flex-column justify-content-center">
           </app-page-title>
         </ng-container>
       </div>
@@ -72,7 +82,7 @@
       <app-page-title #ktPageTitle class="page-title d-flex"></app-page-title>
     </ng-container> -->
     <app-navbar class="app-navbar flex-shrink-0" [appHeaderDefaulMenuDisplay]="appHeaderDefaulMenuDisplay"
-                [isRtl]="false"></app-navbar>
+      [isRtl]="false"></app-navbar>
   </div>
   <!--end::Header wrapper-->
 </div>

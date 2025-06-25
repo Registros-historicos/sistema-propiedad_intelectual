@@ -8,17 +8,6 @@
                     <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.REQUEST_TYPES"></span>
                     <span class="text-muted fw-bold fs-7" translate="GRAPHICS.SUBTITLES.REGISTER"></span>
                 </h3>
-                <div class="card-toolbar">
-                    <!-- begin::Menu -->
-                    <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary"
-                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-flip="top-end">
-                        <app-keenicon name="category" class="fs-2"></app-keenicon>
-                    </button>
-                    <!-- begin::Menu 1 -->
-                    <app-dropdown-menu1></app-dropdown-menu1>
-                    <!-- end::Menu 1 -->
-                    <!-- end::Menu -->
-                </div>
             </div>
             <!-- end::Header -->
             <!-- begin::Body -->
@@ -43,7 +32,7 @@
                                 <th>
                                     <div class="symbol symbol-50px me-2">
                                         <span class="symbol-label">
-                                          <mat-icon fontIcon="emoji_objects"></mat-icon>
+                                            <mat-icon fontIcon="emoji_objects" class="text-danger"></mat-icon>
                                         </span>
                                     </div>
                                 </th>
@@ -59,7 +48,7 @@
                                     </div>
                                 </td>
                                 <td class="text-end">
-                                    <a routerLink="/coordinador/patentes"
+                                    <a routerLink="/coordinador/propiedades/patente"
                                         class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
                                         <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
                                     </a>
@@ -69,7 +58,7 @@
                                 <th>
                                     <div class="symbol symbol-50px me-2">
                                         <span class="symbol-label">
-                                          <mat-icon fontIcon="branding_watermark"></mat-icon>
+                                            <mat-icon fontIcon="branding_watermark" class="text-info"></mat-icon>
                                         </span>
                                     </div>
                                 </th>
@@ -85,7 +74,7 @@
                                     </div>
                                 </td>
                                 <td class="text-end">
-                                    <a routerLink="/coordinador/marcas"
+                                    <a routerLink="/coordinador/propiedades/marca"
                                         class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
                                         <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
                                     </a>
@@ -95,7 +84,7 @@
                                 <th>
                                     <div class="symbol symbol-50px me-2">
                                         <span class="symbol-label">
-                                          <mat-icon fontIcon="construction"></mat-icon>
+                                            <mat-icon fontIcon="construction" class="text-warning"></mat-icon>
                                         </span>
                                     </div>
                                 </th>
@@ -111,7 +100,7 @@
                                     </div>
                                 </td>
                                 <td class="text-end">
-                                    <a routerLink="/coordinador/modelos-utilidad"
+                                    <a routerLink="/coordinador/propiedades/modelo-utilidad"
                                         class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
                                         <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
                                     </a>
@@ -121,7 +110,7 @@
                                 <th>
                                     <div class="symbol symbol-50px me-2">
                                         <span class="symbol-label">
-                                          <mat-icon fontIcon="copyright"></mat-icon>
+                                            <mat-icon fontIcon="copyright" class="text-success"></mat-icon>
                                         </span>
                                     </div>
                                 </th>
@@ -137,7 +126,7 @@
                                     </div>
                                 </td>
                                 <td class="text-end">
-                                    <a routerLink="/coordinador/derechos-autores"
+                                    <a routerLink="/coordinador/propiedades/derecho-autor"
                                         class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
                                         <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
                                     </a>
@@ -147,7 +136,7 @@
                                 <th>
                                     <div class="symbol symbol-50px me-2">
                                         <span class="symbol-label">
-                                          <mat-icon fontIcon="architecture"></mat-icon>
+                                            <mat-icon fontIcon="architecture" class="text-primary"></mat-icon>
                                         </span>
                                     </div>
                                 </th>
@@ -163,7 +152,7 @@
                                     </div>
                                 </td>
                                 <td class="text-end">
-                                    <a routerLink="/coordinador/disenos-industriales"
+                                    <a routerLink="/coordinador/propiedades/diseno-industrial"
                                         class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
                                         <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
                                     </a>
@@ -188,7 +177,12 @@
                 <!-- begin::Title-->
                 <h3 class="card-title align-items-start flex-column">
                     <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.REQUEST"></span>
-                    <span class="text-muted fw-bold fs-7" translate="GRAPHICS.SUBTITLES.MONTHS"></span>
+                    <ng-container *ngIf="selectedFilter === '1'">
+                        <span class="text-muted fw-bold fs-7" translate="GRAPHICS.SUBTITLES.MONTHS"></span>
+                    </ng-container>
+                    <ng-container *ngIf="selectedFilter === '2'">
+                        <span class="text-muted fw-bold fs-7" translate="GRAPHICS.SUBTITLES.YEARS"></span>
+                    </ng-container>
                 </h3>
                 <!-- end::Title-->
 
@@ -199,7 +193,30 @@
                         data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-flip="top-end">
                         <app-keenicon name="category" class="fs-2"></app-keenicon>
                     </button>
-                    <app-dropdown-menu1></app-dropdown-menu1>
+                    <div class="menu menu-sub menu-sub-dropdown w-250px w-md-300px" data-kt-menu="true">
+                        <div class="px-7 py-5">
+                            <div class="fs-5 text-gray-900 fw-bolder">
+                                <span translate="GRAPHICS.OPTIONS_FILTER.TITLE"></span>
+                            </div>
+                        </div>
+
+                        <div class="separator border-gray-200"></div>
+
+                        <div class="px-7 py-5">
+                            <div class="mb-10">
+                                <label class="form-label fw-bold" translate="GRAPHICS.OPTIONS_FILTER.LABEL"></label>
+
+                                <div>
+                                    <select class="form-select form-select-solid" [(ngModel)]="selectedFilter"
+                                        (change)="onFilterChange()" data-kt-select2="true"
+                                        data-placeholder="Select option" data-allow-clear="true">
+                                        <option value="1" data-kt-menu-dismiss="true" translate="GRAPHICS.OPTIONS_FILTER.OPTIONS.MONTHS"></option>
+                                        <option value="2" data-kt-menu-dismiss="true" translate="GRAPHICS.OPTIONS_FILTER.OPTIONS.YEARS"></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- end::Menu-->
                 </div>
@@ -234,15 +251,6 @@
                     <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.DEPARTMENTS"></span>
                     <span class="text-muted mt-1 fw-bold fs-7" translate="GRAPHICS.SUBTITLES.TOP_3"></span>
                 </h3>
-                <div class="card-toolbar">
-                    <!-- begin::Menu -->
-                    <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary"
-                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-flip="top-end">
-                        <app-keenicon name="category" class="fs-2"></app-keenicon>
-                    </button>
-                    <app-dropdown-menu1></app-dropdown-menu1>
-                    <!-- end::Menu -->
-                </div>
             </div>
             <!-- end::Header -->
             <!-- begin::Body -->
@@ -268,15 +276,15 @@
                                 </td>
                                 <td class="text-end">
                                     <span class="badge badge-light-danger fw-bold me-1"
-                                        translate="DEPARTMENTS.ACRONYM.PATENTS"></span>
+                                        translate="ACRONYM.PATENTS"></span>
                                     <span class="badge badge-light-info fw-bold me-1"
-                                        translate="DEPARTMENTS.ACRONYM.TRADEMARKS"></span>
+                                        translate="ACRONYM.TRADEMARKS"></span>
                                     <span class="badge badge-light-warning fw-bold me-1"
-                                        translate="DEPARTMENTS.ACRONYM.UTILITY_MODELS"></span>
+                                        translate="ACRONYM.UTILITY_MODELS"></span>
                                     <span class="badge badge-light-success fw-bold me-1"
-                                        translate="DEPARTMENTS.ACRONYM.COPYRIGHTS"></span>
+                                        translate="ACRONYM.COPYRIGHTS"></span>
                                     <span class="badge badge-light-primary fw-bold me-1"
-                                        translate="DEPARTMENTS.ACRONYM.INDUSTRIAL_DESIGNS"></span>
+                                        translate="ACRONYM.INDUSTRIAL_DESIGNS"></span>
                                 </td>
                                 <td class="text-end">
                                     <span class="text-muted fw-bold">7200 Solicitudes</span>
@@ -289,11 +297,11 @@
                                 </td>
                                 <td class="text-end">
                                     <span class="badge badge-light-danger fw-bold me-1"
-                                        translate="DEPARTMENTS.ACRONYM.PATENTS"></span>
+                                        translate="ACRONYM.PATENTS"></span>
                                     <span class="badge badge-light-warning fw-bold me-1"
-                                        translate="DEPARTMENTS.ACRONYM.UTILITY_MODELS"></span>
+                                        translate="ACRONYM.UTILITY_MODELS"></span>
                                     <span class="badge badge-light-primary fw-bold me-1"
-                                        translate="DEPARTMENTS.ACRONYM.INDUSTRIAL_DESIGNS"></span>
+                                        translate="ACRONYM.INDUSTRIAL_DESIGNS"></span>
                                 </td>
                                 <td class="text-end">
                                     <span class="text-muted fw-bold">4600 Solicitudes</span>
@@ -306,9 +314,9 @@
                                 </td>
                                 <td class="text-end">
                                     <span class="badge badge-light-danger fw-bold me-1"
-                                        translate="DEPARTMENTS.ACRONYM.PATENTS"></span>
+                                        translate="ACRONYM.PATENTS"></span>
                                     <span class="badge badge-light-info fw-bold me-1"
-                                        translate="DEPARTMENTS.ACRONYM.TRADEMARKS"></span>
+                                        translate="ACRONYM.TRADEMARKS"></span>
                                 </td>
                                 <td class="text-end">
                                     <span class="text-muted fw-bold">890 Solicitudes</span>
@@ -332,15 +340,6 @@
                     <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.EDUCATIONAL_PROGRAM"></span>
                     <span class="text-muted mt-1 fw-bold fs-7" translate="GRAPHICS.SUBTITLES.TOP_3"></span>
                 </h3>
-                <div class="card-toolbar">
-                    <!-- begin::Menu -->
-                    <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary"
-                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-flip="top-end">
-                        <app-keenicon name="category" class="fs-2"></app-keenicon>
-                    </button>
-                    <app-dropdown-menu1></app-dropdown-menu1>
-                    <!-- end::Menu -->
-                </div>
             </div>
             <!-- end::Header -->
             <!-- begin::Body -->
@@ -367,11 +366,11 @@
                                 </td>
                                 <td class="text-end">
                                     <span class="badge badge-light-danger fw-bold me-1"
-                                        translate="DEPARTMENTS.ACRONYM.PATENTS"></span>
+                                        translate="ACRONYM.PATENTS"></span>
                                     <span class="badge badge-light-info fw-bold me-1"
-                                        translate="DEPARTMENTS.ACRONYM.TRADEMARKS"></span>
+                                        translate="ACRONYM.TRADEMARKS"></span>
                                     <span class="badge badge-light-success fw-bold me-1"
-                                        translate="DEPARTMENTS.ACRONYM.COPYRIGHTS"></span>
+                                        translate="ACRONYM.COPYRIGHTS"></span>
                                 </td>
                                 <td class="text-end">
                                     <span class="text-muted fw-bold">2300 Solicitudes</span>
@@ -384,9 +383,9 @@
                                 </td>
                                 <td class="text-end">
                                     <span class="badge badge-light-danger fw-bold me-1"
-                                        translate="DEPARTMENTS.ACRONYM.PATENTS"></span>
+                                        translate="ACRONYM.PATENTS"></span>
                                     <span class="badge badge-light-warning fw-bold me-1"
-                                        translate="DEPARTMENTS.ACRONYM.UTILITY_MODELS"></span>
+                                        translate="ACRONYM.UTILITY_MODELS"></span>
                                 </td>
                                 <td class="text-end">
                                     <span class="text-muted fw-bold">1500 Solicitudes</span>
@@ -399,9 +398,9 @@
                                 </td>
                                 <td class="text-end">
                                     <span class="badge badge-light-danger fw-bold me-1"
-                                        translate="DEPARTMENTS.ACRONYM.PATENTS"></span>
+                                        translate="ACRONYM.PATENTS"></span>
                                     <span class="badge badge-light-info fw-bold me-1"
-                                        translate="DEPARTMENTS.ACRONYM.TRADEMARKS"></span>
+                                        translate="ACRONYM.TRADEMARKS"></span>
                                 </td>
                                 <td class="text-end">
                                     <span class="text-muted fw-bold">800 Solicitudes</span>
@@ -418,6 +417,7 @@
         </div>
     </div>
 </div>
+
 <div class="row g-5 g-xl-8">
     <div class="col-xl-12">
         <div class="card card-xl-stretch mb-xl-8">
@@ -439,8 +439,10 @@
                         <thead>
                             <tr class="fw-bolder text-muted">
                                 <th class="min-w-150px"><span translate="GRAPHICS.TITLES.RESEARCHER"></span></th>
-                                <th class="min-w-290px text-center"><span translate="GRAPHICS.TITLES.DEPARTMENT"></span></th>
-                                <th class="min-w-200px text-center"><span translate="GRAPHICS.TITLES.REQUEST"></span></th>
+                                <th class="min-w-290px text-center"><span translate="GRAPHICS.TITLES.DEPARTMENT"></span>
+                                </th>
+                                <th class="min-w-200px text-center"><span translate="GRAPHICS.TITLES.REQUEST"></span>
+                                </th>
                             </tr>
                         </thead>
                         <!-- end::Table head -->
@@ -513,7 +515,7 @@
                                     <span class="text-gray-900 fw-bolder d-block fs-6"
                                         translate="DEPARTMENTS.IT"></span>
                                 </td>
-                                <td  class="text-center">
+                                <td class="text-center">
                                     <div class="d-flex flex-column w-100 me-2">
                                         <div class="d-flex justify-content-center flex-stack mb-2">
                                             <span class="me-2 fs-6 fw-bold text-primary">60</span>

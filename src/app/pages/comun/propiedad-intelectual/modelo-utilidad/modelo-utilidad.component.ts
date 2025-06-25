@@ -51,8 +51,7 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
     descripcion: "",
     institucion: "",
     correo: "",
-    documentos: [""],
-    observaciones: ""
+    documentos: [""]
   };
 
   entidadesFederativas: FederalEntity[] = ENTIDADES_FEDERATIVAS_DATA
@@ -111,6 +110,7 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
         zeroRecords: this.translate.instant('TABLE.ZERO_RECORDS'),
       },
       ajax: (dataTablesParameters: any, callback) => {
+
         this.service.getModUtiles(dataTablesParameters).subscribe({
           next: (resp) => {
             callback(resp);
@@ -267,10 +267,24 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   view(id: number) {
+    this.isViewMode = true;
+    this.cdr.detectChanges();
+
     this.service.getModUtil(id).subscribe((modUtil: IModUtilModel) => {
       this.modUtilModel = { ...modUtil };
       this.inicializarSeleccionesDesdeModUtil();
-      this.isViewMode = true;
+      this.observacionesChanged = false;
+      this.resetEditMode();
+    });
+  }
+
+  follow(id: number) {
+    this.isViewMode = false;
+    this.cdr.detectChanges();
+
+    this.service.getModUtil(id).subscribe((modUtil: IModUtilModel) => {
+      this.modUtilModel = { ...modUtil };
+      this.inicializarSeleccionesDesdeModUtil();
       this.observacionesChanged = false;
       this.resetEditMode();
     });
@@ -294,7 +308,7 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
   getValidStatusOptions(): { value: EstatusModUtil, label: string }[] {
     const currentStatus = this.modUtilModel.estatus;
 
-    switch(currentStatus) {
+    switch (currentStatus) {
       case 'Registrada':
         return [
           { value: 'En trámite', label: 'En trámite' },
@@ -480,7 +494,7 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
 
   editarEstatus(): void {
     const estadoActual = this.modUtilModel.estatus;
-    const siguienteEstado = this.secuenciaEstados[estadoActual];
+    const siguienteEstado = this.secuenciaEstados[estadoActual as EstatusModUtil];
 
     if (!siguienteEstado) {
       const alertaError: SweetAlertOptions = {
@@ -608,14 +622,6 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   closeForm(modal: any) {
-    if (this.isEditingStatus) {
-      this.resetEditMode();
-    }
-
-    this.performCloseForm(modal);
-  }
-
-  private performCloseForm(modal: any): void {
     modal.dismiss('cancel');
 
     this.modUtilModel = {
@@ -628,8 +634,7 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
       institucion: '',
       estatus: 'En trámite',
       descripcion: '',
-      documentos: [],
-      observaciones: ''
+      documentos: []
     };
 
     this.estadoSeleccionado = 0;
@@ -637,6 +642,53 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
     this.institucionesFiltradas = [];
     this.observacionesChanged = false;
     this.resetEditMode();
+  }
+
+  getStatusOrder(status: string): number {
+    const statusOrder: { [key: string]: number } = {
+      'Registrada': 1,
+      'En trámite': 2,
+      'Trámite con observaciones': 2.5,
+      'Aprobada': 4,
+      'Concluida': 5
+    };
+
+    return statusOrder[status] || 0;
+  }
+
+  getStatusProgress(status: string): number {
+    const order = this.getStatusOrder(status);
+    const maxOrder = 5;
+    return Math.round((order / maxOrder) * 100);
+  }
+
+  getStatusDescription(status: string): string {
+    const translationKeys: { [key: string]: string } = {
+      'Registrada': 'MODAL.FOLLOW_UP.DESCRIPTIONS.REGISTERED',
+      'En trámite': 'MODAL.FOLLOW_UP.DESCRIPTIONS.IN_PROCESS',
+      'Trámite con observaciones': 'MODAL.FOLLOW_UP.DESCRIPTIONS.WITH_OBSERVATIONS',
+      'Aprobada': 'MODAL.FOLLOW_UP.DESCRIPTIONS.APPROVED',
+      'Concluida': 'MODAL.FOLLOW_UP.DESCRIPTIONS.COMPLETED'
+    };
+
+    const translationKey = translationKeys[status];
+    if (translationKey) {
+      return this.translate.instant(translationKey);
+    }
+
+    return 'Estado no reconocido.';
+  }
+
+  getStatusIcon(status: string): string {
+    const statusIcons: { [key: string]: string } = {
+      'Registrada': 'document',
+      'En trámite': 'timer',
+      'Trámite con observaciones': 'information',
+      'Aprobada': 'check',
+      'Concluida': 'check-circle'
+    };
+
+    return statusIcons[status] || 'document';
   }
 
   ngOnDestroy(): void {
