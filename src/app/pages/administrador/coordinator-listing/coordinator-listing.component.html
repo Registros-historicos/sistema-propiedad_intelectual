@@ -30,12 +30,14 @@
   </div>
 
   <div class="card-body pt-0">
+    <!-- 🆕 Modal de edición -->
     <app-crud
       [datatableConfig]="datatableConfig"
       route="/administrador/coordinadores"
       (deleteEvent)="delete($event)"
-      (editEvent)="navigateToEdit($event, editModal)"
-      [reload]="reloadEvent">
+      (editEvent)="edit($event)"
+      [reload]="reloadEvent"
+      [modal]="editModal">
     </app-crud>
   </div>
 </div>
@@ -43,17 +45,17 @@
 <!-- SweetAlert2 para notificaciones -->
 <swal #noticeSwal [swalOptions]="swalOptions"></swal>
 
-<!-- Modal de edición -->
 <ng-template #editModal let-modal>
   <div class="modal-header">
     <h3 class="modal-title fw-bold text-gray-800">
-      Editar Coordinador
+      <app-keenicon name="pencil" class="fs-2 me-2"></app-keenicon>
+      <span>Editar Coordinador</span>
     </h3>
-    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    <button type="button" class="btn-close" aria-label="Close" (click)="closeForm(modal)"></button>
   </div>
 
   <div class="modal-body py-6 px-8">
-    <div class="d-flex flex-column" *ngIf="selectedCoordinator">
+    <div class="d-flex flex-column">
       <!-- Notificación informativa -->
       <div class="notice d-flex bg-light-primary rounded border-primary border border-dashed mb-7 p-6">
         <app-keenicon name="information-5" class="fs-2 text-primary me-4"></app-keenicon>
@@ -69,17 +71,17 @@
         <div class="col-md-6">
           <div class="fv-row mb-6">
             <label class="fs-6 fw-semibold mb-2 required">Nombre</label>
-            <input type="text" class="form-control form-control-solid" [(ngModel)]="selectedCoordinator.nombre" name="nombre">
+            <input type="text" class="form-control form-control-solid" [(ngModel)]="coordinadorModel.nombre" name="nombre">
           </div>
 
           <div class="fv-row mb-6">
             <label class="fs-6 fw-semibold mb-2 required">Email</label>
-            <input type="email" class="form-control form-control-solid" [(ngModel)]="selectedCoordinator.email" name="email">
+            <input type="email" class="form-control form-control-solid" [(ngModel)]="coordinadorModel.email" name="email">
           </div>
 
           <div class="fv-row mb-6">
             <label class="fs-6 fw-semibold mb-2">Entidad Federativa</label>
-            <select class="form-select form-select-solid" [(ngModel)]="selectedCoordinator.entidad_federativa" name="entidad_federativa">
+            <select class="form-select form-select-solid" [(ngModel)]="coordinadorModel.entidad_federativa" name="entidad_federativa">
               <option value="">Seleccionar entidad federativa</option>
               <option *ngFor="let entidad of entidadesFederativas" [value]="entidad">{{entidad}}</option>
             </select>
@@ -87,7 +89,7 @@
 
           <div class="fv-row mb-6">
             <label class="fs-6 fw-semibold mb-2">Sexo</label>
-            <select class="form-select form-select-solid" [(ngModel)]="selectedCoordinator.sexo" name="sexo">
+            <select class="form-select form-select-solid" [(ngModel)]="coordinadorModel.sexo" name="sexo">
               <option value="">Seleccionar sexo</option>
               <option *ngFor="let sexo of sexoOptions" [value]="sexo">{{sexo}}</option>
             </select>
@@ -95,7 +97,7 @@
 
           <div class="fv-row mb-6">
             <label class="fs-6 fw-semibold mb-2">RFC</label>
-            <input type="text" class="form-control form-control-solid" [(ngModel)]="selectedCoordinator.rfc" name="rfc">
+            <input type="text" class="form-control form-control-solid" [(ngModel)]="coordinadorModel.rfc" name="rfc">
           </div>
         </div>
 
@@ -103,27 +105,27 @@
         <div class="col-md-6">
           <div class="fv-row mb-6">
             <label class="fs-6 fw-semibold mb-2 required">Apellidos</label>
-            <input type="text" class="form-control form-control-solid" [(ngModel)]="selectedCoordinator.apellidos" name="apellidos">
+            <input type="text" class="form-control form-control-solid" [(ngModel)]="coordinadorModel.apellidos" name="apellidos">
           </div>
 
           <div class="fv-row mb-6">
             <label class="fs-6 fw-semibold mb-2">Teléfono</label>
-            <input type="tel" class="form-control form-control-solid" [(ngModel)]="selectedCoordinator.telefono" name="telefono">
+            <input type="tel" class="form-control form-control-solid" [(ngModel)]="coordinadorModel.telefono" name="telefono">
           </div>
 
           <div class="fv-row mb-6">
             <label class="fs-6 fw-semibold mb-2">Institución</label>
-            <input type="text" class="form-control form-control-solid" [(ngModel)]="selectedCoordinator.institucion_adscripcion" name="institucion_adscripcion">
+            <input type="text" class="form-control form-control-solid" [(ngModel)]="coordinadorModel.institucion_adscripcion" name="institucion_adscripcion">
           </div>
 
           <div class="fv-row mb-6">
             <label class="fs-6 fw-semibold mb-2">Edad</label>
-            <input type="number" class="form-control form-control-solid" [(ngModel)]="selectedCoordinator.edad" name="edad">
+            <input type="number" class="form-control form-control-solid" [(ngModel)]="coordinadorModel.edad" name="edad">
           </div>
 
           <div class="fv-row mb-6">
             <label class="fs-6 fw-semibold mb-2">CURP</label>
-            <input type="text" class="form-control form-control-solid" [(ngModel)]="selectedCoordinator.curp" name="curp">
+            <input type="text" class="form-control form-control-solid" [(ngModel)]="coordinadorModel.curp" name="curp">
           </div>
         </div>
       </div>
@@ -131,8 +133,10 @@
   </div>
 
   <div class="modal-footer border-0 px-8 py-5">
-    <button type="button" class="btn btn-light me-3" (click)="modal.dismiss()">Cancelar</button>
-    <button type="button" class="btn btn-primary" (click)="modal.close()">
+    <button type="button" class="btn btn-light me-3" (click)="closeForm(modal)">
+      <span>Cancelar</span>
+    </button>
+    <button type="button" class="btn btn-primary" (click)="saveChanges(modal)">
       <span class="indicator-label">Guardar</span>
     </button>
   </div>
