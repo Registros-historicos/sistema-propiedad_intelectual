@@ -5,7 +5,7 @@
       <!--begin::Search-->
       <div class="d-flex align-items-center position-relative my-1">
         <app-keenicon name="magnifier" class="fs-3 position-absolute ms-5"></app-keenicon>
-        <input type="text" data-action="filter" class="form-control form-control-solid w-250px ps-12" placeholder="Buscar Coordinadores">
+        <input type="text" data-action="filter" class="form-control form-control-solid w-250px ps-12" [placeholder]="placeholder">
       </div>
       <!--end::Search-->
     </div>
@@ -14,18 +14,15 @@
     <!--begin::Card toolbar-->
     <div class="card-toolbar">
       <!--begin::Toolbar-->
-      <div class="d-flex justify-content-end">
-        <!--begin::Pagination selector-->
-        <div class="d-flex align-items-center">
-          <label class="form-label text-gray-600 me-3 mb-0">Mostrar:</label>
-          <select class="form-select form-select-sm form-select-solid w-75px"
-                  (change)="onPageLengthChange($event)"
+      <div class="d-flex justify-content-end align-items-center">
+        <div class="d-flex align-items-center me-4">
+          <label class="form-label text-gray-600 me-3 mb-0 fw-semibold" translate="TABLE.PAGE_LENGTH.LABEL"></label>
+          <select class="form-select form-select-sm form-select-solid w-auto" (change)="onPageLengthChange($event)"
                   [(ngModel)]="pageLength">
             <option *ngFor="let length of lengthMenu" [value]="length">{{length}}</option>
           </select>
+          <span class="text-gray-600 ms-2 fw-semibold" translate="TABLE.PAGE_LENGTH.RECORDS"></span>
         </div>
-        <!--end::Pagination selector-->
-
       </div>
       <!--end::Toolbar-->
     </div>
@@ -33,10 +30,110 @@
   </div>
 
   <div class="card-body pt-0">
-    <!-- En coordinator-listing.component.html -->
-    <app-crud [datatableConfig]="datatableConfig" route="/administrador/coordinadores" (deleteEvent)="delete($event)" (editEvent)="navigateToEdit($event)" [reload]="reloadEvent"></app-crud>
+    <app-crud
+      [datatableConfig]="datatableConfig"
+      route="/administrador/coordinadores"
+      (deleteEvent)="delete($event)"
+      (editEvent)="navigateToEdit($event, editModal)"
+      [reload]="reloadEvent">
+    </app-crud>
   </div>
 </div>
 
-<swal #noticeSwal [swalOptions]="swalOptions">
-</swal>
+<!-- SweetAlert2 para notificaciones -->
+<swal #noticeSwal [swalOptions]="swalOptions"></swal>
+
+<!-- Modal de edición -->
+<ng-template #editModal let-modal>
+  <div class="modal-header">
+    <h3 class="modal-title fw-bold text-gray-800">
+      Editar Coordinador
+    </h3>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+
+  <div class="modal-body py-6 px-8">
+    <div class="d-flex flex-column" *ngIf="selectedCoordinator">
+      <!-- Notificación informativa -->
+      <div class="notice d-flex bg-light-primary rounded border-primary border border-dashed mb-7 p-6">
+        <app-keenicon name="information-5" class="fs-2 text-primary me-4"></app-keenicon>
+        <div class="d-flex flex-column">
+          <h4 class="text-gray-900 fw-bold mb-2">Información del Coordinador</h4>
+          <span class="text-gray-700">Revise y modifique la información del coordinador según sea necesario.</span>
+        </div>
+      </div>
+
+      <!-- Formulario en dos columnas -->
+      <div class="row g-6 mb-6">
+        <!-- Columna izquierda -->
+        <div class="col-md-6">
+          <div class="fv-row mb-6">
+            <label class="fs-6 fw-semibold mb-2 required">Nombre</label>
+            <input type="text" class="form-control form-control-solid" [(ngModel)]="selectedCoordinator.nombre" name="nombre">
+          </div>
+
+          <div class="fv-row mb-6">
+            <label class="fs-6 fw-semibold mb-2 required">Email</label>
+            <input type="email" class="form-control form-control-solid" [(ngModel)]="selectedCoordinator.email" name="email">
+          </div>
+
+          <div class="fv-row mb-6">
+            <label class="fs-6 fw-semibold mb-2">Entidad Federativa</label>
+            <select class="form-select form-select-solid" [(ngModel)]="selectedCoordinator.entidad_federativa" name="entidad_federativa">
+              <option value="">Seleccionar entidad federativa</option>
+              <option *ngFor="let entidad of entidadesFederativas" [value]="entidad">{{entidad}}</option>
+            </select>
+          </div>
+
+          <div class="fv-row mb-6">
+            <label class="fs-6 fw-semibold mb-2">Sexo</label>
+            <select class="form-select form-select-solid" [(ngModel)]="selectedCoordinator.sexo" name="sexo">
+              <option value="">Seleccionar sexo</option>
+              <option *ngFor="let sexo of sexoOptions" [value]="sexo">{{sexo}}</option>
+            </select>
+          </div>
+
+          <div class="fv-row mb-6">
+            <label class="fs-6 fw-semibold mb-2">RFC</label>
+            <input type="text" class="form-control form-control-solid" [(ngModel)]="selectedCoordinator.rfc" name="rfc">
+          </div>
+        </div>
+
+        <!-- Columna derecha -->
+        <div class="col-md-6">
+          <div class="fv-row mb-6">
+            <label class="fs-6 fw-semibold mb-2 required">Apellidos</label>
+            <input type="text" class="form-control form-control-solid" [(ngModel)]="selectedCoordinator.apellidos" name="apellidos">
+          </div>
+
+          <div class="fv-row mb-6">
+            <label class="fs-6 fw-semibold mb-2">Teléfono</label>
+            <input type="tel" class="form-control form-control-solid" [(ngModel)]="selectedCoordinator.telefono" name="telefono">
+          </div>
+
+          <div class="fv-row mb-6">
+            <label class="fs-6 fw-semibold mb-2">Institución</label>
+            <input type="text" class="form-control form-control-solid" [(ngModel)]="selectedCoordinator.institucion_adscripcion" name="institucion_adscripcion">
+          </div>
+
+          <div class="fv-row mb-6">
+            <label class="fs-6 fw-semibold mb-2">Edad</label>
+            <input type="number" class="form-control form-control-solid" [(ngModel)]="selectedCoordinator.edad" name="edad">
+          </div>
+
+          <div class="fv-row mb-6">
+            <label class="fs-6 fw-semibold mb-2">CURP</label>
+            <input type="text" class="form-control form-control-solid" [(ngModel)]="selectedCoordinator.curp" name="curp">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer border-0 px-8 py-5">
+    <button type="button" class="btn btn-light me-3" (click)="modal.dismiss()">Cancelar</button>
+    <button type="button" class="btn btn-primary" (click)="modal.close()">
+      <span class="indicator-label">Guardar</span>
+    </button>
+  </div>
+</ng-template>
