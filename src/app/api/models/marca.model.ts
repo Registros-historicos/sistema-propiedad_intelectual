@@ -28,6 +28,7 @@ export interface DatosMarca {
   tipoSolicitud: string;
   inicioUso?: string;
   marca: string;
+  estatus: 'Registrada' | 'En trámite' | 'Trámite con observaciones' | 'Aprobada' | 'Concluida';
   productosServicios: ProductoServicio[];
   titular: string;
   tramites?: Tramite[];

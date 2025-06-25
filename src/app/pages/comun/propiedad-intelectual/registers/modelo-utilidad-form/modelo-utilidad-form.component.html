@@ -1,13 +1,7 @@
 <div class="card">
     <div class="card-header border-0 pt-6">
         <div class="card-title">
-            <h3>Registrar Modelo de Utilidad</h3>
-        </div>
-        <div class="card-toolbar">
-            <button type="button" class="btn btn-light me-3" (click)="navigateBack()">
-                <app-keenicon name="arrow-left" class="fs-2"></app-keenicon>
-                Regresar
-            </button>
+            <h3 translate="FORMS.UTILITY_MODEL.TITLE"></h3>
         </div>
     </div>
 
@@ -20,204 +14,511 @@
                     <div class="d-flex flex-stack flex-grow-1">
                         <div class="fw-semibold">
                             <div class="fs-6 text-gray-700">
-                                Complete la información requerida para registrar el modelo de utilidad.
-                                Todos los campos marcados con (*) son obligatorios.
+                                <span translate="FORMS.UTILITY_MODEL.INFO_1"></span><br />
+                                <span translate="FORMS.UTILITY_MODEL.INFO_2"></span>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- SECCIÓN 1: DATOS GENERALES DEL SOLICITANTE -->
                 <div class="fw-bold fs-3 rotate collapsible mb-7" data-bs-toggle="collapse" role="button"
-                    (click)="toggleCollapse(1)" [attr.aria-expanded]="!isCollapsed1" aria-controls="kt_modutil_info">
-                    <app-keenicon name="gear" class="fs-3 me-2"></app-keenicon>
-                    Información del Modelo de Utilidad
+                    (click)="collapse1.toggle()" [attr.aria-expanded]="!isCollapsed1"
+                    aria-controls="kt_solicitante_info">
+                    <app-keenicon name="profile-user" class="fs-3 me-2"></app-keenicon>
+                    <span translate="FORMS.UTILITY_MODEL.GENERAL_SECTION.TITLE"></span>
                     <span class="ms-2 rotate-180">
                         <i class="ki-duotone ki-down fs-3" [ngClass]="{ 'ki-up': !isCollapsed1 }"></i>
                     </span>
                 </div>
 
-                <div class="collapse show" [ngClass]="{ 'show': !isCollapsed1 }">
-
+                <div class="collapse show" #collapse1="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
                     <div class="row g-9 mb-7">
-                        <div class="col-md-4 fv-row">
-                            <label class="fw-semibold fs-6 mb-2 text-gray-600">ID de Solicitud</label>
-                            <input type="text" class="form-control form-control-solid bg-light"
-                                [(ngModel)]="modUtilModel.solicitudId" name="solicitudId" readonly />
-                        </div>
-                        <div class="col-md-4 fv-row">
-                            <label class="fw-semibold fs-6 mb-2 text-gray-600">Fecha de Solicitud</label>
+                        <div class="col-md-6 fv-row">
+                            <label class="fw-semibold fs-6 mb-2 text-gray-600"
+                                translate="FORMS.UTILITY_MODEL.GENERAL_SECTION.APPLICATION_DATE"></label>
                             <input type="date" class="form-control form-control-solid bg-light"
                                 [(ngModel)]="modUtilModel.fechaSolicitud" name="fechaSolicitud" readonly />
                         </div>
-                        <div class="col-md-4 fv-row">
-                            <label class="fw-semibold fs-6 mb-2 text-gray-600">Estado del Trámite</label>
-                            <input type="text" class="form-control form-control-solid bg-light" value="En trámite"
-                                readonly />
+                        <div class="col-md-6 fv-row">
+                            <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                                translate="FORMS.UTILITY_MODEL.GENERAL_SECTION.APPLICATION_MODE.LABEL"></label>
+                            <select class="form-select form-select-solid" [(ngModel)]="modUtilModel.modalidadSolicitud"
+                                name="modalidadSolicitud" #modalidad="ngModel" required>
+                                <option value="" translate="FORMS.UTILITY_MODEL.GENERAL_SECTION.APPLICATION_MODE.SELECT_MODE"></option>
+                                <option value="en_linea"
+                                    translate="FORMS.UTILITY_MODEL.GENERAL_SECTION.APPLICATION_MODE.ONLINE"></option>
+                                <option value="presencial"
+                                    translate="FORMS.UTILITY_MODEL.GENERAL_SECTION.APPLICATION_MODE.IN_PERSON"></option>
+                            </select>
+                            <div *ngIf="myForm.submitted && modalidad.invalid"
+                                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                <div *ngIf="modalidad.errors?.['required']"><span
+                                        translate="FORMS.UTILITY_MODEL.ERRORS.APPLICATION_MODE"></span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-9 mb-7">
+                        <div class="col-md-6 fv-row">
+                            <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                                translate="FORMS.UTILITY_MODEL.GENERAL_SECTION.NAME_COMPANY.LABEL"></label>
+                            <input type="text" #nombreRazonInput class="form-control form-control-solid"
+                                [class.is-invalid]="nombreRazonError"
+                                [class.is-valid]="!nombreRazonError && modUtilModel.nombreCompleto && modUtilModel.nombreCompleto.length > 0"
+                                [(ngModel)]="modUtilModel.nombreCompleto" name="nombreCompleto"
+                                #nombreCompleto="ngModel" required minlength="3" maxlength="200"
+                                (input)="onNombreCompletoChange($event)" [placeholder]="placeholderNombre" />
+
+                            <div *ngIf="nombreRazonError" class="invalid-feedback d-block">
+                                {{ nombreRazonError }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 fv-row">
+                            <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                                translate="FORMS.UTILITY_MODEL.GENERAL_SECTION.NATIONALITY.LABEL"></label>
+                            <input type="text" #nacionalidadInput class="form-control form-control-solid"
+                                [class.is-invalid]="nacionalidadError"
+                                [class.is-valid]="!nacionalidadError && modUtilModel.nacionalidad && modUtilModel.nacionalidad.length > 0"
+                                [(ngModel)]="modUtilModel.nacionalidad" name="nacionalidad" #nacionalidad="ngModel"
+                                required minlength="4" maxlength="20" (input)="onNacionalidadChange($event)"
+                                [placeholder]="placeholderNacionalidad" />
+
+                            <div *ngIf="nacionalidadError" class="invalid-feedback d-block">
+                                {{ nacionalidadError }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-9 mb-7">
+                        <div class="col-md-6 fv-row">
+                            <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                                translate="FORMS.UTILITY_MODEL.GENERAL_SECTION.EMAIL.LABEL"></label>
+                            <input type="email" #correoInput class="form-control form-control-solid"
+                                [class.is-invalid]="correoError"
+                                [class.is-valid]="!correoError && modUtilModel.correo && modUtilModel.correo.length > 0"
+                                [(ngModel)]="modUtilModel.correo" name="correo" #correo="ngModel" required email
+                                maxlength="100" (input)="onCorreoChange($event)" [placeholder]="placeholderCorreo" />
+
+                            <div *ngIf="correoError" class="invalid-feedback d-block">
+                                {{ correoError }}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 fv-row">
+                            <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                                translate="FORMS.UTILITY_MODEL.GENERAL_SECTION.PHONE"></label>
+                            <input type="tel" #celularInput class="form-control form-control-solid"
+                                [class.is-invalid]="celularError"
+                                [class.is-valid]="!celularError && modUtilModel.celular && modUtilModel.celular.length === 10"
+                                [(ngModel)]="modUtilModel.celular" name="celular" #celular="ngModel" required
+                                maxlength="10" (input)="onCelularChange($event)" placeholder="1234567890" />
+
+                            <div *ngIf="celularError" class="invalid-feedback d-block">
+                                {{ celularError }}
+                            </div>
                         </div>
                     </div>
 
                     <div class="fv-row mb-7">
-                        <label class="required fw-semibold fs-6 mb-2 text-gray-600">Nombre del Modelo de
-                            Utilidad</label>
-                        <textarea class="form-control form-control-solid" rows="3"
-                            [(ngModel)]="modUtilModel.nombreModUtil" name="nombreModUtil" #nombreModUtil="ngModel"
-                            required minlength="5" maxlength="500"
-                            placeholder="Ingrese el nombre completo del modelo de utilidad"></textarea>
-                        <div *ngIf="myForm.submitted && nombreModUtil.invalid"
-                            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                            <div *ngIf="nombreModUtil.errors?.['required']">El nombre del modelo de utilidad es
-                                requerido</div>
-                            <div *ngIf="nombreModUtil.errors?.['minlength']">El nombre debe tener al menos 5 caracteres
-                            </div>
-                            <div *ngIf="nombreModUtil.errors?.['maxlength']">El nombre no puede exceder 500 caracteres
-                            </div>
+                        <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                            translate="FORMS.UTILITY_MODEL.GENERAL_SECTION.ADDRESS.LABEL"></label>
+                        <textarea #domicilioInput class="form-control form-control-solid" rows="2"
+                            [class.is-invalid]="domicilioError"
+                            [class.is-valid]="!domicilioError && modUtilModel.domicilio && modUtilModel.domicilio.length >= 10"
+                            [(ngModel)]="modUtilModel.domicilio" name="domicilio" #domicilio="ngModel" required
+                            minlength="10" maxlength="300" (input)="onDomicilioChange($event)"
+                            [placeholder]="placeholderDireccion"></textarea>
+
+                        <div *ngIf="domicilioError" class="invalid-feedback d-block">
+                            {{ domicilioError }}
                         </div>
                     </div>
 
                     <div class="row g-9 mb-7">
                         <div class="col-md-6 fv-row">
-                            <label class="required fw-semibold fs-6 mb-2 text-gray-600">Solicitante</label>
-                            <input type="text" class="form-control form-control-solid"
-                                [(ngModel)]="modUtilModel.solicitante" name="solicitante" #solicitante="ngModel"
-                                required minlength="3" maxlength="150" placeholder="Nombre completo del solicitante" />
-                            <div *ngIf="myForm.submitted && solicitante.invalid"
-                                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                                <div *ngIf="solicitante.errors?.['required']">El solicitante es requerido</div>
-                                <div *ngIf="solicitante.errors?.['minlength']">El nombre debe tener al menos 3
-                                    caracteres</div>
-                                <div *ngIf="solicitante.errors?.['maxlength']">El nombre no puede exceder 150 caracteres
-                                </div>
+                            <label class="fw-semibold fs-6 mb-2 text-gray-600">CURP / RFC</label>
+                            <input type="text" #curpRfcInput class="form-control form-control-solid"
+                                [class.is-invalid]="curpRfcError"
+                                [class.is-valid]="!curpRfcError && modUtilModel.curpRfc && modUtilModel.curpRfc.length > 0"
+                                [(ngModel)]="modUtilModel.curpRfc" name="curpRfc" maxlength="18"
+                                (input)="onCurpRfcChange($event)" [disabled]="!isCurpRfcEnabled"
+                                [placeholder]="placeholderCurpRfc" />
+
+                            <div *ngIf="curpRfcError" class="invalid-feedback d-block">
+                                {{ curpRfcError }}
                             </div>
                         </div>
 
                         <div class="col-md-6 fv-row">
-                            <label class="required fw-semibold fs-6 mb-2 text-gray-600">Correo Electrónico</label>
-                            <input type="email" class="form-control form-control-solid"
-                                [(ngModel)]="modUtilModel.correo" name="correo" #correo="ngModel" required email
-                                placeholder="ejemplo@correo.com" />
-                            <div *ngIf="myForm.submitted && correo.invalid"
-                                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                                <div *ngIf="correo.errors?.['required']">El correo electrónico es requerido</div>
-                                <div *ngIf="correo.errors?.['email']">Ingrese un correo electrónico válido</div>
-                            </div>
+                            <label class="fw-semibold fs-6 mb-2 text-gray-600"
+                                translate="FORMS.UTILITY_MODEL.GENERAL_SECTION.INVENTOR_APPLICANT.LABEL"></label>
+                            <select class="form-select form-select-solid" [(ngModel)]="modUtilModel.inventorDiferente"
+                                name="inventorDiferente">
+                                <option value="no" translate="FORMS.UTILITY_MODEL.GENERAL_SECTION.INVENTOR_APPLICANT.NO">
+                                </option>
+                                <option value="si" translate="FORMS.UTILITY_MODEL.GENERAL_SECTION.INVENTOR_APPLICANT.YES">
+                                </option>
+                            </select>
                         </div>
                     </div>
 
                     <div class="row g-9 mb-7">
                         <div class="col-md-6 fv-row">
-                            <label class="required fw-semibold fs-6 mb-2 text-gray-600">Entidad Federativa</label>
+                            <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                                translate="FORMS.UTILITY_MODEL.GENERAL_SECTION.ENTITY.LABEL"></label>
                             <select class="form-select form-select-solid" [(ngModel)]="estadoSeleccionado"
-                                (ngModelChange)="onEstadoChange($event)" name="entidadFederativa"
-                                #entidadFederativa="ngModel" required>
-                                <option value="">Seleccione una entidad federativa</option>
+                                (ngModelChange)="onEstadoChange($event)" name="estadoSeleccionado" #estado="ngModel"
+                                required>
+                                <option value="" translate="FORMS.UTILITY_MODEL.GENERAL_SECTION.ENTITY.SELECT_ENTITY"></option>
                                 <option *ngFor="let entidad of entidadesFederativas" [value]="entidad.id">
                                     {{entidad.nombre}}
                                 </option>
                             </select>
-                            <div *ngIf="myForm.submitted && entidadFederativa.invalid"
+                            <div *ngIf="myForm.submitted && estado.invalid"
                                 class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                                <div *ngIf="entidadFederativa.errors?.['required']">La entidad federativa es requerida
-                                </div>
+                                <div *ngIf="estado.errors?.['required']"><span
+                                        translate="FORMS.UTILITY_MODEL.ERRORS.ENTITY"></span></div>
                             </div>
                         </div>
 
                         <div class="col-md-6 fv-row">
-                            <label class="required fw-semibold fs-6 mb-2 text-gray-600">Institución</label>
+                            <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                                translate="FORMS.UTILITY_MODEL.GENERAL_SECTION.INSTITUTION.LABEL"></label>
                             <select class="form-select form-select-solid" [(ngModel)]="institucionSeleccionada"
-                                (ngModelChange)="onInstitucionChange($event)" name="institucion" #institucion="ngModel"
-                                required [disabled]="!estadoSeleccionado">
-                                <option value="">Seleccione una institución</option>
-                                <option *ngFor="let institucion of institucionesFiltradas" [value]="institucion.id">
-                                    {{institucion.nombre}}
+                                (ngModelChange)="onInstitucionChange($event)" name="institucionSeleccionada"
+                                #institucion="ngModel" required [disabled]="!estadoSeleccionado">
+                                <option value=""
+                                    translate="FORMS.UTILITY_MODEL.GENERAL_SECTION.INSTITUTION.SELECT_INSTITUTION"></option>
+                                <option *ngFor="let inst of institucionesFiltradas" [value]="inst.id">
+                                    {{inst.nombre}}
                                 </option>
                             </select>
                             <div *ngIf="myForm.submitted && institucion.invalid"
                                 class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                                <div *ngIf="institucion.errors?.['required']">La institución es requerida</div>
+                                <div *ngIf="institucion.errors?.['required']"><span
+                                        translate="FORMS.UTILITY_MODEL.ERRORS.INSTITUTION"></span></div>
                             </div>
                         </div>
                     </div>
-
-                    <div class="fv-row mb-7">
-                        <label class="required fw-semibold fs-6 mb-2 text-gray-600">Descripción</label>
-                        <textarea class="form-control form-control-solid" rows="4"
-                            [(ngModel)]="modUtilModel.descripcion" name="descripcion" #descripcion="ngModel" required
-                            minlength="10" maxlength="1000"
-                            placeholder="Describa detalladamente el modelo de utilidad, su funcionamiento y aplicaciones"></textarea>
-                        <div *ngIf="myForm.submitted && descripcion.invalid"
-                            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                            <div *ngIf="descripcion.errors?.['required']">La descripción es requerida</div>
-                            <div *ngIf="descripcion.errors?.['minlength']">La descripción debe tener al menos 10
-                                caracteres</div>
-                            <div *ngIf="descripcion.errors?.['maxlength']">La descripción no puede exceder 1000
-                                caracteres</div>
-                        </div>
-                    </div>
-
                 </div>
 
+                <!-- SECCIÓN 2: INFORMACIÓN DEL MODELO DE UTILIDAD -->
                 <div class="fw-bold fs-3 rotate collapsible mb-7" data-bs-toggle="collapse" role="button"
-                    (click)="toggleCollapse(2)" [attr.aria-expanded]="!isCollapsed2"
-                    aria-controls="kt_modutil_documents">
-                    <app-keenicon name="folder" class="fs-3 me-2"></app-keenicon>
-                    Documentos de Soporte
+                    (click)="collapse2.toggle()" [attr.aria-expanded]="!isCollapsed2" aria-controls="kt_modelo_info">
+                    <app-keenicon name="gear" class="fs-3 me-2"></app-keenicon>
+                    <span translate="FORMS.UTILITY_MODEL.MODEL_SECTION.TITLE"></span>
                     <span class="ms-2 rotate-180">
                         <i class="ki-duotone ki-down fs-3" [ngClass]="{ 'ki-up': !isCollapsed2 }"></i>
                     </span>
                 </div>
 
-                <div class="collapse" [ngClass]="{ 'show': !isCollapsed2 }">
+                <div class="collapse" #collapse2="ngbCollapse" [(ngbCollapse)]="isCollapsed2">
+                    <div class="fv-row mb-7">
+                        <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                            translate="FORMS.UTILITY_MODEL.MODEL_SECTION.MODEL_NAME.LABEL"></label>
+                        <textarea #nombreModeloInput class="form-control form-control-solid" rows="2"
+                            [class.is-invalid]="nombreModeloError"
+                            [class.is-valid]="!nombreModeloError && modUtilModel.nombreModUtil && modUtilModel.nombreModUtil.length >= 5"
+                            [(ngModel)]="modUtilModel.nombreModUtil" name="nombreModUtil" #nombreModelo="ngModel" required
+                            minlength="5" maxlength="500" (input)="onNombreModeloChange($event)"
+                            [placeholder]="placeholderModelo"></textarea>
 
-                    <div class="notice d-flex bg-light-warning rounded border-warning border border-dashed mb-7 p-6">
-                        <app-keenicon name="information" class="fs-2tx text-warning me-4"></app-keenicon>
-                        <div class="d-flex flex-stack flex-grow-1">
-                            <div class="fw-semibold">
-                                <div class="fs-6 text-gray-700">
-                                    Solo se permiten archivos PDF. Puede adjuntar múltiples documentos como diagramas,
-                                    planos técnicos, especificaciones, etc.
-                                </div>
-                            </div>
+                        <div *ngIf="nombreModeloError" class="invalid-feedback d-block">
+                            {{ nombreModeloError }}
                         </div>
                     </div>
 
                     <div class="fv-row mb-7">
-                        <label class="fw-semibold fs-6 mb-2 text-gray-600">Adjuntar Documentos</label>
-                        <input type="file" class="form-control form-control-solid" accept=".pdf" multiple
-                            (change)="onFileSelected($event)" />
-                        <div class="form-text">Seleccione uno o más archivos PDF</div>
+                        <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                            translate="FORMS.UTILITY_MODEL.MODEL_SECTION.TECHNICAL_FIELD.LABEL"></label>
+                        <textarea #campoTecnicoInput class="form-control form-control-solid" rows="3"
+                            [class.is-invalid]="campoTecnicoError"
+                            [class.is-valid]="!campoTecnicoError && modUtilModel.campoTecnico && modUtilModel.campoTecnico.length >= 20"
+                            [(ngModel)]="modUtilModel.campoTecnico" name="campoTecnico" #campoTecnico="ngModel" required
+                            minlength="20" maxlength="800" (input)="onCampoTecnicoChange($event)"
+                            [placeholder]="placeholderCampoTecnico"></textarea>
+
+                        <div *ngIf="campoTecnicoError" class="invalid-feedback d-block">
+                            {{ campoTecnicoError }}
+                        </div>
                     </div>
 
-                    <div *ngIf="selectedFiles.length > 0" class="fv-row mb-7">
-                        <label class="fw-semibold fs-6 mb-2 text-gray-600">Archivos Seleccionados</label>
-                        <div class="card card-bordered">
-                            <div class="card-body p-4">
-                                <div *ngFor="let file of selectedFiles; let i = index"
-                                    class="d-flex align-items-center justify-content-between border-bottom py-3">
-                                    <div class="d-flex align-items-center">
-                                        <app-keenicon name="file-text" class="fs-2 text-primary me-3"></app-keenicon>
-                                        <div>
-                                            <div class="fw-bold text-gray-800">{{file.name}}</div>
-                                            <div class="text-muted fs-7">{{getFileSize(file.size)}}</div>
+                    <div class="fv-row mb-7">
+                        <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                            translate="FORMS.UTILITY_MODEL.MODEL_SECTION.STATE_TECHNIQUE.LABEL"></label>
+                        <textarea #estadoTecnicaInput class="form-control form-control-solid" rows="4"
+                            [class.is-invalid]="estadoTecnicaError"
+                            [class.is-valid]="!estadoTecnicaError && modUtilModel.estadoTecnica && modUtilModel.estadoTecnica.length >= 50"
+                            [(ngModel)]="modUtilModel.estadoTecnica" name="estadoTecnica" #estadoTecnica="ngModel"
+                            required minlength="50" maxlength="1500" (input)="onEstadoTecnicaChange($event)"
+                            [placeholder]="placeholderEstadoTecnica"></textarea>
+
+                        <div *ngIf="estadoTecnicaError" class="invalid-feedback d-block">
+                            {{ estadoTecnicaError }}
+                        </div>
+                    </div>
+
+                    <div class="fv-row mb-7">
+                        <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                            translate="FORMS.UTILITY_MODEL.MODEL_SECTION.TECHNICAL_PROBLEM.LABEL"></label>
+                        <textarea #problemaTecnicoInput class="form-control form-control-solid" rows="4"
+                            [class.is-invalid]="problemaTecnicoError"
+                            [class.is-valid]="!problemaTecnicoError && modUtilModel.problemaTecnico && modUtilModel.problemaTecnico.length >= 30"
+                            [(ngModel)]="modUtilModel.problemaTecnico" name="problemaTecnico" #problemaTecnico="ngModel"
+                            required minlength="30" maxlength="1000" (input)="onProblemaTecnicoChange($event)"
+                            [placeholder]="placeholderProblemaTecnico"></textarea>
+
+                        <div *ngIf="problemaTecnicoError" class="invalid-feedback d-block">
+                            {{ problemaTecnicoError }}
+                        </div>
+                    </div>
+
+                    <div class="fv-row mb-7">
+                        <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                            translate="FORMS.UTILITY_MODEL.MODEL_SECTION.INDUSTRIAL_APPLICATION.LABEL"></label>
+                        <textarea #aplicacionIndustrialInput class="form-control form-control-solid" rows="3"
+                            [class.is-invalid]="aplicacionIndustrialError"
+                            [class.is-valid]="!aplicacionIndustrialError && modUtilModel.aplicacionIndustrial && modUtilModel.aplicacionIndustrial.length >= 20"
+                            [(ngModel)]="modUtilModel.aplicacionIndustrial" name="aplicacionIndustrial"
+                            #aplicacionIndustrial="ngModel" required minlength="20" maxlength="800"
+                            (input)="onAplicacionIndustrialChange($event)"
+                            [placeholder]="placeholderAplicacionIndustrial"></textarea>
+
+                        <div *ngIf="aplicacionIndustrialError" class="invalid-feedback d-block">
+                            {{ aplicacionIndustrialError }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 3: DESCRIPCIÓN TÉCNICA DETALLADA -->
+                <div class="fw-bold fs-3 rotate collapsible mb-7" data-bs-toggle="collapse" role="button"
+                    (click)="collapse3.toggle()" [attr.aria-expanded]="!isCollapsed3"
+                    aria-controls="kt_descripcion_info">
+                    <app-keenicon name="note-2" class="fs-3 me-2"></app-keenicon>
+                    <span translate="FORMS.UTILITY_MODEL.DETAILED_DESCRIPTION_SECTION.TITLE"></span>
+                    <span class="ms-2 rotate-180">
+                        <i class="ki-duotone ki-down fs-3" [ngClass]="{ 'ki-up': !isCollapsed3 }"></i>
+                    </span>
+                </div>
+
+                <div class="collapse" #collapse3="ngbCollapse" [(ngbCollapse)]="isCollapsed3">
+                    <div class="fv-row mb-7">
+                        <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                            translate="FORMS.UTILITY_MODEL.DETAILED_DESCRIPTION_SECTION.DETAILED_DESCRIPTION.LABEL"></label>
+                        <textarea #descripcionDetalladaInput class="form-control form-control-solid" rows="6"
+                            [class.is-invalid]="descripcionDetalladaError"
+                            [class.is-valid]="!descripcionDetalladaError && modUtilModel.descripcionDetallada && modUtilModel.descripcionDetallada.length >= 100"
+                            [(ngModel)]="modUtilModel.descripcionDetallada" name="descripcionDetallada"
+                            #descripcionDetallada="ngModel" required minlength="100" maxlength="3000"
+                            (input)="onDescripcionDetalladaChange($event)"
+                            [placeholder]="placeholderDescripcionDetallada"></textarea>
+
+                        <div *ngIf="descripcionDetalladaError" class="invalid-feedback d-block">
+                            {{ descripcionDetalladaError }}
+                        </div>
+                    </div>
+
+                    <div class="fv-row mb-7">
+                        <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                            translate="FORMS.UTILITY_MODEL.DETAILED_DESCRIPTION_SECTION.EXAMPLES_REALIZATION.LABEL"></label>
+                        <textarea #ejemplosRealizacionInput class="form-control form-control-solid" rows="5"
+                            [class.is-invalid]="ejemplosRealizacionError"
+                            [class.is-valid]="!ejemplosRealizacionError && modUtilModel.ejemplosRealizacion && modUtilModel.ejemplosRealizacion.length >= 50"
+                            [(ngModel)]="modUtilModel.ejemplosRealizacion" name="ejemplosRealizacion"
+                            #ejemplosRealizacion="ngModel" required minlength="50" maxlength="2000"
+                            (input)="onEjemplosRealizacionChange($event)"
+                            [placeholder]="placeholderEjemplosRealizacion"></textarea>
+
+                        <div *ngIf="ejemplosRealizacionError" class="invalid-feedback d-block">
+                            {{ ejemplosRealizacionError }}
+                        </div>
+                    </div>
+
+                    <div class="fv-row mb-7">
+                        <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                            translate="FORMS.UTILITY_MODEL.DETAILED_DESCRIPTION_SECTION.CLAIMS.LABEL"></label>
+                        <textarea #reivindicacionesInput class="form-control form-control-solid" rows="5"
+                            [class.is-invalid]="reivindicacionesError"
+                            [class.is-valid]="!reivindicacionesError && modUtilModel.reivindicaciones && modUtilModel.reivindicaciones.length >= 30"
+                            [(ngModel)]="modUtilModel.reivindicaciones" name="reivindicaciones"
+                            #reivindicaciones="ngModel" required minlength="30" maxlength="2000"
+                            (input)="onReivindicacionesChange($event)"
+                            [placeholder]="placeholderReivindicaciones"></textarea>
+
+                        <div *ngIf="reivindicacionesError" class="invalid-feedback d-block">
+                            {{ reivindicacionesError }}
+                        </div>
+                    </div>
+
+                    <div class="fv-row mb-7">
+                        <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                            translate="FORMS.UTILITY_MODEL.DETAILED_DESCRIPTION_SECTION.SUMMARY.LABEL"></label>
+                        <textarea #resumenInput class="form-control form-control-solid" rows="4"
+                            [class.is-invalid]="resumenError"
+                            [class.is-valid]="!resumenError && modUtilModel.resumen && modUtilModel.resumen.length >= 150 && modUtilModel.resumen.length <= 250"
+                            [(ngModel)]="modUtilModel.resumen" name="resumen" #resumen="ngModel" required
+                            minlength="150" maxlength="250" (input)="onResumenChange($event)"
+                            [placeholder]="placeholderResumen"></textarea>
+
+                        <div *ngIf="resumenError" class="invalid-feedback d-block">
+                            {{ resumenError }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 4: DOCUMENTACIÓN -->
+                <div class="fw-bold fs-3 rotate collapsible mb-7" data-bs-toggle="collapse" role="button"
+                    (click)="collapse4.toggle()" [attr.aria-expanded]="!isCollapsed4"
+                    aria-controls="kt_documentos_info">
+                    <app-keenicon name="folder" class="fs-3 me-2"></app-keenicon>
+                    <span translate="FORMS.UTILITY_MODEL.DOCUMENTATION_SECTION.TITLE"></span>
+                    <span class="ms-2 rotate-180">
+                        <i class="ki-duotone ki-down fs-3" [ngClass]="{ 'ki-up': !isCollapsed4 }"></i>
+                    </span>
+                </div>
+
+                <div class="collapse" #collapse4="ngbCollapse" [(ngbCollapse)]="isCollapsed4">
+                    <div class="card card-flush">
+                        <div class="card-body pt-0">
+                            <div class="fv-row mb-7">
+                                <label class="fw-semibold fs-6 mb-2 text-gray-600"
+                                    translate="FORMS.UTILITY_MODEL.DOCUMENTATION_SECTION.IMPI.LABEL"></label>
+                                <input type="file" class="form-control form-control-solid"
+                                    (change)="onFormatoOficialSelected($event)" accept=".pdf" />
+                                <div class="form-text">
+                                    <span translate="FORMS.UTILITY_MODEL.DOCUMENTATION_SECTION.IMPI.SUB_TEXT"></span>
+                                </div>
+                            </div>
+
+                            <div class="fv-row mb-7">
+                                <label class="fw-semibold fs-6 mb-2 text-gray-600"
+                                    translate="FORMS.UTILITY_MODEL.DOCUMENTATION_SECTION.TECHNICAL_DRAWINGS.LABEL"></label>
+                                <input type="file" class="form-control form-control-solid"
+                                    (change)="onDibujosSelected($event)" multiple accept=".pdf,.jpg,.jpeg,.png" />
+                                <div class="form-text">
+                                    <span
+                                        translate="FORMS.UTILITY_MODEL.DOCUMENTATION_SECTION.TECHNICAL_DRAWINGS.SUB_TEXT"></span>
+                                </div>
+                            </div>
+
+                            <div class="fv-row mb-7">
+                                <label class="fw-semibold fs-6 mb-2 text-gray-600"
+                                    translate="FORMS.UTILITY_MODEL.DOCUMENTATION_SECTION.PAYMENT_FEES.LABEL"></label>
+                                <input type="file" class="form-control form-control-solid"
+                                    (change)="onComprobantePagoSelected($event)" accept=".pdf" />
+                                <div class="form-text">
+                                    <span translate="FORMS.UTILITY_MODEL.DOCUMENTATION_SECTION.PAYMENT_FEES.SUB_TEXT"></span>
+                                </div>
+                            </div>
+
+                            <div class="fv-row mb-7">
+                                <label class="fw-semibold fs-6 mb-2 text-gray-600"
+                                    translate="FORMS.UTILITY_MODEL.DOCUMENTATION_SECTION.ADDITIONAL_DOCUMENTS.LABEL"></label>
+                                <input type="file" class="form-control form-control-solid"
+                                    (change)="onDocumentosAdicionalesSelected($event)" multiple accept=".pdf" />
+                                <div class="form-text">
+                                    <span
+                                        translate="FORMS.UTILITY_MODEL.DOCUMENTATION_SECTION.ADDITIONAL_DOCUMENTS.SUB_TEXT"></span>
+                                </div>
+                            </div>
+
+                            <div *ngIf="allSelectedFiles.length > 0" class="selected-files-list">
+                                <h6 class="fw-bold mb-4" translate="FORMS.UTILITY_MODEL.DOCUMENTATION_SECTION.SELECTED_FILES">
+                                </h6>
+                                <div *ngFor="let fileInfo of allSelectedFiles; let i = index"
+                                    class="d-flex align-items-center border border-gray-300 border-dashed rounded p-4 mb-3">
+                                    <div class="symbol symbol-50px me-4">
+                                        <div class="symbol-label bg-light-info">
+                                            <app-keenicon name="document" class="fs-2 text-info"></app-keenicon>
                                         </div>
                                     </div>
+                                    <div class="flex-grow-1">
+                                        <div class="fw-bold text-gray-800 fs-6">{{fileInfo.file.name}}</div>
+                                        <div class="text-muted fs-7">{{fileInfo.tipo}} - {{(fileInfo.file.size / 1024 /
+                                            1024).toFixed(2)}} MB</div>
+                                    </div>
                                     <button type="button" class="btn btn-sm btn-light-danger" (click)="removeFile(i)">
-                                        <app-keenicon name="trash" class="fs-3"></app-keenicon>
+                                        <app-keenicon name="cross" class="fs-3"></app-keenicon>
                                     </button>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
+                <!-- SECCIÓN 5: DECLARACIONES -->
+                <div class="fw-bold fs-3 rotate collapsible mb-7" data-bs-toggle="collapse" role="button"
+                    (click)="collapse5.toggle()" [attr.aria-expanded]="!isCollapsed5"
+                    aria-controls="kt_declaraciones_info">
+                    <app-keenicon name="shield-tick" class="fs-3 me-2"></app-keenicon>
+                    <span translate="FORMS.UTILITY_MODEL.STATEMENTS_SECTION.TITLE"></span>
+                    <span class="ms-2 rotate-180">
+                        <i class="ki-duotone ki-down fs-3" [ngClass]="{ 'ki-up': !isCollapsed5 }"></i>
+                    </span>
+                </div>
+
+                <div class="collapse" #collapse5="ngbCollapse" [(ngbCollapse)]="isCollapsed5">
+                    <div class="fv-row mb-7">
+                        <div class="form-check form-check-custom form-check-solid">
+                            <input class="form-check-input" type="checkbox"
+                                [(ngModel)]="modUtilModel.declaracionOriginalidad" name="declaracionOriginalidad"
+                                #declaracionOriginalidad="ngModel" required />
+                            <label class="form-check-label fw-semibold text-gray-700"
+                                translate="FORMS.UTILITY_MODEL.STATEMENTS_SECTION.STATEMENT_1">
+                            </label>
+                        </div>
+                        <div *ngIf="myForm.submitted && declaracionOriginalidad.invalid"
+                            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                            <div *ngIf="declaracionOriginalidad.errors?.['required']"><span
+                                    translate="FORMS.UTILITY_MODEL.ERRORS.DECLARATION_ORIGINALITY"></span></div>
+                        </div>
+                    </div>
+
+                    <div class="fv-row mb-7">
+                        <div class="form-check form-check-custom form-check-solid">
+                            <input class="form-check-input" type="checkbox"
+                                [(ngModel)]="modUtilModel.declaracionVeracidad" name="declaracionVeracidad"
+                                #declaracionVeracidad="ngModel" required />
+                            <label class="form-check-label fw-semibold text-gray-700"
+                                translate="FORMS.UTILITY_MODEL.STATEMENTS_SECTION.STATEMENT_2"></label>
+                        </div>
+                        <div *ngIf="myForm.submitted && declaracionVeracidad.invalid"
+                            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                            <div *ngIf="declaracionVeracidad.errors?.['required']"><span
+                                    translate="FORMS.UTILITY_MODEL.ERRORS.DECLARATION_VERACITY"></span></div>
+                        </div>
+                    </div>
+
+                    <div class="fv-row mb-7">
+                        <label class="fw-semibold fs-6 mb-2 text-gray-600"
+                            translate="FORMS.UTILITY_MODEL.STATEMENTS_SECTION.INVENTION_PREVIOUSLY.LABEL"></label>
+                        <select class="form-select form-select-solid" [(ngModel)]="modUtilModel.divulgacionPrevia"
+                            name="divulgacionPrevia">
+                            <option value="no" translate="FORMS.UTILITY_MODEL.STATEMENTS_SECTION.INVENTION_PREVIOUSLY.NO">
+                            </option>
+                            <option value="si" translate="FORMS.UTILITY_MODEL.STATEMENTS_SECTION.INVENTION_PREVIOUSLY.YES">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div *ngIf="modUtilModel.divulgacionPrevia === 'si'" class="fv-row mb-7">
+                        <label class="fw-semibold fs-6 mb-2 text-gray-600"
+                            translate="FORMS.UTILITY_MODEL.STATEMENTS_SECTION.DISCLOSURE_DETAILS.LABEL"></label>
+                        <textarea class="form-control form-control-solid" rows="3"
+                            [(ngModel)]="modUtilModel.detallesDivulgacion" name="detallesDivulgacion"
+                            [placeholder]="placeholderDivulgacion"></textarea>
+                    </div>
                 </div>
 
                 <div class="d-flex justify-content-end mt-10">
-                    <button type="button" class="btn btn-light me-3" (click)="resetForm()">
-                        Limpiar Formulario
+                    <button type="button" class="btn btn-light me-3" (click)="onCancel()" [disabled]="isLoading"
+                        translate="BUTTON.CANCEL">
                     </button>
                     <button type="submit" class="btn btn-primary" [disabled]="isLoading">
-                        <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
-                        <span *ngIf="isLoading">Registrando...</span>
-                        <span *ngIf="!isLoading">Registrar Modelo de Utilidad</span>
+                        <span *ngIf="isLoading" class="spinner-border spinner-border-sm align-middle me-2"></span>
+                        <span *ngIf="!isLoading" translate="BUTTON.UTILITY_MODEL"></span>
+                        <span *ngIf="isLoading" translate="BUTTON.PROCESSING"></span>
                     </button>
                 </div>
 

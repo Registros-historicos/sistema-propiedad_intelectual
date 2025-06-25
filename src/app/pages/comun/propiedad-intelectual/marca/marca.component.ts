@@ -50,7 +50,8 @@ export class MarcaComponent implements OnInit, AfterViewInit, OnDestroy {
     marca: "",
     productosServicios: [],
     titular: "",
-    tramites: []
+    tramites: [],
+    estatus: 'Registrada'
   };
 
   isViewMode: boolean = true;
@@ -196,9 +197,20 @@ export class MarcaComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   view(id: number) {
+    this.isViewMode = true;
+    this.cdr.detectChanges();
+
     this.service.getTrademark(id).subscribe((marca: DatosMarca) => {
       this.marcaModel = { ...marca };
-      this.isViewMode = true;
+    });
+  }
+
+  follow(id: number) {
+    this.isViewMode = false;
+    this.cdr.detectChanges();
+
+    this.service.getTrademark(id).subscribe((marca: DatosMarca) => {
+      this.marcaModel = { ...marca };
     });
   }
 
@@ -242,13 +254,67 @@ export class MarcaComponent implements OnInit, AfterViewInit, OnDestroy {
     modal.dismiss('cancel');
 
     this.marcaModel = {
-      denominacion: '',
-      fechaPresentacion: '',
-      tipoSolicitud: '',
-      marca: '',
+      denominacion: "",
+      expediente: 0,
+      registro: 0,
+      fechaPresentacion: "",
+      fechaConcesion: "",
+      fechaTerminacion: "",
+      tipoSolicitud: "",
+      inicioUso: "",
+      marca: "",
       productosServicios: [],
-      titular: ''
+      titular: "",
+      tramites: [],
+      estatus: 'Registrada'
     };
+  }
+
+  getStatusOrder(status: string): number {
+    const statusOrder: { [key: string]: number } = {
+      'Registrada': 1,
+      'En trámite': 2,
+      'Trámite con observaciones': 2.5,
+      'Aprobada': 4,
+      'Concluida': 5
+    };
+
+    return statusOrder[status] || 0;
+  }
+
+  getStatusProgress(status: string): number {
+    const order = this.getStatusOrder(status);
+    const maxOrder = 5;
+    return Math.round((order / maxOrder) * 100);
+  }
+
+  getStatusDescription(status: string): string {
+    const translationKeys: { [key: string]: string } = {
+      'Registrada': 'MODAL.FOLLOW_UP.DESCRIPTIONS.REGISTERED',
+      'En trámite': 'MODAL.FOLLOW_UP.DESCRIPTIONS.IN_PROCESS',
+      'Trámite con observaciones': 'MODAL.FOLLOW_UP.DESCRIPTIONS.WITH_OBSERVATIONS',
+      'Aprobada': 'MODAL.FOLLOW_UP.DESCRIPTIONS.APPROVED',
+      'Concluida': 'MODAL.FOLLOW_UP.DESCRIPTIONS.COMPLETED'
+    };
+
+    const translationKey = translationKeys[status];
+    if (translationKey) {
+      return this.translate.instant(translationKey);
+    }
+
+    return 'Estado no reconocido.';
+  }
+
+  getStatusIcon(status: string): string {
+    const statusIcons: { [key: string]: string } = {
+      'Registrada': 'document',
+      'En trámite': 'timer',
+      'Trámite con observaciones': 'information',
+      'Aprobada': 'check',
+      'Concluida': 'check-circle'
+    };
+
+    return statusIcons[status] || 'document';
   }
 
   ngOnDestroy(): void {
