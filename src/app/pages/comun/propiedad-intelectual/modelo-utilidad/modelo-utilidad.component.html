@@ -528,3 +528,239 @@
     </button>
   </div>
 </ng-template>
+
+<ng-template #formModalFollow let-modal>
+  <div class="modal-header bg-primary">
+    <h3 class="modal-title text-white">
+      <app-keenicon name="chart" class="fs-2 me-2 text-white"></app-keenicon>
+      <span translate="MODAL.FOLLOW_UP.TITLE"></span>
+    </h3>
+    <button type="button" class="btn-close btn-close-white" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"></button>
+  </div>
+
+  <div class="modal-body">
+    <div class="d-flex flex-column scroll-y me-n7 pe-7">
+
+      <div class="tracking-header">
+        <h4 class="mb-2">{{modUtilModel.nombreModUtil}}</h4>
+        <div class="d-flex justify-content-center align-items-center gap-4">
+          <div class="text-center">
+            <div class="fs-7 opacity-75" translate="MODAL.FOLLOW_UP.APPLICATION_ID"></div>
+            <div class="fw-bold">{{modUtilModel.solicitudId}}</div>
+          </div>
+          <div class="text-center">
+            <div class="fs-7 opacity-75" translate="MODAL.FOLLOW_UP.APPLICANT"></div>
+            <div class="fw-bold">{{modUtilModel.solicitante}}</div>
+          </div>
+          <div class="text-center">
+            <div class="fs-7 opacity-75" translate="MODAL.FOLLOW_UP.PROGRESS"></div>
+            <div class="fw-bold">{{getStatusProgress(modUtilModel.estatus)}}%</div>
+          </div>
+        </div>
+
+        <div class="progress-indicator mt-4">
+          <div class="progress-bar" [style.width.%]="getStatusProgress(modUtilModel.estatus)"></div>
+        </div>
+      </div>
+
+      <div class="card card-flush mb-6">
+        <div class="card-body text-center py-8">
+          <div class="symbol symbol-75px mx-auto mb-4">
+            <div class="symbol-label" [ngClass]="{
+              'bg-success': modUtilModel.estatus === 'Aprobada' || modUtilModel.estatus === 'Concluida',
+              'bg-primary': modUtilModel.estatus === 'Registrada',
+              'bg-warning': modUtilModel.estatus === 'En trámite',
+              'bg-danger': modUtilModel.estatus === 'Trámite con observaciones'
+            }">
+              <app-keenicon [name]="getStatusIcon(modUtilModel.estatus)" class="fs-1 text-white"></app-keenicon>
+            </div>
+          </div>
+          <h3 class="fw-bold text-gray-800 mb-2">{{modUtilModel.estatus}}</h3>
+          <div class="fs-6 text-gray-600">{{getStatusDescription(modUtilModel.estatus)}}</div>
+        </div>
+      </div>
+
+      <div class="card card-flush mb-6">
+        <div class="card-header">
+          <div class="card-title">
+            <h4 class="fw-bold text-gray-800">
+              <app-keenicon name="timeline" class="fs-2 me-2"></app-keenicon>
+              <span translate="MODAL.FOLLOW_UP.HISTORY_TITLE"></span>
+            </h4>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="timeline">
+
+            <div class="timeline-item" [ngClass]="{
+              'active': modUtilModel.estatus === 'Registrada',
+              'completed': getStatusOrder(modUtilModel.estatus) > 1
+            }">
+              <div class="timeline-line"></div>
+              <div class="timeline-icon symbol symbol-circle symbol-40px">
+                <div class="symbol-label" [ngClass]="{
+                  'bg-success': getStatusOrder(modUtilModel.estatus) > 1,
+                  'bg-primary': modUtilModel.estatus === 'Registrada',
+                  'bg-light-gray': getStatusOrder(modUtilModel.estatus) < 1
+                }">
+                  <app-keenicon name="check" class="fs-2" [ngClass]="{
+                    'text-white': getStatusOrder(modUtilModel.estatus) >= 1,
+                    'text-gray-400': getStatusOrder(modUtilModel.estatus) < 1
+                  }"></app-keenicon>
+                </div>
+              </div>
+              <div class="timeline-content">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <h5 class="fw-bold text-gray-800 mb-0" translate="MODAL.FOLLOW_UP.STATUS.REGISTERED"></h5>
+                  <span class="status-badge" [ngClass]="{
+                    'current': modUtilModel.estatus === 'Registrada',
+                    'completed': getStatusOrder(modUtilModel.estatus) > 1
+                  }">
+                    <app-keenicon [name]="modUtilModel.estatus === 'Registrada' ? 'timer' : 'check'"
+                      class="fs-4"></app-keenicon>
+                    <span
+                      translate="{{modUtilModel.estatus === 'Registrada' ? 'MODAL.FOLLOW_UP.STATUS_LABELS.CURRENT' : 'MODAL.FOLLOW_UP.STATUS_LABELS.COMPLETED'}}"></span>
+                  </span>
+                </div>
+                <p class="text-gray-700 mb-0" translate="MODAL.FOLLOW_UP.DETAILS.REGISTERED.DESCRIPTION"></p>
+                <div class="fs-7 text-gray-500 mt-2">
+                  <app-keenicon name="calendar" class="fs-5 me-1"></app-keenicon>
+                  <span translate="MODAL.FOLLOW_UP.DETAILS.REGISTERED.DATE_LABEL"></span>
+                  {{modUtilModel.fechaSolicitud}}
+                </div>
+              </div>
+            </div>
+
+            <div class="timeline-item" [ngClass]="{
+              'active': modUtilModel.estatus === 'En trámite',
+              'completed': getStatusOrder(modUtilModel.estatus) > 2 && modUtilModel.estatus !== 'Trámite con observaciones'
+            }">
+              <div class="timeline-line"></div>
+              <div class="timeline-icon symbol symbol-circle symbol-40px">
+                <div class="symbol-label" [ngClass]="{
+                  'bg-success': getStatusOrder(modUtilModel.estatus) > 2 && modUtilModel.estatus !== 'Trámite con observaciones',
+                  'bg-warning': modUtilModel.estatus === 'En trámite',
+                  'bg-light-gray': getStatusOrder(modUtilModel.estatus) < 2
+                }">
+                  <app-keenicon [name]="modUtilModel.estatus === 'En trámite' ? 'timer' : 'check'" class="fs-2"
+                    [ngClass]="{
+                    'text-white': getStatusOrder(modUtilModel.estatus) >= 2,
+                    'text-gray-400': getStatusOrder(modUtilModel.estatus) < 2
+                  }"></app-keenicon>
+                </div>
+              </div>
+              <div class="timeline-content">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <h5 class="fw-bold text-gray-800 mb-0" translate="MODAL.FOLLOW_UP.STATUS.IN_PROCESS"></h5>
+                  <span class="status-badge" [ngClass]="{
+                    'current': modUtilModel.estatus === 'En trámite',
+                    'completed': getStatusOrder(modUtilModel.estatus) > 2 && modUtilModel.estatus !== 'Trámite con observaciones'
+                  }">
+                    <app-keenicon [name]="modUtilModel.estatus === 'En trámite' ? 'timer' : 'check'"
+                      class="fs-4"></app-keenicon>
+                    <span
+                      translate="{{modUtilModel.estatus === 'En trámite' ? 'MODAL.FOLLOW_UP.STATUS_LABELS.CURRENT' : 'MODAL.FOLLOW_UP.STATUS_LABELS.COMPLETED'}}"></span>
+                  </span>
+                </div>
+                <p class="text-gray-700 mb-0" translate="MODAL.FOLLOW_UP.DETAILS.IN_PROCESS.DESCRIPTION"></p>
+              </div>
+            </div>
+
+            <div class="timeline-item observation" *ngIf="modUtilModel.estatus === 'Trámite con observaciones'">
+              <div class="timeline-line"></div>
+              <div class="timeline-icon symbol symbol-circle symbol-40px">
+                <div class="symbol-label bg-danger">
+                  <app-keenicon name="information" class="fs-2 text-white"></app-keenicon>
+                </div>
+              </div>
+              <div class="timeline-content">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <h5 class="fw-bold text-gray-800 mb-0" translate="MODAL.FOLLOW_UP.STATUS.WITH_OBSERVATIONS"></h5>
+                  <span class="status-badge observation">
+                    <app-keenicon name="exclamation" class="fs-4"></app-keenicon>
+                    <span translate="MODAL.FOLLOW_UP.STATUS_LABELS.REQUIRES_ATTENTION"></span>
+                  </span>
+                </div>
+                <p class="text-gray-700 mb-0" translate="MODAL.FOLLOW_UP.DETAILS.WITH_OBSERVATIONS.DESCRIPTION"></p>
+                <div class="fs-7 text-gray-500 mt-2">
+                  <app-keenicon name="time" class="fs-5 me-1"></app-keenicon>
+                  <span translate="MODAL.FOLLOW_UP.DETAILS.WITH_OBSERVATIONS.DEADLINE"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="timeline-item" [ngClass]="{
+              'active': modUtilModel.estatus === 'Aprobada',
+              'completed': modUtilModel.estatus === 'Concluida'
+            }">
+              <div class="timeline-line"></div>
+              <div class="timeline-icon symbol symbol-circle symbol-40px">
+                <div class="symbol-label" [ngClass]="{
+                  'bg-success': getStatusOrder(modUtilModel.estatus) >= 4,
+                  'bg-light-gray': getStatusOrder(modUtilModel.estatus) < 4
+                }">
+                  <app-keenicon name="check" class="fs-2" [ngClass]="{
+                    'text-white': getStatusOrder(modUtilModel.estatus) >= 4,
+                    'text-gray-400': getStatusOrder(modUtilModel.estatus) < 4
+                  }"></app-keenicon>
+                </div>
+              </div>
+              <div class="timeline-content">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <h5 class="fw-bold text-gray-800 mb-0" translate="MODAL.FOLLOW_UP.STATUS.APPROVED"></h5>
+                  <span class="status-badge" [ngClass]="{
+                    'current': modUtilModel.estatus === 'Aprobada',
+                    'completed': modUtilModel.estatus === 'Concluida'
+                  }">
+                    <app-keenicon [name]="modUtilModel.estatus === 'Aprobada' ? 'timer' : 'check'"
+                      class="fs-4"></app-keenicon>
+                    <span
+                      translate="{{modUtilModel.estatus === 'Aprobada' ? 'MODAL.FOLLOW_UP.STATUS_LABELS.CURRENT' : 'MODAL.FOLLOW_UP.STATUS_LABELS.COMPLETED'}}"></span>
+                  </span>
+                </div>
+                <p class="text-gray-700 mb-0" translate="MODAL.FOLLOW_UP.DETAILS.APPROVED.DESCRIPTION"></p>
+              </div>
+            </div>
+
+            <div class="timeline-item" [ngClass]="{
+              'active': modUtilModel.estatus === 'Concluida'
+            }">
+              <div class="timeline-icon symbol symbol-circle symbol-40px">
+                <div class="symbol-label" [ngClass]="{
+                  'bg-info': modUtilModel.estatus === 'Concluida',
+                  'bg-light-gray': modUtilModel.estatus !== 'Concluida'
+                }">
+                  <app-keenicon name="check-circle" class="fs-2" [ngClass]="{
+                    'text-white': modUtilModel.estatus === 'Concluida',
+                    'text-gray-400': modUtilModel.estatus !== 'Concluida'
+                  }"></app-keenicon>
+                </div>
+              </div>
+              <div class="timeline-content">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <h5 class="fw-bold text-gray-800 mb-0" translate="MODAL.FOLLOW_UP.STATUS.COMPLETED"></h5>
+                  <span class="status-badge" [ngClass]="{'current': modUtilModel.estatus === 'Concluida'}">
+                    <app-keenicon name="check-circle" class="fs-4"></app-keenicon>
+                    <span
+                      translate="{{modUtilModel.estatus === 'Concluida' ? 'MODAL.FOLLOW_UP.STATUS_LABELS.FINISHED' : 'MODAL.FOLLOW_UP.STATUS_LABELS.PENDING'}}"></span>
+                  </span>
+                </div>
+                <p class="text-gray-700 mb-0" translate="MODAL.FOLLOW_UP.DETAILS.COMPLETED.DESCRIPTION"></p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-light" (click)="closeForm(modal)">
+      <app-keenicon name="cross" class="fs-3 me-1"></app-keenicon>
+      <span translate="MODAL.FOLLOW_UP.BUTTONS.CLOSE"></span>
+    </button>
+  </div>
+</ng-template>

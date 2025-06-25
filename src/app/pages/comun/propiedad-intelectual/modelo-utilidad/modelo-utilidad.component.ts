@@ -273,16 +273,6 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
     this.service.getModUtil(id).subscribe((modUtil: IModUtilModel) => {
       this.modUtilModel = { ...modUtil };
       this.inicializarSeleccionesDesdeModUtil();
-    });
-  }
-
-  follow(id: number) {
-    this.isViewMode = false;
-    this.cdr.detectChanges();
-
-    this.service.getModUtil(id).subscribe((modUtil: IModUtilModel) => {
-      this.modUtilModel = { ...modUtil };
-      this.inicializarSeleccionesDesdeModUtil();
       this.observacionesChanged = false;
       this.resetEditMode();
     });

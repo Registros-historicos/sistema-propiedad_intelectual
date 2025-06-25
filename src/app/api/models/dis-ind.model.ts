@@ -9,7 +9,6 @@ export interface IDisIndModel {
     institucion: string;
     correo: string;
     documentos?: string[];
-    observaciones?: string;
     modalidadSolicitud?: string;
     nombreCompleto?: string;
     nacionalidad?: string;
@@ -26,4 +25,5 @@ export interface IDisIndModel {
     declaracionVeracidad?: boolean;
     divulgacionPrevia?: string;
     detallesDivulgacion?: string;
+    observaciones?: string;
 }

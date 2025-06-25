@@ -9,7 +9,6 @@ export interface IModUtilModel {
     institucion: string;
     correo: string;
     documentos?: string[];
-    observaciones?: string;
     modalidadSolicitud?: string;
     nombreCompleto?: string;
     nacionalidad?: string;
@@ -29,4 +28,5 @@ export interface IModUtilModel {
     declaracionVeracidad?: boolean;
     divulgacionPrevia?: string;
     detallesDivulgacion?: string;
+    observaciones?: string;
 }
