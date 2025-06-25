@@ -105,27 +105,8 @@ export const COORDINATOR_MENUS = [
   {
     name: 'MENU.USERS',
     icon: 'person_add',
-    type: 'dropdown',
-    children: [
-
-      {
-        name: 'BUTTON.NEW.APPLICANT',
-        icon: 'person_add',
-        type: 'link',
-        link: '/coordinador/propiedades/registro/patente',
-      },
-      {
-        name: 'BUTTON.NEW.TRADEMARK',
-        icon: 'branding_watermark',
-        type: 'not-implemented',
-      },
-      {
-        name: 'BUTTON.NEW.UTILITY_MODEL',
-        icon: 'construction',
-        type: 'link',
-        link: '/coordinador/propiedades/registro/modelo-utilidad',
-      },
-    ]
+    link: '/coordinador/registro',
+    type: 'link',
   },
   {
     name: 'MENU.USERS',
