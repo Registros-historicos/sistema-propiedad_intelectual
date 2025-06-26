@@ -34,8 +34,9 @@
       [datatableConfig]="datatableConfig"
       route="/apps/applicants"
       (deleteEvent)="delete($event)"
-      (editEvent)="navigateToEdit($event, editModal)"
-      [reload]="reloadEvent">
+      (editEvent)="edit($event)"
+      [reload]="reloadEvent"
+      [modal]="editModal">
     </app-crud>
   </div>
 </div>
@@ -43,17 +44,17 @@
 <!-- SweetAlert2 para notificaciones -->
 <swal #noticeSwal [swalOptions]="swalOptions"></swal>
 
-<!-- Modal de edición -->
 <ng-template #editModal let-modal>
   <div class="modal-header">
     <h3 class="modal-title fw-bold text-gray-800">
-      Editar Solicitante
+      <app-keenicon name="pencil" class="fs-2 me-2"></app-keenicon>
+      <span>Editar Solicitante</span>
     </h3>
-    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    <button type="button" class="btn-close" aria-label="Close" (click)="closeForm(modal)"></button>
   </div>
 
   <div class="modal-body py-6 px-8">
-    <div class="d-flex flex-column" *ngIf="selectedApplicant">
+    <div class="d-flex flex-column">
       <!-- Notificación informativa -->
       <div class="notice d-flex bg-light-primary rounded border-primary border border-dashed mb-7 p-6">
         <app-keenicon name="information-5" class="fs-2 text-primary me-4"></app-keenicon>
@@ -69,17 +70,17 @@
         <div class="col-md-6">
           <div class="fv-row mb-6">
             <label class="fs-6 fw-semibold mb-2 required">Nombre</label>
-            <input type="text" class="form-control form-control-solid" [(ngModel)]="selectedApplicant.nombre" name="nombre">
+            <input type="text" class="form-control form-control-solid" [(ngModel)]="solicitanteModel.nombre" name="nombre">
           </div>
 
           <div class="fv-row mb-6">
             <label class="fs-6 fw-semibold mb-2 required">Email</label>
-            <input type="email" class="form-control form-control-solid" [(ngModel)]="selectedApplicant.email" name="email">
+            <input type="email" class="form-control form-control-solid" [(ngModel)]="solicitanteModel.email" name="email">
           </div>
 
           <div class="fv-row mb-6">
             <label class="fs-6 fw-semibold mb-2">Entidad Federativa</label>
-            <select class="form-select form-select-solid" [(ngModel)]="selectedApplicant.entidad_federativa" name="entidad_federativa">
+            <select class="form-select form-select-solid" [(ngModel)]="solicitanteModel.entidad_federativa" name="entidad_federativa">
               <option value="">Seleccionar entidad federativa</option>
               <option *ngFor="let entidad of entidadesFederativas" [value]="entidad">{{entidad}}</option>
             </select>
@@ -87,7 +88,7 @@
 
           <div class="fv-row mb-6">
             <label class="fs-6 fw-semibold mb-2">Sexo</label>
-            <select class="form-select form-select-solid" [(ngModel)]="selectedApplicant.sexo" name="sexo">
+            <select class="form-select form-select-solid" [(ngModel)]="solicitanteModel.sexo" name="sexo">
               <option value="">Seleccionar sexo</option>
               <option *ngFor="let sexo of sexoOptions" [value]="sexo">{{sexo}}</option>
             </select>
@@ -95,12 +96,12 @@
 
           <div class="fv-row mb-6">
             <label class="fs-6 fw-semibold mb-2">RFC</label>
-            <input type="text" class="form-control form-control-solid" [(ngModel)]="selectedApplicant.rfc" name="rfc">
+            <input type="text" class="form-control form-control-solid" [(ngModel)]="solicitanteModel.rfc" name="rfc">
           </div>
 
           <div class="fv-row mb-6">
             <label class="fs-6 fw-semibold mb-2">Departamento</label>
-            <select class="form-select form-select-solid" [(ngModel)]="selectedApplicant.departamento" name="departamento" (change)="onDepartamentoChange()">
+            <select class="form-select form-select-solid" [(ngModel)]="solicitanteModel.departamento" name="departamento" (change)="onDepartamentoChange()">
               <option value="">Seleccionar departamento</option>
               <option *ngFor="let dept of departamentos" [value]="dept">{{dept}}</option>
             </select>
@@ -111,32 +112,32 @@
         <div class="col-md-6">
           <div class="fv-row mb-6">
             <label class="fs-6 fw-semibold mb-2 required">Apellidos</label>
-            <input type="text" class="form-control form-control-solid" [(ngModel)]="selectedApplicant.apellidos" name="apellidos">
+            <input type="text" class="form-control form-control-solid" [(ngModel)]="solicitanteModel.apellidos" name="apellidos">
           </div>
 
           <div class="fv-row mb-6">
             <label class="fs-6 fw-semibold mb-2">Teléfono</label>
-            <input type="tel" class="form-control form-control-solid" [(ngModel)]="selectedApplicant.telefono" name="telefono">
+            <input type="tel" class="form-control form-control-solid" [(ngModel)]="solicitanteModel.telefono" name="telefono">
           </div>
 
           <div class="fv-row mb-6">
             <label class="fs-6 fw-semibold mb-2">Institución</label>
-            <input type="text" class="form-control form-control-solid" [(ngModel)]="selectedApplicant.institucion_adscripcion" name="institucion_adscripcion">
+            <input type="text" class="form-control form-control-solid" [(ngModel)]="solicitanteModel.institucion_adscripcion" name="institucion_adscripcion">
           </div>
 
           <div class="fv-row mb-6">
             <label class="fs-6 fw-semibold mb-2">Edad</label>
-            <input type="number" class="form-control form-control-solid" [(ngModel)]="selectedApplicant.edad" name="edad">
+            <input type="number" class="form-control form-control-solid" [(ngModel)]="solicitanteModel.edad" name="edad">
           </div>
 
           <div class="fv-row mb-6">
             <label class="fs-6 fw-semibold mb-2">CURP</label>
-            <input type="text" class="form-control form-control-solid" [(ngModel)]="selectedApplicant.curp" name="curp">
+            <input type="text" class="form-control form-control-solid" [(ngModel)]="solicitanteModel.curp" name="curp">
           </div>
 
           <div class="fv-row mb-6">
             <label class="fs-6 fw-semibold mb-2">Programa Educativo</label>
-            <select class="form-select form-select-solid" [(ngModel)]="selectedApplicant.programa_educativo" name="programa_educativo">
+            <select class="form-select form-select-solid" [(ngModel)]="solicitanteModel.programa_educativo" name="programa_educativo">
               <option value="">Seleccionar programa educativo</option>
               <option *ngFor="let programa of programasEducativosFiltrados" [value]="programa.nombre">{{programa.nombre}}</option>
             </select>
@@ -147,8 +148,10 @@
   </div>
 
   <div class="modal-footer border-0 px-8 py-5">
-    <button type="button" class="btn btn-light me-3" (click)="modal.dismiss()">Cancelar</button>
-    <button type="button" class="btn btn-primary" (click)="modal.close()">
+    <button type="button" class="btn btn-light me-3" (click)="closeForm(modal)">
+      <span>Cancelar</span>
+    </button>
+    <button type="button" class="btn btn-primary" (click)="saveChanges(modal)">
       <span class="indicator-label">Guardar</span>
     </button>
   </div>

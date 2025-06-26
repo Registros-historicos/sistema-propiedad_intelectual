@@ -44,13 +44,30 @@ export class ApplicantListingComponent implements OnInit, OnDestroy {
   lengthMenu: number[] = [5, 10, 15, 20];
   pageLength: number = 10;
   dtInstance: any;
+  placeholder: string = '';
   selectedApplicant: IApplicantModel | null = null;
+  solicitanteModel: IApplicantModel = {
+    id: 0,
+    nombre: '',
+    apellidos: '',
+    edad: 0,
+    entidad_federativa: '',
+    institucion_adscripcion: '',
+    sexo: '',
+    telefono: '',
+    email: '',
+    rfc: '',
+    curp: '',
+    departamento: '',
+    programa_educativo: '',
+    created_at: ''
+  };
+
   entidadesFederativas = ENTIDADES_FEDERATIVAS;
   sexoOptions = SEXO_OPTIONS;
   departamentos = DEPARTAMENTOS;
   programasEducativos = PROGRAMAS_EDUCATIVOS;
   programasEducativosFiltrados: any[] = [];
-  placeholder: string = '';
 
   private cachedMockApplicants: IApplicantModel[] | null = null;
 
@@ -174,74 +191,98 @@ export class ApplicantListingComponent implements OnInit, OnDestroy {
     });
   }
 
-  async navigateToEdit(id: number, modalTemplate: TemplateRef<any>) {
-    try {
-      if (environment.production) {
-        this.applicantService.getApplicant(id).subscribe({
-          next: (applicant) => {
-            this.selectedApplicant = { ...applicant };
-            this.updateProgramasEducativosFiltrados();
-            this.modalService.open(modalTemplate, { size: 'lg' });
-          },
-          error: (err) => {
-            this.showAlert({
-              title: 'Error',
-              text: 'No se pudo cargar la información del solicitante',
-              icon: 'error'
-            });
-          }
-        });
-      } else {
-        const allApplicants = this.getMockApplicants();
-        const numericId = Number(id);
-        const stringId = String(id);
+  edit(id: number) {
+    this.cdr.detectChanges();
 
-        const foundWithOriginal = allApplicants.find(a => a.id === id);
-        const foundWithNumber = allApplicants.find(a => a.id === numericId);
-        const foundWithString = allApplicants.find(a => String(a.id) === stringId);
-        const foundWithDoubleEqual = allApplicants.find(a => a.id == id);
-
-        const foundApplicant = foundWithOriginal || foundWithNumber || foundWithDoubleEqual || foundWithString;
-
-        if (foundApplicant) {
-          this.selectedApplicant = { ...foundApplicant };
+    if (environment.production) {
+      this.applicantService.getApplicant(id).subscribe({
+        next: (applicant: IApplicantModel) => {
+          this.solicitanteModel = { ...applicant };
           this.updateProgramasEducativosFiltrados();
-          this.cdr.detectChanges();
-          const modalRef = this.modalService.open(modalTemplate, { size: 'lg' });
-        } else {
+        },
+        error: (error) => {
+          console.error('Error loading applicant:', error);
           this.showAlert({
-            title: 'No encontrado',
-            text: `El solicitante con ID ${id} no existe`,
-            icon: 'warning'
+            title: 'Error',
+            text: 'No se pudo cargar la información del solicitante',
+            icon: 'error'
           });
         }
-      }
-    } catch (error) {
-      this.showAlert({
-        title: 'Error',
-        text: 'Ocurrió un error inesperado al cargar el solicitante',
-        icon: 'error'
       });
+    } else {
+      const allApplicants = this.getMockApplicants();
+      const foundApplicant = allApplicants.find(a =>
+        a.id === id || a.id === Number(id) || String(a.id) === String(id)
+      );
+
+      if (foundApplicant) {
+        this.solicitanteModel = { ...foundApplicant };
+        this.updateProgramasEducativosFiltrados();
+      } else {
+        this.showAlert({
+          title: 'No encontrado',
+          text: `El solicitante con ID ${id} no existe`,
+          icon: 'warning'
+        });
+      }
     }
+  }
+
+  closeForm(modal: any) {
+    modal.dismiss('cancel');
+
+    this.solicitanteModel = {
+      id: 0,
+      nombre: '',
+      apellidos: '',
+      edad: 0,
+      entidad_federativa: '',
+      institucion_adscripcion: '',
+      sexo: '',
+      telefono: '',
+      email: '',
+      rfc: '',
+      curp: '',
+      departamento: '',
+      programa_educativo: '',
+      created_at: ''
+    };
+
+    this.selectedApplicant = null;
+    this.programasEducativosFiltrados = [];
+  }
+
+  saveChanges(modal: any) {
+    console.log('Guardando cambios para solicitante:', this.solicitanteModel);
+
+    this.showAlert({
+      title: '¡Éxito!',
+      text: 'Los cambios se han guardado correctamente',
+      icon: 'success'
+    });
+    modal.close();
   }
 
   onDepartamentoChange() {
     this.updateProgramasEducativosFiltrados();
-    if (this.selectedApplicant) {
-      this.selectedApplicant.programa_educativo = '';
+    if (this.solicitanteModel) {
+      this.solicitanteModel.programa_educativo = '';
     }
   }
 
   private updateProgramasEducativosFiltrados() {
-    if (this.selectedApplicant && this.selectedApplicant.departamento) {
+    if (this.solicitanteModel && this.solicitanteModel.departamento) {
       this.programasEducativosFiltrados = this.programasEducativos.filter(
-        p => p.departamento === this.selectedApplicant!.departamento
+        p => p.departamento === this.solicitanteModel.departamento
       );
     } else {
       this.programasEducativosFiltrados = [];
     }
   }
 
+  async navigateToEdit(id: number, modalTemplate: TemplateRef<any>) {
+    this.edit(id);
+  }
   navigateToCreate() {
     this.router.navigate(['/administrador/solicitante/registro']);
   }

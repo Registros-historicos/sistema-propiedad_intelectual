@@ -43,11 +43,24 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
   lengthMenu: number[] = [5, 10, 15, 20];
   pageLength: number = 10;
   dtInstance: any;
+  placeholder: string = '';
   selectedCoordinator: ICoordinatorModel | null = null;
+  coordinadorModel: ICoordinatorModel = {
+    id: 0,
+    nombre: '',
+    apellidos: '',
+    edad: 0,
+    entidad_federativa: '',
+    institucion_adscripcion: '',
+    sexo: '',
+    telefono: '',
+    email: '',
+    rfc: '',
+    curp: '',
+    created_at: ''
+  };
   entidadesFederativas = ENTIDADES_FEDERATIVAS;
   sexoOptions = SEXO_OPTIONS;
-  placeholder: string = '';
-
   private cachedMockCoordinators: ICoordinatorModel[] | null = null;
 
   @ViewChild('noticeSwal')
@@ -170,53 +183,75 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
     });
   }
 
-  async navigateToEdit(id: number, modalTemplate: TemplateRef<any>) {
-    try {
-      if (environment.production) {
-        this.coordinatorService.getCoordinator(id).subscribe({
-          next: (coordinator) => {
-            this.selectedCoordinator = { ...coordinator };
-            this.modalService.open(modalTemplate, { size: 'lg' });
-          },
-          error: (err) => {
-            this.showAlert({
-              title: 'Error',
-              text: 'No se pudo cargar la información del coordinador',
-              icon: 'error'
-            });
-          }
-        });
-      } else {
-        const allCoordinators = this.getMockCoordinators();
-        const numericId = Number(id);
-        const stringId = String(id);
+  edit(id: number) {
+    this.cdr.detectChanges();
 
-        const foundWithOriginal = allCoordinators.find(c => c.id === id);
-        const foundWithNumber = allCoordinators.find(c => c.id === numericId);
-        const foundWithString = allCoordinators.find(c => String(c.id) === stringId);
-        const foundWithDoubleEqual = allCoordinators.find(c => c.id == id);
-
-        const foundCoordinator = foundWithOriginal || foundWithNumber || foundWithDoubleEqual || foundWithString;
-
-        if (foundCoordinator) {
-          this.selectedCoordinator = { ...foundCoordinator };
-          this.cdr.detectChanges();
-          const modalRef = this.modalService.open(modalTemplate, { size: 'lg' });
-        } else {
+    if (environment.production) {
+      this.coordinatorService.getCoordinator(id).subscribe({
+        next: (coordinator: ICoordinatorModel) => {
+          this.coordinadorModel = { ...coordinator };
+        },
+        error: (error) => {
+          console.error('Error loading coordinator:', error);
           this.showAlert({
-            title: 'No encontrado',
-            text: `El coordinador con ID ${id} no existe`,
-            icon: 'warning'
+            title: 'Error',
+            text: 'No se pudo cargar la información del coordinador',
+            icon: 'error'
           });
         }
-      }
-    } catch (error) {
-      this.showAlert({
-        title: 'Error',
-        text: 'Ocurrió un error inesperado al cargar el coordinador',
-        icon: 'error'
       });
+    } else {
+      const allCoordinators = this.getMockCoordinators();
+      const foundCoordinator = allCoordinators.find(c =>
+        c.id === id || c.id === Number(id) || String(c.id) === String(id)
+      );
+
+      if (foundCoordinator) {
+        this.coordinadorModel = { ...foundCoordinator };
+      } else {
+        this.showAlert({
+          title: 'No encontrado',
+          text: `El coordinador con ID ${id} no existe`,
+          icon: 'warning'
+        });
+      }
     }
+  }
+
+  closeForm(modal: any) {
+    modal.dismiss('cancel');
+
+    this.coordinadorModel = {
+      id: 0,
+      nombre: '',
+      apellidos: '',
+      edad: 0,
+      entidad_federativa: '',
+      institucion_adscripcion: '',
+      sexo: '',
+      telefono: '',
+      email: '',
+      rfc: '',
+      curp: '',
+      created_at: ''
+    };
+
+    this.selectedCoordinator = null;
+  }
+
+  saveChanges(modal: any) {
+    console.log('Guardando cambios para coordinador:', this.coordinadorModel);
+
+    this.showAlert({
+      title: '¡Éxito!',
+      text: 'Los cambios se han guardado correctamente',
+      icon: 'success'
+    });
+    modal.close();
+  }
+
+  async navigateToEdit(id: number, modalTemplate: TemplateRef<any>) {
+    this.edit(id);
   }
 
   navigateToCreate() {
