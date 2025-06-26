@@ -185,22 +185,22 @@ export const APPLICANTS_MENU = [
     type: 'link',
   },
   {
-    name: 'MENU.APPLICANT.MYPROFILE',
+    name: 'MENU.APPLICANT.REQUESTS',
     type: 'separator',
   },
   {
-    name: 'MENU.APPLICANT.MYPROFILE',
+    name: 'MENU.APPLICANT.MYREQUESTS',
     icon: 'person',
     type: 'link',
-    link: '/solicitante/perfil',
+    link: '/solicitante/solicitudes',
   },
   {
-    name: 'MENU.APPLICANT.REGISTER',
+    name: 'MENU.REGISTERS',
     icon: 'add',
     type: 'separator'
   },
   {
-    name: 'MENU.APPLICANT.REQUEST',
+    name: 'MENU.APPLICANT.REGISTER',
     icon: 'description',
     type: 'link',
     link: '/solicitante/registrar',

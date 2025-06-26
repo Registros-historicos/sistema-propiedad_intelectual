@@ -28,6 +28,10 @@ const Routing: Routes = [
         path: 'perfil',
         loadChildren: () => import('./solicitante/profile/profile.module').then((m) => m.ProfileModule),
       },
+       {
+        path: 'solicitudes',
+        loadChildren: () => import('./solicitante/solicitudes/solicitudes.module').then((m) => m.SolicitudesModule),
+      },
       {
         path: 'registrar',
         loadChildren: () => import('./solicitante/registrar/registrar.module').then((m) => m.RegistrarModule),
