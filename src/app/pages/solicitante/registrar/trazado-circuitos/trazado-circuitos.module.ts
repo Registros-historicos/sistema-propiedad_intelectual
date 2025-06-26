@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PatenteComponent } from './patente.component';
+import { TrazadoCircuitosComponent } from './trazado-circuitos.component';
 import { RouterModule } from '@angular/router';
 import { ModalsModule, WidgetsModule } from 'src/app/template/widgets';
 import { SharedModule } from 'src/app/template/shared/shared.module';
@@ -9,13 +9,13 @@ import { FormsModule } from '@angular/forms';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 @NgModule({
-  declarations: [PatenteComponent],
+  declarations: [TrazadoCircuitosComponent],
   imports: [
     CommonModule,
     RouterModule.forChild([
       {
         path: '',
-        component: PatenteComponent,
+        component: TrazadoCircuitosComponent,
       },
     ]),
     WidgetsModule,
@@ -26,4 +26,4 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     SweetAlert2Module,
   ],
 })
-export class PatenteModule {}
+export class TrazadoCircuitosModule {}

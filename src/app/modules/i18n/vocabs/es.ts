@@ -1346,6 +1346,10 @@ export const locale = {
       INDUSTRIAL_SECRET: {
         TITLE: 'Secretos Industriales',
         DESCRIPTION: 'Protección de secretos comerciales y de información confidencial'
+      },
+      CIRCUIT_MAPPING:{
+        TITLE: 'Trazado de Circuitos Integrados',
+        DESCRIPTION: 'Protección de diseños de circuitos electricos'
       }
     }
     },

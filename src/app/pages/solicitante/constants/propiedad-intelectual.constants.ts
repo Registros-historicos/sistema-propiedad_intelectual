@@ -33,27 +33,34 @@ export const REGISTRO_PROPIEDAD_INTELECTUAL: RegistroPropiedadIntelectual[] = [
     tituloKey: 'GUEST.REGISTER.INDUSTRIAL_DESIGN.TITLE',
     descripcionKey: 'GUEST.REGISTER.INDUSTRIAL_DESIGN.DESCRIPTION',
     claseColor: 'purple',
-    ruta: '/solicitante/registrar/derechos-autor'
+    ruta: '/solicitante/registrar/modelo-industrial'
   },
   {
     icono: 'branding_watermark',
     tituloKey: 'GUEST.REGISTER.TRADEMARK.TITLE',
     descripcionKey: 'GUEST.REGISTER.TRADEMARK.DESCRIPTION',
     claseColor: 'pink',
-    ruta: '/solicitante/registrar/derechos-autor'
+    ruta: '/solicitante/registrar'
   },
   {
     icono: 'eco',
     tituloKey: 'GUEST.REGISTER.PLANT_VARIETY.TITLE',
     descripcionKey: 'GUEST.REGISTER.PLANT_VARIETY.DESCRIPTION',
     claseColor: 'teal',
-    ruta: '/solicitante/registrar/variedad-vegetal'
+    ruta: '/solicitante/registrar'
   },
   {
     icono: 'lock',
     tituloKey: 'GUEST.REGISTER.INDUSTRIAL_SECRET.TITLE',
     descripcionKey: 'GUEST.REGISTER.INDUSTRIAL_SECRET.DESCRIPTION',
     claseColor: 'brown',
-    ruta: '/solicitante/registrar/secreto-industrial'
+    ruta: '/solicitante/registrar'
+  },
+  {
+    icono: 'memory',
+    tituloKey: 'GUEST.REGISTER.CIRCUIT_MAPPING.TITLE',
+    descripcionKey: 'GUEST.REGISTER.CIRCUIT_MAPPING.DESCRIPTION',
+    claseColor: 'blue',
+    ruta: '/solicitante/registrar/trazado-circuitos'
   }
 ];

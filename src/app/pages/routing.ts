@@ -49,6 +49,14 @@ const Routing: Routes = [
         loadChildren: () => import('./solicitante/registrar/modelo-utilidad/modelo-utilidad.module').then((m) => m.ModeloUtilidadModule),
       },
       {
+        path: 'registrar/modelo-industrial',
+        loadChildren: () => import('./solicitante/registrar/dis-industrial/dis-industrial.module').then((m) => m.DisIndustrialModule),
+      },
+      {
+        path: 'registrar/trazado-circuitos',
+        loadChildren: () => import('./solicitante/registrar/trazado-circuitos/trazado-circuitos.module').then((m) => m.TrazadoCircuitosModule),
+      },
+      {
         path: 'registrar/variedad-vegetal',
         component: Error503Component
    },

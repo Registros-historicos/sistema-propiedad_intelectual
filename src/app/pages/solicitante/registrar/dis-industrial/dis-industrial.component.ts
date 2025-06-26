@@ -2,11 +2,12 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-patente',
-  templateUrl: './patente.component.html',
-  styleUrl: './patente.component.scss'
+  selector: 'app-dis-industrial',
+  templateUrl: './dis-industrial.component.html',
+  styleUrl: './dis-industrial.component.scss'
 })
-export class PatenteComponent {
+
+export class DisIndustrialComponent {
   isLoading = false;
   formSubmitted = false;
 

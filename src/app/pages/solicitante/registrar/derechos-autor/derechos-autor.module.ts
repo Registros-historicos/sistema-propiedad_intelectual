@@ -3,6 +3,10 @@ import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { DerechosAutorComponent } from './derechos-autor.component';
 import { ModalsModule, WidgetsModule } from 'src/app/template/widgets';
+import { SharedModule } from '../../../../template/shared/shared.module';
+import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
+import { FormsModule } from '@angular/forms';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 @NgModule({
   declarations: [DerechosAutorComponent],
@@ -16,6 +20,10 @@ import { ModalsModule, WidgetsModule } from 'src/app/template/widgets';
     ]),
     WidgetsModule,
     ModalsModule,
+    SharedModule,
+    NgbCollapseModule,
+    FormsModule,
+    SweetAlert2Module,
   ],
 })
 export class DerechosAutorModule {}
