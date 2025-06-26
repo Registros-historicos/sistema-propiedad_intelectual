@@ -8,32 +8,26 @@ import { disIndData } from '../data/dis-ind.data';
   providedIn: 'root'
 })
 export class IndustrialDesignsService {
-  private industrialDesigns: IDisIndModel[] = [...disIndData]; // 📊 Trabajar con datos locales
+  private industrialDesigns: IDisIndModel[] = [...disIndData];
 
   constructor() { }
 
-  /**
-   * Convertir formato de fecha para búsquedas
-   * @param dateStr Fecha en formato YYYY-MM-DD
-   * @returns Fecha en formato DD-MM-YYYY
-   */
   private convertDateFormat(dateStr: string): string {
     const converted = dateStr.split('-').reverse().join('-');
     return converted;
   }
 
-  /**
-   * Obtener diseños industriales con paginación y búsqueda (para DataTable)
-   * @param tableParams Parámetros de la tabla
-   */
   public getIndustrialDesigns(tableParams: any): Observable<any> {
     const start = tableParams.start || 0;
     const length = tableParams.length || 10;
     const searchValue = tableParams.search?.value || '';
 
+    const orderColumn = tableParams.order?.[0]?.column || 0;
+    const orderDir = tableParams.order?.[0]?.dir || 'asc';
+    const columnName = tableParams.columns?.[orderColumn]?.data || 'id';
+
     let filteredDesigns = this.industrialDesigns;
 
-    // 🔍 Aplicar filtro de búsqueda si existe
     if (searchValue) {
       filteredDesigns = this.industrialDesigns.filter(design => {
         const convertedDate = this.convertDateFormat(design.fechaSolicitud);
@@ -47,6 +41,32 @@ export class IndustrialDesignsService {
           convertedDate.includes(searchValue);
       });
     }
+
+    const getIndustrialDesignValue = (industrialDesign: IDisIndModel, column: string): string | number => {
+      switch (column) {
+        case 'solicitante':
+          return industrialDesign.solicitante || '';
+        case 'nombreDisInd':
+          return industrialDesign.nombreDisInd || '';
+        case 'institucion':
+          return industrialDesign.institucion || '';
+        case 'fechaSolicitud':
+          return new Date(industrialDesign.fechaSolicitud).getTime();
+        default:
+          return industrialDesign.id;
+      }
+    };
+
+    filteredDesigns.sort((a, b) => {
+      const valueA = getIndustrialDesignValue(a, columnName);
+      const valueB = getIndustrialDesignValue(b, columnName);
+
+      if (orderDir === 'asc') {
+        return valueA > valueB ? 1 : -1;
+      } else {
+        return valueA < valueB ? 1 : -1;
+      }
+    });
 
     const total = filteredDesigns.length;
     const paginatedDesigns = filteredDesigns.slice(start, start + length);

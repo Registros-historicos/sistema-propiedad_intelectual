@@ -20,6 +20,10 @@ export class TrademarksService {
     const length = tableParams.length || 10;
     const searchValue = tableParams.search?.value || '';
 
+    const orderColumn = tableParams.order?.[0]?.column || 0;
+    const orderDir = tableParams.order?.[0]?.dir || 'asc';
+    const columnName = tableParams.columns?.[orderColumn]?.data || 'id';
+
     let filteredTrademarks = this.trademarks;
 
     if (searchValue) {
@@ -33,6 +37,32 @@ export class TrademarksService {
           convertedDate.includes(searchValue)
       });
     }
+
+    const getTrademarkValue = (trademark: DatosMarca, column: string): string | number => {
+      switch (column) {
+        case 'denominacion':
+          return trademark.denominacion || '';
+        case 'tipoSolicitud':
+          return trademark.tipoSolicitud || '';
+        case 'titular':
+          return trademark.titular || '';
+        case 'fechaPresentacion':
+          return new Date(trademark.fechaPresentacion).getTime();
+        default:
+          return trademark.registro || 0;
+      }
+    };
+
+    filteredTrademarks.sort((a, b) => {
+      const valueA = getTrademarkValue(a, columnName);
+      const valueB = getTrademarkValue(b, columnName);
+
+      if (orderDir === 'asc') {
+        return valueA > valueB ? 1 : -1;
+      } else {
+        return valueA < valueB ? 1 : -1;
+      }
+    });
 
     const total = filteredTrademarks.length;
     const paginatedTrademarks = filteredTrademarks.slice(start, start + length);

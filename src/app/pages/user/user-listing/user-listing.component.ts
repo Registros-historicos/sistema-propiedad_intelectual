@@ -47,6 +47,7 @@ export class UserListingComponent implements OnInit, AfterViewInit, OnDestroy {
     this.datatableConfig = {
       serverSide: true,
       ajax: (dataTablesParameters: any, callback) => {
+        console.log('DataTables parameters:', dataTablesParameters);
         this.apiService.getUsers(dataTablesParameters).subscribe(resp => {
           callback(resp);
         });
@@ -54,6 +55,8 @@ export class UserListingComponent implements OnInit, AfterViewInit, OnDestroy {
       columns: [
         {
           title: 'Name', data: 'name', render: function (data, type, full) {
+            console.log('Rendering applicant name:', data, 'type: ' + type + ' full: ', full);
+
             const colorClasses = ['success', 'info', 'warning', 'danger'];
             const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
 

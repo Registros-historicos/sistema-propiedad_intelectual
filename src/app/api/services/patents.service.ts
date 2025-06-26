@@ -1,38 +1,32 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { IPatentModel } from '../models/patent.model';
-import { PATENT_DATA } from '../data/patent.data'; // 📁 Importar los datos locales
+import { PATENT_DATA } from '../data/patent.data';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PatentsService {
-  private patents: IPatentModel[] = [...PATENT_DATA]; // 📊 Trabajar con datos locales
+  private patents: IPatentModel[] = [...PATENT_DATA];
 
   constructor() { }
 
-  /**
-   * Convertir formato de fecha para búsquedas
-   * @param dateStr Fecha en formato YYYY-MM-DD
-   * @returns Fecha en formato DD-MM-YYYY
-   */
   private convertDateFormat(dateStr: string): string {
     const converted = dateStr.split('-').reverse().join('-');
     return converted;
   }
 
-  /**
-   * Obtener patentes con paginación y búsqueda (para DataTable)
-   * @param tableParams Parámetros de la tabla
-   */
   public getPatents(tableParams: any): Observable<any> {
     const start = tableParams.start || 0;
     const length = tableParams.length || 10;
     const searchValue = tableParams.search?.value || '';
 
+    const orderColumn = tableParams.order?.[0]?.column || 0;
+    const orderDir = tableParams.order?.[0]?.dir || 'asc';
+    const columnName = tableParams.columns?.[orderColumn]?.data || 'id';
+
     let filteredPatents = this.patents;
 
-    // 🔍 Aplicar filtro de búsqueda si existe
     if (searchValue) {
       filteredPatents = this.patents.filter(patent => {
         const convertedDate = this.convertDateFormat(patent.fechaSolicitud);
@@ -46,6 +40,36 @@ export class PatentsService {
           convertedDate.includes(searchValue);
       });
     }
+
+    const getPatentValue = (patent: IPatentModel, column: string): string | number => {
+      switch (column) {
+        case 'solicitante':
+          return patent.solicitante || '';
+        case 'nombrePatente':
+          return patent.nombrePatente || '';
+        case 'institucion':
+          return patent.institucion || '';
+        case 'fechaSolicitud':
+          return new Date(patent.fechaSolicitud).getTime();
+        case 'estatus':
+          return patent.estatus || '';
+        case 'correo':
+          return patent.correo || '';
+        default:
+          return patent.id;
+      }
+    };
+
+    filteredPatents.sort((a, b) => {
+      const valueA = getPatentValue(a, columnName);
+      const valueB = getPatentValue(b, columnName);
+
+      if (orderDir === 'asc') {
+        return valueA > valueB ? 1 : -1;
+      } else {
+        return valueA < valueB ? 1 : -1;
+      }
+    });
 
     const total = filteredPatents.length;
     const paginatedPatents = filteredPatents.slice(start, start + length);

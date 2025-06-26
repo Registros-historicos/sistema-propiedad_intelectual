@@ -45,6 +45,10 @@ export const locale = {
       ZERO_RECORDS: 'No se encontraron coincidencias',
       TYPE_REQUEST: "Tipo de solicitud",
       STATUS_REQUEST: "Estatus",
+      FULL_NAME: "Nombre completo",
+      FEDERAL_ENTITY: "Entidad Federativa",
+      PHONE: "Teléfono",
+      REGISTERED_DATE: "Fecha de registro",
       PAGE_LENGTH: {
         LABEL: "Mostrar:",
         RECORDS: "registros"

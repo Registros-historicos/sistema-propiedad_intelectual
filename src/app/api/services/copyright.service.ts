@@ -8,32 +8,26 @@ import { COPYRIGHT_DATA } from '../data/copyright.data';
   providedIn: 'root'
 })
 export class CopyrightsService {
-  private copyrights: ICopyrightModel[] = [...COPYRIGHT_DATA]; // 📊 Trabajar con datos locales
+  private copyrights: ICopyrightModel[] = [...COPYRIGHT_DATA];
 
   constructor() { }
 
-  /**
-   * Convertir formato de fecha para búsquedas
-   * @param dateStr Fecha en formato YYYY-MM-DD
-   * @returns Fecha en formato DD-MM-YYYY
-   */
   private convertDateFormat(dateStr: string): string {
     const converted = dateStr.split('-').reverse().join('-');
     return converted;
   }
 
-  /**
-   * Obtener derechos de autor con paginación y búsqueda (para DataTable)
-   * @param tableParams Parámetros de la tabla
-   */
   public getCopyrights(tableParams: any): Observable<any> {
     const start = tableParams.start || 0;
     const length = tableParams.length || 10;
     const searchValue = tableParams.search?.value || '';
 
+    const orderColumn = tableParams.order?.[0]?.column || 0;
+    const orderDir = tableParams.order?.[0]?.dir || 'asc';
+    const columnName = tableParams.columns?.[orderColumn]?.data || 'id';
+
     let filteredCopyrights = this.copyrights;
 
-    // 🔍 Aplicar filtro de búsqueda si existe
     if (searchValue) {
       filteredCopyrights = this.copyrights.filter(copyright => {
         const convertedDate = this.convertDateFormat(copyright.fechaSolicitud);
@@ -48,6 +42,32 @@ export class CopyrightsService {
           convertedDate.includes(searchValue);
       });
     }
+
+    const getCopyrightValue = (copyright: ICopyrightModel, column: string): string | number => {
+      switch (column) {
+        case 'solicitante':
+          return copyright.solicitante || '';
+        case 'nombreObra':
+          return copyright.nombreObra || '';
+        case 'institucion':
+          return copyright.institucion || '';
+        case 'fechaSolicitud':
+          return new Date(copyright.fechaSolicitud).getTime();
+        default:
+          return copyright.id;
+      }
+    };
+
+    filteredCopyrights.sort((a, b) => {
+      const valueA = getCopyrightValue(a, columnName);
+      const valueB = getCopyrightValue(b, columnName);
+
+      if (orderDir === 'asc') {
+        return valueA > valueB ? 1 : -1;
+      } else {
+        return valueA < valueB ? 1 : -1;
+      }
+    });
 
     const total = filteredCopyrights.length;
     const paginatedCopyrights = filteredCopyrights.slice(start, start + length);

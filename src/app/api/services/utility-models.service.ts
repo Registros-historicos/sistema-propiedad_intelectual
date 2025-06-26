@@ -7,32 +7,26 @@ import { modUtilData } from '../data/mod-util.data';
   providedIn: 'root'
 })
 export class UtilityModelsService {
-  private modUtiles: IModUtilModel[] = [...modUtilData]; // 📊 Trabajar con datos locales
+  private modUtiles: IModUtilModel[] = [...modUtilData];
 
   constructor() { }
 
-  /**
-   * Convertir formato de fecha para búsquedas
-   * @param dateStr Fecha en formato YYYY-MM-DD
-   * @returns Fecha en formato DD-MM-YYYY
-   */
   private convertDateFormat(dateStr: string): string {
     const converted = dateStr.split('-').reverse().join('-');
     return converted;
   }
 
-  /**
-   * Obtener modelos de utilidad con paginación y búsqueda (para DataTable)
-   * @param tableParams Parámetros de la tabla
-   */
   public getModUtiles(tableParams: any): Observable<any> {
     const start = tableParams.start || 0;
     const length = tableParams.length || 10;
     const searchValue = tableParams.search?.value || '';
 
+    const orderColumn = tableParams.order?.[0]?.column || 0;
+    const orderDir = tableParams.order?.[0]?.dir || 'asc';
+    const columnName = tableParams.columns?.[orderColumn]?.data || 'id';
+
     let filteredModUtiles = this.modUtiles;
 
-    // 🔍 Aplicar filtro de búsqueda si existe
     if (searchValue) {
       filteredModUtiles = this.modUtiles.filter(modUtil => {
         const convertedDate = this.convertDateFormat(modUtil.fechaSolicitud);
@@ -46,6 +40,32 @@ export class UtilityModelsService {
           convertedDate.includes(searchValue);
       });
     }
+
+    const getUtilityModelValue = (utilityModel: IModUtilModel, column: string): string | number => {
+      switch (column) {
+        case 'solicitante':
+          return utilityModel.solicitante || '';
+        case 'nombreModUtil':
+          return utilityModel.nombreModUtil || '';
+        case 'institucion':
+          return utilityModel.institucion || '';
+        case 'fechaSolicitud':
+          return new Date(utilityModel.fechaSolicitud).getTime();
+        default:
+          return utilityModel.id;
+      }
+    };
+
+    filteredModUtiles.sort((a, b) => {
+      const valueA = getUtilityModelValue(a, columnName);
+      const valueB = getUtilityModelValue(b, columnName);
+
+      if (orderDir === 'asc') {
+        return valueA > valueB ? 1 : -1;
+      } else {
+        return valueA < valueB ? 1 : -1;
+      }
+    });
 
     const total = filteredModUtiles.length;
     const paginatedModUtiles = filteredModUtiles.slice(start, start + length);
