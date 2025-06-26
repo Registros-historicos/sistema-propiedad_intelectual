@@ -33,8 +33,15 @@ export class ReporteSelectorComponent implements OnInit {
 
   verReporte(archivo: string): void {
     this.showLoading();
+    const tipo = this.perfil;
     setTimeout(() => {
-      this.router.navigate([archivo], { relativeTo: this.route });
+      // ocupo pasar archivo y tipo como parámetros de Ruta
+      this.zone.run(() => {
+        this.progress = 100; // Simula que la carga ha terminado
+      });
+      // Redirige a la ruta del visor de PDF con los parámetros necesarios
+      this.router.navigate(['visor-pdf', { archivo, tipo }], { relativeTo: this.route });
+
       //window.open(`assets/reportes/${archivo}`, '_blank');
   }, 4000);
   }
