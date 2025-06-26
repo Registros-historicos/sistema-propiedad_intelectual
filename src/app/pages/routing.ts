@@ -26,7 +26,7 @@ const Routing: Routes = [
       },
       {
         path: 'perfil',
-        loadChildren: () => import('./solicitante/profile/profile.module').then((m) => m.ProfileModule),
+        loadChildren: () => import('../modules/profile/profile.module').then((m) => m.ProfileModule),
       },
        {
         path: 'solicitudes',
