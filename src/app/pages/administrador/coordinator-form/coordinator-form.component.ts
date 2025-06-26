@@ -219,6 +219,6 @@ export class CoordinatorFormComponent implements OnInit {
   }
 
   cancel() {
-    this.router.navigate(['/apps/coordinators']);
+    this.router.navigate(['/administrador/registro']);
   }
 }

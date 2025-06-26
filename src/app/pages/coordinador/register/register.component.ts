@@ -23,7 +23,6 @@ export class RegisterComponent {
 
   ngOnInit(): void {
     this.registros = Object.values(REGISTROS_POR_ROL);
-    console.log('Registros:', this.registros);
   }
 
   verRegistro(archivo: string): void {
