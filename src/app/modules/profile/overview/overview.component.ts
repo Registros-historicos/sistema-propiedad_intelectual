@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
+import {AuthService} from '../../auth';
 
 @Component({
   selector: 'app-overview',
@@ -9,7 +10,11 @@ import { DomSanitizer } from '@angular/platform-browser';
 export class OverviewComponent implements OnInit {
   userProfile: any = {};
 
-  constructor(private iconRegistry: MatIconRegistry, private sanitizer: DomSanitizer) {
+  constructor(
+    private iconRegistry: MatIconRegistry,
+    private sanitizer: DomSanitizer,
+    private authS: AuthService
+  ) {
     this.iconRegistry.addSvgIcon('linkedin', this.sanitizer.bypassSecurityTrustResourceUrl('./assets/media/svg/social-logos/linkedin.svg'));
     this.iconRegistry.addSvgIcon('facebook', this.sanitizer.bypassSecurityTrustResourceUrl('./assets/media/svg/social-logos/facebook.svg'));
     this.iconRegistry.addSvgIcon('twitter', this.sanitizer.bypassSecurityTrustResourceUrl('./assets/media/svg/social-logos/twitter.svg'));
@@ -21,10 +26,10 @@ export class OverviewComponent implements OnInit {
   }
 
   loadUserProfile(): void {
-    const storedUser = localStorage.getItem('user');
-    
+    const storedUser = this.authS.currentUserValue;
+
     if (storedUser) {
-      this.userProfile = JSON.parse(storedUser);
+      this.userProfile = storedUser;
     } else {
       this.userProfile = {
         id: 1,
