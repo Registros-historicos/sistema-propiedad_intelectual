@@ -164,7 +164,7 @@ export class ApplicantListingComponent implements OnInit, OnDestroy {
         },
         {
           title: 'Fecha de Registro', data: 'created_at', className: 'text-center', render: function (data) {
-            return moment(data).format('DD MMM YYYY, hh:mm a');
+            return moment(data).format('DD-MM-YYYY');
           }
         }
       ],
