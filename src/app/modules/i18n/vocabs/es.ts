@@ -1230,16 +1230,16 @@ export const locale = {
           DESCRIPTION: 'Reporte por departamento.'
         },
         RESEARCHER: {
-          TITLE: 'Investigador',
-          DESCRIPTION: 'Reporte por investigador.'
+          TITLE: 'Investigadores',
+          DESCRIPTION: 'Reporte de investigadores.'
         },
         ACADEMIC: {
           TITLE: 'Cuerpo Académico',
-          DESCRIPTION: 'Reporte por cuerpo académico.'
+          DESCRIPTION: 'Reporte de cuerpo académico.'
         },
         PROGRAM: {
           TITLE: 'Programa Educativo',
-          DESCRIPTION: 'Reporte por programa educativo.'
+          DESCRIPTION: 'Reporte de programa educativo.'
         },
         DATE: {
           TITLE: 'Fecha de Solicitud',

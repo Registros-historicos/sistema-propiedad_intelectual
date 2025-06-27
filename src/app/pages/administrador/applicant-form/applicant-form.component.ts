@@ -148,13 +148,20 @@ export class ApplicantFormComponent implements OnInit {
     const completeFn = () => {
       this.isLoading = false;
     };
-
+    
+    const currentUrl = this.router.url;
     if (this.applicantModel.id > 0) {
       this.applicantService.updateApplicant(this.applicantModel.id, this.applicantModel).subscribe({
         next: () => {
           this.showAlert(successAlert);
           // Redirigir después de mostrar la alerta
-          setTimeout(() => this.router.navigate(['/administrador/solicitantes']), 1500);
+          if (currentUrl.startsWith('/coordinador')) {
+          setTimeout(() => this.router.navigate(['/coordinador/solicitantes']), 1500);
+          } else if (currentUrl.startsWith('/administrador')) {
+            setTimeout(() => this.router.navigate(['/administrador/solicitantes']), 1500);
+          } else {
+            setTimeout(() => this.router.navigate(['/']), 1500);
+          }
         },
         error: (error) => {
           errorAlert.text = this.extractText(error.error);
@@ -168,7 +175,13 @@ export class ApplicantFormComponent implements OnInit {
         next: () => {
           this.showAlert(successAlert);
           // Redirigir después de mostrar la alerta
-          setTimeout(() => this.router.navigate(['/administrador/solicitantes']), 1500);
+          if (currentUrl.startsWith('/coordinador')) {
+            setTimeout(() => this.router.navigate(['/coordinador/solicitantes']), 1500);
+          } else if (currentUrl.startsWith('/administrador')) {
+            setTimeout(() => this.router.navigate(['/administrador/solicitantes']), 1500);
+          } else {
+            setTimeout(() => this.router.navigate(['/']), 1500);
+          }
         },
         error: (error) => {
           errorAlert.text = this.extractText(error.error);
@@ -213,7 +226,21 @@ export class ApplicantFormComponent implements OnInit {
     this.noticeSwal.fire();
   }
 
+  
+
   cancel() {
-    this.router.navigate(['/apps/solicitantes']);
+
+    // si esta en /coordinador redirige a /coordinador/solicitantes
+    // si esta en /administrador redirige a /administrador/solicitantes
+    const currentUrl = this.router.url;
+    if (currentUrl.startsWith('/coordinador')) {
+      this.router.navigate(['/coordinador/solicitantes']);
+    }
+    else if (currentUrl.startsWith('/administrador')) {
+      this.router.navigate(['/administrador/solicitantes']);
+    } else {
+      this.router.navigate(['/']);
+    }
+
   }
 }

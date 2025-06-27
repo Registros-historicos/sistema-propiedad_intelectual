@@ -13,10 +13,14 @@ export class VisorPdfComponent {
 
   constructor(private route: ActivatedRoute) {
     const archivoParam = this.route.snapshot.paramMap.get('archivo');
+    const tipoParam = this.route.snapshot.paramMap.get('tipo');
 
-    if (archivoParam) {
+    
+
+    if (archivoParam && tipoParam) {
       this.archivoNombre = archivoParam;
-      this.archivo = 'assets/reportes/' + archivoParam;
+      this.archivo = 'assets/reportes/' + tipoParam + '/' + archivoParam;
+      console.log('Archivo cargado:', this.archivo);
 
       const baseName = archivoParam.replace('.pdf', '').replace(/-/g, ' ');
       this.archivoTitulo = baseName.charAt(0).toUpperCase() + baseName.slice(1);
