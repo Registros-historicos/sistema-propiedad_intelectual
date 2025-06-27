@@ -202,7 +202,7 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
         },
         {
           title: this.translate.instant('TABLE.REGISTERED_DATE'), data: 'created_at', className: 'text-center', render: function (data) {
-            return moment(data).format('DD MMM YYYY, hh:mm a');
+            return moment(data).format('DD-MM-YYYY');
           }
         }
       ],
