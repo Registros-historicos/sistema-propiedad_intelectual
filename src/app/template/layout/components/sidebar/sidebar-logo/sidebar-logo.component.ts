@@ -3,6 +3,7 @@ import { Subscription } from 'rxjs';
 import { LayoutType } from '../../../core/configs/config';
 import { LayoutService } from '../../../core/layout.service';
 import { Router } from '@angular/router';
+import {AuthService} from '../../../../../modules/auth';
 
 @Component({
   selector: 'app-sidebar-logo',
@@ -19,7 +20,11 @@ export class SidebarLogoComponent implements OnInit, OnDestroy {
 
   toggleAttr: string;
 
-  constructor(private layout: LayoutService, private router: Router) {}
+  constructor(
+    private layout: LayoutService,
+    private router: Router,
+    private authS: AuthService
+  ) {}
 
   ngOnInit(): void {
     this.toggleAttr = `app-sidebar-${this.toggleType}`;
@@ -32,7 +37,7 @@ export class SidebarLogoComponent implements OnInit, OnDestroy {
   }
 
   redirected() {
-    const role = parseInt(localStorage.getItem('role') ?? '0');
+    const role = this.authS.currentUserValue?.roles[0];
 
     switch(role) {
       case 1:
@@ -45,7 +50,7 @@ export class SidebarLogoComponent implements OnInit, OnDestroy {
         this.router.navigate(['/solicitante/dashboard']);
         break;
       default:
-        break;      
+        break;
     }
   }
 

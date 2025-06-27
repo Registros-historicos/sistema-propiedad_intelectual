@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import {ADMINISTRATOR_MENUS, APPLICANTS_MENU, COORDINATOR_MENUS} from '../../../../shared/menus';
 import { SweetAlertOptions } from 'sweetalert2';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import {AuthService} from '../../../../../modules/auth';
 
 @Component({
   selector: 'app-sidebar-menu',
@@ -22,10 +23,12 @@ export class SidebarMenuComponent implements OnInit {
     }
   };
 
-  constructor() { }
+  constructor(
+    private authS: AuthService
+  ) { }
 
   ngOnInit(): void {
-    const role = parseInt(localStorage.getItem('role') ?? '0');
+    const role = this.authS.currentUserValue?.roles[0];
 
     switch (role) {
       case 1:
