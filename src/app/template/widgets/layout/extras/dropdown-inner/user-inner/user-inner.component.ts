@@ -27,20 +27,20 @@ export class UserInnerComponent implements OnInit, OnDestroy {
   private unsubscribe: Subscription[] = [];
 
   constructor(
-    private auth: AuthService,
+    private authS: AuthService,
     private translationService: TranslationService,
     private translate: TranslateService,
     private router: Router
   ) { }
 
   ngOnInit(): void {
-    this.user$ = this.auth.currentUserSubject.asObservable();
+    this.user$ = this.authS.currentUserSubject.asObservable();
     this.initializeLanguages();
     this.setLanguage(this.translationService.getSelectedLanguage());
   }
 
   logout() {
-    this.auth.logout();
+    this.authS.logout();
     document.location.reload();
   }
 
@@ -97,7 +97,7 @@ export class UserInnerComponent implements OnInit, OnDestroy {
   }
 
   redirected() {
-    const role = parseInt(localStorage.getItem('role') ?? '0');
+    const role = this.authS.currentUserValue?.roles[0];
 
     switch (role) {
       case 1:

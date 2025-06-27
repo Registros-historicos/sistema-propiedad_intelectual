@@ -13,7 +13,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class LoginComponent implements OnInit, OnDestroy {
   defaultAuth: any = {
-    email: 'admin@demo.com',
+    email: 'jose.sc@demo.com',
     password: 'demo',
   };
   loginForm: FormGroup;
@@ -88,8 +88,6 @@ export class LoginComponent implements OnInit, OnDestroy {
       .subscribe((user: UserModel | undefined) => {
         if (user) {
           const role = user.roles[0] || 0;
-          localStorage.setItem('role', role.toString());
-          localStorage.setItem('user', JSON.stringify(user));
           this.router.navigate([this.returnUrl]);
         }
       });
