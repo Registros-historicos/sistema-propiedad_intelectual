@@ -26,7 +26,11 @@ const Routing: Routes = [
       },
       {
         path: 'perfil',
-        loadChildren: () => import('./solicitante/profile/profile.module').then((m) => m.ProfileModule),
+        loadChildren: () => import('../modules/profile/profile.module').then((m) => m.ProfileModule),
+      },
+       {
+        path: 'solicitudes',
+        loadChildren: () => import('./solicitante/solicitudes/solicitudes.module').then((m) => m.SolicitudesModule),
       },
       {
         path: 'registrar',
@@ -43,6 +47,14 @@ const Routing: Routes = [
       {
         path: 'registrar/modelo-utilidad',
         loadChildren: () => import('./solicitante/registrar/modelo-utilidad/modelo-utilidad.module').then((m) => m.ModeloUtilidadModule),
+      },
+      {
+        path: 'registrar/modelo-industrial',
+        loadChildren: () => import('./solicitante/registrar/dis-industrial/dis-industrial.module').then((m) => m.DisIndustrialModule),
+      },
+      {
+        path: 'registrar/trazado-circuitos',
+        loadChildren: () => import('./solicitante/registrar/trazado-circuitos/trazado-circuitos.module').then((m) => m.TrazadoCircuitosModule),
       },
       {
         path: 'registrar/variedad-vegetal',
