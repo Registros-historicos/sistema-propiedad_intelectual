@@ -9,7 +9,7 @@ import { APPLICANTS_REQUEST_DATA } from '../data/applicant.data';
 export class ApplicantsService {
   private applicants: IAplicantModel[] = [...APPLICANTS_REQUEST_DATA];
 
-  constructor() {}
+  constructor() { }
 
   private convertDateFormat(dateStr: string): string {
     const converted = dateStr.split('-').reverse().join('-');
@@ -20,6 +20,10 @@ export class ApplicantsService {
     const start = tableParams.start || 0;
     const length = tableParams.length || 10;
     const searchValue = tableParams.search?.value || '';
+
+    const orderColumn = tableParams.order?.[0]?.column || 0;
+    const orderDir = tableParams.order?.[0]?.dir || 'asc';
+    const columnName = tableParams.columns?.[orderColumn]?.data || 'id';
 
     let filteredApplicants = this.applicants;
 
@@ -41,6 +45,32 @@ export class ApplicantsService {
         );
       });
     }
+
+    const getApplicantValue = (applicant: IAplicantModel, column: string): string | number => {
+      switch (column) {
+        case 'nombre':
+          return applicant.solicitante || '';
+        case 'entidad_federativa':
+          return applicant.estado || '';
+        case 'institucion_adscripcion':
+          return applicant.institucion || '';
+        case 'created_at':
+          return new Date(applicant.fechaSolicitud).getTime();
+        default:
+          return applicant.id;
+      }
+    };
+
+    filteredApplicants.sort((a, b) => {
+      const valueA = getApplicantValue(a, columnName);
+      const valueB = getApplicantValue(b, columnName);
+
+      if (orderDir === 'asc') {
+        return valueA > valueB ? 1 : -1;
+      } else {
+        return valueA < valueB ? 1 : -1;
+      }
+    });
 
     const total = filteredApplicants.length;
     const paginatedApplicants = filteredApplicants.slice(start, start + length);

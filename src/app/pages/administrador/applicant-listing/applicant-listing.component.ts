@@ -23,6 +23,7 @@ import { CrudModule } from '../../../modules/crud/crud.module';
 import { SharedModule } from '../../../template/shared/shared.module';
 import { environment } from '../../../../environments/environment';
 import { FormsModule } from '@angular/forms';
+import { TranslationModule } from 'src/app/modules/i18n';
 
 @Component({
   selector: 'app-applicant-listing',
@@ -33,7 +34,8 @@ import { FormsModule } from '@angular/forms';
     SweetAlert2Module,
     CrudModule,
     SharedModule,
-    FormsModule
+    FormsModule,
+    TranslationModule
   ],
   styleUrls: ['./applicant-listing.component.scss']
 })
@@ -83,7 +85,7 @@ export class ApplicantListingComponent implements OnInit, OnDestroy {
     private router: Router,
     private modalService: NgbModal,
     private translate: TranslateService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.placeholder = this.translate.instant('TABLE.PLACEHOLDER_SEARCH');
@@ -105,13 +107,57 @@ export class ApplicantListingComponent implements OnInit, OnDestroy {
           const mockData = this.getMockApplicants();
           const start = dataTablesParameters.start;
           const length = dataTablesParameters.length;
-          const paginatedData = mockData.slice(start, start + length);
+          const searchValue = dataTablesParameters.search?.value || '';
+
+          const orderColumn = dataTablesParameters.order?.[0]?.column || 0;
+          const orderDir = dataTablesParameters.order?.[0]?.dir || 'asc';
+          const columnName = dataTablesParameters.columns?.[orderColumn]?.data || 'id';
+
+          let filteredApplicants = mockData;
+
+          if (searchValue) {
+            filteredApplicants = mockData.filter(applicant => {
+              return applicant.nombre.toLowerCase().includes(searchValue.toLowerCase()) ||
+                applicant.entidad_federativa.toLowerCase().includes(searchValue.toLowerCase()) ||
+                applicant.institucion_adscripcion.toLowerCase().includes(searchValue.toLowerCase()) ||
+                applicant.telefono.toLowerCase().includes(searchValue.toLowerCase())
+            });
+          }
+
+          const getApplicantValue = (aplicant: IApplicantModel, column: string): string | number => {
+            switch (column) {
+              case 'nombre':
+                return aplicant.nombre || '';
+              case 'entidad_federativa':
+                return aplicant.entidad_federativa || '';
+              case 'institucion_adscripcion':
+                return aplicant.institucion_adscripcion || '';
+              case 'created_at':
+                return aplicant.created_at || '';
+              default:
+                return aplicant.id;
+            }
+          };
+
+          filteredApplicants.sort((a, b) => {
+            const valueA = getApplicantValue(a, columnName);
+            const valueB = getApplicantValue(b, columnName);
+
+            if (orderDir === 'asc') {
+              return valueA > valueB ? 1 : -1;
+            } else {
+              return valueA < valueB ? 1 : -1;
+            }
+          });
+
+          const total = filteredApplicants.length;
+          const paginatedData = filteredApplicants.slice(start, start + length);
 
           callback({
             data: paginatedData,
             draw: dataTablesParameters.draw,
             recordsTotal: mockData.length,
-            recordsFiltered: mockData.length
+            recordsFiltered: total
           });
         } else {
           this.applicantService.getApplicants(dataTablesParameters).subscribe(resp => {
@@ -125,7 +171,7 @@ export class ApplicantListingComponent implements OnInit, OnDestroy {
       },
       columns: [
         {
-          title: 'Nombre Completo', data: 'nombre', render: function (data, type, full) {
+          title: this.translate.instant('TABLE.FULL_NAME'), data: 'nombre', render: function (data, type, full) {
             const colorClasses = ['success', 'info', 'warning', 'danger'];
             const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
 
@@ -154,16 +200,16 @@ export class ApplicantListingComponent implements OnInit, OnDestroy {
           }
         },
         {
-          title: 'Entidad Federativa', data: 'entidad_federativa',className: 'text-center'
+          title: this.translate.instant('TABLE.FEDERAL_ENTITY'), data: 'entidad_federativa', className: 'text-center'
         },
         {
-          title: 'Institución', data: 'institucion_adscripcion',className: 'text-center'
+          title: this.translate.instant('TABLE.INSTITUTION'), data: 'institucion_adscripcion', className: 'text-center'
         },
         {
-          title: 'Teléfono', data: 'telefono',className: 'text-center'
+          title: this.translate.instant('TABLE.PHONE'), data: 'telefono', className: 'text-center', orderable: false
         },
         {
-          title: 'Fecha de Registro', data: 'created_at', className: 'text-center', render: function (data) {
+          title: this.translate.instant('TABLE.REGISTERED_DATE'), data: 'created_at', className: 'text-center', render: function (data) {
             return moment(data).format('DD-MM-YYYY');
           }
         }
@@ -326,7 +372,7 @@ export class ApplicantListingComponent implements OnInit, OnDestroy {
 
     const todasLasInstituciones = this.institucionService.getMockInstituciones();
 
-    const institucionesPorEntidad: {[key: string]: IInstitucionModel[]} = {};
+    const institucionesPorEntidad: { [key: string]: IInstitucionModel[] } = {};
     todasLasInstituciones.forEach((inst: IInstitucionModel) => {
       if (!institucionesPorEntidad[inst.entidad_federativa]) {
         institucionesPorEntidad[inst.entidad_federativa] = [];

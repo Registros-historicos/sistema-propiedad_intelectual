@@ -124,18 +124,21 @@ export class MarcaComponent implements OnInit, AfterViewInit, OnDestroy {
               </div>`;
 
             return `
-              <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" data-action="view" data-id="${full.registro}">
-                <a href="javascript:;">
-                  ${symbolLabel}
-                </a>
+              <div class="d-flex align-items-center">
+                <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" data-action="view" data-id="${full.registro}">
+                  <a href="javascript:;">
+                    ${symbolLabel}
+                  </a>
+                </div>
+                ${nameAndHolder}
               </div>
-              ${nameAndHolder}
             `;
           }
         },
         {
           title: this.translate.instant('TABLE.MARK.IMAGE'),
           data: 'marca',
+          orderable: false,
           render: function (url: string, type, full) {
             return `
               <div class="text-center">

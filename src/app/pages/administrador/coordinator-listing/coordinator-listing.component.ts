@@ -21,7 +21,8 @@ import { SharedModule } from '../../../template/shared/shared.module';
 import { CrudModule } from '../../../modules/crud/crud.module';
 import { NgClass } from '@angular/common';
 import { environment } from '../../../../environments/environment';
-import {FormsModule} from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { TranslationModule } from 'src/app/modules/i18n';
 
 @Component({
   selector: 'app-coordinator-listing',
@@ -32,7 +33,8 @@ import {FormsModule} from '@angular/forms';
     SharedModule,
     SweetAlert2Module,
     CrudModule,
-    FormsModule
+    FormsModule,
+    TranslationModule
   ],
   styleUrls: ['./coordinator-listing.component.scss']
 })
@@ -75,7 +77,7 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
     private router: Router,
     private modalService: NgbModal,
     private translate: TranslateService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.placeholder = this.translate.instant('TABLE.PLACEHOLDER_SEARCH');
@@ -97,13 +99,57 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
           const mockData = this.getMockCoordinators();
           const start = dataTablesParameters.start;
           const length = dataTablesParameters.length;
-          const paginatedData = mockData.slice(start, start + length);
+          const searchValue = dataTablesParameters.search?.value || '';
+
+          const orderColumn = dataTablesParameters.order?.[0]?.column || 0;
+          const orderDir = dataTablesParameters.order?.[0]?.dir || 'asc';
+          const columnName = dataTablesParameters.columns?.[orderColumn]?.data || 'id';
+
+          let filteredCoordinators = mockData;
+
+          if (searchValue) {
+            filteredCoordinators = mockData.filter(coordinator => {
+              return coordinator.nombre.toLowerCase().includes(searchValue.toLowerCase()) ||
+                coordinator.entidad_federativa.toLowerCase().includes(searchValue.toLowerCase()) ||
+                coordinator.institucion_adscripcion.toLowerCase().includes(searchValue.toLowerCase()) ||
+                coordinator.telefono.toLowerCase().includes(searchValue.toLowerCase())
+            });
+          }
+
+          const getCoordinatorValue = (coordinator: ICoordinatorModel, column: string): string | number => {
+            switch (column) {
+              case 'nombre':
+                return coordinator.nombre || '';
+              case 'entidad_federativa':
+                return coordinator.entidad_federativa || '';
+              case 'institucion_adscripcion':
+                return coordinator.institucion_adscripcion || '';
+              case 'created_at':
+                return coordinator.created_at || '';
+              default:
+                return coordinator.id;
+            }
+          };
+
+          filteredCoordinators.sort((a, b) => {
+            const valueA = getCoordinatorValue(a, columnName);
+            const valueB = getCoordinatorValue(b, columnName);
+
+            if (orderDir === 'asc') {
+              return valueA > valueB ? 1 : -1;
+            } else {
+              return valueA < valueB ? 1 : -1;
+            }
+          });
+
+          const total = filteredCoordinators.length;
+          const paginatedData = filteredCoordinators.slice(start, start + length);
 
           callback({
             data: paginatedData,
             draw: dataTablesParameters.draw,
             recordsTotal: mockData.length,
-            recordsFiltered: mockData.length
+            recordsFiltered: total
           });
         } else {
           this.coordinatorService.getCoordinators(dataTablesParameters).subscribe(resp => {
@@ -117,7 +163,7 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
       },
       columns: [
         {
-          title: 'Nombre Completo', data: 'nombre', render: function (data, type, full) {
+          title: this.translate.instant('TABLE.FULL_NAME'), data: 'nombre', render: function (data, type, full) {
             const colorClasses = ['success', 'info', 'warning', 'danger'];
             const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
 
@@ -146,16 +192,16 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
           }
         },
         {
-          title: 'Entidad Federativa', data: 'entidad_federativa',className: 'text-center'
+          title: this.translate.instant('TABLE.FEDERAL_ENTITY'), data: 'entidad_federativa', className: 'text-center'
         },
         {
-          title: 'Institución', data: 'institucion_adscripcion',className: 'text-center'
+          title: this.translate.instant('TABLE.INSTITUTION'), data: 'institucion_adscripcion', className: 'text-center'
         },
         {
-          title: 'Teléfono', data: 'telefono',className: 'text-center'
+          title: this.translate.instant('TABLE.PHONE'), data: 'telefono', className: 'text-center', orderable: false
         },
         {
-          title: 'Fecha de Registro', data: 'created_at', className: 'text-center', render: function (data) {
+          title: this.translate.instant('TABLE.REGISTERED_DATE'), data: 'created_at', className: 'text-center', render: function (data) {
             return moment(data).format('DD-MM-YYYY');
           }
         }
@@ -297,7 +343,7 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
 
     const todasLasInstituciones = this.institucionService.getMockInstituciones();
 
-    const institucionesPorEntidad: {[key: string]: IInstitucionModel[]} = {};
+    const institucionesPorEntidad: { [key: string]: IInstitucionModel[] } = {};
     todasLasInstituciones.forEach((inst: IInstitucionModel) => {
       if (!institucionesPorEntidad[inst.entidad_federativa]) {
         institucionesPorEntidad[inst.entidad_federativa] = [];
