@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SwalComponent, SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { SweetAlertOptions } from 'sweetalert2';
 import moment from 'moment';
 import { Config } from 'datatables.net';
@@ -84,6 +84,7 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
 
     this.datatableConfig = {
       serverSide: true,
+      processing: true,
       lengthMenu: this.lengthMenu,
       pageLength: this.pageLength,
       language: {
@@ -95,67 +96,64 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
         zeroRecords: this.translate.instant('TABLE.ZERO_RECORDS'),
       },
       ajax: (dataTablesParameters: any, callback) => {
-        if (environment.production === false) {
-          const mockData = this.getMockCoordinators();
-          const start = dataTablesParameters.start;
-          const length = dataTablesParameters.length;
-          const searchValue = dataTablesParameters.search?.value || '';
+        const mockData = this.getMockCoordinators();
+        const start = dataTablesParameters.start;
+        const length = dataTablesParameters.length;
+        const searchValue = dataTablesParameters.search?.value || '';
 
-          const orderColumn = dataTablesParameters.order?.[0]?.column || 0;
-          const orderDir = dataTablesParameters.order?.[0]?.dir || 'asc';
-          const columnName = dataTablesParameters.columns?.[orderColumn]?.data || 'id';
+        const orderColumn = dataTablesParameters.order?.[0]?.column || 0;
+        const orderDir = dataTablesParameters.order?.[0]?.dir || 'asc';
+        const columnName = dataTablesParameters.columns?.[orderColumn]?.data || 'id';
 
-          let filteredCoordinators = mockData;
+        let filteredCoordinators = mockData;
 
-          if (searchValue) {
-            filteredCoordinators = mockData.filter(coordinator => {
-              return coordinator.nombre.toLowerCase().includes(searchValue.toLowerCase()) ||
-                coordinator.entidad_federativa.toLowerCase().includes(searchValue.toLowerCase()) ||
-                coordinator.institucion_adscripcion.toLowerCase().includes(searchValue.toLowerCase()) ||
-                coordinator.telefono.toLowerCase().includes(searchValue.toLowerCase())
-            });
-          }
-
-          const getCoordinatorValue = (coordinator: ICoordinatorModel, column: string): string | number => {
-            switch (column) {
-              case 'nombre':
-                return coordinator.nombre || '';
-              case 'entidad_federativa':
-                return coordinator.entidad_federativa || '';
-              case 'institucion_adscripcion':
-                return coordinator.institucion_adscripcion || '';
-              case 'created_at':
-                return coordinator.created_at || '';
-              default:
-                return coordinator.id;
-            }
-          };
-
-          filteredCoordinators.sort((a, b) => {
-            const valueA = getCoordinatorValue(a, columnName);
-            const valueB = getCoordinatorValue(b, columnName);
-
-            if (orderDir === 'asc') {
-              return valueA > valueB ? 1 : -1;
-            } else {
-              return valueA < valueB ? 1 : -1;
-            }
-          });
-
-          const total = filteredCoordinators.length;
-          const paginatedData = filteredCoordinators.slice(start, start + length);
-
-          callback({
-            data: paginatedData,
-            draw: dataTablesParameters.draw,
-            recordsTotal: mockData.length,
-            recordsFiltered: total
-          });
-        } else {
-          this.coordinatorService.getCoordinators(dataTablesParameters).subscribe(resp => {
-            callback(resp);
+        if (searchValue) {
+          filteredCoordinators = mockData.filter(coordinator => {
+            return coordinator.nombre.toLowerCase().includes(searchValue.toLowerCase()) ||
+              coordinator.apellidos?.toLowerCase().includes(searchValue.toLowerCase()) ||
+              coordinator.entidad_federativa.toLowerCase().includes(searchValue.toLowerCase()) ||
+              coordinator.institucion_adscripcion.toLowerCase().includes(searchValue.toLowerCase()) ||
+              coordinator.telefono.toLowerCase().includes(searchValue.toLowerCase())
           });
         }
+
+        const getCoordinatorValue = (coordinator: ICoordinatorModel, column: string): string | number => {
+          switch (column) {
+            case 'nombre':
+              return coordinator.nombre || '';
+            case 'apellidos':
+              return coordinator.apellidos || '';
+            case 'entidad_federativa':
+              return coordinator.entidad_federativa || '';
+            case 'institucion_adscripcion':
+              return coordinator.institucion_adscripcion || '';
+            case 'created_at':
+              return coordinator.created_at || '';
+            default:
+              return coordinator.id;
+          }
+        };
+
+        filteredCoordinators.sort((a, b) => {
+          const valueA = getCoordinatorValue(a, columnName);
+          const valueB = getCoordinatorValue(b, columnName);
+
+          if (orderDir === 'asc') {
+            return valueA > valueB ? 1 : -1;
+          } else {
+            return valueA < valueB ? 1 : -1;
+          }
+        });
+
+        const total = filteredCoordinators.length;
+        const paginatedData = filteredCoordinators.slice(start, start + length);
+
+        callback({
+          data: paginatedData,
+          draw: dataTablesParameters.draw,
+          recordsTotal: mockData.length,
+          recordsFiltered: total
+        });
       },
       initComplete: (settings, json) => {
         this.dtInstance = settings.oInstance.api();
@@ -163,7 +161,9 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
       },
       columns: [
         {
-          title: this.translate.instant('TABLE.FULL_NAME'), data: 'nombre', render: function (data, type, full) {
+          title: this.translate.instant('TABLE.FULL_NAME'),
+          data: 'nombre',
+          render: (data, type, full) => {
             const colorClasses = ['success', 'info', 'warning', 'danger'];
             const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
 
@@ -192,21 +192,31 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
           }
         },
         {
-          title: this.translate.instant('TABLE.FEDERAL_ENTITY'), data: 'entidad_federativa', className: 'text-center'
+          title: this.translate.instant('TABLE.FEDERAL_ENTITY'),
+          data: 'entidad_federativa',
+          className: 'text-center'
         },
         {
-          title: this.translate.instant('TABLE.INSTITUTION'), data: 'institucion_adscripcion', className: 'text-center'
+          title: this.translate.instant('TABLE.INSTITUTION'),
+          data: 'institucion_adscripcion',
+          className: 'text-center'
         },
         {
-          title: this.translate.instant('TABLE.PHONE'), data: 'telefono', className: 'text-center', orderable: false
+          title: this.translate.instant('TABLE.PHONE'),
+          data: 'telefono',
+          className: 'text-center',
+          orderable: false
         },
         {
-          title: this.translate.instant('TABLE.REGISTERED_DATE'), data: 'created_at', className: 'text-center', render: function (data) {
+          title: this.translate.instant('TABLE.REGISTERED_DATE'),
+          data: 'created_at',
+          className: 'text-center',
+          render: (data) => {
             return moment(data).format('DD-MM-YYYY');
           }
         }
       ],
-      createdRow: function (row, data, dataIndex) {
+      createdRow: (row, data, dataIndex) => {
         $('td:eq(0)', row).addClass('d-flex align-items-center');
       },
     };
@@ -224,43 +234,29 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
   }
 
   delete(id: number) {
-    this.coordinatorService.deleteCoordinator(id).subscribe(() => {
-      this.reloadEvent.emit(true);
+    this.showAlert({
+      title: '¡Éxito!',
+      text: 'El coordinador ha sido eliminado',
+      icon: 'success'
     });
+    this.reloadEvent.emit(true);
   }
 
   edit(id: number) {
     this.cdr.detectChanges();
+    const allCoordinators = this.getMockCoordinators();
+    const foundCoordinator = allCoordinators.find(c =>
+      c.id === id || c.id === Number(id) || String(c.id) === String(id)
+    );
 
-    if (environment.production) {
-      this.coordinatorService.getCoordinator(id).subscribe({
-        next: (coordinator: ICoordinatorModel) => {
-          this.coordinadorModel = { ...coordinator };
-        },
-        error: (error) => {
-          console.error('Error loading coordinator:', error);
-          this.showAlert({
-            title: 'Error',
-            text: 'No se pudo cargar la información del coordinador',
-            icon: 'error'
-          });
-        }
-      });
+    if (foundCoordinator) {
+      this.coordinadorModel = { ...foundCoordinator };
     } else {
-      const allCoordinators = this.getMockCoordinators();
-      const foundCoordinator = allCoordinators.find(c =>
-        c.id === id || c.id === Number(id) || String(c.id) === String(id)
-      );
-
-      if (foundCoordinator) {
-        this.coordinadorModel = { ...foundCoordinator };
-      } else {
-        this.showAlert({
-          title: 'No encontrado',
-          text: `El coordinador con ID ${id} no existe`,
-          icon: 'warning'
-        });
-      }
+      this.showAlert({
+        title: 'No encontrado',
+        text: `El coordinador con ID ${id} no existe`,
+        icon: 'warning'
+      });
     }
   }
 
@@ -286,14 +282,13 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
   }
 
   saveChanges(modal: any) {
-    console.log('Guardando cambios para coordinador:', this.coordinadorModel);
-
     this.showAlert({
       title: '¡Éxito!',
       text: 'Los cambios se han guardado correctamente',
       icon: 'success'
     });
     modal.close();
+    this.reloadEvent.emit(true);
   }
 
   async navigateToEdit(id: number, modalTemplate: TemplateRef<any>) {
