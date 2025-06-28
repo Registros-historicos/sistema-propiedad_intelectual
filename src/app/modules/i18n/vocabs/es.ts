@@ -24,6 +24,7 @@ export const locale = {
       INDUSTRIAL_DESIGN: 'Enviar solicitud de diseño industrial',
       COPYRIGHT: 'Enviar solicitud de derecho de autor',
       PROCESSING: 'Procesando...',
+      CONFIRM_LOGOUT: 'Cerrar sesión',
     },
     TABLE: {
       ACTIONS: {
@@ -1011,6 +1012,10 @@ export const locale = {
         TITLE: "¿Estás seguro de eliminar este registro?",
         BODY: "Esta acción no se puede deshacer",
         SUCCESS: "Registro eliminado"
+      },
+      LOGOUT: {
+        TITLE: "¿Estás seguro de salir?",
+        SUCCESS: "Sesión cerrada exitosamente"
       }
     },
     GRAPHICS: {
@@ -1318,6 +1323,11 @@ export const locale = {
       NOTAVAILABLE: {
         TITLE: "Funcionalidad no disponible",
         DESCRIPTION: "Lo sentimos, esta funcionalidad no está disponible en este momento. Por favor, inténtelo de nuevo más tarde o contacte con el soporte técnico si el problema persiste.",
+        BACK_TO_HOME: "Volver al inicio"
+      },
+      NOT_FOUND: {
+        TITLE: 'Página no encontrada',
+        BODY: 'No podemos encontrar esa página.',
         BACK_TO_HOME: "Volver al inicio"
       }
     },

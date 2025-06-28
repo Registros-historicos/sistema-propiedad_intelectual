@@ -43,6 +43,11 @@ const routes: Routes = [
       {
         path: 'registro',
         loadComponent: () => import('./register/register.component').then(m => m.RegisterComponent)
+      },
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
       }
     ]
   }

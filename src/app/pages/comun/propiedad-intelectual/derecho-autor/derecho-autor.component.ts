@@ -10,7 +10,6 @@ import { Observable } from 'rxjs';
 import { ICopyrightModel } from 'src/app/api/models/copyrigth.model';
 import { TranslateService } from '@ngx-translate/core';
 
-// 🆕 Definir tipo para el estado
 type EstadoCopyright = 'Registrada' | 'En trámite' | 'Trámite con observaciones' | 'Aprobada' | 'Concluida';
 
 @Component({
@@ -59,11 +58,8 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
   institucionesFiltradas: any[] = []
   estadoSeleccionado: number | null = null
   institucionSeleccionada: number | null = null
-
   selectedFile: File | null = null;
   isViewMode: boolean = true;
-
-   // 🆕 Nuevas propiedades para el modo de edición
   isEditingStatus: boolean = false;
   isSaving: boolean = false;
   statusError: boolean = false;
@@ -71,14 +67,9 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
   editedObservations: string = '';
   originalStatus: string = '';
   originalObservations: string = '';
-
-  // 🆕 SOLUCIÓN 2: Key para forzar recreación del select
   editingSelectKey: boolean = false;
-
-  // Mantener la propiedad existente para compatibilidad
   observacionesChanged: boolean = false;
 
-  // 🆕 Secuencia de estados (mantener para referencia)
   private secuenciaEstados: { [key in EstadoCopyright]?: EstadoCopyright } = {
     'Registrada': 'En trámite',
     'En trámite': 'Concluida',
@@ -284,7 +275,6 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  // 🆕 Obtener clase CSS para el badge de estado
   getStatusBadgeClass(status: string): string {
     const statusClasses: { [key: string]: string } = {
       'En trámite': 'badge-light-info',
@@ -296,9 +286,6 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
     return statusClasses[status] || 'badge-light-secondary';
   }
 
-  /**
-   * Obtener las opciones válidas de estado según el estado actual
-   */
   getValidStatusOptions(): { value: EstadoCopyright, label: string }[] {
     const currentStatus = this.copyrightModel.estado;
 
@@ -332,49 +319,40 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  /**
-   * Verificar si el estado actual permite edición
-   */
   canEditStatus(): boolean {
     return this.getValidStatusOptions().length > 0;
   }
 
-  // 🔧 SOLUCIÓN 2: Método enableEditMode actualizado
   enableEditMode(): void {
     this.isEditingStatus = true;
     this.originalStatus = this.copyrightModel.estado;
     this.originalObservations = this.copyrightModel.observaciones || '';
 
-    // 🆕 Destruir el select y recrearlo
     this.editingSelectKey = false;
     this.editedStatus = '';
     this.editedObservations = this.originalObservations;
     this.statusError = false;
 
-    // 🆕 Recrear el select en el siguiente ciclo
     setTimeout(() => {
       this.editingSelectKey = true;
       this.cdr.detectChanges();
     }, 10);
   }
 
-  // 🔧 SOLUCIÓN 2: Método resetEditMode actualizado
   private resetEditMode(): void {
     this.isEditingStatus = false;
-    this.editingSelectKey = false; // 🆕 Resetear key
+    this.editingSelectKey = false;
     this.editedStatus = '';
     this.editedObservations = this.originalObservations;
     this.statusError = false;
     this.isSaving = false;
   }
 
-  // 🆕 Verificar si hay cambios
   private hasChanges(): boolean {
     return this.editedStatus !== this.originalStatus ||
       this.editedObservations !== this.originalObservations;
   }
 
-  // 🆕 Validar formulario
   private validateForm(): boolean {
     this.statusError = false;
 
@@ -386,7 +364,6 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
     return true;
   }
 
-  // 🆕 Guardar cambios
   saveChanges(): void {
     if (!this.validateForm()) {
       const alertaError: SweetAlertOptions = {
@@ -401,7 +378,6 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    // Mostrar confirmación
     const alertaConfirmacion: SweetAlertOptions = {
       icon: 'question',
       title: '¿Confirmar cambios?',
@@ -430,7 +406,6 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  // 🆕 Realizar el guardado
   private performSave(): void {
     this.isSaving = true;
 
@@ -442,19 +417,12 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
     this.service.updateCopyrightStatusAndObservations(this.copyrightModel.id, updateData).subscribe({
       next: (response) => {
         this.isSaving = false;
-
-        // Actualizar el modelo local
         this.copyrightModel.estado = updateData.estado;
         this.copyrightModel.observaciones = updateData.observaciones;
-
-        // Actualizar valores originales
         this.originalStatus = this.editedStatus;
         this.originalObservations = this.editedObservations;
-
-        // Salir del modo edición
         this.isEditingStatus = false;
 
-        // Mostrar éxito
         const alertaExito: SweetAlertOptions = {
           icon: 'success',
           title: '¡Éxito!',
@@ -464,7 +432,6 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
         };
         this.showAlert(alertaExito);
 
-        // Recargar tabla
         this.reloadEvent.emit(true);
       },
       error: (error) => {
@@ -483,8 +450,6 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
   }
-
-  // MÉTODOS EXISTENTES (mantener para compatibilidad)
 
   editarEstado(): void {
     const estadoActual = this.copyrightModel.estado;
