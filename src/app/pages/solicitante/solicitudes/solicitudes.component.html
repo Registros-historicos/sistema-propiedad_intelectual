@@ -37,16 +37,7 @@
   </div>
 
   <div class="card-body pt-0">
-    <!-- <app-crud
-      [datatableConfig]="datatableConfig"
-      route="/apps/solicitudes"
-      (deleteEvent)="delete($event)"
-      (viewEvent)="view($event)"
-      [reload]="reloadEvent"
-      [modal]="formModal"
-    ></app-crud> -->
-
-    <!-- <app-crud
+    <app-crud
       [datatableConfig]="datatableConfig"
       route="/apps/solicitudes"
       (deleteEvent)="delete($event)"
@@ -54,13 +45,7 @@
       (followEvent)="follow($event)"
       [reload]="reloadEvent"
       [modal]="isViewMode ? formModal : formModalFollow"
-    ></app-crud> -->
-
-    <app-crud [datatableConfig]="datatableConfig" route="/coordinador/propiedades/patente"
-      (deleteEvent)="delete($event)" (followEvent)="follow($event)" (viewEvent)="view($event)" [reload]="reloadEvent"
-      [modal]="isViewMode ? formModal : formModalFollow">
-    </app-crud>
-
+    ></app-crud>
 
     <swal #noticeSwal [swalOptions]="swalOptions"></swal>
   </div>
@@ -195,7 +180,6 @@
     </div>
   </ng-template>
 
-
   <ng-template #formModalFollow let-modal>
     <div class="modal-header bg-primary">
       <h3 class="modal-title text-white">
@@ -209,7 +193,7 @@
         (click)="modal.dismiss('Cross click')"
       ></button>
     </div>
-  
+
     <div class="modal-body">
       <div class="d-flex flex-column scroll-y me-n7 pe-7">
         <!-- Información general -->
@@ -218,7 +202,9 @@
           <div class="d-flex justify-content-center align-items-center gap-4">
             <div class="text-center">
               <div class="fs-7 opacity-75">Solicitante</div>
-              <div class="fw-bold">{{ solicitudSeleccionada?.solicitante }}</div>
+              <div class="fw-bold">
+                {{ solicitudSeleccionada?.solicitante }}
+              </div>
             </div>
             <div class="text-center">
               <div class="fs-7 opacity-75">Correo</div>
@@ -226,33 +212,52 @@
             </div>
             <div class="text-center">
               <div class="fs-7 opacity-75">Progreso</div>
-              <div class="fw-bold">{{ getStatusProgress(solicitudSeleccionada!.estado) }}%</div>
+              <div class="fw-bold">
+                {{ getStatusProgress(solicitudSeleccionada!.estado) }}%
+              </div>
             </div>
           </div>
-  
+
           <div class="progress-indicator mt-4">
-            <div class="progress-bar" [style.width.%]="getStatusProgress(solicitudSeleccionada!.estado)"></div>
+            <div
+              class="progress-bar"
+              [style.width.%]="getStatusProgress(solicitudSeleccionada!.estado)"
+            ></div>
           </div>
         </div>
-  
+
         <!-- Estado actual -->
         <div class="card card-flush mb-6">
           <div class="card-body text-center py-8">
             <div class="symbol symbol-75px mx-auto mb-4">
-              <div class="symbol-label" [ngClass]="{
-                'bg-success': solicitudSeleccionada?.estado === 'Aprobada' || solicitudSeleccionada?.estado === 'Concluida',
-                'bg-primary': solicitudSeleccionada?.estado === 'Registrada',
-                'bg-warning': solicitudSeleccionada?.estado === 'En trámite',
-                'bg-danger': solicitudSeleccionada?.estado === 'Trámite con observaciones'
-              }">
-                <app-keenicon [name]="getStatusIcon(solicitudSeleccionada!.estado)" class="fs-1 text-white"></app-keenicon>
+              <div
+                class="symbol-label"
+                [ngClass]="{
+                  'bg-success':
+                    solicitudSeleccionada?.estado === 'Aprobada' ||
+                    solicitudSeleccionada?.estado === 'Concluida',
+                  'bg-primary': solicitudSeleccionada?.estado === 'Registrada',
+                  'bg-warning': solicitudSeleccionada?.estado === 'En trámite',
+                  'bg-danger':
+                    solicitudSeleccionada?.estado ===
+                    'Trámite con observaciones'
+                }"
+              >
+                <app-keenicon
+                  [name]="getStatusIcon(solicitudSeleccionada!.estado)"
+                  class="fs-1 text-white"
+                ></app-keenicon>
               </div>
             </div>
-            <h3 class="fw-bold text-gray-800 mb-2">{{ solicitudSeleccionada?.estado }}</h3>
-            <div class="fs-6 text-gray-600">{{ getStatusDescription(solicitudSeleccionada!.estado) }}</div>
+            <h3 class="fw-bold text-gray-800 mb-2">
+              {{ solicitudSeleccionada?.estado }}
+            </h3>
+            <div class="fs-6 text-gray-600">
+              {{ getStatusDescription(solicitudSeleccionada!.estado) }}
+            </div>
           </div>
         </div>
-  
+
         <!-- Historial de estados -->
         <div class="card card-flush mb-6">
           <div class="card-header">
@@ -266,103 +271,174 @@
           <div class="card-body">
             <div class="timeline">
               <!-- Estado: Registrada -->
-              <div class="timeline-item" [ngClass]="{
-                'active': solicitudSeleccionada?.estado === 'Registrada',
-                'completed': getStatusOrder(solicitudSeleccionada!.estado) > 1
-              }">
+              <div
+                class="timeline-item"
+                [ngClass]="{
+                  active: solicitudSeleccionada?.estado === 'Registrada',
+                  completed: getStatusOrder(solicitudSeleccionada!.estado) > 1
+                }"
+              >
                 <div class="timeline-line"></div>
                 <div class="timeline-icon symbol symbol-circle symbol-40px">
-                  <div class="symbol-label" [ngClass]="{
-                    'bg-success': getStatusOrder(solicitudSeleccionada!.estado) > 1,
-                    'bg-primary': solicitudSeleccionada?.estado === 'Registrada',
-                    'bg-light-gray': getStatusOrder(solicitudSeleccionada!.estado) < 1
-                  }">
-                    <app-keenicon name="check" class="fs-2" [ngClass]="{
-                      'text-white': getStatusOrder(solicitudSeleccionada!.estado) >= 1,
-                      'text-gray-400': getStatusOrder(solicitudSeleccionada!.estado) < 1
-                    }"></app-keenicon>
+                  <div
+                    class="symbol-label"
+                    [ngClass]="{
+                      'bg-success':
+                        getStatusOrder(solicitudSeleccionada!.estado) > 1,
+                      'bg-primary':
+                        solicitudSeleccionada?.estado === 'Registrada',
+                      'bg-light-gray':
+                        getStatusOrder(solicitudSeleccionada!.estado) < 1
+                    }"
+                  >
+                    <app-keenicon
+                      name="check"
+                      class="fs-2"
+                      [ngClass]="{
+                        'text-white':
+                          getStatusOrder(solicitudSeleccionada!.estado) >= 1,
+                        'text-gray-400':
+                          getStatusOrder(solicitudSeleccionada!.estado) < 1
+                      }"
+                    ></app-keenicon>
                   </div>
                 </div>
                 <div class="timeline-content">
                   <h5 class="fw-bold text-gray-800 mb-0">Registrada</h5>
-                  <p class="text-gray-700 mb-0">La solicitud ha sido registrada.</p>
+                  <p class="text-gray-700 mb-0">
+                    La solicitud ha sido registrada.
+                  </p>
                   <div class="fs-7 text-gray-500 mt-2">
-                    <app-keenicon name="calendar" class="fs-5 me-1"></app-keenicon>
-                    Fecha de Registro: {{ solicitudSeleccionada?.fechaSolicitud }}
+                    <app-keenicon
+                      name="calendar"
+                      class="fs-5 me-1"
+                    ></app-keenicon>
+                    Fecha de Registro:
+                    {{ solicitudSeleccionada?.fechaSolicitud }}
                   </div>
                 </div>
               </div>
-  
+
               <!-- Estado: En trámite -->
-              <div class="timeline-item" [ngClass]="{
-                'active': solicitudSeleccionada?.estado === 'En trámite',
-                'completed': getStatusOrder(solicitudSeleccionada!.estado) > 2
-              }">
+              <div
+                class="timeline-item"
+                [ngClass]="{
+                  active: solicitudSeleccionada?.estado === 'En trámite',
+                  completed: getStatusOrder(solicitudSeleccionada!.estado) > 2
+                }"
+              >
                 <div class="timeline-line"></div>
                 <div class="timeline-icon symbol symbol-circle symbol-40px">
-                  <div class="symbol-label" [ngClass]="{
-                    'bg-success': getStatusOrder(solicitudSeleccionada!.estado) > 2,
-                    'bg-warning': solicitudSeleccionada?.estado === 'En trámite',
-                    'bg-light-gray': getStatusOrder(solicitudSeleccionada!.estado) < 2
-                  }">
-                    <app-keenicon name="timer" class="fs-2" [ngClass]="{
-                      'text-white': getStatusOrder(solicitudSeleccionada!.estado) >= 2,
-                      'text-gray-400': getStatusOrder(solicitudSeleccionada!.estado) < 2
-                    }"></app-keenicon>
+                  <div
+                    class="symbol-label"
+                    [ngClass]="{
+                      'bg-success':
+                        getStatusOrder(solicitudSeleccionada!.estado) > 2,
+                      'bg-warning':
+                        solicitudSeleccionada?.estado === 'En trámite',
+                      'bg-light-gray':
+                        getStatusOrder(solicitudSeleccionada!.estado) < 2
+                    }"
+                  >
+                    <app-keenicon
+                      name="timer"
+                      class="fs-2"
+                      [ngClass]="{
+                        'text-white':
+                          getStatusOrder(solicitudSeleccionada!.estado) >= 2,
+                        'text-gray-400':
+                          getStatusOrder(solicitudSeleccionada!.estado) < 2
+                      }"
+                    ></app-keenicon>
                   </div>
                 </div>
                 <div class="timeline-content">
                   <h5 class="fw-bold text-gray-800 mb-0">En trámite</h5>
-                  <p class="text-gray-700 mb-0">La solicitud está en proceso de revisión.</p>
+                  <p class="text-gray-700 mb-0">
+                    La solicitud está en proceso de revisión.
+                  </p>
                 </div>
               </div>
-  
+
               <!-- Estado: Trámite con observaciones -->
-              <div class="timeline-item" *ngIf="solicitudSeleccionada?.estado === 'Trámite con observaciones'">
+              <div
+                class="timeline-item"
+                *ngIf="
+                  solicitudSeleccionada?.estado === 'Trámite con observaciones'
+                "
+              >
                 <div class="timeline-line"></div>
                 <div class="timeline-icon symbol symbol-circle symbol-40px">
                   <div class="symbol-label bg-danger">
-                    <app-keenicon name="information" class="fs-2 text-white"></app-keenicon>
+                    <app-keenicon
+                      name="information"
+                      class="fs-2 text-white"
+                    ></app-keenicon>
                   </div>
                 </div>
                 <div class="timeline-content">
-                  <h5 class="fw-bold text-gray-800 mb-0">Trámite con Observaciones</h5>
-                  <p class="text-gray-700 mb-0">Se requiere atención para continuar con el trámite.</p>
+                  <h5 class="fw-bold text-gray-800 mb-0">
+                    Trámite con Observaciones
+                  </h5>
+                  <p class="text-gray-700 mb-0">
+                    Se requiere atención para continuar con el trámite.
+                  </p>
                 </div>
               </div>
-  
+
               <!-- Estado: Aprobada -->
-              <div class="timeline-item" [ngClass]="{
-                'active': solicitudSeleccionada?.estado === 'Aprobada',
-                'completed': solicitudSeleccionada?.estado === 'Concluida'
-              }">
+              <div
+                class="timeline-item"
+                [ngClass]="{
+                  active: solicitudSeleccionada?.estado === 'Aprobada',
+                  completed: solicitudSeleccionada?.estado === 'Concluida'
+                }"
+              >
                 <div class="timeline-line"></div>
                 <div class="timeline-icon symbol symbol-circle symbol-40px">
-                  <div class="symbol-label" [ngClass]="{
-                    'bg-success': solicitudSeleccionada?.estado === 'Aprobada',
-                    'bg-light-gray': solicitudSeleccionada?.estado !== 'Aprobada'
-                  }">
-                    <app-keenicon name="check" class="fs-2 text-white"></app-keenicon>
+                  <div
+                    class="symbol-label"
+                    [ngClass]="{
+                      'bg-success':
+                        solicitudSeleccionada?.estado === 'Aprobada',
+                      'bg-light-gray':
+                        solicitudSeleccionada?.estado !== 'Aprobada'
+                    }"
+                  >
+                    <app-keenicon
+                      name="check"
+                      class="fs-2 text-white"
+                    ></app-keenicon>
                   </div>
                 </div>
                 <div class="timeline-content">
                   <h5 class="fw-bold text-gray-800 mb-0">Aprobada</h5>
-                  <p class="text-gray-700 mb-0">La solicitud ha sido aprobada.</p>
+                  <p class="text-gray-700 mb-0">
+                    La solicitud ha sido aprobada.
+                  </p>
                 </div>
               </div>
-  
+
               <!-- Estado: Concluida -->
-              <div class="timeline-item" [ngClass]="{
-                'active': solicitudSeleccionada?.estado === 'Concluida'
-              }">
+              <div
+                class="timeline-item"
+                [ngClass]="{
+                  active: solicitudSeleccionada?.estado === 'Concluida'
+                }"
+              >
                 <div class="timeline-icon symbol symbol-circle symbol-40px">
                   <div class="symbol-label bg-info">
-                    <app-keenicon name="check-circle" class="fs-2 text-white"></app-keenicon>
+                    <app-keenicon
+                      name="check-circle"
+                      class="fs-2 text-white"
+                    ></app-keenicon>
                   </div>
                 </div>
                 <div class="timeline-content">
                   <h5 class="fw-bold text-gray-800 mb-0">Concluida</h5>
-                  <p class="text-gray-700 mb-0">El trámite de la solicitud ha concluido.</p>
+                  <p class="text-gray-700 mb-0">
+                    El trámite de la solicitud ha concluido.
+                  </p>
                 </div>
               </div>
             </div>
@@ -370,7 +446,7 @@
         </div>
       </div>
     </div>
-  
+
     <div class="modal-footer">
       <button
         type="button"
@@ -381,5 +457,4 @@
       </button>
     </div>
   </ng-template>
-
 </div>

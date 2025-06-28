@@ -211,21 +211,21 @@ export class SolicitudesComponent implements OnInit, OnDestroy {
     }, msUntilMidnight);
   }
 
-  follow(id: number): void {
+    follow(id: number): void {
     this.isViewMode = false; // Cambiar al modo de seguimiento
     this.cdr.detectChanges();
-
+  
     this.service.getApplicant(id).subscribe((applicant: IAplicantModel) => {
       this.solicitudSeleccionada = { ...applicant };
     });
   }
-
+  
   getStatusProgress(status: IAplicantModel['estado']): number {
     const statusOrder = this.getStatusOrder(status);
     const maxOrder = 5; // Número máximo de estados
     return Math.round((statusOrder / maxOrder) * 100);
   }
-
+  
   getStatusOrder(status: IAplicantModel['estado']): number {
     const statusOrder: { [key in IAplicantModel['estado']]: number } = {
       Registrada: 1,
@@ -236,19 +236,18 @@ export class SolicitudesComponent implements OnInit, OnDestroy {
     };
     return statusOrder[status] || 0;
   }
-
+  
   getStatusDescription(status: IAplicantModel['estado']): string {
     const descriptions: { [key in IAplicantModel['estado']]: string } = {
       Registrada: 'La solicitud ha sido registrada.',
       'En trámite': 'La solicitud está en proceso de revisión.',
-      'Trámite con observaciones':
-        'Se requiere atención para continuar con el trámite.',
+      'Trámite con observaciones': 'Se requiere atención para continuar con el trámite.',
       Aprobada: 'La solicitud ha sido aprobada.',
       Concluida: 'El trámite de la solicitud ha concluido.',
     };
     return descriptions[status] || 'Estado desconocido.';
   }
-
+  
   getStatusIcon(status: IAplicantModel['estado']): string {
     const icons: { [key in IAplicantModel['estado']]: string } = {
       Registrada: 'document',
@@ -258,25 +257,5 @@ export class SolicitudesComponent implements OnInit, OnDestroy {
       Concluida: 'check-circle',
     };
     return icons[status] || 'document';
-  }
-
-  closeForm(modal: any): void {
-    modal.dismiss('cancel');
-
-    this.aplicantModel = {
-      id: 0,
-      titulo: '',
-      solicitante: '',
-      autor: '',
-      fechaSolicitud: '',
-      estado: 'En trámite',
-      descripcion: '',
-      institucion: '',
-      correo: '',
-      documentos: [''],
-    };
-
-    this.solicitudSeleccionada = undefined;
-    this.isViewMode = false;
   }
 }
