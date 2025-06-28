@@ -18,7 +18,6 @@ import { IAplicantModel } from 'src/app/api/models/applicant.model';
 import { ApplicantsService } from 'src/app/api/services/applicant.service';
 import { AuthService, UserType } from 'src/app/modules/auth';
 import { SweetAlertOptions } from 'sweetalert2';
-import { DerechosAutorComponent } from '../registrar/derechos-autor/derechos-autor.component';
 
 @Component({
   selector: 'app-solicitudes',
@@ -27,39 +26,30 @@ import { DerechosAutorComponent } from '../registrar/derechos-autor/derechos-aut
 })
 export class SolicitudesComponent implements OnInit, OnDestroy {
   user$: Observable<UserType>;
+  aplicantModel: IAplicantModel = {
+    id: 0,
+    titulo: '',
+    solicitante: '',
+    autor: '',
+    fechaSolicitud: '',
+    estado: 'En trámite',
+    descripcion: '',
+    institucion: '',
+    correo: '',
+    documentos: [''],
+  };
   currentDate = new Date();
-  itemClass: string = 'ms-1 ms-lg-3';
-
   pageLength: number = 10;
-  dtInstance: any;
   lengthMenu: number[] = [5, 10, 15, 20];
   datatableConfig: Config = {};
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
 
-  @ViewChild('noticeSwal')
-  noticeSwal!: SwalComponent;
+  @ViewChild('noticeSwal') noticeSwal!: SwalComponent;
   @ViewChild('formModal') formModalRef!: TemplateRef<any>;
 
   swalOptions: SweetAlertOptions = {};
-
   solicitudes: any[] = [];
-
-  chartOptions: any;
-
-  totalSolicitudes: number = 0;
-  solicitudesPendientes: number = 0;
-  solicitudesEnTramite: number = 0;
-  solicitudesRegistradas: number = 0;
-  solicitudesConObservaciones: number = 0;
-  solicitudesAprobadas: number = 0;
-
   solicitudSeleccionada: IAplicantModel | undefined;
-
-  isCollapsed1 = false;
-  isCollapsed2 = true;
-  estadoSeleccionado: number | null = null;
-  institucionSeleccionada: number | null = null;
-  selectedFile: File | null = null;
   isViewMode: boolean = false;
 
   private applicantSubscription: Subscription | undefined;
@@ -124,21 +114,27 @@ export class SolicitudesComponent implements OnInit, OnDestroy {
             )}</span>`,
         },
       ],
-      createdRow: (row, data: any, dataIndex) => {
+      createdRow: (row, data: any) => {
         const $row = $(row);
         $row.attr('data-action', 'view');
         $row.attr('data-id', data.id);
         $row.addClass('cursor-pointer');
       },
-      initComplete: (settings, json) => {
-        this.dtInstance = settings.oInstance.api();
+      initComplete: (settings) => {
         this.cdr.detectChanges();
-        $(this.dtInstance.table().body()).on('click', 'tr', (event: any) => {
-          const rowData = this.dtInstance.row(event.currentTarget).data();
-          if (rowData && rowData.id) {
-            this.view(rowData.id);
+        $(settings.oInstance.api().table().body()).on(
+          'click',
+          'tr',
+          (event: any) => {
+            const rowData = settings.oInstance
+              .api()
+              .row(event.currentTarget)
+              .data();
+            if (rowData && rowData.id) {
+              this.view(rowData.id);
+            }
           }
-        });
+        );
       },
     };
 
@@ -146,7 +142,7 @@ export class SolicitudesComponent implements OnInit, OnDestroy {
     this.updateCurrentDate();
   }
 
-  view(id: number) {
+  view(id: number): void {
     if (this.applicantSubscription) {
       this.applicantSubscription.unsubscribe();
     }
@@ -166,27 +162,7 @@ export class SolicitudesComponent implements OnInit, OnDestroy {
   onPageLengthChange(event: any): void {
     const newLength = parseInt(event.target.value);
     this.pageLength = newLength;
-
-    if (this.dtInstance) {
-      this.dtInstance.page.len(newLength).draw();
-    } else {
-      this.reloadEvent.emit(true);
-    }
-  }
-
-  editarSolicitud(id: number): void {
-    const solicitud = this.solicitudes.find((sol) => sol.id === id);
-
-    if (solicitud) {
-      this.solicitudSeleccionada = solicitud;
-
-      this.dialog.open(DerechosAutorComponent, {
-        width: '800px',
-        data: { solicitud: this.solicitudSeleccionada },
-      });
-    } else {
-      console.error('Solicitud no encontrada');
-    }
+    this.reloadEvent.emit(true);
   }
 
   delete(event: any): void {
@@ -224,16 +200,83 @@ export class SolicitudesComponent implements OnInit, OnDestroy {
 
   private updateCurrentDate(): void {
     this.currentDate = new Date();
-
     const now = new Date();
     const tomorrow = new Date(now);
     tomorrow.setDate(now.getDate() + 1);
     tomorrow.setHours(0, 0, 1, 0);
 
     const msUntilMidnight = tomorrow.getTime() - now.getTime();
-
     setTimeout(() => {
       this.updateCurrentDate();
     }, msUntilMidnight);
+  }
+
+  follow(id: number): void {
+    this.isViewMode = false; // Cambiar al modo de seguimiento
+    this.cdr.detectChanges();
+
+    this.service.getApplicant(id).subscribe((applicant: IAplicantModel) => {
+      this.solicitudSeleccionada = { ...applicant };
+    });
+  }
+
+  getStatusProgress(status: IAplicantModel['estado']): number {
+    const statusOrder = this.getStatusOrder(status);
+    const maxOrder = 5; // Número máximo de estados
+    return Math.round((statusOrder / maxOrder) * 100);
+  }
+
+  getStatusOrder(status: IAplicantModel['estado']): number {
+    const statusOrder: { [key in IAplicantModel['estado']]: number } = {
+      Registrada: 1,
+      'En trámite': 2,
+      'Trámite con observaciones': 2.5,
+      Aprobada: 4,
+      Concluida: 5,
+    };
+    return statusOrder[status] || 0;
+  }
+
+  getStatusDescription(status: IAplicantModel['estado']): string {
+    const descriptions: { [key in IAplicantModel['estado']]: string } = {
+      Registrada: 'La solicitud ha sido registrada.',
+      'En trámite': 'La solicitud está en proceso de revisión.',
+      'Trámite con observaciones':
+        'Se requiere atención para continuar con el trámite.',
+      Aprobada: 'La solicitud ha sido aprobada.',
+      Concluida: 'El trámite de la solicitud ha concluido.',
+    };
+    return descriptions[status] || 'Estado desconocido.';
+  }
+
+  getStatusIcon(status: IAplicantModel['estado']): string {
+    const icons: { [key in IAplicantModel['estado']]: string } = {
+      Registrada: 'document',
+      'En trámite': 'timer',
+      'Trámite con observaciones': 'information',
+      Aprobada: 'check',
+      Concluida: 'check-circle',
+    };
+    return icons[status] || 'document';
+  }
+
+  closeForm(modal: any): void {
+    modal.dismiss('cancel');
+
+    this.aplicantModel = {
+      id: 0,
+      titulo: '',
+      solicitante: '',
+      autor: '',
+      fechaSolicitud: '',
+      estado: 'En trámite',
+      descripcion: '',
+      institucion: '',
+      correo: '',
+      documentos: [''],
+    };
+
+    this.solicitudSeleccionada = undefined;
+    this.isViewMode = false;
   }
 }
