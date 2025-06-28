@@ -234,10 +234,10 @@ export class ApplicantFormComponent implements OnInit {
     // si esta en /administrador redirige a /administrador/solicitantes
     const currentUrl = this.router.url;
     if (currentUrl.startsWith('/coordinador')) {
-      this.router.navigate(['/coordinador/solicitantes']);
+      this.router.navigate(['/coordinador/registro']);
     }
     else if (currentUrl.startsWith('/administrador')) {
-      this.router.navigate(['/administrador/solicitantes']);
+      this.router.navigate(['/administrador/registro']);
     } else {
       this.router.navigate(['/']);
     }
