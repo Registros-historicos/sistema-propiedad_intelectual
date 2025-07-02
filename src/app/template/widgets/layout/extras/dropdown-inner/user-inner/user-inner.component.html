@@ -97,16 +97,11 @@
 
   <div class="separator my-2"></div>
 
-  <div
-    class="menu-item px-5"
-    data-kt-menu-trigger="hover"
-    data-kt-menu-placement="left-start"
-    data-kt-menu-flip="bottom"
-  >
+  <div class="menu-item px-5" data-kt-menu-trigger="hover" data-kt-menu-placement="left-start"
+    data-kt-menu-flip="bottom">
     <a class="menu-link px-5 cursor-pointer">
       <span class="menu-title position-relative" translate="KEYWORDS.LANGUAGE">
-        <span
-          class="
+        <span class="
             fs-8
             rounded
             bg-light
@@ -116,28 +111,16 @@
             translate-middle-y
             top-50
             end-0
-          "
-        >
+          ">
           {{ language.name }}{{ " " }}
-          <img
-            class="w-15px h-15px rounded-1 ms-2"
-            [src]="language.flag"
-            alt="metronic"
-          />
+          <img class="w-15px h-15px rounded-1 ms-2" [src]="language.flag" alt="metronic" />
         </span>
       </span>
     </a>
 
     <div class="menu-sub menu-sub-dropdown w-175px py-4">
-      <div
-        *ngFor="let l of langs"
-        class="menu-item px-3 cursor-pointer"
-        (click)="selectLanguage(l.lang)"
-      >
-        <a
-          class="menu-link d-flex px-5"
-          [ngClass]="l.lang === language.lang ? 'active' : ''"
-        >
+      <div *ngFor="let l of langs" class="menu-item px-3 cursor-pointer" (click)="selectLanguage(l.lang)">
+        <a class="menu-link d-flex px-5" [ngClass]="l.lang === language.lang ? 'active' : ''">
           <span class="symbol symbol-20px me-4">
             <img class="rounded-1" [src]="l.flag" alt="metronic" />
           </span>
@@ -156,3 +139,7 @@
     <a (click)="logout()" class="menu-link px-5 cursor-pointer" translate="KEYWORDS.SIGN_OUT"></a>
   </div>
 </ng-container>
+
+<swal #deleteSwal [swalOptions]="swalOptions" [title]="titleDelete" icon="warning" [showCancelButton]="true"
+  [focusCancel]="true" [customClass]="{confirmButton: 'btn btn-danger', cancelButton: 'btn btn-active-light'}">
+</swal>

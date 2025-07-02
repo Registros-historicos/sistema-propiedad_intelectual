@@ -1,9 +1,11 @@
-import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostBinding, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { TranslationService } from '../../../../../../modules/i18n';
 import { AuthService, UserType } from '../../../../../../modules/auth';
 import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
+import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { SweetAlertOptions } from 'sweetalert2';
 
 interface LanguageFlag {
   lang: string;
@@ -21,6 +23,13 @@ export class UserInnerComponent implements OnInit, OnDestroy {
   class = `menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg menu-state-primary fw-bold py-4 fs-6 w-275px`;
   @HostBinding('attr.data-kt-menu') dataKtMenu = 'true';
 
+  @ViewChild('deleteSwal')
+  public readonly deleteSwal!: SwalComponent;
+
+  swalOptions: SweetAlertOptions;
+
+  titleDelete: string = '';
+
   language: LanguageFlag;
   user$: Observable<UserType>;
   langs: LanguageFlag[] = [];
@@ -34,13 +43,31 @@ export class UserInnerComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    this.titleDelete = this.translate.instant('ALERT.LOGOUT.TITLE');
+
+    this.setupSweetAlert();
     this.user$ = this.authS.currentUserSubject.asObservable();
     this.initializeLanguages();
     this.setLanguage(this.translationService.getSelectedLanguage());
   }
 
+  setupSweetAlert() {
+    this.swalOptions = {
+      buttonsStyling: false,
+      confirmButtonText: this.translate.instant('BUTTON.CONFIRM_LOGOUT'),
+      cancelButtonText: this.translate.instant('BUTTON.CANCEL')
+    };
+  }
+
   logout() {
-    this.authS.logout();
+    this.deleteSwal.fire().then((clicked) => {
+      if (clicked.isConfirmed) {
+        this.authS.logout();
+        this.router.navigate(['/auth/login'], {
+          queryParams: {},
+        });
+      }
+    });
   }
 
   initializeLanguages() {

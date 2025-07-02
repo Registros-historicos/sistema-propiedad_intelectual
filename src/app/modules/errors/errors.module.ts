@@ -5,6 +5,7 @@ import { ErrorsRoutingModule } from './errors-routing.module';
 import { ErrorsComponent } from '../errors/errors.component';
 import { Error404Component } from './error404/error404.component';
 import { Error500Component } from './error500/error500.component';
+import { TranslationModule } from '../i18n';
 
 
 @NgModule({
@@ -15,7 +16,8 @@ import { Error500Component } from './error500/error500.component';
   ],
   imports: [
     CommonModule,
-    ErrorsRoutingModule
+    ErrorsRoutingModule,
+    TranslationModule
   ]
 })
 export class ErrorsModule { }
