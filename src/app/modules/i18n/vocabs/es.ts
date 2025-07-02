@@ -16,6 +16,7 @@ export const locale = {
       },
       CONFIRM: "Confirmar",
       CANCEL: "Cancelar",
+      RETURN: "Regresar",
       CLOSE: 'Cerrar',
       DOWNLOAD: 'Descargar',
       SEE: 'Ver',

@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import {Component} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
+import {Location} from '@angular/common'
 
 @Component({
   selector: 'app-visor-pdf',
@@ -11,11 +12,12 @@ export class VisorPdfComponent {
   archivoNombre: string = '';
   archivoTitulo: string = '';
 
-  constructor(private route: ActivatedRoute) {
+  constructor(
+    private route: ActivatedRoute,
+    private location: Location
+  ) {
     const archivoParam = this.route.snapshot.paramMap.get('archivo');
     const tipoParam = this.route.snapshot.paramMap.get('tipo');
-
-    
 
     if (archivoParam && tipoParam) {
       this.archivoNombre = archivoParam;
@@ -25,5 +27,10 @@ export class VisorPdfComponent {
       const baseName = archivoParam.replace('.pdf', '').replace(/-/g, ' ');
       this.archivoTitulo = baseName.charAt(0).toUpperCase() + baseName.slice(1);
     }
+  }
+
+  protected goBack() {
+    // Regresar la navegación una pagina atrás
+    this.location.back();
   }
 }
