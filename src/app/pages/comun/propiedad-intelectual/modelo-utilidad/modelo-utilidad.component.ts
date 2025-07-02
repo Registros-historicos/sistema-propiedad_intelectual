@@ -10,7 +10,6 @@ import { IModUtilModel } from 'src/app/api/models/mod-util.model';
 import { FederalEntity } from 'src/app/api/models/entity.model';
 import { TranslateService } from '@ngx-translate/core';
 
-// 🆕 Definir tipo para el estatus
 type EstatusModUtil = 'Registrada' | 'En trámite' | 'Trámite con observaciones' | 'Aprobada' | 'Concluida';
 
 @Component({
@@ -61,8 +60,6 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
 
   selectedFile: File | null = null;
   isViewMode: boolean = true;
-
-  // 🆕 Nuevas propiedades para el modo de edición
   isEditingStatus: boolean = false;
   isSaving: boolean = false;
   statusError: boolean = false;
@@ -70,14 +67,9 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
   editedObservations: string = '';
   originalStatus: string = '';
   originalObservations: string = '';
-
-  // 🆕 SOLUCIÓN 2: Key para forzar recreación del select
   editingSelectKey: boolean = false;
-
-  // Mantener la propiedad existente para compatibilidad
   observacionesChanged: boolean = false;
 
-  // 🆕 Secuencia de estados (mantener para referencia)
   private secuenciaEstados: { [key in EstatusModUtil]?: EstatusModUtil } = {
     'Registrada': 'En trámite',
     'En trámite': 'Concluida',
@@ -290,7 +282,6 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
     });
   }
 
-  // 🆕 Obtener clase CSS para el badge de estatus
   getStatusBadgeClass(status: string): string {
     const statusClasses: { [key: string]: string } = {
       'En trámite': 'badge-light-info',
@@ -302,9 +293,6 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
     return statusClasses[status] || 'badge-light-secondary';
   }
 
-  /**
-   * Obtener las opciones válidas de estatus según el estado actual
-   */
   getValidStatusOptions(): { value: EstatusModUtil, label: string }[] {
     const currentStatus = this.modUtilModel.estatus;
 
@@ -338,49 +326,39 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
     }
   }
 
-  /**
-   * Verificar si el estatus actual permite edición
-   */
   canEditStatus(): boolean {
     return this.getValidStatusOptions().length > 0;
   }
 
-  // 🔧 SOLUCIÓN 2: Método enableEditMode actualizado
   enableEditMode(): void {
     this.isEditingStatus = true;
     this.originalStatus = this.modUtilModel.estatus;
     this.originalObservations = this.modUtilModel.observaciones || '';
-
-    // 🆕 Destruir el select y recrearlo
     this.editingSelectKey = false;
     this.editedStatus = '';
     this.editedObservations = this.originalObservations;
     this.statusError = false;
 
-    // 🆕 Recrear el select en el siguiente ciclo
     setTimeout(() => {
       this.editingSelectKey = true;
       this.cdr.detectChanges();
     }, 10);
   }
 
-  // 🔧 SOLUCIÓN 2: Método resetEditMode actualizado
   private resetEditMode(): void {
     this.isEditingStatus = false;
-    this.editingSelectKey = false; // 🆕 Resetear key
+    this.editingSelectKey = false;
     this.editedStatus = '';
     this.editedObservations = this.originalObservations;
     this.statusError = false;
     this.isSaving = false;
   }
 
-  // 🆕 Verificar si hay cambios
   private hasChanges(): boolean {
     return this.editedStatus !== this.originalStatus ||
       this.editedObservations !== this.originalObservations;
   }
 
-  // 🆕 Validar formulario
   private validateForm(): boolean {
     this.statusError = false;
 
@@ -392,7 +370,6 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
     return true;
   }
 
-  // 🆕 Guardar cambios
   saveChanges(): void {
     if (!this.validateForm()) {
       const alertaError: SweetAlertOptions = {
@@ -407,7 +384,6 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
       return;
     }
 
-    // Mostrar confirmación
     const alertaConfirmacion: SweetAlertOptions = {
       icon: 'question',
       title: '¿Confirmar cambios?',
@@ -436,7 +412,6 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
     });
   }
 
-  // 🆕 Realizar el guardado
   private performSave(): void {
     this.isSaving = true;
 
@@ -448,19 +423,12 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
     this.service.updateModUtilStatusAndObservations(this.modUtilModel.id, updateData).subscribe({
       next: (response) => {
         this.isSaving = false;
-
-        // Actualizar el modelo local
         this.modUtilModel.estatus = updateData.estatus;
         this.modUtilModel.observaciones = updateData.observaciones;
-
-        // Actualizar valores originales
         this.originalStatus = this.editedStatus;
         this.originalObservations = this.editedObservations;
-
-        // Salir del modo edición
         this.isEditingStatus = false;
 
-        // Mostrar éxito
         const alertaExito: SweetAlertOptions = {
           icon: 'success',
           title: '¡Éxito!',
@@ -468,9 +436,8 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
           timer: 2000,
           showConfirmButton: false
         };
-        this.showAlert(alertaExito);
 
-        // Recargar tabla
+        this.showAlert(alertaExito);
         this.reloadEvent.emit(true);
       },
       error: (error) => {
@@ -489,8 +456,6 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
       }
     });
   }
-
-  // MÉTODOS EXISTENTES (mantener para compatibilidad)
 
   editarEstatus(): void {
     const estadoActual = this.modUtilModel.estatus;

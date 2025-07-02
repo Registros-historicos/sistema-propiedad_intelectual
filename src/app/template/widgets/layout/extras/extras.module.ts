@@ -12,6 +12,7 @@ import {NgbTooltipModule} from "@ng-bootstrap/ng-bootstrap";
 import {FormsModule} from "@angular/forms";
 import { SharedModule } from "../../../shared/shared.module";
 import {MatIcon} from "@angular/material/icon";
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,8 @@ import {MatIcon} from "@angular/material/icon";
         TranslationModule,
         NgbTooltipModule,
         SharedModule,
-        MatIcon
+        MatIcon,
+        SweetAlert2Module.forChild()
     ],
   exports: [
     NotificationsInnerComponent,
