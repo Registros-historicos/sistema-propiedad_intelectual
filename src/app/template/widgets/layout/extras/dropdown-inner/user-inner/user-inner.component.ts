@@ -68,7 +68,6 @@ export class UserInnerComponent implements OnInit, OnDestroy {
         });
       }
     });
-
   }
 
   initializeLanguages() {
