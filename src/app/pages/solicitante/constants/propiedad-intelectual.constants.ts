@@ -56,11 +56,11 @@ export const REGISTRO_PROPIEDAD_INTELECTUAL: RegistroPropiedadIntelectual[] = [
     claseColor: 'brown',
     ruta: '/solicitante/registrar'
   },
-  {
-    icono: 'memory',
-    tituloKey: 'GUEST.REGISTER.CIRCUIT_MAPPING.TITLE',
-    descripcionKey: 'GUEST.REGISTER.CIRCUIT_MAPPING.DESCRIPTION',
-    claseColor: 'blue',
-    ruta: '/solicitante/registrar/trazado-circuitos'
-  }
+  // {
+  //   icono: 'memory',
+  //   tituloKey: 'GUEST.REGISTER.CIRCUIT_MAPPING.TITLE',
+  //   descripcionKey: 'GUEST.REGISTER.CIRCUIT_MAPPING.DESCRIPTION',
+  //   claseColor: 'blue',
+  //   ruta: '/solicitante/registrar/trazado-circuitos'
+  // }
 ];
