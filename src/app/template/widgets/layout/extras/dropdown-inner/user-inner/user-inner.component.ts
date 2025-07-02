@@ -41,9 +41,6 @@ export class UserInnerComponent implements OnInit, OnDestroy {
 
   logout() {
     this.authS.logout();
-    this.router.navigate(['/auth/login'], {
-      queryParams: {},
-    });
   }
 
   initializeLanguages() {
