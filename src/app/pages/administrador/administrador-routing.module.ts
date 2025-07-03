@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { CoordinatorListingComponent } from './coordinator-listing/coordinator-listing.component';
 import { ApplicantListingComponent } from './applicant-listing/applicant-listing.component';
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
+import {Error503Component} from '../../modules/errors/error503/error503.component';
 
 const routes: Routes = [
   {
@@ -43,6 +44,10 @@ const routes: Routes = [
       {
         path: 'registro',
         loadComponent: () => import('./register/register.component').then(m => m.RegisterComponent)
+      },
+      {
+        path: 'ayuda',
+        component: Error503Component
       },
       {
         path: '',
