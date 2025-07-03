@@ -88,13 +88,13 @@ export class SolicitudesComponent implements OnInit, OnDestroy {
       data: this.solicitudes,
       columns: [
         {
-          title: this.translate.instant('TABLE.TYPE_REQUEST'),
+          title: this.translate.instant('TABLE.TITLE_REQUEST'),
           data: 'tipo',
           render: (data) =>
             `<span class="fw-bold fs-6 text-gray-800">${data || ''}</span>`,
         },
         {
-          title: this.translate.instant('TABLE.WORK_TITLE'),
+          title: this.translate.instant('TABLE.DESCRIPTION_REQUEST'),
           data: 'titulo',
           render: (data) =>
             `<span class="fw-semibold text-gray-600">${data || ''}</span>`,
@@ -126,12 +126,25 @@ export class SolicitudesComponent implements OnInit, OnDestroy {
           'click',
           'tr',
           (event: any) => {
-            const rowData = settings.oInstance
-              .api()
-              .row(event.currentTarget)
-              .data();
-            if (rowData && rowData.id) {
-              this.view(rowData.id);
+            const target = $(event.target);
+
+            // Verifica si el clic ocurrió en un ícono específico
+            if (target.hasClass('ki-eye')) {
+              const rowData = settings.oInstance
+                .api()
+                .row(event.currentTarget)
+                .data();
+              if (rowData && rowData.id) {
+                this.view(rowData.id);
+              }
+            } else if (target.hasClass('ki-follow')) {
+              const rowData = settings.oInstance
+                .api()
+                .row(event.currentTarget)
+                .data();
+              if (rowData && rowData.id) {
+                this.follow(rowData.id);
+              }
             }
           }
         );
@@ -147,10 +160,13 @@ export class SolicitudesComponent implements OnInit, OnDestroy {
       this.applicantSubscription.unsubscribe();
     }
 
+    this.isViewMode = true;
+    this.cdr.detectChanges(); // Forzar la detección de cambios
+
     this.applicantSubscription = this.service.getApplicant(id).subscribe(
       (applicantData: IAplicantModel) => {
         this.solicitudSeleccionada = { ...applicantData };
-        this.isViewMode = true;
+        this.cdr.detectChanges(); // Forzar la detección de cambios
       },
       (error) => {
         console.error('Error al cargar la solicitud:', error);
@@ -211,21 +227,22 @@ export class SolicitudesComponent implements OnInit, OnDestroy {
     }, msUntilMidnight);
   }
 
-    follow(id: number): void {
-    this.isViewMode = false; // Cambiar al modo de seguimiento
-    this.cdr.detectChanges();
-  
+  follow(id: number): void {
+    this.isViewMode = false;
+    this.cdr.detectChanges(); // Forzar la detección de cambios
+
     this.service.getApplicant(id).subscribe((applicant: IAplicantModel) => {
       this.solicitudSeleccionada = { ...applicant };
+      this.cdr.detectChanges(); // Forzar la detección de cambios
     });
   }
-  
+
   getStatusProgress(status: IAplicantModel['estado']): number {
     const statusOrder = this.getStatusOrder(status);
     const maxOrder = 5; // Número máximo de estados
     return Math.round((statusOrder / maxOrder) * 100);
   }
-  
+
   getStatusOrder(status: IAplicantModel['estado']): number {
     const statusOrder: { [key in IAplicantModel['estado']]: number } = {
       Registrada: 1,
@@ -236,18 +253,19 @@ export class SolicitudesComponent implements OnInit, OnDestroy {
     };
     return statusOrder[status] || 0;
   }
-  
+
   getStatusDescription(status: IAplicantModel['estado']): string {
     const descriptions: { [key in IAplicantModel['estado']]: string } = {
       Registrada: 'La solicitud ha sido registrada.',
       'En trámite': 'La solicitud está en proceso de revisión.',
-      'Trámite con observaciones': 'Se requiere atención para continuar con el trámite.',
+      'Trámite con observaciones':
+        'Se requiere atención para continuar con el trámite.',
       Aprobada: 'La solicitud ha sido aprobada.',
       Concluida: 'El trámite de la solicitud ha concluido.',
     };
     return descriptions[status] || 'Estado desconocido.';
   }
-  
+
   getStatusIcon(status: IAplicantModel['estado']): string {
     const icons: { [key in IAplicantModel['estado']]: string } = {
       Registrada: 'document',
