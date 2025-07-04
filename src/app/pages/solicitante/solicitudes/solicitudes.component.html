@@ -444,6 +444,59 @@
             </div>
           </div>
         </div>
+        
+        <!-- Acción sobre comprobante -->
+        <div class="d-flex justify-content-center mt-5">
+          <button
+            class="btn btn-light-primary"
+            (click)="abrirComprobante()"
+          >
+            <app-keenicon name="folder-open" class="me-2"></app-keenicon>
+            Comprobante de pago
+          </button>
+        </div>
+
+        <!-- Modal simulado para subir comprobante -->
+        <div *ngIf="mostrarUploaderComprobante" class="modal d-block bg-dark bg-opacity-50" tabindex="-1">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+              <div class="modal-header">
+                <h5 class="modal-title">Subir comprobante de pago</h5>
+                <button type="button" class="btn-close" (click)="mostrarUploaderComprobante = false"></button>
+              </div>
+
+              <div class="modal-body">
+                <input
+                  type="file"
+                  class="form-control"
+                  accept=".pdf, .jpg, .jpeg, .png"
+                  (change)="onFileSelected($event)"
+                />
+                <div class="form-text">Formatos permitidos: PDF, JPG, JPEG, PNG.</div>
+
+                <div class="text-muted mt-2" *ngIf="comprobanteSeleccionado">
+                  Archivo seleccionado:
+                  <strong>{{ comprobanteSeleccionado.name }}</strong>
+                </div>
+              </div>
+
+              <div class="modal-footer">
+                <button class="btn btn-secondary" (click)="mostrarUploaderComprobante = false">Cancelar</button>
+                <button
+                  class="btn btn-primary"
+                  [disabled]="!comprobanteSeleccionado"
+                  (click)="upload()"
+                >
+                  Subir comprobante
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        
       </div>
     </div>
 

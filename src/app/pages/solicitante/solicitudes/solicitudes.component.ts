@@ -258,4 +258,69 @@ export class SolicitudesComponent implements OnInit, OnDestroy {
     };
     return icons[status] || 'document';
   }
+
+  mostrarUploaderComprobante: boolean = false;
+
+  abrirComprobante(): void {
+    const comprobante = this.solicitudSeleccionada?.documentos?.find(
+      (doc) =>
+        doc.toLowerCase().includes('comprobante') ||
+        doc.toLowerCase().includes('pago')
+    );
+
+    if (comprobante) {
+      window.open(comprobante, '_blank');
+    } else if (
+      this.solicitudSeleccionada?.estado === 'Registrada' ||
+      this.solicitudSeleccionada?.estado === 'En trámite'
+    ) {
+      this.mostrarUploaderComprobante = true;
+      this.showAlert({
+        icon: 'info',
+        title: 'Sube tu comprobante',
+        text: 'Selecciona el archivo correspondiente a tu comprobante de pago.',
+      });
+    } else {
+      this.showAlert({
+        icon: 'warning',
+        title: 'Sin comprobante',
+        text: 'No hay comprobante registrado para esta solicitud.',
+      });
+    }
+  }
+
+
+
+  comprobanteSeleccionado: File | null = null;
+
+
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    const tiposPermitidos = ['application/pdf', 'image/jpeg', 'image/png'];
+
+    if (file && tiposPermitidos.includes(file.type)) {
+      this.comprobanteSeleccionado = file;
+    } else {
+      this.comprobanteSeleccionado = null;
+      event.target.value = ''; 
+
+      this.showAlert({
+        icon: 'error',
+        title: 'Archivo inválido',
+        text: 'Solo se permiten archivos PDF, JPG, JPEG o PNG.',
+      });
+    }
+  }
+
+  upload(): void {
+  this.showAlert({
+    icon: 'success',
+    title: 'Comprobante cargado',
+    text: `El archivo "${this.comprobanteSeleccionado?.name}" ha sido cargado correctamente.`,
+  });
+  this.comprobanteSeleccionado = null;
+  this.mostrarUploaderComprobante = false;
+}
+
+
 }
