@@ -6,6 +6,15 @@
       </p>
       <div class="separator my-6"></div>
       <form (ngSubmit)="onSubmit()" novalidate>
+        <div class="mb-6">
+          <div class="form-check form-check-custom form-check-solid form-switch">
+            <label class="form-check-label me-5">Nuevo registro</label>
+            <input class="form-check-input w-50px bg-primary border-primary" type="checkbox"
+              name="model.app.sidebar.default.minimize.desktop.default"
+              disabled />
+            <label class="form-check-label ms-5">Registro anterior</label>
+          </div>
+        </div>
         <!-- Solicitante Persona Física -->
         <div class="p-4 mb-6 border rounded">
           <h3 class="mb-4">Datos Generales del o de los Solicitante(s)</h3>

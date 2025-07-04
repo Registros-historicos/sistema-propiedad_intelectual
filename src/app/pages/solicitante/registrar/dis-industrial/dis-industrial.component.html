@@ -3,6 +3,15 @@
       <form #solicitudForm="ngForm" (ngSubmit)="onSubmit()" novalidate>
         <h2 class="text-center mb-4">Solicitud de registro de diseño industrial</h2>
         <div *ngIf="formError" class="alert alert-danger mb-4">{{ formError }}</div>
+        <div class="mb-6">
+          <div class="form-check form-check-custom form-check-solid form-switch">
+            <label class="form-check-label me-5">Nuevo registro</label>
+            <input class="form-check-input w-50px bg-primary border-primary" type="checkbox"
+              name="model.app.sidebar.default.minimize.desktop.default"
+              disabled />
+            <label class="form-check-label ms-5">Registro anterior</label>
+          </div>
+        </div>
         <div class="row mb-6">
           <!-- Modalidad de solicitud -->
           <div class="col-md-6 mb-3">
