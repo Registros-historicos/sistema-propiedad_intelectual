@@ -1031,7 +1031,7 @@ export const locale = {
         RESEARCHER: "Investigador",
         DEPARTMENT: "Departamento",
         FEDERAL_INSTITUTIONS: "Instituciones Federales",
-        CENTRALIZED_INSTITUTIONS: "Instituciones Centralizadas",
+        CENTRALIZED_INSTITUTIONS: "Instituciones Descentralizadas",
         APPLICATION_TYPE: "Tipo de solicitud",
         FEDERAL_ENTITIES: "Entidades Federativas",
       },
@@ -1045,7 +1045,7 @@ export const locale = {
       LEGENDS: {
         NO_FEDERAL_ENTITIES: "No hay entidades federativas con registros.",
         NO_FEDERAL_INSTITUTIONS: "No hay instituciones federales con registros.",
-        NO_CENTRALIZED_INSTITUTIONS: "No hay instituciones centralizadas con registros.",
+        NO_CENTRALIZED_INSTITUTIONS: "No hay instituciones descentralizadas con registros.",
         TOTAL_APPLICATIONS: 'Total de solicitudes',
         HOVER_APPLICATIONS: 'solicitudes',
         ACRONYM: {
@@ -1232,7 +1232,7 @@ export const locale = {
           DESCRIPTION: 'Reporte por entidad federativa.'
         },
         TYPE: {
-          TITLE: 'Federal o Centralizado',
+          TITLE: 'Federal o Descentralizado',
           DESCRIPTION: 'Reporte clasificado por tipo de institución.'
         }
       },
