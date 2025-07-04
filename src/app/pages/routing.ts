@@ -69,6 +69,10 @@ const Routing: Routes = [
         loadChildren: () => import('./reportes/reportes.module').then((m) => m.ReportesModule),
       },
       {
+        path: 'ayuda',
+        component: Error503Component
+      },
+      {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full'

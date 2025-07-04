@@ -1111,6 +1111,7 @@ export const locale = {
       USERS: 'Usuarios',
       INTELECTUAL_PROPERTIES: 'Propiedades Intelectuales',
       REPORTS: 'Reportes',
+      HELP: 'Ayuda',
       ADMIN: {
         MANAGEMENT: 'Gestión',
         COORDINATORS: 'Coordinadores',
@@ -1122,7 +1123,8 @@ export const locale = {
         COPYRIGHTS: 'Derechos de Autor',
         INDUSTRIAL_DESIGNS: 'Diseños Industriales',
         VEGETAL_VARIETIES: 'Variedades Vegetales',
-        INDUSTRIAL_SECRETS: 'Secretos Industriales'
+        INDUSTRIAL_SECRETS: 'Secretos Industriales',
+        HELP: 'Centro de Ayuda'
       },
       COORD: {
         APPLICANTS: 'Solicitantes',
@@ -1135,12 +1137,14 @@ export const locale = {
         UTILITY_MODELS: 'Modelos de Utilidad',
         VEGETAL_VARIETIES: 'Variedades Vegetales',
         INDUSTRIAL_SECRETS: 'Secretos Industriales',
+        HELP: 'Centro de Ayuda'
       },
       APPLICANT: {
         MYREQUESTS: 'Mis Solicitudes',
         REQUESTS: 'Solicitudes',
         REPORTS: 'Reportes',
         REGISTER: "Registrar",
+        HELP: 'Centro de Ayuda'
       },
     },
     AUTH: {

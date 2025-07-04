@@ -87,7 +87,17 @@ export const ADMINISTRATOR_MENUS = [
     icon: 'bar_chart',
     link: '/administrador/reportes',
     type: 'link'
-  }
+  },
+  {
+    name: 'MENU.HELP',
+    type: 'separator',
+  },
+  {
+    name: 'MENU.ADMIN.HELP',
+    icon: 'help',
+    link: '/administrador/ayuda',
+    type: 'link'
+  },
 ];
 
 export const COORDINATOR_MENUS = [
@@ -152,7 +162,6 @@ export const COORDINATOR_MENUS = [
     link: '/coordinador/propiedades/diseno-industrial',
     type: 'link'
   },
-
   {
     name: 'MENU.COORD.VEGETAL_VARIETIES',
     icon: 'eco',
@@ -173,6 +182,16 @@ export const COORDINATOR_MENUS = [
     name: 'MENU.REPORTS',
     icon: 'bar_chart',
     link: '/coordinador/reportes',
+    type: 'link'
+  },
+  {
+    name: 'MENU.HELP',
+    type: 'separator',
+  },
+  {
+    name: 'MENU.COORD.HELP',
+    icon: 'help',
+    link: '/coordinador/ayuda',
     type: 'link'
   }
 ];
@@ -213,6 +232,16 @@ export const APPLICANTS_MENU = [
     name: 'MENU.REPORTS',
     icon: 'analytics',
     link: 'solicitante/reportes',
+    type: 'link'
+  },
+  {
+    name: 'MENU.HELP',
+    type: 'separator',
+  },
+  {
+    name: 'MENU.APPLICANT.HELP',
+    icon: 'help',
+    link: '/solicitante/ayuda',
     type: 'link'
   }
 ];

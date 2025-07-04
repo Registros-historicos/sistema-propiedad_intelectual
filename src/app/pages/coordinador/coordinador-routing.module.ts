@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import {Error503Component} from '../../modules/errors/error503/error503.component';
 
 const routes: Routes = [
     {
@@ -33,6 +34,10 @@ const routes: Routes = [
             {
                 path: 'registro',
                 loadComponent: () => import('./register/register.component').then(m => m.RegisterComponent)
+            },
+            {
+              path: 'ayuda',
+              component: Error503Component
             },
             {
                 path: '',

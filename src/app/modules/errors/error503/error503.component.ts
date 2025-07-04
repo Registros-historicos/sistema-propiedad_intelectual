@@ -39,10 +39,10 @@ export class Error503Component {
         this.router.navigate(['administrador']);
         break;
       case 2:
-        this.router.navigate(['error/404']);
+        this.router.navigate(['coordinador']);
         break;
       default:
-        this.router.navigate(['error/404']);
+        this.router.navigate(['solicitante']);
         break;
     }
   }
