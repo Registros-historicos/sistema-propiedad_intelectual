@@ -61,6 +61,25 @@
         <textarea type="text" class="form-control form-control-solid bg-light" [value]="copyrightModel.nombreObra"
                   readonly style="resize: none; overflow: hidden;" rows="auto"></textarea>
       </div>
+      <div class="fv-row mb-7">
+        <label class="fw-semibold fs-6 mb-2 text-gray-600">Tipo de Solicitud</label>
+        <div class="form-control form-control-solid bg-light d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center">
+            <span [class]="getTipoSolicitudBadgeClass(copyrightModel.tipoSolicitud ?? '')" class="badge me-3">
+              {{copyrightModel.tipoSolicitud ?? 'No definido'}}
+            </span>
+            <div class="d-flex flex-column">
+              <span class="fw-bold text-gray-800 fs-6">{{getTipoSolicitudNombre(copyrightModel.tipoSolicitud ?? '')}}</span>
+              <span class="text-muted fs-7">{{getTipoSolicitudDescripcion(copyrightModel.tipoSolicitud ?? '')}}</span>
+            </div>
+          </div>
+          <div class="symbol symbol-40px">
+            <div class="symbol-label" [ngClass]="getTipoSolicitudIconClass(copyrightModel.tipoSolicitud ?? '')">
+              <app-keenicon [name]="getTipoSolicitudIcon(copyrightModel.tipoSolicitud ?? '')" class="fs-2 text-white"></app-keenicon>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div class="row g-9 mb-7">
         <div class="fv-row col-md-6">

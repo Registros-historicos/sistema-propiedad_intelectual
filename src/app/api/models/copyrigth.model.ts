@@ -25,4 +25,6 @@ export interface ICopyrightModel {
     declaracionOriginalidad?: boolean;
     declaracionVeracidad?: boolean;
     declaracionTitularidad?: boolean;
+    tipoSolicitud?: string,
+
 }

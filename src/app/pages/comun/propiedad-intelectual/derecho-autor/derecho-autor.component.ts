@@ -139,38 +139,58 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
             }
 
             const symbolLabel = `
-              <div class="symbol-label fs-3 bg-light-${randomColorClass} text-${randomColorClass}">
-                ${initials}
-              </div>
-            `;
+        <div class="symbol-label fs-3 bg-light-${randomColorClass} text-${randomColorClass}">
+          ${initials}
+        </div>
+      `;
 
             const nameAndEmail = `
-              <div class="d-flex flex-column" data-action="view" data-id="${full.id}">
-                <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${data}</a>
-                <span class="text-muted">${full.correo || ''}</span>
-              </div>
-            `;
+        <div class="d-flex flex-column" data-action="view" data-id="${full.id}">
+          <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${data}</a>
+          <span class="text-muted">${full.correo || ''}</span>
+        </div>
+      `;
 
             return `
-              <div class="d-flex align-items-center">
-                <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" data-action="view" data-id="${full.id}">
-                  <a href="javascript:;">
-                    ${symbolLabel}
-                  </a>
-                </div>
-                ${nameAndEmail}
-              </div>
-            `;
+        <div class="d-flex align-items-center">
+          <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" data-action="view" data-id="${full.id}">
+            <a href="javascript:;">
+              ${symbolLabel}
+            </a>
+          </div>
+          ${nameAndEmail}
+        </div>
+      `;
           },
         },
         {
-          title: this.translate.instant('TABLE.WORK_TITLE'), data: 'nombreObra'
+          title: this.translate.instant('TABLE.WORK_TITLE'),
+          data: 'nombreObra',
+          render: (data) => {
+            return `<span class="fw-bold fs-6 text-gray-800">${data || ''}</span>`;
+          }
         },
         {
-          title: this.translate.instant('TABLE.INSTITUTION'), data: 'institucion'
+          title: 'Tipo de Solicitud',
+          data: 'tipoSolicitud',
+          render: (data) => {
+            const badgeClass = data === 'RPDA-01' ? 'badge-light-primary' : 'badge-light-info';
+            const badgeText = data === 'RPDA-01' ? 'Obra Literaria/Artística' : 'Derechos Conexos';
+            return `<span class="badge ${badgeClass}">${data}</span>
+              <div class="text-muted fs-7 mt-1">${badgeText}</div>`;
+          }
         },
         {
-          title: this.translate.instant('TABLE.DATE'), data: 'fechaSolicitud', render: function (data) {
+          title: this.translate.instant('TABLE.INSTITUTION'),
+          data: 'institucion',
+          render: (data) => {
+            return `<span class="fw-semibold text-gray-600">${data || ''}</span>`;
+          }
+        },
+        {
+          title: this.translate.instant('TABLE.DATE'),
+          data: 'fechaSolicitud',
+          render: function (data) {
             return `<span class="fw-semibold text-gray-600">${moment(data).format('DD-MM-YYYY')}</span>`;
           }
         }
@@ -604,6 +624,7 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
       institucion: '',
       estado: 'En trámite',
       descripcion: '',
+      tipoSolicitud: '',
       documentos: []
     };
 
@@ -663,5 +684,61 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.reloadEvent.unsubscribe();
+  }
+  // Agregar estos métodos a tu componente
+
+  /**
+   * Obtener clase CSS para el badge del tipo de solicitud
+   */
+  getTipoSolicitudBadgeClass(tipoSolicitud: string): string {
+    const badgeClasses: { [key: string]: string } = {
+      'RPDA-01': 'badge-light-primary',
+      'RPDA-02': 'badge-light-info'
+    };
+    return badgeClasses[tipoSolicitud] || 'badge-light-secondary';
+  }
+
+  /**
+   * Obtener nombre descriptivo del tipo de solicitud
+   */
+  getTipoSolicitudNombre(tipoSolicitud: string): string {
+    const nombres: { [key: string]: string } = {
+      'RPDA-01': 'Registro de Obra',
+      'RPDA-02': 'Derechos Conexos'
+    };
+    return nombres[tipoSolicitud] || 'Tipo no definido';
+  }
+
+  /**
+   * Obtener descripción del tipo de solicitud
+   */
+  getTipoSolicitudDescripcion(tipoSolicitud: string): string {
+    const descripciones: { [key: string]: string } = {
+      'RPDA-01': 'Obras literarias y artísticas',
+      'RPDA-02': 'Fonogramas, videogramas y ediciones'
+    };
+    return descripciones[tipoSolicitud] || 'Sin descripción';
+  }
+
+  /**
+   * Obtener icono para el tipo de solicitud
+   */
+  getTipoSolicitudIcon(tipoSolicitud: string): string {
+    const iconos: { [key: string]: string } = {
+      'RPDA-01': 'book',
+      'RPDA-02': 'music-note'
+    };
+    return iconos[tipoSolicitud] || 'document';
+  }
+
+  /**
+   * Obtener clase CSS para el ícono del tipo de solicitud
+   */
+  getTipoSolicitudIconClass(tipoSolicitud: string): string {
+    const iconClasses: { [key: string]: string } = {
+      'RPDA-01': 'bg-primary',
+      'RPDA-02': 'bg-info'
+    };
+    return iconClasses[tipoSolicitud] || 'bg-secondary';
   }
 }

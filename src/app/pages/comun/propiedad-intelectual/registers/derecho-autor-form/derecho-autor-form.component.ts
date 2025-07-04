@@ -51,6 +51,7 @@ export class DerechoAutorFormComponent implements OnInit {
     datosObraPrimigenia: '',
     urlObra: '',
     sintesisObra: '',
+    tipoSolicitud: '',
     declaracionOriginalidad: false,
     declaracionVeracidad: false,
     declaracionTitularidad: false,
@@ -123,6 +124,7 @@ export class DerechoAutorFormComponent implements OnInit {
     this.placeholderUrlObra = this.translate.instant('FORMS.COPYRIGHT.EXEMPLAR_SECTION.URL_FIELD.PLACEHOLDER');
     this.placeholderSintesisObra = this.translate.instant('FORMS.COPYRIGHT.EXEMPLAR_SECTION.SYNTHESIS_FIELD.PLACEHOLDER');
     this.copyrightModel.estado = 'En trámite';
+    this.copyrightModel.tipoSolicitud = 'RPDA-01';
   }
 
   private generateSolicitudId(): string {
@@ -582,6 +584,19 @@ export class DerechoAutorFormComponent implements OnInit {
     if (!this.validateRequiredDocuments()) {
       return;
     }
+    if (!this.copyrightModel.tipoSolicitud) {
+      this.showAlert({
+        icon: 'error',
+        title: 'Error!',
+        text: 'El tipo de solicitud INDAUTOR es requerido'
+      });
+      return;
+    }
+
+    // Validar compatibilidad entre tipo de solicitud y rama
+    if (!this.validarCompatibilidadTipoSolicitudRama()) {
+      return;
+    }
 
     this.isLoading = true;
 
@@ -673,4 +688,52 @@ export class DerechoAutorFormComponent implements OnInit {
   collapse3 = { toggle: () => { this.isCollapsed3 = !this.isCollapsed3; } };
   collapse4 = { toggle: () => { this.isCollapsed4 = !this.isCollapsed4; } };
   collapse5 = { toggle: () => { this.isCollapsed5 = !this.isCollapsed5; } };
+  /**
+   * Manejar cambio en tipo de solicitud
+   */
+  onTipoSolicitudChange(): void {
+    // Lógica adicional si es necesaria
+    console.log('Tipo de solicitud seleccionado:', this.copyrightModel.tipoSolicitud);
+  }
+
+  /**
+   * Determinar automáticamente el tipo de solicitud basado en la rama
+   */
+  private determinarTipoSolicitudPorRama(rama: string): 'RPDA-01' | 'RPDA-02' {
+    // Ramas que van con RPDA-02 (Derechos Conexos)
+    const ramasRPDA02 = [
+      'fonograma',
+      'videograma',
+      'edicion_libro'
+    ];
+
+    return ramasRPDA02.includes(rama) ? 'RPDA-02' : 'RPDA-01';
+  }
+
+  /**
+   * Validar que el tipo de solicitud sea compatible con la rama seleccionada
+   */
+  private validarCompatibilidadTipoSolicitudRama(): boolean {
+    if (!this.copyrightModel.rama || !this.copyrightModel.tipoSolicitud) {
+      return true; // No validar si no están ambos seleccionados
+    }
+
+    const tipoEsperado = this.determinarTipoSolicitudPorRama(this.copyrightModel.rama);
+
+    if (this.copyrightModel.tipoSolicitud !== tipoEsperado) {
+      this.showAlert({
+        icon: 'warning',
+        title: 'Incompatibilidad detectada',
+        text: `La rama "${this.copyrightModel.rama}" debería usar ${tipoEsperado}. ¿Deseas cambiar automáticamente?`,
+        showCancelButton: true,
+        confirmButtonText: 'Sí, cambiar',
+        cancelButtonText: 'Mantener actual'
+      });
+      return false;
+    }
+
+    return true;
+  }
+
 }
+
