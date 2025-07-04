@@ -51,6 +51,8 @@ export const locale = {
       FEDERAL_ENTITY: "Entidad Federativa",
       PHONE: "Teléfono",
       REGISTERED_DATE: "Fecha de registro",
+      TITLE_REQUEST: "Título",
+      DESCRIPTION_REQUEST: "Descripción",
       PAGE_LENGTH: {
         LABEL: "Mostrar:",
         RECORDS: "registros"
