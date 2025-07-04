@@ -8,6 +8,15 @@
   </div>
   <div class="card-body">
     <form #myForm="ngForm" (ngSubmit)="onSubmit($event)" class="copyright-form">
+      <div class="mb-6">
+        <div class="form-check form-check-custom form-check-solid form-switch">
+          <label class="form-check-label me-5">Nuevo registro</label>
+          <input class="form-check-input w-50px bg-primary border-primary" type="checkbox"
+            name="model.app.sidebar.default.minimize.desktop.default"
+            disabled />
+          <label class="form-check-label ms-5">Registro anterior</label>
+        </div>
+      </div>
       <div class="mb-7 p-4 border rounded">
         <h3 class="mb-4">Datos Generales del Solicitante</h3>
         <!-- Modalidad -->
