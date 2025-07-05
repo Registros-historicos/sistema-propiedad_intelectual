@@ -11,3 +11,118 @@
     }
   }
 }
+
+
+/* Estilos para inputs y botones */
+.form-control-lg {
+  border: 1px solid #e0e3e7;
+
+  &:focus {
+    border-color: #2B3E8C;
+    box-shadow: 0 0 0 3px rgba(43, 62, 140, 0.1);
+  }
+}
+
+.btn-primary {
+  background-color: #2B3E8C;
+  border: none;
+  font-weight: 600;
+  padding: 0.75rem;
+  transition: all 0.3s ease;
+  min-height: 42px; /* Altura mínima consistente */
+  position: relative; /* Para posicionar el contenido */
+
+  &:hover {
+    background-color: darken(#2B3E8C, 7%);
+  }
+
+  &:disabled {
+    background-color: lighten(#2B3E8C, 20%);
+  }
+
+  .login-button-content {
+    display: inline-block;
+    min-width: 120px; /* Ancho mínimo para mantener el tamaño */
+    text-align: center;
+  }
+
+  /**.indicator-progress {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }**/
+}
+
+/* Responsive */
+@media (max-width: 991.98px) {
+  .login-main-container {
+    flex-direction: column;
+  }
+
+  .w-lg-50 {
+    width: 100% !important;
+  }
+
+  .login-form-container {
+    padding: 2rem;
+    min-height: 400px;
+  }
+
+  .login-aside-section {
+    min-height: 300px;
+  }
+}
+
+/* Fullscreen loader styles */
+.fullscreen-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #ffd900ee;
+  //background-color: rgba(255, 255, 255, 0.76);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(2px);
+  animation: fadeIn 0.3s ease-out forwards;
+    &.ng-leave {  
+    animation: fadeOut 3s ease-in forwards; /* 3 segundos de duración */
+  }
+
+  .loader-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    
+    .indicator-progress {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #2B3E8C;
+    }
+    
+    .spinner-border {
+      width: 3rem;
+      height: 3rem;
+      border-width: 0.25em;
+      border-color: #2B3E8C;
+      border-right-color: transparent;
+    }
+  }
+}
+
+.fullscreen-loader .spinner-border {
+  width: 3rem;
+  height: 3rem;
+  border-width: 0.3em;
+}
+
+/* Opcional: Deshabilitar el botón durante la carga */
+button[type="submit"][disabled] {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+

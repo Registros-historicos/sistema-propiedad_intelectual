@@ -1,0 +1,133 @@
+<div class="row d-flex align-items-stretch">
+  <div class="col-xl-6 d-flex">
+    <!-- begin::Header -->
+    <div class="card card-xl-stretch mb-xl-8 h-100 w-100">
+      <div class="card-header border-0 pt-5">
+        <h3 class="card-title align-items-start flex-column">
+          <span
+            class="card-label fw-bolder fs-3 mb-1"
+            translate="GRAPHICS.TITLES.REQUEST_TYPES"
+          ></span>
+          <span
+            class="text-muted fw-bold fs-7"
+            translate="GRAPHICS.SUBTITLES.REGISTER"
+          ></span>
+        </h3>
+        <div class="card-toolbar">
+          <!-- begin::Menu -->
+          <button
+            type="button"
+            class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary"
+            data-kt-menu-trigger="click"
+            data-kt-menu-placement="bottom-end"
+            data-kt-menu-flip="top-end"
+          >
+            <app-keenicon name="category" class="fs-2"></app-keenicon>
+          </button>
+
+          <app-dropdown-menu1></app-dropdown-menu1>
+        </div>
+      </div>
+
+      <div class="card-body py-3">
+        <div class="table-responsive">
+          <table class="table align-middle gs-0 gy-5">
+            <thead>
+              <tr>
+                <th class="p-0 w-50px"></th>
+                <th class="p-0 min-w-200px"></th>
+                <th class="p-0 min-w-100px"></th>
+                <th class="p-0 min-w-40px"></th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let tipo of tiposSolicitudes">
+                <th>
+                  <div class="symbol symbol-50px me-2">
+                    <span class="symbol-label">
+                      <mat-icon fontIcon="{{ tipo.icono }}"></mat-icon>
+                    </span>
+                  </div>
+                </th>
+                <td>
+                  <span class="text-gray-900 fw-bolder mb-1 fs-6">{{
+                    tipo.nombre
+                  }}</span>
+                </td>
+                <td>
+                  <div class="d-flex flex-column w-100 me-2">
+                    <div class="d-flex flex-stack mb-2">
+                      <span class="me-2 fs-6 fw-bold text-primary"
+                        >{{ tipo.total }} solicitudes</span
+                      >
+                    </div>
+                  </div>
+                </td>
+                <td class="text-end">
+                  <a
+                    routerLink="/solicitante/solicitudes"
+                    class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary"
+                  >
+                    <app-keenicon
+                      name="arrow-right"
+                      class="fs-2"
+                    ></app-keenicon>
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-6 d-flex">
+    <div class="card h-100 w-100">
+      <div class="card-header border-0 pt-5">
+        <h3 class="card-title align-items-start flex-column">
+          <span
+            class="card-label fw-bolder fs-3 mb-1"
+            translate="GRAPHICS.TITLES.REQUEST"
+          ></span>
+          <span
+            class="text-muted fw-bold fs-7"
+            translate="GRAPHICS.SUBTITLES.MONTHS"
+          ></span>
+        </h3>
+
+        <div class="card-toolbar">
+          <button
+            type="button"
+            class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary"
+            data-kt-menu-trigger="click"
+            data-kt-menu-placement="bottom-end"
+            data-kt-menu-flip="top-end"
+          >
+            <app-keenicon name="category" class="fs-2"></app-keenicon>
+          </button>
+          <app-dropdown-menu1></app-dropdown-menu1>
+        </div>
+      </div>
+      <div class="card-body">
+        <div #chartRef id="dashboard_chart" [style.height]="'350px'">
+          <apx-chart
+            [series]="chartOptions.series"
+            [chart]="chartOptions.chart"
+            [xaxis]="chartOptions.xaxis"
+            [yaxis]="chartOptions.yaxis"
+            [dataLabels]="chartOptions.dataLabels"
+            [stroke]="chartOptions.stroke"
+            [legend]="chartOptions.legend"
+            [fill]="chartOptions.fill"
+            [states]="chartOptions.states"
+            [tooltip]="chartOptions.tooltip"
+            [colors]="chartOptions.colors"
+            [plotOptions]="chartOptions.plotOptions"
+          ></apx-chart>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

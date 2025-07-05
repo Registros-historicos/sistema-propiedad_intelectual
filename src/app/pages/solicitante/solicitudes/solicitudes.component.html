@@ -1,0 +1,514 @@
+<div class="card">
+  <div class="card-header border-0 pt-5">
+    <div class="card-title">
+      <div class="d-flex flex-column align-items-start w-100">
+        <div class="card-title mb-3">
+          <span class="card-label fw-bolder fs-3">Mis Solicitudes</span>
+        </div>
+        <div class="d-flex align-items-center position-relative w-100">
+          <app-keenicon
+            name="magnifier"
+            class="fs-3 position-absolute ms-5"
+          ></app-keenicon>
+          <input
+            type="text"
+            data-action="filter"
+            class="form-control form-control-solid w-100 ps-12"
+            placeholder="Buscar solicitud"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="card-toolbar">
+      <div class="d-flex align-items-center">
+        <label class="form-label text-gray-600 me-3 mb-0">Mostrar:</label>
+        <select
+          class="form-select form-select-sm form-select-solid w-75px"
+          [(ngModel)]="pageLength"
+          (change)="onPageLengthChange($event)"
+        >
+          <option *ngFor="let length of lengthMenu" [value]="length">
+            {{ length }}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-body pt-0">
+    <app-crud
+      [datatableConfig]="datatableConfig"
+      route="/apps/solicitudes"
+      (deleteEvent)="delete($event)"
+      (viewEvent)="view($event)"
+      (followEvent)="follow($event)"
+      [reload]="reloadEvent"
+      [modal]="isViewMode ? formModal : formModalFollow"
+    ></app-crud>
+
+    <swal #noticeSwal [swalOptions]="swalOptions"></swal>
+  </div>
+
+  <ng-template #formModal let-modal>
+    <div class="modal-header">
+      <h3 class="modal-title">Detalles de la Solicitud</h3>
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Close"
+        (click)="modal.dismiss('Cross click')"
+      ></button>
+    </div>
+
+    <div class="modal-body">
+      <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-650px">
+        <div
+          class="notice d-flex bg-light-info rounded border-info border border-dashed mb-7 p-6"
+        >
+          <app-keenicon
+            name="information-5"
+            class="fs-2tx text-info me-4"
+          ></app-keenicon>
+          <div class="d-flex flex-stack flex-grow-1">
+            <div class="fw-semibold">
+              <h4 class="text-gray-900 fw-bold">Información de la Solicitud</h4>
+              <div class="fs-6 text-gray-700">
+                Aquí puedes ver los detalles de la solicitud seleccionada.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="fv-row mb-7">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Título</label>
+          <textarea
+            type="text"
+            class="form-control form-control-solid bg-light"
+            [value]="solicitudSeleccionada?.titulo"
+            readonly
+            style="resize: none; overflow: hidden"
+            rows="auto"
+          ></textarea>
+        </div>
+
+        <div class="row g-9 mb-7">
+          <div class="fv-row col-md-6">
+            <label class="fw-semibold fs-6 mb-2 text-gray-600"
+              >Solicitante</label
+            >
+            <input
+              type="text"
+              class="form-control form-control-solid bg-light"
+              [value]="solicitudSeleccionada?.solicitante"
+              readonly
+            />
+          </div>
+
+          <div class="fv-row col-md-6">
+            <label class="fw-semibold fs-6 mb-2 text-gray-600">Correo</label>
+            <input
+              type="email"
+              class="form-control form-control-solid bg-light"
+              [value]="solicitudSeleccionada?.correo"
+              readonly
+            />
+          </div>
+        </div>
+
+        <div class="row g-9 mb-7">
+          <div class="fv-row col-md-6">
+            <label class="fw-semibold fs-6 mb-2 text-gray-600"
+              >Fecha de Solicitud</label
+            >
+            <input
+              type="text"
+              class="form-control form-control-solid bg-light"
+              [value]="solicitudSeleccionada?.fechaSolicitud"
+              readonly
+            />
+          </div>
+
+          <div class="fv-row col-md-6">
+            <label class="fw-semibold fs-6 mb-2 text-gray-600">Estado</label>
+            <div
+              class="form-control form-control-solid d-flex align-items-center"
+            >
+              <span
+                class="badge"
+                [ngClass]="{
+                  'badge-light-success':
+                    solicitudSeleccionada?.estado === 'Aprobada',
+                  'badge-light-primary':
+                    solicitudSeleccionada?.estado === 'Registrada',
+                  'badge-light-warning':
+                    solicitudSeleccionada?.estado === 'En trámite',
+                  'badge-light-danger':
+                    solicitudSeleccionada?.estado ===
+                    'Trámite con observaciones',
+                  'badge-light-info':
+                    solicitudSeleccionada?.estado === 'Concluida'
+                }"
+                class="fs-7 fw-bold"
+              >
+                {{ solicitudSeleccionada?.estado }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="fv-row mb-7">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Descripción</label>
+          <textarea
+            class="form-control form-control-solid bg-light"
+            [value]="solicitudSeleccionada?.descripcion"
+            rows="3"
+            readonly
+          ></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="modal.dismiss('Close click')"
+      >
+        Cerrar
+      </button>
+    </div>
+  </ng-template>
+
+  <ng-template #formModalFollow let-modal>
+    <div class="modal-header bg-primary">
+      <h3 class="modal-title text-white">
+        <app-keenicon name="chart" class="fs-2 me-2 text-white"></app-keenicon>
+        Seguimiento de la Solicitud
+      </h3>
+      <button
+        type="button"
+        class="btn-close btn-close-white"
+        aria-label="Close"
+        (click)="modal.dismiss('Cross click')"
+      ></button>
+    </div>
+
+    <div class="modal-body">
+      <div class="d-flex flex-column scroll-y me-n7 pe-7">
+        <!-- Información general -->
+        <div class="tracking-header">
+          <h4 class="mb-2">{{ solicitudSeleccionada?.titulo }}</h4>
+          <div class="d-flex justify-content-center align-items-center gap-4">
+            <div class="text-center">
+              <div class="fs-7 opacity-75">Solicitante</div>
+              <div class="fw-bold">
+                {{ solicitudSeleccionada?.solicitante }}
+              </div>
+            </div>
+            <div class="text-center">
+              <div class="fs-7 opacity-75">Correo</div>
+              <div class="fw-bold">{{ solicitudSeleccionada?.correo }}</div>
+            </div>
+            <div class="text-center">
+              <div class="fs-7 opacity-75">Progreso</div>
+              <div class="fw-bold">
+                {{ getStatusProgress(solicitudSeleccionada!.estado) }}%
+              </div>
+            </div>
+          </div>
+
+          <div class="progress-indicator mt-4">
+            <div
+              class="progress-bar"
+              [style.width.%]="getStatusProgress(solicitudSeleccionada!.estado)"
+            ></div>
+          </div>
+        </div>
+
+        <!-- Estado actual -->
+        <div class="card card-flush mb-6">
+          <div class="card-body text-center py-8">
+            <div class="symbol symbol-75px mx-auto mb-4">
+              <div
+                class="symbol-label"
+                [ngClass]="{
+                  'bg-success':
+                    solicitudSeleccionada?.estado === 'Aprobada' ||
+                    solicitudSeleccionada?.estado === 'Concluida',
+                  'bg-primary': solicitudSeleccionada?.estado === 'Registrada',
+                  'bg-warning': solicitudSeleccionada?.estado === 'En trámite',
+                  'bg-danger':
+                    solicitudSeleccionada?.estado ===
+                    'Trámite con observaciones'
+                }"
+              >
+                <app-keenicon
+                  [name]="getStatusIcon(solicitudSeleccionada!.estado)"
+                  class="fs-1 text-white"
+                ></app-keenicon>
+              </div>
+            </div>
+            <h3 class="fw-bold text-gray-800 mb-2">
+              {{ solicitudSeleccionada?.estado }}
+            </h3>
+            <div class="fs-6 text-gray-600">
+              {{ getStatusDescription(solicitudSeleccionada!.estado) }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Historial de estados -->
+        <div class="card card-flush mb-6">
+          <div class="card-header">
+            <div class="card-title">
+              <h4 class="fw-bold text-gray-800">
+                <app-keenicon name="timeline" class="fs-2 me-2"></app-keenicon>
+                Historial de Estados
+              </h4>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="timeline">
+              <!-- Estado: Registrada -->
+              <div
+                class="timeline-item"
+                [ngClass]="{
+                  active: solicitudSeleccionada?.estado === 'Registrada',
+                  completed: getStatusOrder(solicitudSeleccionada!.estado) > 1
+                }"
+              >
+                <div class="timeline-line"></div>
+                <div class="timeline-icon symbol symbol-circle symbol-40px">
+                  <div
+                    class="symbol-label"
+                    [ngClass]="{
+                      'bg-success':
+                        getStatusOrder(solicitudSeleccionada!.estado) > 1,
+                      'bg-primary':
+                        solicitudSeleccionada?.estado === 'Registrada',
+                      'bg-light-gray':
+                        getStatusOrder(solicitudSeleccionada!.estado) < 1
+                    }"
+                  >
+                    <app-keenicon
+                      name="check"
+                      class="fs-2"
+                      [ngClass]="{
+                        'text-white':
+                          getStatusOrder(solicitudSeleccionada!.estado) >= 1,
+                        'text-gray-400':
+                          getStatusOrder(solicitudSeleccionada!.estado) < 1
+                      }"
+                    ></app-keenicon>
+                  </div>
+                </div>
+                <div class="timeline-content">
+                  <h5 class="fw-bold text-gray-800 mb-0">Registrada</h5>
+                  <p class="text-gray-700 mb-0">
+                    La solicitud ha sido registrada.
+                  </p>
+                  <div class="fs-7 text-gray-500 mt-2">
+                    <app-keenicon
+                      name="calendar"
+                      class="fs-5 me-1"
+                    ></app-keenicon>
+                    Fecha de Registro:
+                    {{ solicitudSeleccionada?.fechaSolicitud }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Estado: En trámite -->
+              <div
+                class="timeline-item"
+                [ngClass]="{
+                  active: solicitudSeleccionada?.estado === 'En trámite',
+                  completed: getStatusOrder(solicitudSeleccionada!.estado) > 2
+                }"
+              >
+                <div class="timeline-line"></div>
+                <div class="timeline-icon symbol symbol-circle symbol-40px">
+                  <div
+                    class="symbol-label"
+                    [ngClass]="{
+                      'bg-success':
+                        getStatusOrder(solicitudSeleccionada!.estado) > 2,
+                      'bg-warning':
+                        solicitudSeleccionada?.estado === 'En trámite',
+                      'bg-light-gray':
+                        getStatusOrder(solicitudSeleccionada!.estado) < 2
+                    }"
+                  >
+                    <app-keenicon
+                      name="timer"
+                      class="fs-2"
+                      [ngClass]="{
+                        'text-white':
+                          getStatusOrder(solicitudSeleccionada!.estado) >= 2,
+                        'text-gray-400':
+                          getStatusOrder(solicitudSeleccionada!.estado) < 2
+                      }"
+                    ></app-keenicon>
+                  </div>
+                </div>
+                <div class="timeline-content">
+                  <h5 class="fw-bold text-gray-800 mb-0">En trámite</h5>
+                  <p class="text-gray-700 mb-0">
+                    La solicitud está en proceso de revisión.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Estado: Trámite con observaciones -->
+              <div
+                class="timeline-item"
+                *ngIf="
+                  solicitudSeleccionada?.estado === 'Trámite con observaciones'
+                "
+              >
+                <div class="timeline-line"></div>
+                <div class="timeline-icon symbol symbol-circle symbol-40px">
+                  <div class="symbol-label bg-danger">
+                    <app-keenicon
+                      name="information"
+                      class="fs-2 text-white"
+                    ></app-keenicon>
+                  </div>
+                </div>
+                <div class="timeline-content">
+                  <h5 class="fw-bold text-gray-800 mb-0">
+                    Trámite con Observaciones
+                  </h5>
+                  <p class="text-gray-700 mb-0">
+                    Se requiere atención para continuar con el trámite.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Estado: Aprobada -->
+              <div
+                class="timeline-item"
+                [ngClass]="{
+                  active: solicitudSeleccionada?.estado === 'Aprobada',
+                  completed: solicitudSeleccionada?.estado === 'Concluida'
+                }"
+              >
+                <div class="timeline-line"></div>
+                <div class="timeline-icon symbol symbol-circle symbol-40px">
+                  <div
+                    class="symbol-label"
+                    [ngClass]="{
+                      'bg-success':
+                        solicitudSeleccionada?.estado === 'Aprobada',
+                      'bg-light-gray':
+                        solicitudSeleccionada?.estado !== 'Aprobada'
+                    }"
+                  >
+                    <app-keenicon
+                      name="check"
+                      class="fs-2 text-white"
+                    ></app-keenicon>
+                  </div>
+                </div>
+                <div class="timeline-content">
+                  <h5 class="fw-bold text-gray-800 mb-0">Aprobada</h5>
+                  <p class="text-gray-700 mb-0">
+                    La solicitud ha sido aprobada.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Estado: Concluida -->
+              <div
+                class="timeline-item"
+                [ngClass]="{
+                  active: solicitudSeleccionada?.estado === 'Concluida'
+                }"
+              >
+                <div class="timeline-icon symbol symbol-circle symbol-40px">
+                  <div class="symbol-label bg-info">
+                    <app-keenicon
+                      name="check-circle"
+                      class="fs-2 text-white"
+                    ></app-keenicon>
+                  </div>
+                </div>
+                <div class="timeline-content">
+                  <h5 class="fw-bold text-gray-800 mb-0">Concluida</h5>
+                  <p class="text-gray-700 mb-0">
+                    El trámite de la solicitud ha concluido.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Acción sobre comprobante -->
+        <div class="d-flex justify-content-center mt-5">
+          <button
+            class="btn btn-light-primary"
+            (click)="abrirComprobante()"
+          >
+            <app-keenicon name="folder-open" class="me-2"></app-keenicon>
+            Comprobante de pago
+          </button>
+        </div>
+
+        <!-- Modal simulado para subir comprobante -->
+        <div *ngIf="mostrarUploaderComprobante" class="modal d-block bg-dark bg-opacity-50" tabindex="-1">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+              <div class="modal-header">
+                <h5 class="modal-title">Subir comprobante de pago</h5>
+                <button type="button" class="btn-close" (click)="mostrarUploaderComprobante = false"></button>
+              </div>
+
+              <div class="modal-body">
+                <input
+                  type="file"
+                  class="form-control"
+                  accept=".pdf, .jpg, .jpeg, .png"
+                  (change)="onFileSelected($event)"
+                />
+                <div class="form-text">Formatos permitidos: PDF, JPG, JPEG, PNG.</div>
+
+                <div class="text-muted mt-2" *ngIf="comprobanteSeleccionado">
+                  Archivo seleccionado:
+                  <strong>{{ comprobanteSeleccionado.name }}</strong>
+                </div>
+              </div>
+
+              <div class="modal-footer">
+                <button class="btn btn-secondary" (click)="mostrarUploaderComprobante = false">Cancelar</button>
+                <button
+                  class="btn btn-primary"
+                  [disabled]="!comprobanteSeleccionado"
+                  (click)="upload()"
+                >
+                  Subir comprobante
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-light"
+        (click)="modal.dismiss('Close click')"
+      >
+        Cerrar
+      </button>
+    </div>
+  </ng-template>
+  
+</div>

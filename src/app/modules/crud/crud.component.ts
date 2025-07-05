@@ -7,6 +7,7 @@ import { fromEvent } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 import { SweetAlertOptions } from 'sweetalert2';
 import { Api, Config } from 'datatables.net';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-crud',
@@ -26,6 +27,8 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Output() deleteEvent = new EventEmitter<number>();
   @Output() editEvent = new EventEmitter<number>();
+  @Output() viewEvent = new EventEmitter<number>();
+  @Output() followEvent = new EventEmitter<number>();
   @Output() createEvent = new EventEmitter<boolean>();
 
   dtOptions: Config = {};
@@ -45,15 +48,29 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
     modalDialogClass: 'modal-dialog modal-dialog-centered mw-650px',
   };
 
-  swalOptions: SweetAlertOptions = { buttonsStyling: false };
+  swalOptions: SweetAlertOptions;
 
   private modalRef: NgbModalRef;
 
+  titleDelete: string = '';
+  titleDeleteSuccess: string = '';
+  textDelete: string = '';
+
   private clickListener: () => void;
 
-  constructor(private renderer: Renderer2, private router: Router, private modalService: NgbModal) { }
+  constructor(
+    private renderer: Renderer2,
+    private router: Router,
+    private modalService: NgbModal,
+    private translate: TranslateService
+  ) { }
 
   ngOnInit(): void {
+
+    this.titleDelete = this.translate.instant('ALERT.DELETE.TITLE');
+    this.textDelete = this.translate.instant('ALERT.DELETE.BODY');
+    this.titleDeleteSuccess = this.translate.instant('ALERT.DELETE.SUCCESS');
+
     this.dtOptions = {
       dom: "<'row'<'col-sm-12'tr>>" +
         "<'d-flex justify-content-between'<'col-sm-12 col-md-5'i><'d-flex justify-content-between'p>>",
@@ -77,18 +94,35 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
   renderActionColumn(): void {
     const actionColumn = {
       sortable: false,
-      title: 'Actions',
+      title: this.translate.instant('TABLE.ACTIONS.LABEL'),
       render: (data: any, type: any, full: any) => {
         const editButton = `
-          <button class="btn btn-icon btn-active-light-primary w-30px h-30px me-3" data-action="edit" data-id="${full.id}">
+          <button class="btn btn-icon btn-active-light-primary w-15px h-25px me-3" data-action="edit" data-id="${full.id}">
             <i class="ki-duotone ki-pencil fs-3"><span class="path1"></span><span class="path2"></span></i>
           </button>`;
 
+        // Arreglar arreglo de marcas para que utilice ID (full.id) y no REGISTRO (full.registro)
         const deleteButton = `
-          <button class="btn btn-icon btn-active-light-primary w-30px h-30px" data-action="delete" data-id="${full.id}">
+          <button class="btn btn-icon btn-active-light-primary w-15px h-25px" data-action="delete" data-id="${full.id || full.registro}">
             <i class="ki-duotone ki-trash fs-3">
               <span class="path1"></span><span class="path2"></span>
               <span class="path3"></span><span class="path4"></span><span class="path5"></span>
+            </i>
+          </button>`;
+
+        const followButton = `
+        <button class="btn btn-icon btn-active-light-primary w-15px h-25px me-2" data-action="follow" data-id="${full.id || full.registro}">
+          <i class="ki-duotone ki-chart fs-3">
+            <span class="path1"></span><span class="path2"></span>
+            <span class="path3"></span><span class="path4"></span><span class="path5"></span>
+          </i>
+        </button>`;
+
+        const viewButton = `
+          <button class="btn btn-icon btn-active-light-primary w-15px h-25px me-2" data-action="view" data-id="${full.id || full.registro}">
+            <i class="ki-duotone ki-eye fs-3">
+              <span class="path1"></span><span class="path2"></span><span class="path3"></span>
+              <span class="path4"></span><span class="path5"></span><span class="path6"></span>
             </i>
           </button>`;
 
@@ -96,6 +130,14 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
 
         if (this.editEvent.observed) {
           buttons.push(editButton);
+        }
+
+        if (this.viewEvent.observed) {
+          buttons.push(viewButton);
+        }
+
+        if (this.followEvent.observed) {
+          buttons.push(followButton);
         }
 
         if (this.deleteEvent.observed) {
@@ -120,9 +162,15 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
 
         switch (action) {
           case 'view':
-            this.router.navigate([`${this.route}/${id}`]);
+            this.viewEvent.emit(this.idInAction);
+            this.modalRef = this.modalService.open(this.modal, this.modalConfig);
+            /* console.log('Navigating to:', `${this.route}/${id}`);
+            this.router.navigate([`${this.route}/${id}`]); */
             break;
-
+          case 'follow':
+            this.followEvent.emit(this.idInAction);
+            this.modalRef = this.modalService.open(this.modal, this.modalConfig);
+            break;
           case 'create':
             this.createEvent.emit(true);
             this.modalRef = this.modalService.open(this.modal, this.modalConfig);
@@ -181,6 +229,8 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
   setupSweetAlert() {
     this.swalOptions = {
       buttonsStyling: false,
+      confirmButtonText: this.translate.instant('BUTTON.CONFIRM'),
+      cancelButtonText: this.translate.instant('BUTTON.CANCEL')
     };
   }
 }

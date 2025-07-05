@@ -10,11 +10,11 @@
   </tbody>
 </table>
 
-<swal #deleteSwal [swalOptions]="swalOptions" title="Are you sure to delete?" text="This cannot be undone" icon="warning" [showCancelButton]="true"
+<swal #deleteSwal [swalOptions]="swalOptions" [title]="titleDelete" [text]="textDelete" icon="warning" [showCancelButton]="true"
   [focusCancel]="true" (confirm)="triggerDelete()"
   [customClass]="{confirmButton: 'btn btn-danger', cancelButton: 'btn btn-active-light'}">
 </swal>
 
-<swal #successSwal [swalOptions]="swalOptions" title="Delete successfully!" text="" icon="success"
+<swal #successSwal [swalOptions]="swalOptions" [title]="titleDeleteSuccess" icon="success"
   [customClass]="{confirmButton: 'btn btn-success'}">
 </swal>

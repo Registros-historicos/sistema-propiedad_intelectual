@@ -1,0 +1,331 @@
+<div class="card">
+  <div class="card-header border-0 pt-6">
+    <div class="card-title">
+      <h3>{{ isEdit ? 'Editar Coordinador' : 'Agregar Coordinador' }}</h3>
+    </div>
+    <div class="card-toolbar">
+    </div>
+  </div>
+
+  <div class="card-body">
+    <form #myForm="ngForm" (ngSubmit)="onSubmit($event)" class="coordinator-form">
+      <div class="d-flex flex-column scroll-y me-n7 pe-7" id="kt_modal_update_coordinator_scroll" data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_update_coordinator_header" data-kt-scroll-wrappers="#kt_modal_update_coordinator_scroll"
+           data-kt-scroll-offset="300px">
+        <!--begin::Notice-->
+        <div class="notice d-flex bg-light-primary rounded border-primary border border-dashed mb-9 p-6">
+          <!--begin::Icon-->
+          <app-keenicon name="information" class="fs-2tx text-primary me-4"></app-keenicon>
+          <!--end::Icon-->
+          <!--begin::Wrapper-->
+          <div class="d-flex flex-stack flex-grow-1">
+            <!--begin::Content-->
+            <div class="fw-semibold">
+              <div class="fs-6 text-gray-700">El registro de coordinador requiere información completa y verificable. Para más información,
+                consulte nuestra
+                <a href="#">Política de Privacidad</a>
+              </div>
+            </div>
+            <!--end::Content-->
+          </div>
+          <!--end::Wrapper-->
+        </div>
+        <!--end::Notice-->
+
+        <!--begin::Personal Information toggle-->
+        <div class="fw-bold fs-3 rotate collapsible mb-7" data-bs-toggle="collapse" role="button" (click)="collapse1.toggle()" [attr.aria-expanded]="!isCollapsed1" aria-controls="kt_modal_update_coordinator_personal_info">Información Personal
+          <span class="ms-2 rotate-180">
+            <i class="ki-duotone ki-down fs-3" [ngClass]="{ 'ki-up': !isCollapsed1 }"></i>
+          </span>
+        </div>
+        <!--end::Personal Information toggle-->
+
+        <!--begin::Personal Information form-->
+        <div class="collapse show" #collapse1="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
+          <!--begin::Row-->
+          <div class="row g-9 mb-7">
+            <!--begin::Col-->
+            <div class="col-md-6 fv-row">
+              <!--begin::Label-->
+              <label class="required fw-semibold fs-6 mb-2">Nombre</label>
+              <!--end::Label-->
+              <!--begin::Input-->
+              <input type="text" class="form-control form-control-solid" name="nombre" [(ngModel)]="coordinatorModel.nombre" #nombre="ngModel" required minlength="2" />
+              <div *ngIf="myForm.submitted && myForm.invalid" class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                <div *ngIf="nombre.errors?.['required']">El nombre es requerido</div>
+                <div *ngIf="nombre.errors?.['minlength']">El nombre debe tener al menos 2 caracteres</div>
+              </div>
+              <!--end::Input-->
+            </div>
+            <!--end::Col-->
+            <!--begin::Col-->
+            <div class="col-md-6 fv-row">
+              <!--begin::Label-->
+              <label class="required fw-semibold fs-6 mb-2">Apellidos</label>
+              <!--end::Label-->
+              <!--begin::Input-->
+              <input type="text" class="form-control form-control-solid" name="apellidos" [(ngModel)]="coordinatorModel.apellidos" #apellidos="ngModel" required minlength="2" />
+              <div *ngIf="myForm.submitted && myForm.invalid" class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                <div *ngIf="apellidos.errors?.['required']">Los apellidos son requeridos</div>
+                <div *ngIf="apellidos.errors?.['minlength']">Los apellidos deben tener al menos 2 caracteres</div>
+              </div>
+              <!--end::Input-->
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--end::Row-->
+
+          <!--begin::Row-->
+          <div class="row g-9 mb-7">
+            <!--begin::Col-->
+            <div class="col-md-6 fv-row">
+              <!--begin::Label-->
+              <label class="required fw-semibold fs-6 mb-2">Edad</label>
+              <!--end::Label-->
+              <!--begin::Input-->
+              <input type="number" class="form-control form-control-solid" name="edad" [(ngModel)]="coordinatorModel.edad" #edad="ngModel" required min="18" max="100" />
+              <div *ngIf="myForm.submitted && myForm.invalid" class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                <div *ngIf="edad.errors?.['required']">La edad es requerida</div>
+                <div *ngIf="edad.errors?.['min']">La edad mínima es 18 años</div>
+                <div *ngIf="edad.errors?.['max']">La edad máxima es 100 años</div>
+              </div>
+              <!--end::Input-->
+            </div>
+            <!--end::Col-->
+            <!--begin::Col-->
+            <div class="col-md-6 fv-row">
+              <!--begin::Label-->
+              <label class="required fw-semibold fs-6 mb-2">Sexo</label>
+              <!--end::Label-->
+              <!--begin::Select-->
+              <select class="form-select form-select-solid" name="sexo" [(ngModel)]="coordinatorModel.sexo" #sexo="ngModel" required>
+                <option value="">Seleccione...</option>
+                <option *ngFor="let option of sexoOptions" [value]="option">{{ option }}</option>
+              </select>
+              <div *ngIf="myForm.submitted && myForm.invalid" class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                <div *ngIf="sexo.errors?.['required']">El sexo es requerido</div>
+              </div>
+              <!--end::Select-->
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--end::Row-->
+
+          <!--begin::Input group-->
+          <div class="fv-row mb-7">
+            <!--begin::Label-->
+            <label class="required fw-semibold fs-6 mb-2">Entidad Federativa</label>
+            <!--end::Label-->
+            <!--begin::Select-->
+            <select class="form-select form-select-solid" name="entidad_federativa"
+                    [(ngModel)]="coordinatorModel.entidad_federativa"
+                    #entidadFederativa="ngModel"
+                    required
+                    (change)="onEntidadChange()">
+              <option value="">Seleccione una entidad federativa...</option>
+              <option *ngFor="let entidad of entidadesFederativas" [value]="entidad">{{ entidad }}</option>
+            </select>
+            <div *ngIf="myForm.submitted && myForm.invalid" class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div *ngIf="entidadFederativa.errors?.['required']">La entidad federativa es requerida</div>
+            </div>
+            <!--end::Select-->
+          </div>
+          <!--end::Input group-->
+
+          <!--begin::Input group-->
+          <div class="fv-row mb-7">
+            <!--begin::Label-->
+            <label class="required fw-semibold fs-6 mb-2">Institución de Adscripción</label>
+            <!--end::Label-->
+            <!--begin::Select-->
+            <select class="form-select form-select-solid" name="institucion_adscripcion"
+                    [(ngModel)]="coordinatorModel.institucion_adscripcion"
+                    #institucionAdscripcion="ngModel"
+                    required
+                    [disabled]="!coordinatorModel.entidad_federativa">
+              <option value="">{{ coordinatorModel.entidad_federativa ? 'Seleccione una institución...' : 'Primero seleccione una entidad federativa' }}</option>
+              <option *ngFor="let institucion of institucionesFiltradas" [value]="institucion.nombre">{{ institucion.nombre }}</option>
+            </select>
+            <div *ngIf="myForm.submitted && myForm.invalid" class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div *ngIf="institucionAdscripcion.errors?.['required']">La institución de adscripción es requerida</div>
+            </div>
+            <!--end::Select-->
+          </div>
+          <!--end::Input group-->
+
+          <!--begin::Row-->
+          <div class="row g-9 mb-7">
+            <!--begin::Col-->
+            <div class="col-md-6 fv-row">
+              <!--begin::Label-->
+              <label class="required fw-semibold fs-6 mb-2">Teléfono</label>
+              <!--end::Label-->
+              <!--begin::Input-->
+              <input type="tel" class="form-control form-control-solid" name="telefono" [(ngModel)]="coordinatorModel.telefono" #telefono="ngModel" required pattern="[0-9]{10}" placeholder="10 dígitos" />
+              <div *ngIf="myForm.submitted && myForm.invalid" class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                <div *ngIf="telefono.errors?.['required']">El teléfono es requerido</div>
+                <div *ngIf="telefono.errors?.['pattern']">El teléfono debe tener 10 dígitos</div>
+              </div>
+              <!--end::Input-->
+            </div>
+            <!--end::Col-->
+            <!--begin::Col-->
+            <div class="col-md-6 fv-row">
+              <!--begin::Label-->
+              <label class="required fw-semibold fs-6 mb-2">
+                <span>Correo Electrónico</span>
+                <span class="ms-1" placement="end" ngbTooltip="El correo electrónico debe estar activo">
+                  <app-keenicon name="information" class="fs-7"></app-keenicon>
+                </span>
+              </label>
+              <!--end::Label-->
+              <!--begin::Input-->
+              <input type="email" class="form-control form-control-solid" name="email" [(ngModel)]="coordinatorModel.email" #email="ngModel" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" />
+              <div *ngIf="myForm.submitted && myForm.invalid" class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                <div *ngIf="email.errors?.['required']">El correo electrónico es requerido</div>
+                <div *ngIf="email.errors?.['pattern']">El correo electrónico no es válido</div>
+              </div>
+              <!--end::Input-->
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--end::Row-->
+
+          <!--begin::Row-->
+          <div class="row g-9 mb-7">
+            <!--begin::Col-->
+            <div class="col-md-6 fv-row">
+              <!--begin::Label-->
+              <label class="required fw-semibold fs-6 mb-2">RFC</label>
+              <!--end::Label-->
+              <!--begin::Input-->
+              <input type="text" class="form-control form-control-solid" name="rfc" [(ngModel)]="coordinatorModel.rfc" #rfc="ngModel" required pattern="^[A-Z&Ñ]{3,4}[0-9]{6}[A-Z0-9]{3}$" placeholder="XXXX000000XXX" style="text-transform: uppercase;" />
+              <div *ngIf="myForm.submitted && myForm.invalid" class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                <div *ngIf="rfc.errors?.['required']">El RFC es requerido</div>
+                <div *ngIf="rfc.errors?.['pattern']">El RFC no tiene el formato correcto</div>
+              </div>
+              <!--end::Input-->
+            </div>
+            <!--end::Col-->
+            <!--begin::Col-->
+            <div class="col-md-6 fv-row">
+              <!--begin::Label-->
+              <label class="required fw-semibold fs-6 mb-2">CURP</label>
+              <!--end::Label-->
+              <!--begin::Input-->
+              <input type="text" class="form-control form-control-solid" name="curp" [(ngModel)]="coordinatorModel.curp" #curp="ngModel" required pattern="^[A-Z]{4}[0-9]{6}[HM][A-Z]{5}[0-9A-Z]{2}$" placeholder="XXXX000000XXXXXXX00" style="text-transform: uppercase;" />
+              <div *ngIf="myForm.submitted && myForm.invalid" class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                <div *ngIf="curp.errors?.['required']">La CURP es requerida</div>
+                <div *ngIf="curp.errors?.['pattern']">La CURP no tiene el formato correcto</div>
+              </div>
+              <!--end::Input-->
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--end::Row-->
+
+          <!--begin::Row-->
+          <div class="row g-9 mb-7">
+            <!--begin::Col-->
+            <div class="col-md-6 fv-row">
+              <!--begin::Label-->
+              <label class="required fw-semibold fs-6 mb-2">Inicio de vigencia de cargo</label>
+              <!--end::Label-->
+              <!--begin::Input-->
+              <div class="input-group">
+                <input
+                  class="form-control form-control-solid"
+                  placeholder="dd/mm/yyyy"
+                  name="fecha_inicio_vigencia"
+                  [(ngModel)]="coordinatorModel.fecha_inicio_vigencia"
+                  ngbDatepicker
+                  #fechaInicio="ngbDatepicker"
+                  #fecha_inicio_vigencia="ngModel"
+                  required
+                />
+                <button
+                  class="btn btn-icon btn-light"
+                  type="button"
+                  (click)="fechaInicio.toggle()"
+                >
+                  <app-keenicon name="calendar" class="fs-4"></app-keenicon>
+                </button>
+              </div>
+              <div *ngIf="myForm.submitted && myForm.invalid" class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                <div *ngIf="fecha_inicio_vigencia.errors?.['required']">La fecha de inicio de vigencia es requerida</div>
+              </div>
+              <!--end::Input-->
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--end::Row-->
+        </div>
+        <!--end::Personal Information form-->
+
+        <!--begin::Documents toggle-->
+        <div class="fw-bold fs-3 rotate collapsible mb-7" data-bs-toggle="collapse" role="button" (click)="collapse2.toggle()" [attr.aria-expanded]="!isCollapsed2" aria-controls="kt_modal_update_coordinator_documents">Documentación
+          <span class="ms-2 rotate-180">
+            <i class="ki-duotone ki-down fs-3" [ngClass]="{ 'ki-up': !isCollapsed2 }"></i>
+          </span>
+        </div>
+        <!--end::Documents toggle-->
+
+        <!--begin::Documents form-->
+        <div class="collapse" #collapse2="ngbCollapse" [(ngbCollapse)]="isCollapsed2">
+          <!--begin::Input group-->
+          <div class="fv-row mb-7">
+            <!--begin::Label-->
+            <label class="required fw-semibold fs-6 mb-2">
+              <span>Oficio de Asignación</span>
+              <span class="ms-1" placement="end" ngbTooltip="Solo se permiten archivos PDF">
+                <app-keenicon name="information" class="fs-7"></app-keenicon>
+              </span>
+            </label>
+            <!--end::Label-->
+            <!--begin::Input-->
+            <input #oficioAsignacion type="file" class="form-control form-control-solid" name="oficio_asignacion" (change)="onFileSelected($event)" accept=".pdf"
+                   [required]="coordinatorModel.id === 0" />
+            <div *ngIf="myForm.submitted && myForm.invalid && coordinatorModel.id === 0 && !selectedFile" class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div>El oficio de asignación es requerido</div>
+            </div>
+            <!--begin::Hint-->
+            <div class="form-text">Solo se permiten archivos PDF. Tamaño máximo: 10MB</div>
+            <!--end::Hint-->
+            <!--begin::Preview-->
+            <div *ngIf="selectedFile" class="mt-3 file-upload-preview">
+              <div class="d-flex align-items-center">
+                <app-keenicon name="pdf" class="fs-2 text-danger me-2 file-icon"></app-keenicon>
+                <span>{{ selectedFile?.name }}</span>
+              </div>
+            </div>
+            <!--end::Preview-->
+            <!--end::Input-->
+          </div>
+          <!--end::Input group-->
+        </div>
+        <!--end::Documents form-->
+      </div>
+
+      <div class="d-flex justify-content-end mt-8">
+        <!--begin::Button-->
+        <button type="button" class="btn btn-light me-3" (click)="cancel()">
+          Cancelar
+        </button>
+        <!--end::Button-->
+
+        <!--begin::Button-->
+        <button type="submit" class="btn btn-primary" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
+          <span class="indicator-label">
+            Guardar
+          </span>
+          <span class="indicator-progress">
+            Por favor espere... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+          </span>
+        </button>
+        <!--end::Button-->
+      </div>
+    </form>
+  </div>
+</div>
+
+<swal #noticeSwal [swalOptions]="swalOptions">
+</swal>

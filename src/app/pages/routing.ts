@@ -1,9 +1,89 @@
 import { Routes } from '@angular/router';
+import { RoleGuard } from '../guards/role.guard';
+import { Error503Component } from '../modules/errors/error503/error503.component';
 
 const Routing: Routes = [
   {
     path: 'dashboard',
+    canActivate: [RoleGuard],
+    data: { roles: ['administrador', 'coordinador', 'solicitante'] },
     loadChildren: () => import('./dashboard/dashboard.module').then((m) => m.DashboardModule),
+  },
+  {
+    path: 'coordinador',
+    canActivate: [RoleGuard],
+    data: { roles: ['coordinador'] },
+    loadChildren: () => import('./coordinador/coordinador.module').then((m) => m.CoordinadorModule)
+  },
+  {
+    path: 'solicitante',
+    canActivate: [RoleGuard],
+    data: { roles: ['solicitante'] },
+    children: [
+      {
+        path: 'dashboard',
+        loadChildren: () => import('./solicitante/dashboard/dashboard.module').then((m) => m.DashboardModule),
+      },
+      {
+        path: 'perfil',
+        loadChildren: () => import('../modules/profile/profile.module').then((m) => m.ProfileModule),
+      },
+       {
+        path: 'solicitudes',
+        loadChildren: () => import('./solicitante/solicitudes/solicitudes.module').then((m) => m.SolicitudesModule),
+      },
+      {
+        path: 'registrar',
+        loadChildren: () => import('./solicitante/registrar/registrar.module').then((m) => m.RegistrarModule),
+      },
+      {
+        path: 'registrar/derechos-autor',
+        loadChildren: () => import('./solicitante/registrar/derechos-autor/derechos-autor.module').then((m) => m.DerechosAutorModule),
+      },
+      {
+        path: 'registrar/patente',
+        loadChildren: () => import('./solicitante/registrar/patente/patente.module').then((m) => m.PatenteModule),
+      },
+      {
+        path: 'registrar/modelo-utilidad',
+        loadChildren: () => import('./solicitante/registrar/modelo-utilidad/modelo-utilidad.module').then((m) => m.ModeloUtilidadModule),
+      },
+      {
+        path: 'registrar/modelo-industrial',
+        loadChildren: () => import('./solicitante/registrar/dis-industrial/dis-industrial.module').then((m) => m.DisIndustrialModule),
+      },
+      {
+        path: 'registrar/trazado-circuitos',
+        loadChildren: () => import('./solicitante/registrar/trazado-circuitos/trazado-circuitos.module').then((m) => m.TrazadoCircuitosModule),
+      },
+      {
+        path: 'registrar/variedad-vegetal',
+        component: Error503Component
+   },
+      {
+        path: 'registrar/secreto-industrial',
+        component: Error503Component
+      },
+      {
+        path: 'reportes',
+        loadChildren: () => import('./reportes/reportes.module').then((m) => m.ReportesModule),
+      },
+      {
+        path: 'ayuda',
+        component: Error503Component
+      },
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      }
+    ]
+  },
+  {
+    path: 'administrador',
+    canActivate: [RoleGuard],
+    data: { roles: ['administrador'] },
+    loadChildren: () => import('./administrador/administrador.module').then((m) => m.AdministradorModule),
   },
   {
     path: 'builder',
@@ -48,7 +128,7 @@ const Routing: Routes = [
   },
   {
     path: '',
-    redirectTo: '/dashboard',
+    redirectTo: '',
     pathMatch: 'full',
   },
   {

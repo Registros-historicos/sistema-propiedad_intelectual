@@ -1,16 +1,19 @@
 import {NgModule} from '@angular/core';
 import {KeeniconComponent} from './keenicon/keenicon.component';
 import {CommonModule} from "@angular/common";
+import { SafeUrlPipe } from './pipes/safe-url.pipe';
 
 @NgModule({
   declarations: [
-    KeeniconComponent
+    KeeniconComponent,
+    SafeUrlPipe
   ],
   imports: [
     CommonModule,
   ],
   exports: [
-    KeeniconComponent
+    KeeniconComponent,
+    SafeUrlPipe
   ]
 })
 export class SharedModule {

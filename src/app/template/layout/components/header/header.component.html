@@ -49,30 +49,32 @@
 
   <!--begin::Header wrapper-->
   <div class="d-flex align-items-stretch justify-content-between flex-lg-grow-1" id="kt_app_header_wrapper">
+    <div class="d-none">
+      <a class="menu-link" [ngClass]="{'active': isProfileRoute()}" routerLink="/administrador/perfil">
+        <span class="menu-title" translate="KEYWORDS.MY_PROFILE"></span>
+      </a>
+      <a class="menu-link" [ngClass]="{'active': isProfileRoute()}" routerLink="/coordinador/perfil">
+        <span class="menu-title" translate="KEYWORDS.MY_PROFILE"></span>
+      </a>
+      <a class="menu-link" [ngClass]="{'active': isProfileRoute()}" routerLink="/solicitante/perfil">
+        <span class="menu-title" translate="KEYWORDS.MY_PROFILE"></span>
+      </a>
+    </div>
+
     <ng-container *ngIf="appHeaderDefaultContent === 'menu' && appHeaderDefaulMenuDisplay">
       <!--begin::Menu wrapper-->
-      <div class="
-    app-header-menu
-    app-header-mobile-drawer
-    align-items-stretch
-" data-kt-drawer="true" data-kt-drawer-name="app-header-menu" data-kt-drawer-activate="{default: true, lg: false}"
+      <div class="app-header-menu app-header-mobile-drawer align-items-stretch" data-kt-drawer="true"
+        data-kt-drawer-name="app-header-menu" data-kt-drawer-activate="{default: true, lg: false}"
         data-kt-drawer-overlay="true" data-kt-drawer-width="225px" data-kt-drawer-direction="end"
         data-kt-drawer-toggle="#kt_app_header_menu_toggle" data-kt-swapper="true"
         data-kt-swapper-mode="{default: 'append', lg: 'prepend'}"
         data-kt-swapper-parent="{default: '#kt_app_body', lg: '#kt_app_header_wrapper'}">
-        <!--begin::Menu-->
-        <app-header-menu class="
-        menu
-        menu-rounded
-        menu-column
-        menu-lg-row
-        my-5
-        my-lg-0
-        align-items-stretch
-        fw-semibold
-        px-2 px-lg-0
-    " id="kt_app_header_menu" data-kt-menu="true"></app-header-menu>
-        <!--end::Menu-->
+        <ng-container>
+          <app-page-title [appPageTitleDirection]="'column'" [appPageTitleBreadcrumb]="true"
+            [appPageTitleDescription]="false"
+            class="page-title d-flex flex-wrap me-3 flex-column justify-content-center">
+          </app-page-title>
+        </ng-container>
       </div>
       <!--end::Menu wrapper-->
     </ng-container>

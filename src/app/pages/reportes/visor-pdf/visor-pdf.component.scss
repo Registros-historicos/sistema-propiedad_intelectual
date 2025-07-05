@@ -1,0 +1,39 @@
+.visor-container {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 150px);
+  padding: 1rem;
+
+  .reports-title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    margin-bottom: 1rem;
+
+    button {
+      position: relative;
+      left: 0;
+    }
+
+    h2 {
+      width: 100%;
+      text-align: center;
+      font-size: 1.5rem;
+    }
+  }
+
+  .visor-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    overflow: hidden;
+  }
+
+  .visor-pdf {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+}

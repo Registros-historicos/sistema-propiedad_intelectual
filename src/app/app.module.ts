@@ -14,6 +14,7 @@ import { environment } from 'src/environments/environment';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 // #fake-start#
 import { FakeAPIService } from './api/fake-api.service';
+import {FormsModule} from '@angular/forms';
 // #fake-end#
 
 function appInitializer(authService: AuthService) {
@@ -45,6 +46,7 @@ function appInitializer(authService: AuthService) {
     InlineSVGModule.forRoot(),
     NgbModule,
     SweetAlert2Module.forRoot(),
+    FormsModule,
   ],
   providers: [
     {

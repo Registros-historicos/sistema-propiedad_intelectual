@@ -52,6 +52,12 @@ export class AuthService implements OnDestroy {
         return result;
       }),
       switchMap(() => this.getUserByToken()),
+      map((user: UserType) => {
+        if (user) {
+          this.redirectUserBasedOnRole(user);
+        }
+        return user;
+      }),
       catchError((err) => {
         console.error('err', err);
         return of(undefined);
@@ -60,8 +66,32 @@ export class AuthService implements OnDestroy {
     );
   }
 
+  private redirectUserBasedOnRole(user: UserModel): void {
+    if (user.roles && user.roles.length > 0) {
+      const userRole = user.roles[0];
+      switch (userRole) {
+        case 1:
+          this.router.navigate(['/administrador/dashboard']);
+          break;
+        case 2:
+          this.router.navigate(['/coordinador/dashboard']);
+          break;
+        case 3:
+          this.router.navigate(['/solicitante/dashboard']);
+          break;
+        default:
+          this.router.navigate(['/auth/login']);
+          break;
+      }
+    } else {
+      this.router.navigate(['/auth/login']);
+    }
+  }
+
   logout() {
     localStorage.removeItem(this.authLocalStorageToken);
+    this.currentUserSubject.next(undefined);
+    this.isLoadingSubject.next(false);
     this.router.navigate(['/auth/login'], {
       queryParams: {},
     });

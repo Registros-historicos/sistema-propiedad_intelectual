@@ -1,0 +1,408 @@
+<div class="card">
+  <div
+    class="card-header border-0 pt-6 text-center d-flex justify-content-center align-items-center"
+  >
+    <div class="card-title">
+      <h2>Formulario de solicitud de derechos de autor</h2>
+    </div>
+  </div>
+  <div class="card-body">
+    <form #myForm="ngForm" (ngSubmit)="onSubmit($event)" class="copyright-form">
+      <div class="mb-6">
+        <div class="form-check form-check-custom form-check-solid form-switch">
+          <label class="form-check-label me-5">Nuevo registro</label>
+          <input class="form-check-input w-50px bg-primary border-primary" type="checkbox"
+            name="model.app.sidebar.default.minimize.desktop.default"
+            disabled />
+          <label class="form-check-label ms-5">Registro anterior</label>
+        </div>
+      </div>
+      <div class="mb-7 p-4 border rounded">
+        <h3 class="mb-4">Datos Generales del Solicitante</h3>
+        <!-- Modalidad -->
+        <div class="mb-6">
+          <label class="fw-bold fs-6"
+            >Modalidad de Solicitud <span class="text-danger">*</span></label
+          >
+          <select
+            class="form-select form-select-solid"
+            [(ngModel)]="copyrightModel.modalidadSolicitud"
+            name="modalidadSolicitud"
+            required
+          >
+            <option value="" disabled selected>Seleccione una opción</option>
+            <option value="en_linea">En línea (INDARELIN)</option>
+            <option value="presencial">Presencial (Oficinas)</option>
+          </select>
+        </div>
+        <!-- Seudónimo o Datos -->
+        <div class="mb-6">
+          <label class="fw-bold fs-6"
+            >¿El solicitante usará sus datos o un seudónimo?
+            <span class="text-danger">*</span></label
+          >
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="radio"
+              [(ngModel)]="copyrightModel.tipoSolicitud"
+              name="datosSeudonimo"
+              value="autor"
+              checked
+            />
+            <label class="form-check-label">Datos del Autor</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="radio"
+              [(ngModel)]="copyrightModel.tipoSolicitud"
+              name="datosSeudonimo"
+              value="seudonimo"
+            />
+            <label class="form-check-label">Seudónimo del Autor</label>
+          </div>
+        </div>
+        <!-- CURP, RFC -->
+        <div class="row mb-6">
+          <div class="col-md-6 mb-3">
+            <label class="fw-bold fs-6">CURP</label>
+            <input
+              type="text"
+              class="form-control form-control-solid"
+              [(ngModel)]="copyrightModel.curp"
+              name="curp"
+              placeholder="Ingrese CURP"
+            />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="fw-bold fs-6"
+              >RFC <span class="text-danger">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control form-control-solid"
+              #rfcInput
+              [class.is-invalid]="rfcError"
+              [(ngModel)]="copyrightModel.rfc"
+              name="rfc"
+              placeholder="Ingrese RFC"
+              required
+              (input)="onRfcChange($event)"
+            />
+            <div *ngIf="rfcError" class="invalid-feedback d-block">
+              {{ rfcError }}
+            </div>
+          </div>
+        </div>
+        <!-- Nombres y Apellidos -->
+        <div class="row mb-6">
+          <div class="col-md-4 mb-3">
+            <label class="fw-bold fs-6"
+              >Nombre(s) <span class="text-danger">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control form-control-solid"
+              #nombresInput
+              [class.is-invalid]="nombresError"
+              [(ngModel)]="copyrightModel.nombres"
+              name="nombres"
+              placeholder="Ingrese nombre(s)"
+              required
+              (input)="onNombresChange($event)"
+            />
+            <div *ngIf="nombresError" class="invalid-feedback d-block">
+              {{ nombresError }}
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="fw-bold fs-6"
+              >Primer Apellido <span class="text-danger">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control form-control-solid"
+              #primerApellidoInput
+              [class.is-invalid]="primerApellidoError"
+              [(ngModel)]="copyrightModel.primerApellido"
+              name="primerApellido"
+              placeholder="Ingrese primer apellido"
+              required
+              (input)="onPrimerApellidoChange($event)"
+            />
+            <div *ngIf="primerApellidoError" class="invalid-feedback d-block">
+              {{ primerApellidoError }}
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="fw-bold fs-6">Segundo Apellido</label>
+            <input
+              type="text"
+              class="form-control form-control-solid"
+              [(ngModel)]="copyrightModel.segundoApellido"
+              name="segundoApellido"
+              placeholder="Ingrese segundo apellido"
+            />
+          </div>
+        </div>
+        <!-- Nacionalidad, Sexo, Fecha de nacimiento -->
+        <div class="row mb-6">
+          <div class="col-md-4 mb-3">
+            <label class="fw-bold fs-6"
+              >Nacionalidad <span class="text-danger">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control form-control-solid"
+              #nacionalidadInput
+              [class.is-invalid]="nacionalidadError"
+              [(ngModel)]="copyrightModel.nacionalidad"
+              name="nacionalidad"
+              placeholder="Ingrese nacionalidad"
+              required
+              (input)="onNacionalidadChange($event)"
+            />
+            <div *ngIf="nacionalidadError" class="invalid-feedback d-block">
+              {{ nacionalidadError }}
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="fw-bold fs-6"
+              >Sexo <span class="text-danger">*</span></label
+            >
+            <select
+              class="form-select form-select-solid"
+              [(ngModel)]="copyrightModel.sexo"
+              name="sexo"
+              required
+            >
+              <option value="" disabled selected>Seleccione</option>
+              <option value="masculino">Masculino</option>
+              <option value="femenino">Femenino</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="fw-bold fs-6"
+              >Fecha de Nacimiento <span class="text-danger">*</span></label
+            >
+            <input
+              type="date"
+              class="form-control form-control-solid"
+              [(ngModel)]="copyrightModel.fechaNacimiento"
+              name="fechaNacimiento"
+              required
+            />
+          </div>
+        </div>
+        <!-- Lugar de nacimiento, Participación, Tipo -->
+        <div class="row mb-6">
+          <div class="col-md-6 mb-3">
+            <label class="fw-bold fs-6"
+              >Lugar de Nacimiento <span class="text-danger">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control form-control-solid"
+              [(ngModel)]="copyrightModel.lugarNacimiento"
+              name="lugarNacimiento"
+              required
+            />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="fw-bold fs-6"
+              >Porcentaje de participación en la obra (%)
+              <span class="text-danger">*</span></label
+            >
+            <input
+              type="number"
+              class="form-control form-control-solid"
+              [(ngModel)]="copyrightModel.participacion"
+              name="participacion"
+              required
+            />
+          </div>
+        </div>
+        <div class="mb-6">
+          <label class="fw-bold fs-6"
+            >Tipo de participación en la obra
+            <span class="text-danger">*</span></label
+          >
+          <input
+            type="text"
+            class="form-control form-control-solid"
+            [(ngModel)]="copyrightModel.tipoParticipacion"
+            name="tipoParticipacion"
+            required
+            placeholder="Ej. Autor principal, Coautor"
+          />
+        </div>
+        <!-- Teléfonos y Correo -->
+        <div class="row mb-6">
+          <div class="col-md-4 mb-3">
+            <label class="fw-bold fs-6">Teléfono y Extensión</label>
+            <input
+              type="text"
+              class="form-control form-control-solid"
+              [(ngModel)]="copyrightModel.telefono"
+              name="telefono"
+              placeholder="Teléfono y Extensión"
+            />
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="fw-bold fs-6">Teléfono móvil</label>
+            <input
+              type="text"
+              class="form-control form-control-solid"
+              #celularInput
+              [class.is-invalid]="celularError"
+              [(ngModel)]="copyrightModel.celular"
+              name="celular"
+              placeholder="Teléfono móvil"
+              (input)="onCelularChange($event)"
+            />
+            <div *ngIf="celularError" class="invalid-feedback d-block">
+              {{ celularError }}
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="fw-bold fs-6">Correo Electrónico</label>
+            <input
+              type="email"
+              class="form-control form-control-solid"
+              #correoInput
+              [class.is-invalid]="correoError"
+              [(ngModel)]="copyrightModel.correo"
+              name="correo"
+              placeholder="Correo Electrónico"
+              (input)="onCorreoChange($event)"
+            />
+            <div *ngIf="correoError" class="invalid-feedback d-block">
+              {{ correoError }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- DOMICILIO DEL SOLICITANTE -->
+      <div class="mb-7 p-4 border rounded">
+        <h4 class="mb-4">Domicilio Legal o Particular del Solicitante</h4>
+        <div class="row mb-6">
+          <div class="col-md-3 mb-3">
+            <label class="fw-bold fs-6"
+              >Código Postal <span class="text-danger">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control form-control-solid"
+              [(ngModel)]="copyrightModel.cp"
+              name="cp"
+              required
+            />
+          </div>
+          <div class="col-md-5 mb-3">
+            <label class="fw-bold fs-6"
+              >Calle <span class="text-danger">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control form-control-solid"
+              [(ngModel)]="copyrightModel.calle"
+              name="calle"
+              required
+            />
+          </div>
+          <div class="col-md-2 mb-3">
+            <label class="fw-bold fs-6"
+              >No. Exterior <span class="text-danger">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control form-control-solid"
+              [(ngModel)]="copyrightModel.numExterior"
+              name="numExterior"
+              required
+            />
+          </div>
+          <div class="col-md-2 mb-3">
+            <label class="fw-bold fs-6">No. Interior</label>
+            <input
+              type="text"
+              class="form-control form-control-solid"
+              [(ngModel)]="copyrightModel.numInterior"
+              name="numInterior"
+            />
+          </div>
+        </div>
+        <div class="row mb-6">
+          <div class="col-md-4 mb-3">
+            <label class="fw-bold fs-6"
+              >Colonia <span class="text-danger">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control form-control-solid"
+              [(ngModel)]="copyrightModel.colonia"
+              name="colonia"
+              required
+            />
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="fw-bold fs-6"
+              >Municipio o Alcaldía <span class="text-danger">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control form-control-solid"
+              [(ngModel)]="copyrightModel.municipio"
+              name="municipio"
+              required
+            />
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="fw-bold fs-6"
+              >Estado <span class="text-danger">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control form-control-solid"
+              [(ngModel)]="copyrightModel.estado"
+              name="estado"
+              required
+            />
+          </div>
+        </div>
+        <div class="mb-6">
+          <label class="fw-bold fs-6"
+            >País <span class="text-danger">*</span></label
+          >
+          <input
+            type="text"
+            class="form-control form-control-solid"
+            [(ngModel)]="copyrightModel.pais"
+            name="pais"
+            required
+          />
+        </div>
+      </div>
+      <div class="d-flex justify-content-end mt-10">
+        <button
+          type="button"
+          class="btn btn-light me-3"
+          routerLink="/solicitante/registrar"
+          [disabled]="isLoading"
+        >
+          Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+          <span
+            *ngIf="isLoading"
+            class="spinner-border spinner-border-sm align-middle me-2"
+          ></span>
+          <span *ngIf="!isLoading">Enviar Solicitud</span>
+          <span *ngIf="isLoading">Procesando...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

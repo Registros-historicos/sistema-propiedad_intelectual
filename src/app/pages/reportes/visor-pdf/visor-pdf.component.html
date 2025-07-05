@@ -1,0 +1,23 @@
+<div class="visor-container">
+  <div class="reports-title">
+    <button type="button" class="btn btn-light me-3"
+            (click)="goBack()"
+            translate="BUTTON.RETURN">
+    </button>
+
+    <h2>{{ archivoTitulo}}</h2>
+  </div>
+
+  <div class="visor-wrapper">
+    <object
+      [data]="archivo | safeUrl"
+      type="application/pdf"
+      class="visor-pdf"
+    >
+      <p>
+        Tu navegador no puede mostrar este PDF.
+        <a [href]="archivo" target="_blank" rel="noopener">Descargar PDF</a>
+      </p>
+    </object>
+  </div>
+</div>

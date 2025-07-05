@@ -1,0 +1,397 @@
+<div class="card">
+  <div class="card-header border-0 pt-6">
+    <div class="card-title">
+      <div class="d-flex align-items-center position-relative my-1">
+        <app-keenicon name="magnifier" class="fs-3 position-absolute ms-5"></app-keenicon>
+        <input type="text" data-action="filter" class="form-control form-control-solid w-250px ps-12"
+          [placeholder]="placeholder">
+      </div>
+    </div>
+
+    <div class="card-toolbar">
+      <div class="d-flex justify-content-end align-items-center">
+        <div class="d-flex align-items-center me-4">
+          <label class="form-label text-gray-600 me-3 mb-0 fw-semibold" translate="TABLE.PAGE_LENGTH.LABEL"></label>
+          <select class="form-select form-select-sm form-select-solid w-auto" (change)="onPageLengthChange($event)"
+            [(ngModel)]="pageLength">
+            <option *ngFor="let length of lengthMenu" [value]="length">{{length}}</option>
+          </select>
+          <span class="text-gray-600 ms-2 fw-semibold" translate="TABLE.PAGE_LENGTH.RECORDS"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-body pt-0">
+    <app-crud [datatableConfig]="datatableConfig" route="/coordinador/propiedades/patente"
+      (deleteEvent)="delete($event)" (followEvent)="follow($event)" (viewEvent)="view($event)" [reload]="reloadEvent"
+      [modal]="isViewMode ? formModal : formModalFollow">
+    </app-crud>
+  </div>
+</div>
+
+<swal #noticeSwal [swalOptions]="swalOptions"></swal>
+
+<ng-template #formModal let-modal>
+  <div class="modal-header">
+    <h3 class="modal-title">
+      <span translate="MODAL.TITLE"></span>
+    </h3>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+
+  <div class="modal-body">
+    <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-650px">
+
+      <div class="notice d-flex bg-light-info rounded border-info border border-dashed mb-7 p-6">
+        <app-keenicon name="information-5" class="fs-2tx text-info me-4"></app-keenicon>
+        <div class="d-flex flex-stack flex-grow-1">
+          <div class="fw-semibold">
+            <h4 class="text-gray-900 fw-bold" translate="MODAL.INFO.TITLE"></h4>
+            <div class="fs-6 text-gray-700">
+              <span translate="MODAL.INFO.BODY"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fv-row mb-7">
+        <label class="fw-semibold fs-6 mb-2 text-gray-600" translate="MODAL.FORM.PATENT.NAME"></label>
+        <textarea type="text" class="form-control form-control-solid bg-light" [value]="patenteModel.nombrePatente"
+          readonly style="resize: none; overflow: hidden;" rows="auto"></textarea>
+      </div>
+
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600" translate="MODAL.FORM.APPLICANT"></label>
+          <input type="text" class="form-control form-control-solid bg-light" [value]="patenteModel.solicitante"
+            readonly />
+        </div>
+
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600" translate="MODAL.FORM.EMAIL"></label>
+          <input type="email" class="form-control form-control-solid bg-light" [value]="patenteModel.correo" readonly />
+        </div>
+      </div>
+
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600" translate="MODAL.FORM.DATE"></label>
+          <input type="text" class="form-control form-control-solid bg-light" [value]="patenteModel.fechaSolicitud"
+            readonly />
+        </div>
+
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600" translate="MODAL.FORM.STATUS"></label>
+          <div class="form-control form-control-solid d-flex align-items-center">
+            <span class="badge" [ngClass]="{
+                    'badge-light-success': patenteModel.estatus === 'Aprobada',
+                    'badge-light-primary': patenteModel.estatus === 'Registrada',
+                    'badge-light-warning': patenteModel.estatus === 'En trámite',
+                    'badge-light-danger': patenteModel.estatus === 'Trámite con observaciones',
+                    'badge-light-info': patenteModel.estatus === 'Concluida'
+                  }" class="fs-7 fw-bold">
+              {{patenteModel.estatus}}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600" translate="MODAL.FORM.FEDERAL_ENTITY.LABEL"></label>
+          <select class="form-select form-select-solid bg-light" [(ngModel)]="estadoSeleccionado"
+            (ngModelChange)="onEstadoChange($event)" readonly disabled>
+            <option value="" translate="MODAL.FORM.FEDERAL_ENTITY.OPTIONS_LABEL"></option>
+            <option *ngFor="let entidad of entidadesFederativas" [value]="entidad.id">
+              {{entidad.nombre}}
+            </option>
+          </select>
+        </div>
+
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600" translate="MODAL.FORM.INSTITUTION.LABEL"></label>
+          <select class="form-select form-select-solid bg-light" [(ngModel)]="institucionSeleccionada"
+            (ngModelChange)="onInstitucionChange($event)" readonly disabled>
+            <option value="" translate="MODAL.FORM.INSTITUTION.OPTIONS_LABEL"></option>
+            <option *ngFor="let institucion of institucionesFiltradas" [value]="institucion.id">
+              {{institucion.nombre}}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="fv-row mb-7">
+        <label class="fw-semibold fs-6 mb-2 text-gray-600" translate="MODAL.FORM.DESCRIPTION"></label>
+        <textarea class="form-control form-control-solid bg-light" [value]="patenteModel.descripcion" rows="3"
+          readonly></textarea>
+      </div>
+
+      <div class="fw-bold fs-3 rotate collapsible mb-7" data-bs-toggle="collapse" role="button"
+        (click)="collapse2.toggle()" [attr.aria-expanded]="!isCollapsed2"
+        aria-controls="kt_modal_update_coordinator_documents">
+        <app-keenicon name="folder" class="fs-3 me-2"></app-keenicon>
+        <span translate="MODAL.FORM.DOCUMENTATION"></span>
+        <span class="ms-2 rotate-180">
+          <i class="ki-duotone ki-down fs-3" [ngClass]="{ 'ki-up': !isCollapsed2 }"></i>
+        </span>
+      </div>
+
+      <div class="collapse" #collapse2="ngbCollapse" [(ngbCollapse)]="isCollapsed2">
+        <div class="card card-flush">
+          <div class="card-body pt-0">
+            <div *ngIf="patenteModel.documentos && patenteModel.documentos.length > 0; else noDocuments">
+              <div *ngFor="let documento of patenteModel.documentos; let i = index"
+                class="d-flex align-items-center border border-gray-300 border-dashed rounded p-4 mb-3">
+
+                <div class="symbol symbol-50px me-4">
+                  <div class="symbol-label bg-light-danger">
+                    <app-keenicon name="document" class="fs-2 text-danger"></app-keenicon>
+                  </div>
+                </div>
+
+                <div class="flex-grow-1">
+                  <div class="fw-bold text-gray-800 fs-6">{{documento}}</div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                  <button type="button" class="btn btn-sm btn-light-primary me-2" (click)="downloadDocument(documento)"
+                    translate="BUTTON.DOWNLOAD">
+                  </button>
+
+                  <button type="button" class="btn btn-sm btn-light-info" translate="BUTTON.SEE">
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <ng-template #noDocuments>
+              <div class="text-center py-8">
+                <app-keenicon name="file-deleted" class="fs-3x text-muted mb-4"></app-keenicon>
+                <div class="text-muted fs-6" translate="MODAL.FORM.DOCUMENTATION_EMPTY"></div>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="closeForm(modal)" translate="BUTTON.CLOSE">
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #formModalFollow let-modal>
+  <div class="modal-header bg-primary">
+    <h3 class="modal-title text-white">
+      <app-keenicon name="chart" class="fs-2 me-2 text-white"></app-keenicon>
+      <span translate="MODAL.FOLLOW_UP.TITLE"></span>
+    </h3>
+    <button type="button" class="btn-close btn-close-white" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"></button>
+  </div>
+
+  <div class="modal-body">
+    <div class="d-flex flex-column scroll-y me-n7 pe-7">
+
+      <div class="tracking-header">
+        <h4 class="mb-2">{{patenteModel.nombrePatente}}</h4>
+        <div class="d-flex justify-content-center align-items-center gap-4">
+          <div class="text-center">
+            <div class="fs-7 opacity-75" translate="MODAL.FOLLOW_UP.APPLICATION_ID"></div>
+            <div class="fw-bold">{{patenteModel.solicitudId}}</div>
+          </div>
+          <div class="text-center">
+            <div class="fs-7 opacity-75" translate="MODAL.FOLLOW_UP.APPLICANT"></div>
+            <div class="fw-bold">{{patenteModel.solicitante}}</div>
+          </div>
+          <div class="text-center">
+            <div class="fs-7 opacity-75" translate="MODAL.FOLLOW_UP.PROGRESS"></div>
+            <div class="fw-bold">{{getStatusProgress(patenteModel.estatus)}}%</div>
+          </div>
+        </div>
+
+        <div class="progress-indicator mt-4">
+          <div class="progress-bar" [style.width.%]="getStatusProgress(patenteModel.estatus)"></div>
+        </div>
+      </div>
+
+      <div class="card card-flush mb-6">
+        <div class="card-body text-center py-8">
+          <div class="symbol symbol-75px mx-auto mb-4">
+            <div class="symbol-label" [ngClass]="{
+              'bg-success': patenteModel.estatus === 'Aprobada' || patenteModel.estatus === 'Concluida',
+              'bg-primary': patenteModel.estatus === 'Registrada',
+              'bg-warning': patenteModel.estatus === 'En trámite',
+              'bg-danger': patenteModel.estatus === 'Trámite con observaciones'
+            }">
+              <app-keenicon [name]="getStatusIcon(patenteModel.estatus)" class="fs-1 text-white"></app-keenicon>
+            </div>
+          </div>
+          <h3 class="fw-bold text-gray-800 mb-2">{{patenteModel.estatus}}</h3>
+          <div class="fs-6 text-gray-600">{{getStatusDescription(patenteModel.estatus)}}</div>
+        </div>
+      </div>
+
+      <div class="card card-flush mb-6">
+        <div class="card-header">
+          <div class="card-title">
+            <h4 class="fw-bold text-gray-800">
+              <app-keenicon name="timeline" class="fs-2 me-2"></app-keenicon>
+              <span translate="MODAL.FOLLOW_UP.HISTORY_TITLE"></span>
+            </h4>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="timeline">
+            <div class="timeline-item"
+              [ngClass]="{'active': patenteModel.estatus === 'Registrada', 'completed': getStatusOrder(patenteModel.estatus) > 1 }">
+              <div class="timeline-line"></div>
+              <div class="timeline-icon symbol symbol-circle symbol-40px">
+                <div class="symbol-label" [ngClass]="{
+                  'bg-success': getStatusOrder(patenteModel.estatus) > 1,
+                  'bg-primary': patenteModel.estatus === 'Registrada',
+                  'bg-light-gray': getStatusOrder(patenteModel.estatus) < 1 }">
+                  <app-keenicon name="check" class="fs-2" [ngClass]="{
+                    'text-white': getStatusOrder(patenteModel.estatus) >= 1,
+                    'text-gray-400': getStatusOrder(patenteModel.estatus) < 1}">
+                  </app-keenicon>
+                </div>
+              </div>
+              <div class="timeline-content">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <h5 class="fw-bold text-gray-800 mb-0" translate="MODAL.FOLLOW_UP.STATUS.REGISTERED"></h5>
+                  <span class="status-badge" [ngClass]="{
+                    'current': patenteModel.estatus === 'Registrada', 
+                    'completed': getStatusOrder(patenteModel.estatus) > 1,
+                    'pending': getStatusOrder(patenteModel.estatus) < 1}">
+                    <app-keenicon
+                      [name]="getStatusOrder(patenteModel.estatus) < 1 ? 'time' : (patenteModel.estatus === 'Registrada' ? 'timer' : 'check')"
+                      class="fs-4"></app-keenicon>
+                    <span
+                      translate="{{getStatusOrder(patenteModel.estatus) < 1 ? 'MODAL.FOLLOW_UP.STATUS_LABELS.PENDING' : (patenteModel.estatus === 'Registrada' ? 'MODAL.FOLLOW_UP.STATUS_LABELS.CURRENT' : 'MODAL.FOLLOW_UP.STATUS_LABELS.COMPLETED')}}"></span>
+                  </span>
+                </div>
+                <p class="text-gray-700 mb-0" translate="MODAL.FOLLOW_UP.DETAILS.REGISTERED.DESCRIPTION"></p>
+                <div class="fs-7 text-gray-500 mt-2">
+                  <app-keenicon name="calendar" class="fs-5 me-1"></app-keenicon>
+                  <span translate="MODAL.FOLLOW_UP.DETAILS.REGISTERED.DATE_LABEL"></span>
+                  {{patenteModel.fechaSolicitud}}
+                </div>
+              </div>
+            </div>
+
+            <div class="timeline-item"
+              [ngClass]="{
+              'active': patenteModel.estatus === 'En trámite',
+              'completed': getStatusOrder(patenteModel.estatus) > 2 && patenteModel.estatus !== 'Trámite con observaciones'}">
+              <div class="timeline-line"></div>
+              <div class="timeline-icon symbol symbol-circle symbol-40px">
+                <div class="symbol-label"
+                  [ngClass]="{'bg-success': getStatusOrder(patenteModel.estatus) > 2 && patenteModel.estatus !== 'Trámite con observaciones', 'bg-warning': patenteModel.estatus === 'En trámite', 'bg-light-gray': getStatusOrder(patenteModel.estatus) < 2}">
+                  <app-keenicon
+                    [name]="getStatusOrder(patenteModel.estatus) < 2 ? 'time' : (patenteModel.estatus === 'En trámite' ? 'timer' : 'check')"
+                    class="fs-2"
+                    [ngClass]="{'text-white': getStatusOrder(patenteModel.estatus) >= 2, 'text-gray-400': getStatusOrder(patenteModel.estatus) < 2}"></app-keenicon>
+                </div>
+              </div>
+              <div class="timeline-content">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <h5 class="fw-bold text-gray-800 mb-0" translate="MODAL.FOLLOW_UP.STATUS.IN_PROCESS"></h5>
+                  <span class="status-badge"
+                    [ngClass]="{'current': patenteModel.estatus === 'En trámite', 'completed': getStatusOrder(patenteModel.estatus) > 2 && patenteModel.estatus !== 'Trámite con observaciones', 'pending': getStatusOrder(patenteModel.estatus) < 2 }">
+                    <app-keenicon
+                      [name]="getStatusOrder(patenteModel.estatus) < 2 ? 'time' : (patenteModel.estatus === 'En trámite' ? 'timer' : 'check')"
+                      class="fs-4"></app-keenicon>
+                    <span
+                      translate="{{getStatusOrder(patenteModel.estatus) < 2 ? 'MODAL.FOLLOW_UP.STATUS_LABELS.PENDING' : (patenteModel.estatus === 'En trámite' ? 'MODAL.FOLLOW_UP.STATUS_LABELS.CURRENT' : 'MODAL.FOLLOW_UP.STATUS_LABELS.COMPLETED')}}"></span>
+                  </span>
+                </div>
+                <p class="text-gray-700 mb-0" translate="MODAL.FOLLOW_UP.DETAILS.IN_PROCESS.DESCRIPTION"></p>
+              </div>
+            </div>
+
+            <div class="timeline-item observation" *ngIf="patenteModel.estatus === 'Trámite con observaciones'">
+              <div class="timeline-line"></div>
+              <div class="timeline-icon symbol symbol-circle symbol-40px">
+                <div class="symbol-label bg-danger">
+                  <app-keenicon name="information" class="fs-2 text-white"></app-keenicon>
+                </div>
+              </div>
+              <div class="timeline-content">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <h5 class="fw-bold text-gray-800 mb-0" translate="MODAL.FOLLOW_UP.STATUS.WITH_OBSERVATIONS"></h5>
+                  <span class="status-badge observation">
+                    <app-keenicon name="exclamation" class="fs-4"></app-keenicon>
+                    <span translate="MODAL.FOLLOW_UP.STATUS_LABELS.CURRENT"></span>
+                  </span>
+                </div>
+                <p class="text-gray-700 mb-0" translate="MODAL.FOLLOW_UP.DETAILS.WITH_OBSERVATIONS.DESCRIPTION"></p>
+              </div>
+            </div>
+
+            <div class="timeline-item"
+              [ngClass]="{'active': patenteModel.estatus === 'Aprobada', 'completed': patenteModel.estatus === 'Concluida'}">
+              <div class="timeline-line"></div>
+              <div class="timeline-icon symbol symbol-circle symbol-40px">
+                <div class="symbol-label"
+                  [ngClass]="{'bg-success': getStatusOrder(patenteModel.estatus) >= 4, 'bg-light-gray': getStatusOrder(patenteModel.estatus) < 4 }">
+                  <app-keenicon name="check" class="fs-2"
+                    [ngClass]="{'text-white': getStatusOrder(patenteModel.estatus) >= 4, 'text-gray-400': getStatusOrder(patenteModel.estatus) < 4}"></app-keenicon>
+                </div>
+              </div>
+              <div class="timeline-content">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <h5 class="fw-bold text-gray-800 mb-0" translate="MODAL.FOLLOW_UP.STATUS.APPROVED"></h5>
+                  <span class="status-badge"
+                    [ngClass]="{'current': patenteModel.estatus === 'Aprobada', 'completed': patenteModel.estatus === 'Concluida', 'pending': getStatusOrder(patenteModel.estatus) < 4}">
+                    <app-keenicon
+                      [name]="getStatusOrder(patenteModel.estatus) < 4 ? 'time' : (patenteModel.estatus === 'Aprobada' ? 'timer' : 'check')"
+                      class="fs-4"></app-keenicon>
+                    <span
+                      translate="{{getStatusOrder(patenteModel.estatus) < 4 ? 'MODAL.FOLLOW_UP.STATUS_LABELS.PENDING' : (patenteModel.estatus === 'Aprobada' ? 'MODAL.FOLLOW_UP.STATUS_LABELS.CURRENT' : 'MODAL.FOLLOW_UP.STATUS_LABELS.COMPLETED')}}"></span>
+                  </span>
+                </div>
+                <p class="text-gray-700 mb-0" translate="MODAL.FOLLOW_UP.DETAILS.APPROVED.DESCRIPTION"></p>
+              </div>
+            </div>
+
+            <div class="timeline-item" [ngClass]="{'active': patenteModel.estatus === 'Concluida'}">
+              <div class="timeline-icon symbol symbol-circle symbol-40px">
+                <div class="symbol-label"
+                  [ngClass]="{'bg-info': patenteModel.estatus === 'Concluida', 'bg-light-gray': patenteModel.estatus !== 'Concluida'}">
+                  <app-keenicon name="check-circle" class="fs-2"
+                    [ngClass]="{'text-white': patenteModel.estatus === 'Concluida', 'text-gray-400': patenteModel.estatus !== 'Concluida'}"></app-keenicon>
+                </div>
+              </div>
+              <div class="timeline-content">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <h5 class="fw-bold text-gray-800 mb-0" translate="MODAL.FOLLOW_UP.STATUS.COMPLETED"></h5>
+                  <span class="status-badge"
+                    [ngClass]="{'current': patenteModel.estatus === 'Concluida', 'pending': patenteModel.estatus !== 'Concluida'}">
+                    <app-keenicon [name]="patenteModel.estatus === 'Concluida' ? 'check-circle' : 'time'"
+                      class="fs-4"></app-keenicon>
+                    <span
+                      translate="{{patenteModel.estatus === 'Concluida' ? 'MODAL.FOLLOW_UP.STATUS_LABELS.CURRENT' : 'MODAL.FOLLOW_UP.STATUS_LABELS.PENDING'}}"></span>
+                  </span>
+                </div>
+                <p class="text-gray-700 mb-0" translate="MODAL.FOLLOW_UP.DETAILS.COMPLETED.DESCRIPTION"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-light" (click)="closeForm(modal)">
+      <app-keenicon name="cross" class="fs-3 me-1"></app-keenicon>
+      <span translate="MODAL.FOLLOW_UP.BUTTONS.CLOSE"></span>
+    </button>
+  </div>
+</ng-template>

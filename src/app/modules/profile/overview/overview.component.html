@@ -1,14 +1,186 @@
 <div class="row g-5 g-xxl-8">
   <div class="col-xl-6">
-    <app-feeds-widget2 class="card mb-5 mb-xxl-8"></app-feeds-widget2>
-    <app-feeds-widget3 class="card mb-5 mb-xxl-8"></app-feeds-widget3>
-    <app-feeds-widget4 class="card mb-5 mb-xxl-8"></app-feeds-widget4>
-    <app-feeds-widget5 class="card mb-5 mb-xxl-8"></app-feeds-widget5>
-    <app-feeds-widget6 class="card mb-5 mb-xxl-8"></app-feeds-widget6>
+    <div class="card mb-5 mb-xxl-8">
+      <div class="card-header border-0 pt-5">
+        <h3 class="card-title align-items-start flex-column">
+          <span class="card-label fw-bolder fs-3 mb-1">Información Personal</span>
+          <span class="text-muted mt-1 fw-bold fs-7">Datos básicos del usuario</span>
+        </h3>
+      </div>
+      <div class="card-body py-3">
+        <div class="table-responsive">
+          <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+            <tbody>
+              <tr>
+                <td class="fw-bolder text-muted">Nombre completo</td>
+                <td class="text-dark fw-bolder text-hover-primary fs-6">{{userProfile.fullname}}</td>
+              </tr>
+              <tr>
+                <td class="fw-bolder text-muted">Email</td>
+                <td class="text-dark fw-bolder text-hover-primary fs-6">{{userProfile.email}}</td>
+              </tr>
+              <tr>
+                <td class="fw-bolder text-muted">Teléfono</td>
+                <td class="text-dark fw-bolder text-hover-primary fs-6">{{userProfile.phone}}</td>
+              </tr>
+              <tr>
+                <td class="fw-bolder text-muted">Ocupación</td>
+                <td class="text-dark fw-bolder text-hover-primary fs-6">{{userProfile.occupation}}</td>
+              </tr>
+              <tr>
+                <td class="fw-bolder text-muted">Empresa</td>
+                <td class="text-dark fw-bolder text-hover-primary fs-6">{{userProfile.companyName}}</td>
+              </tr>
+              <tr>
+                <td class="fw-bolder text-muted">Sitio web</td>
+                <td>
+                  <a [href]="userProfile.website" target="_blank" class="text-primary fw-bolder text-hover-primary fs-6">
+                    {{userProfile.website}}
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-5 mb-xxl-8">
+      <div class="card-header border-0 pt-5">
+        <h3 class="card-title align-items-start flex-column">
+          <span class="card-label fw-bolder fs-3 mb-1">Dirección</span>
+          <span class="text-muted mt-1 fw-bold fs-7">Ubicación actual</span>
+        </h3>
+      </div>
+      <div class="card-body py-3">
+        <div class="notice d-flex bg-light-primary rounded border-primary border border-dashed p-6">
+          <app-keenicon name="geolocation" class="fs-2tx text-primary me-4"></app-keenicon>
+          <div class="d-flex flex-stack flex-grow-1">
+            <div class="fw-bold">
+              <div class="fs-6 text-gray-700">{{userProfile.address?.addressLine}}</div>
+              <div class="fs-6 text-gray-700">{{userProfile.address?.city}}, {{userProfile.address?.state}}</div>
+              <div class="fs-6 text-gray-700">Código postal: {{userProfile.address?.postCode}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
+
   <div class="col-xl-6">
-    <app-charts-widget1 class="card mb-5 mb-xxl-8"></app-charts-widget1>
-    <app-lists-widget5 class="card mb-5 mb-xxl-8"></app-lists-widget5>
-    <app-lists-widget2 class="card mb-5 mb-xxl-8"></app-lists-widget2>
+    <div class="card mb-5 mb-xxl-8">
+      <div class="card-header border-0 pt-5">
+        <h3 class="card-title align-items-start flex-column">
+          <span class="card-label fw-bolder fs-3 mb-1">Configuración</span>
+          <span class="text-muted mt-1 fw-bold fs-7">Preferencias del sistema</span>
+        </h3>
+      </div>
+      <div class="card-body py-3">
+        <div class="table-responsive">
+          <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+            <tbody>
+              <tr>
+                <td class="fw-bolder text-muted">Idioma</td>
+                <td class="text-dark fw-bolder text-hover-primary fs-6">{{userProfile.language?.toUpperCase()}}</td>
+              </tr>
+              <tr>
+                <td class="fw-bolder text-muted">Zona horaria</td>
+                <td class="text-dark fw-bolder text-hover-primary fs-6">{{userProfile.timeZone}}</td>
+              </tr>
+              <tr>
+                <td class="fw-bolder text-muted">Email habilitado</td>
+                <td>
+                  <span [class]="userProfile.communication?.email ? 'badge badge-light-success' : 'badge badge-light-danger'">
+                    {{userProfile.communication?.email ? 'Sí' : 'No'}}
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td class="fw-bolder text-muted">SMS habilitado</td>
+                <td>
+                  <span [class]="userProfile.communication?.sms ? 'badge badge-light-success' : 'badge badge-light-danger'">
+                    {{userProfile.communication?.sms ? 'Sí' : 'No'}}
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td class="fw-bolder text-muted">Teléfono habilitado</td>
+                <td>
+                  <span [class]="userProfile.communication?.phone ? 'badge badge-light-success' : 'badge badge-light-danger'">
+                    {{userProfile.communication?.phone ? 'Sí' : 'No'}}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-5 mb-xxl-8">
+      <div class="card-header border-0 pt-5">
+        <h3 class="card-title align-items-start flex-column">
+          <span class="card-label fw-bolder fs-3 mb-1">Redes Sociales</span>
+          <span class="text-muted mt-1 fw-bold fs-7">Enlaces a perfiles sociales</span>
+        </h3>
+      </div>
+      <div class="card-body py-3">
+        <div class="d-flex flex-stack">
+          <div class="d-flex">
+            <div class="symbol symbol-40px me-4">
+              <div class="symbol-label bg-light-linkedin">
+                <mat-icon svgIcon="linkedin"></mat-icon>
+              </div>
+            </div>
+            <div class="d-flex flex-column justify-content-center">
+              <a [href]="userProfile.socialNetworks?.linkedIn" target="_blank" class="fs-6 text-dark text-hover-primary fw-bold">LinkedIn</a>
+              <span class="fs-7 text-muted fw-bold">{{userProfile.socialNetworks?.linkedIn}}</span>
+            </div>
+          </div>
+        </div>
+        <div class="separator separator-dashed my-4"></div>
+        <div class="d-flex flex-stack">
+          <div class="d-flex">
+            <div class="symbol symbol-40px me-4">
+              <div class="symbol-label bg-light-facebook">
+                <mat-icon svgIcon="facebook"></mat-icon>
+              </div>
+            </div>
+            <div class="d-flex flex-column justify-content-center">
+              <a [href]="userProfile.socialNetworks?.facebook" target="_blank" class="fs-6 text-dark text-hover-primary fw-bold">Facebook</a>
+              <span class="fs-7 text-muted fw-bold">{{userProfile.socialNetworks?.facebook}}</span>
+            </div>
+          </div>
+        </div>
+        <div class="separator separator-dashed my-4"></div>
+        <div class="d-flex flex-stack">
+          <div class="d-flex">
+            <div class="symbol symbol-40px me-4">
+              <div class="symbol-label bg-light-twitter">
+                <mat-icon svgIcon="twitter"></mat-icon>
+              </div>
+            </div>
+            <div class="d-flex flex-column justify-content-center">
+              <a [href]="userProfile.socialNetworks?.twitter" target="_blank" class="fs-6 text-dark text-hover-primary fw-bold">Twitter</a>
+              <span class="fs-7 text-muted fw-bold">{{userProfile.socialNetworks?.twitter}}</span>
+            </div>
+          </div>
+        </div>
+        <div class="separator separator-dashed my-4"></div>
+        <div class="d-flex flex-stack">
+          <div class="d-flex">
+            <div class="symbol symbol-40px me-4">
+              <div class="symbol-label bg-light-instagram">
+                <mat-icon svgIcon="instagram"></mat-icon>
+              </div>
+            </div>
+            <div class="d-flex flex-column justify-content-center">
+              <a [href]="userProfile.socialNetworks?.instagram" target="_blank" class="fs-6 text-dark text-hover-primary fw-bold">Instagram</a>
+              <span class="fs-7 text-muted fw-bold">{{userProfile.socialNetworks?.instagram}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

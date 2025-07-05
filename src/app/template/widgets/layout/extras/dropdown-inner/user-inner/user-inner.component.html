@@ -8,9 +8,9 @@
       <div class="d-flex flex-column">
         <div class="fw-bolder d-flex align-items-center fs-5">
           {{ _user.firstname }} {{ _user.lastname }}
-          <span class="badge badge-light-success fw-bolder fs-8 px-2 py-1 ms-2"
+          <!-- <span class="badge badge-light-success fw-bolder fs-8 px-2 py-1 ms-2"
             >Pro</span
-          >
+          > -->
         </div>
         <a class="fw-bold text-muted text-hover-primary fs-7 cursor-pointer">
           {{ _user.email }}
@@ -22,12 +22,11 @@
   <div class="separator my-2"></div>
 
   <div class="menu-item px-5">
-    <a routerLink="/crafted/pages/profile" class="menu-link px-5">
-      My Profile
+    <a (click)="redirected()" class="menu-link px-5" translate="KEYWORDS.MY_PROFILE">
     </a>
   </div>
 
-  <div class="menu-item px-5">
+  <!-- <div class="menu-item px-5">
     <a class="menu-link px-5 cursor-pointer" placement="top-start" ngbTooltip="Coming soon">
       <span class="menu-text">My Projects</span>
       <span class="menu-badge">
@@ -94,21 +93,15 @@
 
   <div class="menu-item px-5">
     <a class="menu-link px-5 cursor-pointer" placement="top-start" ngbTooltip="Coming soon">My Statements</a>
-  </div>
+  </div> -->
 
   <div class="separator my-2"></div>
 
-  <div
-    class="menu-item px-5"
-    data-kt-menu-trigger="hover"
-    data-kt-menu-placement="left-start"
-    data-kt-menu-flip="bottom"
-  >
+  <div class="menu-item px-5" data-kt-menu-trigger="hover" data-kt-menu-placement="left-start"
+    data-kt-menu-flip="bottom">
     <a class="menu-link px-5 cursor-pointer">
-      <span class="menu-title position-relative">
-        Language
-        <span
-          class="
+      <span class="menu-title position-relative" translate="KEYWORDS.LANGUAGE">
+        <span class="
             fs-8
             rounded
             bg-light
@@ -118,28 +111,16 @@
             translate-middle-y
             top-50
             end-0
-          "
-        >
+          ">
           {{ language.name }}{{ " " }}
-          <img
-            class="w-15px h-15px rounded-1 ms-2"
-            [src]="language.flag"
-            alt="metronic"
-          />
+          <img class="w-15px h-15px rounded-1 ms-2" [src]="language.flag" alt="metronic" />
         </span>
       </span>
     </a>
 
     <div class="menu-sub menu-sub-dropdown w-175px py-4">
-      <div
-        *ngFor="let l of langs"
-        class="menu-item px-3 cursor-pointer"
-        (click)="selectLanguage(l.lang)"
-      >
-        <a
-          class="menu-link d-flex px-5"
-          [ngClass]="l.lang === language.lang ? 'active' : ''"
-        >
+      <div *ngFor="let l of langs" class="menu-item px-3 cursor-pointer" (click)="selectLanguage(l.lang)">
+        <a class="menu-link d-flex px-5" [ngClass]="l.lang === language.lang ? 'active' : ''">
           <span class="symbol symbol-20px me-4">
             <img class="rounded-1" [src]="l.flag" alt="metronic" />
           </span>
@@ -149,13 +130,16 @@
     </div>
   </div>
 
-  <div class="menu-item px-5 my-1">
-    <a routerLink="/crafted/account/settings" class="menu-link px-5">
-      Account Settings
+  <!-- <div class="menu-item px-5 my-1">
+    <a routerLink="/crafted/account/settings" class="menu-link px-5" translate="KEYWORDS.SETTINGS">
     </a>
-  </div>
+  </div> -->
 
   <div class="menu-item px-5">
-    <a (click)="logout()" class="menu-link px-5 cursor-pointer"> Sign Out </a>
+    <a (click)="logout()" class="menu-link px-5 cursor-pointer" translate="KEYWORDS.SIGN_OUT"></a>
   </div>
 </ng-container>
+
+<swal #deleteSwal [swalOptions]="swalOptions" [title]="titleDelete" icon="warning" [showCancelButton]="true"
+  [focusCancel]="true" [customClass]="{confirmButton: 'btn btn-danger', cancelButton: 'btn btn-active-light'}">
+</swal>

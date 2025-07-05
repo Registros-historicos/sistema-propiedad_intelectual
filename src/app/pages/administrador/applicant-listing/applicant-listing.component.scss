@@ -1,0 +1,39 @@
+.applicant-form {
+  .form-control,
+  .form-select {
+    &:focus {
+      border-color: var(--bs-primary);
+      box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+    }
+  }
+
+  .fiscal-info-section {
+    border-top: 1px solid var(--bs-border-color);
+    padding-top: 1rem;
+  }
+
+  .invalid-feedback {
+    display: block;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+  }
+
+  input[name="rfc"],
+  input[name="curp"] {
+    text-transform: uppercase;
+  }
+}
+
+table.dataTable thead th {
+  text-align: center !important;
+  vertical-align: middle;
+}
+
+table.dataTable tbody td {
+  vertical-align: middle;
+}
+
+table.dataTable tbody td.d-flex {
+  justify-content: center;
+}
+

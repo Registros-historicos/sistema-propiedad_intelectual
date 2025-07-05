@@ -1,0 +1,652 @@
+<div class="card">
+  <div class="card-header border-0 pt-6">
+    <div class="card-title">
+      <h3 translate="FORMS.COPYRIGHT.TITLE"></h3>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <form #myForm="ngForm" (ngSubmit)="onSubmit($event)" class="copyright-form">
+      <div class="d-flex flex-column scroll-y me-n7 pe-7">
+
+        <div class="notice d-flex bg-light-primary rounded border-primary border border-dashed mb-9 p-6">
+          <app-keenicon name="information" class="fs-2tx text-primary me-4"></app-keenicon>
+          <div class="d-flex flex-stack flex-grow-1">
+            <div class="fw-semibold">
+              <div class="fs-6 text-gray-700">
+                <span translate="FORMS.COPYRIGHT.INFO_1"></span><br />
+                <span translate="FORMS.COPYRIGHT.INFO_2"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 1: DATOS GENERALES DEL SOLICITANTE -->
+        <div class="fw-bold fs-3 rotate collapsible mb-7" data-bs-toggle="collapse" role="button"
+             (click)="collapse1.toggle()" [attr.aria-expanded]="!isCollapsed1"
+             aria-controls="kt_solicitante_info">
+          <app-keenicon name="profile-user" class="fs-3 me-2"></app-keenicon>
+          <span translate="FORMS.COPYRIGHT.GENERAL_SECTION.TITLE"></span>
+          <span class="ms-2 rotate-180">
+                        <i class="ki-duotone ki-down fs-3" [ngClass]="{ 'ki-up': !isCollapsed1 }"></i>
+                    </span>
+        </div>
+
+        <div class="collapse show" #collapse1="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
+          <div class="row g-9 mb-7">
+            <div class="col-md-6 fv-row">
+              <label class="fw-semibold fs-6 mb-2 text-gray-600"
+                     translate="FORMS.COPYRIGHT.GENERAL_SECTION.APPLICATION_DATE"></label>
+              <input type="date" class="form-control form-control-solid bg-light"
+                     [(ngModel)]="copyrightModel.fechaSolicitud" name="fechaSolicitud" readonly />
+            </div>
+            <div class="col-md-6 fv-row">
+              <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                     translate="FORMS.COPYRIGHT.GENERAL_SECTION.APPLICATION_MODE.LABEL"></label>
+              <select class="form-select form-select-solid"
+                      [(ngModel)]="copyrightModel.modalidadSolicitud" name="modalidadSolicitud"
+                      #modalidad="ngModel" required>
+                <option value=""
+                        translate="FORMS.COPYRIGHT.GENERAL_SECTION.APPLICATION_MODE.SELECT_MODE"></option>
+                <option value="en_linea"
+                        translate="FORMS.COPYRIGHT.GENERAL_SECTION.APPLICATION_MODE.ONLINE"></option>
+                <option value="presencial"
+                        translate="FORMS.COPYRIGHT.GENERAL_SECTION.APPLICATION_MODE.IN_PERSON"></option>
+              </select>
+              <div *ngIf="myForm.submitted && modalidad.invalid"
+                   class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                <div *ngIf="modalidad.errors?.['required']"><span
+                  translate="FORMS.COPYRIGHT.ERRORS.APPLICATION_MODE"></span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="fv-row mb-7">
+            <label class="required fw-semibold fs-6 mb-2 text-gray-600">Tipo de Solicitud INDAUTOR</label>
+            <select class="form-select form-select-solid"
+                    [(ngModel)]="copyrightModel.tipoSolicitud"
+                    name="tipoSolicitud"
+                    #tipoSolicitud="ngModel"
+                    required
+                    (ngModelChange)="onTipoSolicitudChange()">
+              <option value="">Seleccionar tipo de solicitud...</option>
+              <option value="RPDA-01">RPDA-01 - Registro de Obra (Literarias y Artísticas)</option>
+              <option value="RPDA-02">RPDA-02 - Derechos Conexos (Fonogramas, Videogramas, Ediciones)</option>
+            </select>
+
+            <!-- Texto de ayuda -->
+            <div class="form-text text-muted">
+              <app-keenicon name="information-4" class="fs-6 me-1"></app-keenicon>
+              <strong>RPDA-01:</strong> Obras literarias, musicales, pictóricas, programas de cómputo, etc. |
+              <strong>RPDA-02:</strong> Fonogramas, videogramas y ediciones de libros
+            </div>
+
+            <!-- Validación de errores -->
+            <div *ngIf="myForm.submitted && tipoSolicitud.invalid"
+                 class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div *ngIf="tipoSolicitud.errors?.['required']">
+                <span>El tipo de solicitud es requerido</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="fv-row mb-7">
+            <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                   translate="FORMS.COPYRIGHT.GENERAL_SECTION.WORK_TITLE.LABEL"></label>
+            <textarea #tituloObraInput class="form-control form-control-solid" rows="2"
+                      [class.is-invalid]="tituloObraError"
+                      [class.is-valid]="!tituloObraError && copyrightModel.nombreObra && copyrightModel.nombreObra.length >= 5"
+                      [(ngModel)]="copyrightModel.nombreObra" name="nombreObra" #nombreObra="ngModel" required
+                      minlength="5" maxlength="500" (input)="onTituloObraChange($event)"
+                      [placeholder]="placeholderTituloObra"></textarea>
+
+            <div *ngIf="tituloObraError" class="invalid-feedback d-block">
+              {{ tituloObraError }}
+            </div>
+            <div *ngIf="myForm.submitted && nombreObra.invalid && !tituloObraError"
+                 class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div *ngIf="nombreObra.errors?.['required']"><span
+                translate="FORMS.COPYRIGHT.ERRORS.WORK_TITLE_REQUIRED"></span></div>
+              <div *ngIf="nombreObra.errors?.['minlength']"><span
+                translate="FORMS.COPYRIGHT.ERRORS.WORK_TITLE_MIN_LENGTH"></span></div>
+              <div *ngIf="nombreObra.errors?.['maxlength']"><span
+                translate="FORMS.COPYRIGHT.ERRORS.WORK_TITLE_MAX_LENGTH"></span></div>
+            </div>
+          </div>
+
+          <div class="row g-9 mb-7">
+            <div class="col-md-6 fv-row">
+              <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                     translate="FORMS.COPYRIGHT.GENERAL_SECTION.NAME_COMPANY.LABEL"></label>
+              <input type="text" #nombreCompletoInput class="form-control form-control-solid"
+                     [class.is-invalid]="nombreCompletoError"
+                     [class.is-valid]="!nombreCompletoError && copyrightModel.solicitante && copyrightModel.solicitante.length > 0"
+                     [(ngModel)]="copyrightModel.solicitante" name="solicitante" #solicitante="ngModel"
+                     required minlength="3" maxlength="200" (input)="onNombreCompletoChange($event)"
+                     [placeholder]="placeholderNombreCompleto" />
+
+              <div *ngIf="nombreCompletoError" class="invalid-feedback d-block">
+                {{ nombreCompletoError }}
+              </div>
+            </div>
+            <div class="col-md-6 fv-row">
+              <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                     translate="FORMS.COPYRIGHT.GENERAL_SECTION.NATIONALITY.LABEL"></label>
+              <input type="text" #nacionalidadInput class="form-control form-control-solid"
+                     [class.is-invalid]="nacionalidadError"
+                     [class.is-valid]="!nacionalidadError && copyrightModel.nacionalidad && copyrightModel.nacionalidad.length > 0"
+                     [(ngModel)]="copyrightModel.nacionalidad" name="nacionalidad" #nacionalidad="ngModel"
+                     required minlength="4" maxlength="20" (input)="onNacionalidadChange($event)"
+                     [placeholder]="placeholderNacionalidad" />
+
+              <div *ngIf="nacionalidadError" class="invalid-feedback d-block">
+                {{ nacionalidadError }}
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-9 mb-7">
+            <div class="col-md-6 fv-row">
+              <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                     translate="FORMS.COPYRIGHT.GENERAL_SECTION.EMAIL.LABEL"></label>
+              <input type="email" #correoInput class="form-control form-control-solid"
+                     [class.is-invalid]="correoError"
+                     [class.is-valid]="!correoError && copyrightModel.correo && copyrightModel.correo.length > 0"
+                     [(ngModel)]="copyrightModel.correo" name="correo" #correo="ngModel" required email
+                     maxlength="100" (input)="onCorreoChange($event)" [placeholder]="placeholderCorreo" />
+
+              <div *ngIf="correoError" class="invalid-feedback d-block">
+                {{ correoError }}
+              </div>
+              <div *ngIf="myForm.submitted && correo.invalid && !correoError"
+                   class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                <div *ngIf="correo.errors?.['required']"><span
+                  translate="FORMS.COPYRIGHT.ERRORS.EMAIL_REQUIRED"></span></div>
+                <div *ngIf="correo.errors?.['email']"><span
+                  translate="FORMS.COPYRIGHT.ERRORS.EMAIL_INVALID"></span></div>
+              </div>
+            </div>
+
+            <div class="col-md-6 fv-row">
+              <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                     translate="FORMS.COPYRIGHT.GENERAL_SECTION.PHONE"></label>
+              <input type="tel" #celularInput class="form-control form-control-solid"
+                     [class.is-invalid]="celularError"
+                     [class.is-valid]="!celularError && copyrightModel.celular && copyrightModel.celular.length === 10"
+                     [(ngModel)]="copyrightModel.celular" name="celular" #celular="ngModel" required
+                     maxlength="10" (input)="onCelularChange($event)" placeholder="1234567890" />
+
+              <div *ngIf="celularError" class="invalid-feedback d-block">
+                {{ celularError }}
+              </div>
+              <div *ngIf="myForm.submitted && celular.invalid && !celularError"
+                   class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                <div *ngIf="celular.errors?.['required']"><span
+                  translate="FORMS.COPYRIGHT.ERRORS.PHONE_REQUIRED"></span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="fv-row mb-7">
+            <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                   translate="FORMS.COPYRIGHT.GENERAL_SECTION.ADDRESS.LABEL"></label>
+            <textarea #domicilioInput class="form-control form-control-solid" rows="2"
+                      [class.is-invalid]="domicilioError"
+                      [class.is-valid]="!domicilioError && copyrightModel.domicilio && copyrightModel.domicilio.length >= 10"
+                      [(ngModel)]="copyrightModel.domicilio" name="domicilio" #domicilio="ngModel" required
+                      minlength="10" maxlength="300" (input)="onDomicilioChange($event)"
+                      [placeholder]="placeholderDomicilio"></textarea>
+
+            <div *ngIf="domicilioError" class="invalid-feedback d-block">
+              {{ domicilioError }}
+            </div>
+            <div *ngIf="myForm.submitted && domicilio.invalid && !domicilioError"
+                 class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div *ngIf="domicilio.errors?.['required']"><span
+                translate="FORMS.COPYRIGHT.ERRORS.ADDRESS_REQUIRED"></span></div>
+              <div *ngIf="domicilio.errors?.['minlength']"><span
+                translate="FORMS.COPYRIGHT.ERRORS.ADDRESS_SIZE_MIN"></span></div>
+              <div *ngIf="domicilio.errors?.['maxlength']"><span
+                translate="FORMS.COPYRIGHT.ERRORS.ADDRESS_SIZE_MAX"></span></div>
+            </div>
+          </div>
+
+          <div class="row g-9 mb-7">
+            <div class="col-md-6 fv-row">
+              <label class="fw-semibold fs-6 mb-2 text-gray-600">CURP / RFC</label>
+              <input type="text" #curpRfcInput class="form-control form-control-solid"
+                     [class.is-invalid]="curpRfcError"
+                     [class.is-valid]="!curpRfcError && copyrightModel.curpRfc && copyrightModel.curpRfc.length > 0"
+                     [(ngModel)]="copyrightModel.curpRfc" name="curpRfc" maxlength="18"
+                     (input)="onCurpRfcChange($event)" [disabled]="!isCurpRfcEnabled"
+                     [placeholder]="placeholderCurpRfc" />
+
+              <div *ngIf="curpRfcError" class="invalid-feedback d-block">
+                {{ curpRfcError }}
+              </div>
+            </div>
+
+            <div class="col-md-6 fv-row">
+              <label class="fw-semibold fs-6 mb-2 text-gray-600"
+                     translate="FORMS.COPYRIGHT.GENERAL_SECTION.AUTHOR_NAME.LABEL"></label>
+              <input type="text" class="form-control form-control-solid"
+                     [(ngModel)]="copyrightModel.autor" name="autor" maxlength="200"
+                     [placeholder]="placeholderAutor" />
+            </div>
+          </div>
+
+          <div class="row g-9 mb-7">
+            <div class="col-md-6 fv-row">
+              <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                     translate="FORMS.COPYRIGHT.GENERAL_SECTION.ENTITY.LABEL"></label>
+              <select class="form-select form-select-solid" [(ngModel)]="estadoSeleccionado"
+                      (ngModelChange)="onEstadoChange($event)" name="estadoSeleccionado" #estado="ngModel"
+                      required>
+                <option value="" translate="FORMS.COPYRIGHT.GENERAL_SECTION.ENTITY.SELECT_ENTITY">
+                </option>
+                <option *ngFor="let entidad of entidadesFederativas" [value]="entidad.id">
+                  {{entidad.nombre}}
+                </option>
+              </select>
+              <div *ngIf="myForm.submitted && estado.invalid"
+                   class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                <div *ngIf="estado.errors?.['required']"><span
+                  translate="FORMS.COPYRIGHT.ERRORS.ENTITY"></span></div>
+              </div>
+            </div>
+
+            <div class="col-md-6 fv-row">
+              <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                     translate="FORMS.COPYRIGHT.GENERAL_SECTION.INSTITUTION.LABEL"></label>
+              <select class="form-select form-select-solid" [(ngModel)]="institucionSeleccionada"
+                      (ngModelChange)="onInstitucionChange($event)" name="institucionSeleccionada"
+                      #institucion="ngModel" required [disabled]="!estadoSeleccionado">
+                <option value=""
+                        translate="FORMS.COPYRIGHT.GENERAL_SECTION.INSTITUTION.SELECT_INSTITUTION"></option>
+                <option *ngFor="let inst of institucionesFiltradas" [value]="inst.id">
+                  {{inst.nombre}}
+                </option>
+              </select>
+              <div *ngIf="myForm.submitted && institucion.invalid"
+                   class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                <div *ngIf="institucion.errors?.['required']"><span
+                  translate="FORMS.COPYRIGHT.ERRORS.INSTITUTION"></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 2: INFORMACIÓN DE LA OBRA -->
+        <div class="fw-bold fs-3 rotate collapsible mb-7" data-bs-toggle="collapse" role="button"
+             (click)="collapse2.toggle()" [attr.aria-expanded]="!isCollapsed2" aria-controls="kt_obra_info">
+          <app-keenicon name="document" class="fs-3 me-2"></app-keenicon>
+          <span translate="FORMS.COPYRIGHT.WORK_SECTION.TITLE"></span>
+          <span class="ms-2 rotate-180">
+                        <i class="ki-duotone ki-down fs-3" [ngClass]="{ 'ki-up': !isCollapsed2 }"></i>
+                    </span>
+        </div>
+
+        <div class="collapse" #collapse2="ngbCollapse" [(ngbCollapse)]="isCollapsed2">
+          <div class="fv-row mb-7">
+            <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                   translate="FORMS.COPYRIGHT.WORK_SECTION.BRANCH.LABEL"></label>
+            <select class="form-select form-select-solid" [(ngModel)]="copyrightModel.rama" name="rama"
+                    #rama="ngModel" required>
+              <option value="" translate="FORMS.COPYRIGHT.WORK_SECTION.BRANCH.SELECT_BRANCH"></option>
+              <option value="literaria" translate="FORMS.COPYRIGHT.WORK_SECTION.BRANCH.OPTIONS.LITERARY">
+              </option>
+              <option value="musical_con_letra"
+                      translate="FORMS.COPYRIGHT.WORK_SECTION.BRANCH.OPTIONS.MUSICAL_WITH_LYRICS"></option>
+              <option value="musical_sin_letra"
+                      translate="FORMS.COPYRIGHT.WORK_SECTION.BRANCH.OPTIONS.MUSICAL_WITHOUT_LYRICS">
+              </option>
+              <option value="dramatica" translate="FORMS.COPYRIGHT.WORK_SECTION.BRANCH.OPTIONS.DRAMATIC">
+              </option>
+              <option value="danza" translate="FORMS.COPYRIGHT.WORK_SECTION.BRANCH.OPTIONS.DANCE">
+              </option>
+              <option value="pictorica" translate="FORMS.COPYRIGHT.WORK_SECTION.BRANCH.OPTIONS.PICTORIAL">
+              </option>
+              <option value="dibujo" translate="FORMS.COPYRIGHT.WORK_SECTION.BRANCH.OPTIONS.DRAWING">
+              </option>
+              <option value="escultorica"
+                      translate="FORMS.COPYRIGHT.WORK_SECTION.BRANCH.OPTIONS.SCULPTURAL"></option>
+              <option value="caracter_plastico"
+                      translate="FORMS.COPYRIGHT.WORK_SECTION.BRANCH.OPTIONS.PLASTIC_CHARACTER"></option>
+              <option value="caricatura"
+                      translate="FORMS.COPYRIGHT.WORK_SECTION.BRANCH.OPTIONS.CARICATURE"></option>
+              <option value="historieta" translate="FORMS.COPYRIGHT.WORK_SECTION.BRANCH.OPTIONS.COMIC">
+              </option>
+              <option value="arquitectonica"
+                      translate="FORMS.COPYRIGHT.WORK_SECTION.BRANCH.OPTIONS.ARCHITECTURAL"></option>
+              <option value="cinematografica"
+                      translate="FORMS.COPYRIGHT.WORK_SECTION.BRANCH.OPTIONS.CINEMATOGRAPHIC"></option>
+              <option value="audiovisual"
+                      translate="FORMS.COPYRIGHT.WORK_SECTION.BRANCH.OPTIONS.AUDIOVISUAL"></option>
+              <option value="programa_radio"
+                      translate="FORMS.COPYRIGHT.WORK_SECTION.BRANCH.OPTIONS.RADIO_PROGRAM"></option>
+              <option value="programa_television"
+                      translate="FORMS.COPYRIGHT.WORK_SECTION.BRANCH.OPTIONS.TV_PROGRAM"></option>
+              <option value="programa_computo"
+                      translate="FORMS.COPYRIGHT.WORK_SECTION.BRANCH.OPTIONS.COMPUTER_PROGRAM"></option>
+              <option value="fotografica"
+                      translate="FORMS.COPYRIGHT.WORK_SECTION.BRANCH.OPTIONS.PHOTOGRAPHIC"></option>
+              <option value="arte_aplicado"
+                      translate="FORMS.COPYRIGHT.WORK_SECTION.BRANCH.OPTIONS.APPLIED_ART"></option>
+              <option value="base_datos" translate="FORMS.COPYRIGHT.WORK_SECTION.BRANCH.OPTIONS.DATABASE">
+              </option>
+            </select>
+            <div *ngIf="myForm.submitted && rama.invalid"
+                 class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div *ngIf="rama.errors?.['required']"><span
+                translate="FORMS.COPYRIGHT.ERRORS.BRANCH_REQUIRED"></span></div>
+            </div>
+          </div>
+
+          <div class="fv-row mb-7">
+            <label class="fw-semibold fs-6 mb-2 text-gray-600"
+                   translate="FORMS.COPYRIGHT.WORK_SECTION.IS_DERIVED.LABEL"></label>
+            <select class="form-select form-select-solid" [(ngModel)]="copyrightModel.esDerivada"
+                    name="esDerivada" (ngModelChange)="onObraDerivadaChange()">
+              <option value="no" translate="FORMS.COPYRIGHT.WORK_SECTION.IS_DERIVED.NO"></option>
+              <option value="si" translate="FORMS.COPYRIGHT.WORK_SECTION.IS_DERIVED.YES"></option>
+            </select>
+          </div>
+
+          <div *ngIf="copyrightModel.esDerivada === 'si'" class="fv-row mb-7">
+            <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                   translate="FORMS.COPYRIGHT.WORK_SECTION.DERIVED_TYPE.LABEL"></label>
+            <select class="form-select form-select-solid" [(ngModel)]="copyrightModel.tipoDerivada"
+                    name="tipoDerivada" #tipoDerivada="ngModel" [required]="copyrightModel.esDerivada === 'si'">
+              <option value="" translate="FORMS.COPYRIGHT.WORK_SECTION.DERIVED_TYPE.SELECT_TYPE"></option>
+              <option value="ampliacion"
+                      translate="FORMS.COPYRIGHT.WORK_SECTION.DERIVED_TYPE.OPTIONS.AMPLIFICATION"></option>
+              <option value="traduccion"
+                      translate="FORMS.COPYRIGHT.WORK_SECTION.DERIVED_TYPE.OPTIONS.TRANSLATION"></option>
+              <option value="arreglo"
+                      translate="FORMS.COPYRIGHT.WORK_SECTION.DERIVED_TYPE.OPTIONS.ARRANGEMENT"></option>
+              <option value="compendio"
+                      translate="FORMS.COPYRIGHT.WORK_SECTION.DERIVED_TYPE.OPTIONS.COMPENDIUM"></option>
+              <option value="adaptacion"
+                      translate="FORMS.COPYRIGHT.WORK_SECTION.DERIVED_TYPE.OPTIONS.ADAPTATION"></option>
+              <option value="parafrasis"
+                      translate="FORMS.COPYRIGHT.WORK_SECTION.DERIVED_TYPE.OPTIONS.PARAPHRASE"></option>
+              <option value="compilacion"
+                      translate="FORMS.COPYRIGHT.WORK_SECTION.DERIVED_TYPE.OPTIONS.COMPILATION"></option>
+              <option value="transformacion"
+                      translate="FORMS.COPYRIGHT.WORK_SECTION.DERIVED_TYPE.OPTIONS.TRANSFORMATION">
+              </option>
+              <option value="coleccion"
+                      translate="FORMS.COPYRIGHT.WORK_SECTION.DERIVED_TYPE.OPTIONS.COLLECTION"></option>
+            </select>
+            <div *ngIf="myForm.submitted && tipoDerivada.invalid && copyrightModel.esDerivada === 'si'"
+                 class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div *ngIf="tipoDerivada.errors?.['required']"><span
+                translate="FORMS.COPYRIGHT.ERRORS.DERIVED_TYPE_REQUIRED"></span></div>
+            </div>
+          </div>
+
+          <div *ngIf="copyrightModel.esDerivada === 'si'" class="fv-row mb-7">
+            <label class="fw-semibold fs-6 mb-2 text-gray-600"
+                   translate="FORMS.COPYRIGHT.WORK_SECTION.ORIGINAL_WORK_DATA.LABEL"></label>
+            <textarea class="form-control form-control-solid" rows="3"
+                      [(ngModel)]="copyrightModel.datosObraPrimigenia" name="datosObraPrimigenia"
+                      [placeholder]="placeholderObraPrimigenia"></textarea>
+          </div>
+
+          <div class="fv-row mb-7">
+            <label class="required fw-semibold fs-6 mb-2 text-gray-600"
+                   translate="FORMS.COPYRIGHT.WORK_SECTION.DESCRIPTION.LABEL"></label>
+            <textarea #descripcionInput class="form-control form-control-solid" rows="4"
+                      [class.is-invalid]="descripcionError"
+                      [class.is-valid]="!descripcionError && copyrightModel.descripcion && copyrightModel.descripcion.length >= 20"
+                      [(ngModel)]="copyrightModel.descripcion" name="descripcion" #descripcion="ngModel" required
+                      minlength="20" maxlength="2000" (input)="onDescripcionChange($event)"
+                      [placeholder]="placeholderDescripcion"></textarea>
+
+            <div *ngIf="descripcionError" class="invalid-feedback d-block">
+              {{ descripcionError }}
+            </div>
+            <div *ngIf="myForm.submitted && descripcion.invalid && !descripcionError"
+                 class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div *ngIf="descripcion.errors?.['required']"><span
+                translate="FORMS.COPYRIGHT.ERRORS.DESCRIPTION_REQUIRED"></span></div>
+              <div *ngIf="descripcion.errors?.['minlength']"><span
+                translate="FORMS.COPYRIGHT.ERRORS.DESCRIPTION_SIZE_MIN"></span></div>
+              <div *ngIf="descripcion.errors?.['maxlength']"><span
+                translate="FORMS.COPYRIGHT.ERRORS.DESCRIPTION_SIZE_MAX"></span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 3: EJEMPLAR DE LA OBRA -->
+        <div class="fw-bold fs-3 rotate collapsible mb-7" data-bs-toggle="collapse" role="button"
+             (click)="collapse3.toggle()" [attr.aria-expanded]="!isCollapsed3" aria-controls="kt_ejemplar_info">
+          <app-keenicon name="code" class="fs-3 me-2"></app-keenicon>
+          <span translate="FORMS.COPYRIGHT.EXEMPLAR_SECTION.TITLE"></span>
+          <span class="ms-2 rotate-180">
+                        <i class="ki-duotone ki-down fs-3" [ngClass]="{ 'ki-up': !isCollapsed3 }"></i>
+                    </span>
+        </div>
+
+        <div class="collapse" #collapse3="ngbCollapse" [(ngbCollapse)]="isCollapsed3">
+          <div class="fv-row mb-7">
+            <label class="fw-semibold fs-6 mb-2 text-gray-600"
+                   translate="FORMS.COPYRIGHT.EXEMPLAR_SECTION.TYPE_LABEL"></label>
+            <div class="form-check form-check-custom form-check-solid mb-3">
+              <input class="form-check-input" type="checkbox" value="codigo_fuente"
+                     [(ngModel)]="tipoEjemplar.codigoFuente" name="tipoEjemplarCodigoFuente" />
+              <label class="form-check-label" translate="FORMS.COPYRIGHT.EXEMPLAR_SECTION.SOURCE_CODE">
+              </label>
+            </div>
+            <div class="form-check form-check-custom form-check-solid mb-3">
+              <input class="form-check-input" type="checkbox" value="url_obra"
+                     [(ngModel)]="tipoEjemplar.urlObra" name="tipoEjemplarUrlObra" />
+              <label class="form-check-label" translate="FORMS.COPYRIGHT.EXEMPLAR_SECTION.URL_WORK">
+              </label>
+            </div>
+            <div class="form-check form-check-custom form-check-solid">
+              <input class="form-check-input" type="checkbox" value="sintesis_obra"
+                     [(ngModel)]="tipoEjemplar.sintesisObra" name="tipoEjemplarSintesisObra" />
+              <label class="form-check-label" translate="FORMS.COPYRIGHT.EXEMPLAR_SECTION.SYNTHESIS">
+              </label>
+            </div>
+          </div>
+
+          <div *ngIf="tipoEjemplar.urlObra" class="fv-row mb-7">
+            <label class="fw-semibold fs-6 mb-2 text-gray-600"
+                   translate="FORMS.COPYRIGHT.EXEMPLAR_SECTION.URL_FIELD.LABEL"></label>
+            <input type="url" class="form-control form-control-solid" [(ngModel)]="copyrightModel.urlObra"
+                   name="urlObra" [placeholder]="placeholderUrlObra" />
+          </div>
+
+          <div *ngIf="tipoEjemplar.sintesisObra" class="fv-row mb-7">
+            <label class="fw-semibold fs-6 mb-2 text-gray-600"
+                   translate="FORMS.COPYRIGHT.EXEMPLAR_SECTION.SYNTHESIS_FIELD.LABEL"></label>
+            <textarea class="form-control form-control-solid" rows="4"
+                      [(ngModel)]="copyrightModel.sintesisObra" name="sintesisObra" maxlength="1000"
+                      [placeholder]="placeholderSintesisObra"></textarea>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 4: DOCUMENTACIÓN -->
+        <div class="fw-bold fs-3 rotate collapsible mb-7" data-bs-toggle="collapse" role="button"
+             (click)="collapse4.toggle()" [attr.aria-expanded]="!isCollapsed4"
+             aria-controls="kt_documentos_info">
+          <app-keenicon name="folder" class="fs-3 me-2"></app-keenicon>
+          <span translate="FORMS.COPYRIGHT.DOCUMENTATION_SECTION.TITLE"></span>
+          <span class="ms-2 rotate-180">
+                        <i class="ki-duotone ki-down fs-3" [ngClass]="{ 'ki-up': !isCollapsed4 }"></i>
+                    </span>
+        </div>
+
+        <div class="collapse" #collapse4="ngbCollapse" [(ngbCollapse)]="isCollapsed4">
+          <div class="card card-flush">
+            <div class="card-body pt-0">
+              <div class="fv-row mb-7">
+                <label class="fw-semibold fs-6 mb-2 text-gray-600"
+                       translate="FORMS.COPYRIGHT.DOCUMENTATION_SECTION.INDAUTOR_FORMAT.LABEL"></label>
+                <input type="file" class="form-control form-control-solid"
+                       (change)="onFormatoOficialSelected($event)" accept=".pdf" />
+                <div class="form-text">
+                                    <span
+                                      translate="FORMS.COPYRIGHT.DOCUMENTATION_SECTION.INDAUTOR_FORMAT.SUB_TEXT"></span>
+                </div>
+              </div>
+
+              <div class="fv-row mb-7">
+                <label class="fw-semibold fs-6 mb-2 text-gray-600"
+                       translate="FORMS.COPYRIGHT.DOCUMENTATION_SECTION.OFFICIAL_ID.LABEL"></label>
+                <input type="file" class="form-control form-control-solid"
+                       (change)="onIdentificacionSelected($event)" multiple
+                       accept=".pdf,.jpg,.jpeg,.png" />
+                <div class="form-text">
+                  <span translate="FORMS.COPYRIGHT.DOCUMENTATION_SECTION.OFFICIAL_ID.SUB_TEXT"></span>
+                </div>
+              </div>
+
+              <div class="fv-row mb-7">
+                <label class="fw-semibold fs-6 mb-2 text-gray-600"
+                       translate="FORMS.COPYRIGHT.DOCUMENTATION_SECTION.OWNERSHIP_DOCUMENT.LABEL"></label>
+                <input type="file" class="form-control form-control-solid"
+                       (change)="onTitularidadSelected($event)" multiple accept=".pdf" />
+                <div class="form-text">
+                                    <span
+                                      translate="FORMS.COPYRIGHT.DOCUMENTATION_SECTION.OWNERSHIP_DOCUMENT.SUB_TEXT"></span>
+                </div>
+              </div>
+
+              <div class="fv-row mb-7">
+                <label class="fw-semibold fs-6 mb-2 text-gray-600"
+                       translate="FORMS.COPYRIGHT.DOCUMENTATION_SECTION.PAYMENT_RECEIPT.LABEL"></label>
+                <input type="file" class="form-control form-control-solid"
+                       (change)="onComprobantePagoSelected($event)" accept=".pdf" />
+                <div class="form-text">
+                                    <span
+                                      translate="FORMS.COPYRIGHT.DOCUMENTATION_SECTION.PAYMENT_RECEIPT.SUB_TEXT"></span>
+                </div>
+              </div>
+
+              <div class="fv-row mb-7">
+                <label class="fw-semibold fs-6 mb-2 text-gray-600"
+                       translate="FORMS.COPYRIGHT.DOCUMENTATION_SECTION.WORK_EXEMPLAR.LABEL"></label>
+                <input type="file" class="form-control form-control-solid"
+                       (change)="onEjemplarObraSelected($event)" multiple accept=".pdf,.doc,.docx,.txt" />
+                <div class="form-text">
+                                    <span
+                                      translate="FORMS.COPYRIGHT.DOCUMENTATION_SECTION.WORK_EXEMPLAR.SUB_TEXT"></span>
+                </div>
+              </div>
+
+              <div class="fv-row mb-7">
+                <label class="fw-semibold fs-6 mb-2 text-gray-600"
+                       translate="FORMS.COPYRIGHT.DOCUMENTATION_SECTION.ADDITIONAL_DOCUMENTS.LABEL"></label>
+                <input type="file" class="form-control form-control-solid"
+                       (change)="onDocumentosAdicionalesSelected($event)" multiple accept=".pdf" />
+                <div class="form-text">
+                                    <span
+                                      translate="FORMS.COPYRIGHT.DOCUMENTATION_SECTION.ADDITIONAL_DOCUMENTS.SUB_TEXT"></span>
+                </div>
+              </div>
+
+              <div *ngIf="allSelectedFiles.length > 0" class="selected-files-list">
+                <h6 class="fw-bold mb-4"
+                    translate="FORMS.COPYRIGHT.DOCUMENTATION_SECTION.SELECTED_FILES">
+                </h6>
+                <div *ngFor="let fileInfo of allSelectedFiles; let i = index"
+                     class="d-flex align-items-center border border-gray-300 border-dashed rounded p-4 mb-3">
+                  <div class="symbol symbol-50px me-4">
+                    <div class="symbol-label bg-light-info">
+                      <app-keenicon name="document" class="fs-2 text-info"></app-keenicon>
+                    </div>
+                  </div>
+                  <div class="flex-grow-1">
+                    <div class="fw-bold text-gray-800 fs-6">{{fileInfo.file.name}}</div>
+                    <div class="text-muted fs-7">{{fileInfo.tipo}} - {{(fileInfo.file.size / 1024 /
+                      1024).toFixed(2)}} MB</div>
+                  </div>
+                  <button type="button" class="btn btn-sm btn-light-danger" (click)="removeFile(i)">
+                    <app-keenicon name="cross" class="fs-3"></app-keenicon>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 5: DECLARACIONES -->
+        <div class="fw-bold fs-3 rotate collapsible mb-7" data-bs-toggle="collapse" role="button"
+             (click)="collapse5.toggle()" [attr.aria-expanded]="!isCollapsed5"
+             aria-controls="kt_declaraciones_info">
+          <app-keenicon name="shield-tick" class="fs-3 me-2"></app-keenicon>
+          <span translate="FORMS.COPYRIGHT.STATEMENTS_SECTION.TITLE"></span>
+          <span class="ms-2 rotate-180">
+                        <i class="ki-duotone ki-down fs-3" [ngClass]="{ 'ki-up': !isCollapsed5 }"></i>
+                    </span>
+        </div>
+
+        <div class="collapse" #collapse5="ngbCollapse" [(ngbCollapse)]="isCollapsed5">
+          <div class="fv-row mb-7">
+            <div class="form-check form-check-custom form-check-solid">
+              <input class="form-check-input" type="checkbox"
+                     [(ngModel)]="copyrightModel.declaracionOriginalidad" name="declaracionOriginalidad"
+                     #declaracionOriginalidad="ngModel" required />
+              <label class="form-check-label fw-semibold text-gray-700"
+                     translate="FORMS.COPYRIGHT.STATEMENTS_SECTION.STATEMENT_1">
+              </label>
+            </div>
+            <div *ngIf="myForm.submitted && declaracionOriginalidad.invalid"
+                 class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div *ngIf="declaracionOriginalidad.errors?.['required']"><span
+                translate="FORMS.COPYRIGHT.ERRORS.DECLARATION_ORIGINALITY"></span></div>
+            </div>
+          </div>
+
+          <div class="fv-row mb-7">
+            <div class="form-check form-check-custom form-check-solid">
+              <input class="form-check-input" type="checkbox"
+                     [(ngModel)]="copyrightModel.declaracionVeracidad" name="declaracionVeracidad"
+                     #declaracionVeracidad="ngModel" required />
+              <label class="form-check-label fw-semibold text-gray-700"
+                     translate="FORMS.COPYRIGHT.STATEMENTS_SECTION.STATEMENT_2"></label>
+            </div>
+            <div *ngIf="myForm.submitted && declaracionVeracidad.invalid"
+                 class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div *ngIf="declaracionVeracidad.errors?.['required']"><span
+                translate="FORMS.COPYRIGHT.ERRORS.DECLARATION_VERACITY"></span></div>
+            </div>
+          </div>
+
+          <div class="fv-row mb-7">
+            <div class="form-check form-check-custom form-check-solid">
+              <input class="form-check-input" type="checkbox"
+                     [(ngModel)]="copyrightModel.declaracionTitularidad" name="declaracionTitularidad"
+                     #declaracionTitularidad="ngModel" required />
+              <label class="form-check-label fw-semibold text-gray-700"
+                     translate="FORMS.COPYRIGHT.STATEMENTS_SECTION.STATEMENT_3">
+              </label>
+            </div>
+            <div *ngIf="myForm.submitted && declaracionTitularidad.invalid"
+                 class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div *ngIf="declaracionTitularidad.errors?.['required']"><span
+                translate="FORMS.COPYRIGHT.ERRORS.DECLARATION_OWNERSHIP"></span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end mt-10">
+          <button type="button" class="btn btn-light me-3" (click)="onCancel()" [disabled]="isLoading"
+                  translate="BUTTON.CANCEL">
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm align-middle me-2"></span>
+            <span *ngIf="!isLoading" translate="BUTTON.COPYRIGHT"></span>
+            <span *ngIf="isLoading" translate="BUTTON.PROCESSING"></span>
+          </button>
+        </div>
+
+      </div>
+    </form>
+  </div>
+</div>
+
+<swal #noticeSwal [swalOptions]="swalOptions"></swal>

@@ -94,6 +94,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       config
     ) as string;
     if (this.appHeaderDefaultContainerClass) {
+      console.log('Header Container Class:', this.appHeaderDefaultContainerClass);
       this.headerContainerCssClass += ` ${this.appHeaderDefaultContainerClass}`;
     }
 
@@ -131,6 +132,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
       }
     });
     this.unsubscribe.push(routerSubscription);
+  }
+
+  isProfileRoute(): boolean {
+    const url = this.router.url;
+    return url.includes('/perfil');
   }
 
   ngOnDestroy() {

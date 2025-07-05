@@ -1,0 +1,353 @@
+<div class="card card-flush mt-4">
+    <div class="card-body">
+      <form #solicitudForm="ngForm" (ngSubmit)="onSubmit()" novalidate>
+        <h2 class="text-center mb-4">Solicitud de registro de diseño industrial</h2>
+        <div *ngIf="formError" class="alert alert-danger mb-4">{{ formError }}</div>
+        <div class="mb-6">
+          <div class="form-check form-check-custom form-check-solid form-switch">
+            <label class="form-check-label me-5">Nuevo registro</label>
+            <input class="form-check-input w-50px bg-primary border-primary" type="checkbox"
+              name="model.app.sidebar.default.minimize.desktop.default"
+              disabled />
+            <label class="form-check-label ms-5">Registro anterior</label>
+          </div>
+        </div>
+        <div class="row mb-6">
+          <!-- Modalidad de solicitud -->
+          <div class="col-md-6 mb-3">
+            <label class="fw-bold fs-6">Modalidad de Solicitud <span class="text-danger">*</span></label>
+            <select
+              class="form-select form-select-solid"
+              [ngClass]="{'is-invalid': campoInvalido(model.modalidad)}"
+              name="modalidad"
+              [(ngModel)]="model.modalidad"
+              required>
+              <option value="" disabled selected>Seleccione una opción</option>
+              <option value="en_linea">En línea (e-IMPI)</option>
+              <option value="presencial">Presencial (Oficinas)</option>
+            </select>
+            <div *ngIf="campoInvalido(model.modalidad)" class="invalid-feedback d-block">
+              Campo obligatorio
+            </div>
+          </div>
+          <!-- Tipo de invención registrada -->
+          <div class="col-md-6 mb-3">
+            <label class="fw-bold fs-6">Tipo de Invención Registrada <span class="text-danger">*</span></label>
+            <select
+              class="form-select form-select-solid"
+              [ngClass]="{'is-invalid': campoInvalido(model.tipoInvencion)}"
+              name="tipoInvencion"
+              [(ngModel)]="model.tipoInvencion"
+              required>
+              <option value="" disabled selected>Seleccione una opción</option>
+              <option value="patente">Patente</option>
+              <option value="modelo_utilidad">Modelo de utilidad</option>
+              <option value="diseno_industrial">Diseño industrial</option>
+            </select>
+            <div *ngIf="campoInvalido(model.tipoInvencion)" class="invalid-feedback d-block">
+              Campo obligatorio
+            </div>
+          </div>
+        </div>
+  
+        <div class="separator my-4"></div>
+  
+        <!-- Persona física o moral -->
+        <div class="mb-6">
+          <label class="fw-bold fs-6">Tipo de Solicitante</label>
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="tipoSolicitante"
+              [(ngModel)]="model.tipoSolicitante"
+              value="fisica"
+              checked />
+            <label class="form-check-label">Persona Física</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="tipoSolicitante"
+              [(ngModel)]="model.tipoSolicitante"
+              value="moral" />
+            <label class="form-check-label">Persona Moral</label>
+          </div>
+        </div>
+  
+        <!-- Datos persona física -->
+        <div *ngIf="model.tipoSolicitante === 'fisica'" class="mb-6 border rounded p-4">
+          <h4>Datos de la Persona Física</h4>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label>CURP (opcional)</label>
+              <input type="text" class="form-control form-control-solid" name="curp" [(ngModel)]="model.curp" />
+            </div>
+            <div class="col-md-4 mb-3">
+              <label>Nombre(s) <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-solid" [ngClass]="{'is-invalid': campoInvalido(model.nombres)}" name="nombres" [(ngModel)]="model.nombres" required />
+              <div *ngIf="campoInvalido(model.nombres)" class="invalid-feedback d-block">Campo obligatorio</div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label>Primer Apellido <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-solid" [ngClass]="{'is-invalid': campoInvalido(model.primerApellido)}" name="primerApellido" [(ngModel)]="model.primerApellido" required />
+              <div *ngIf="campoInvalido(model.primerApellido)" class="invalid-feedback d-block">Campo obligatorio</div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label>Segundo Apellido</label>
+              <input type="text" class="form-control form-control-solid" name="segundoApellido" [(ngModel)]="model.segundoApellido" />
+            </div>
+            <div class="col-md-4 mb-3">
+              <label>Nacionalidad <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-solid" [ngClass]="{'is-invalid': campoInvalido(model.nacionalidadFisica)}" name="nacionalidadFisica" [(ngModel)]="model.nacionalidadFisica" required />
+              <div *ngIf="campoInvalido(model.nacionalidadFisica)" class="invalid-feedback d-block">Campo obligatorio</div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label>Teléfono (lada, número y extensión) <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-solid" [ngClass]="{'is-invalid': campoInvalido(model.telefonoFisica)}" name="telefonoFisica" [(ngModel)]="model.telefonoFisica" required />
+              <div *ngIf="campoInvalido(model.telefonoFisica)" class="invalid-feedback d-block">Campo obligatorio</div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label>Correo Electrónico (opcional)</label>
+              <input type="email" class="form-control form-control-solid" name="correoFisica" [(ngModel)]="model.correoFisica" />
+            </div>
+          </div>
+        </div>
+  
+        <!-- Datos persona moral -->
+        <div *ngIf="model.tipoSolicitante === 'moral'" class="mb-6 border rounded p-4">
+          <h4>Datos de la Persona Moral</h4>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label>RFC (opcional)</label>
+              <input type="text" class="form-control form-control-solid" name="rfc" [(ngModel)]="model.rfc" />
+            </div>
+            <div class="col-md-4 mb-3">
+              <label>Denominación o razón social <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-solid" [ngClass]="{'is-invalid': campoInvalido(model.razonSocial)}" name="razonSocial" [(ngModel)]="model.razonSocial" required />
+              <div *ngIf="campoInvalido(model.razonSocial)" class="invalid-feedback d-block">Campo obligatorio</div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label>Nacionalidad <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-solid" [ngClass]="{'is-invalid': campoInvalido(model.nacionalidadMoral)}" name="nacionalidadMoral" [(ngModel)]="model.nacionalidadMoral" required />
+              <div *ngIf="campoInvalido(model.nacionalidadMoral)" class="invalid-feedback d-block">Campo obligatorio</div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label>Teléfono (lada, número y extensión) <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-solid" [ngClass]="{'is-invalid': campoInvalido(model.telefonoMoral)}" name="telefonoMoral" [(ngModel)]="model.telefonoMoral" required />
+              <div *ngIf="campoInvalido(model.telefonoMoral)" class="invalid-feedback d-block">Campo obligatorio</div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label>Correo Electrónico (opcional)</label>
+              <input type="email" class="form-control form-control-solid" name="correoMoral" [(ngModel)]="model.correoMoral" />
+            </div>
+          </div>
+        </div>
+  
+        <!-- Domicilio del solicitante -->
+        <div class="mb-6 border rounded p-4">
+          <h4>Domicilio del/de los solicitantes</h4>
+          <div class="row">
+            <div class="col-md-3 mb-3">
+              <label>Código Postal <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-solid" [ngClass]="{'is-invalid': campoInvalido(model.cp)}" name="cp" [(ngModel)]="model.cp" required />
+              <div *ngIf="campoInvalido(model.cp)" class="invalid-feedback d-block">Campo obligatorio</div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label>Calle <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-solid" [ngClass]="{'is-invalid': campoInvalido(model.calle)}" name="calle" [(ngModel)]="model.calle" required />
+              <div *ngIf="campoInvalido(model.calle)" class="invalid-feedback d-block">Campo obligatorio</div>
+            </div>
+            <div class="col-md-2 mb-3">
+              <label>Número Exterior <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-solid" [ngClass]="{'is-invalid': campoInvalido(model.numExterior)}" name="numExterior" [(ngModel)]="model.numExterior" required />
+              <div *ngIf="campoInvalido(model.numExterior)" class="invalid-feedback d-block">Campo obligatorio</div>
+            </div>
+            <div class="col-md-2 mb-3">
+              <label>Número Interior</label>
+              <input type="text" class="form-control form-control-solid" name="numInterior" [(ngModel)]="model.numInterior" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label>Colonia <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-solid" [ngClass]="{'is-invalid': campoInvalido(model.colonia)}" name="colonia" [(ngModel)]="model.colonia" required />
+              <div *ngIf="campoInvalido(model.colonia)" class="invalid-feedback d-block">Campo obligatorio</div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label>Municipio o Alcaldía <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-solid" [ngClass]="{'is-invalid': campoInvalido(model.municipio)}" name="municipio" [(ngModel)]="model.municipio" required />
+              <div *ngIf="campoInvalido(model.municipio)" class="invalid-feedback d-block">Campo obligatorio</div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label>Localidad <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-solid" [ngClass]="{'is-invalid': campoInvalido(model.localidad)}" name="localidad" [(ngModel)]="model.localidad" required />
+              <div *ngIf="campoInvalido(model.localidad)" class="invalid-feedback d-block">Campo obligatorio</div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label>Entidad Federativa <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-solid" [ngClass]="{'is-invalid': campoInvalido(model.entidadFederativa)}" name="entidadFederativa" [(ngModel)]="model.entidadFederativa" required />
+              <div *ngIf="campoInvalido(model.entidadFederativa)" class="invalid-feedback d-block">Campo obligatorio</div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label>Entre calles (opcional)</label>
+              <input type="text" class="form-control form-control-solid" name="entreCalles" [(ngModel)]="model.entreCalles" />
+            </div>
+            <div class="col-md-4 mb-3">
+              <label>País <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-solid" [ngClass]="{'is-invalid': campoInvalido(model.pais)}" name="pais" [(ngModel)]="model.pais" required />
+              <div *ngIf="campoInvalido(model.pais)" class="invalid-feedback d-block">Campo obligatorio</div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label>Calle posterior (opcional)</label>
+              <input type="text" class="form-control form-control-solid" name="callePosterior" [(ngModel)]="model.callePosterior" />
+            </div>
+          </div>
+        </div>
+  
+        <div class="separator my-4"></div>
+  
+        <!-- Datos según tipo de protección -->
+        <div *ngIf="model.tipoInvencion === 'patente' || model.tipoInvencion === 'modelo_utilidad'" class="mb-6 border rounded p-4">
+          <h4>Datos de la {{ model.tipoInvencion === "patente" ? "Patente" : "Modelo de Utilidad" }}</h4>
+          <div class="mb-3">
+            <label>Título de la invención <span class="text-danger">*</span></label>
+            <input type="text" class="form-control form-control-solid" [ngClass]="{'is-invalid': campoInvalido(model.tituloInvencion)}" name="tituloInvencion" [(ngModel)]="model.tituloInvencion" required />
+            <div *ngIf="campoInvalido(model.tituloInvencion)" class="invalid-feedback d-block">Campo obligatorio</div>
+          </div>
+          <div class="mb-3">
+            <label>Campo técnico <span class="text-danger">*</span></label>
+            <input type="text" class="form-control form-control-solid" [ngClass]="{'is-invalid': campoInvalido(model.campoTecnico)}" name="campoTecnico" [(ngModel)]="model.campoTecnico" required />
+            <div *ngIf="campoInvalido(model.campoTecnico)" class="invalid-feedback d-block">Campo obligatorio</div>
+          </div>
+          <div class="mb-3">
+            <label>Estado de la técnica (antecedentes) <span class="text-danger">*</span></label>
+            <textarea class="form-control form-control-solid" [ngClass]="{'is-invalid': campoInvalido(model.estadoTecnica)}" name="estadoTecnica" [(ngModel)]="model.estadoTecnica" required></textarea>
+            <div *ngIf="campoInvalido(model.estadoTecnica)" class="invalid-feedback d-block">Campo obligatorio</div>
+          </div>
+          <div class="mb-3">
+            <label>Problema técnico a resolver <span class="text-danger">*</span></label>
+            <textarea class="form-control form-control-solid" [ngClass]="{'is-invalid': campoInvalido(model.problemaTecnico)}" name="problemaTecnico" [(ngModel)]="model.problemaTecnico" required></textarea>
+            <div *ngIf="campoInvalido(model.problemaTecnico)" class="invalid-feedback d-block">Campo obligatorio</div>
+          </div>
+          <div class="mb-3">
+            <label>Descripción detallada <span class="text-danger">*</span></label>
+            <textarea class="form-control form-control-solid" [ngClass]="{'is-invalid': campoInvalido(model.descripcionDetallada)}" name="descripcionDetallada" [(ngModel)]="model.descripcionDetallada" required></textarea>
+            <div *ngIf="campoInvalido(model.descripcionDetallada)" class="invalid-feedback d-block">Campo obligatorio</div>
+          </div>
+          <div class="mb-3">
+            <label>Ejemplos de realización <span class="text-danger">*</span></label>
+            <textarea class="form-control form-control-solid" [ngClass]="{'is-invalid': campoInvalido(model.ejemplosRealizacion)}" name="ejemplosRealizacion" [(ngModel)]="model.ejemplosRealizacion" required></textarea>
+            <div *ngIf="campoInvalido(model.ejemplosRealizacion)" class="invalid-feedback d-block">Campo obligatorio</div>
+          </div>
+          <div class="mb-3">
+            <label>Aplicación industrial <span class="text-danger">*</span></label>
+            <input type="text" class="form-control form-control-solid" [ngClass]="{'is-invalid': campoInvalido(model.aplicacionIndustrial)}" name="aplicacionIndustrial" [(ngModel)]="model.aplicacionIndustrial" required />
+            <div *ngIf="campoInvalido(model.aplicacionIndustrial)" class="invalid-feedback d-block">Campo obligatorio</div>
+          </div>
+          <div class="mb-3">
+            <label>Reivindicaciones <span class="text-danger">*</span></label>
+            <textarea class="form-control form-control-solid" [ngClass]="{'is-invalid': campoInvalido(model.reivindicaciones)}" name="reivindicaciones" [(ngModel)]="model.reivindicaciones" required></textarea>
+            <div *ngIf="campoInvalido(model.reivindicaciones)" class="invalid-feedback d-block">Campo obligatorio</div>
+          </div>
+        </div>
+        <div *ngIf="model.tipoInvencion === 'diseno_industrial'" class="mb-6 border rounded p-4">
+          <h4>Datos del Diseño Industrial</h4>
+          <div class="mb-3">
+            <label>Título del diseño <span class="text-danger">*</span></label>
+            <input type="text" class="form-control form-control-solid" [ngClass]="{'is-invalid': campoInvalido(model.tituloDiseno)}" name="tituloDiseno" [(ngModel)]="model.tituloDiseno" required />
+            <div *ngIf="campoInvalido(model.tituloDiseno)" class="invalid-feedback d-block">Campo obligatorio</div>
+          </div>
+        </div>
+  
+        <!-- Selects de formato oficial, descripción técnica, resumen, declaración, pago de derechos, traducción, documentos -->
+        <div class="mb-6 border rounded p-4">
+          <h4>Documentos y Declaraciones</h4>
+          <div class="mb-3">
+            <label>Formato oficial de solicitud <span class="text-danger">*</span></label>
+            <select class="form-select form-select-solid" [ngClass]="{'is-invalid': campoInvalido(model.formatoOficial)}" name="formatoOficial" [(ngModel)]="model.formatoOficial" required>
+              <option value="" disabled selected>Seleccione el formato</option>
+              <option value="IMPI-00-00">IMPI-00-00</option>
+            </select>
+            <div *ngIf="campoInvalido(model.formatoOficial)" class="invalid-feedback d-block">Campo obligatorio</div>
+          </div>
+          <div class="mb-3">
+            <label>Descripción técnica de la invención <span class="text-danger">*</span></label>
+            <textarea class="form-control form-control-solid" [ngClass]="{'is-invalid': campoInvalido(model.descripcionTecnica)}" name="descripcionTecnica" [(ngModel)]="model.descripcionTecnica" required></textarea>
+            <div *ngIf="campoInvalido(model.descripcionTecnica)" class="invalid-feedback d-block">Campo obligatorio</div>
+          </div>
+          <div class="mb-3">
+            <label>Resumen <span class="text-danger">*</span></label>
+            <textarea class="form-control form-control-solid" [ngClass]="{'is-invalid': campoInvalido(model.resumen)}" name="resumen" [(ngModel)]="model.resumen" required></textarea>
+            <div *ngIf="campoInvalido(model.resumen)" class="invalid-feedback d-block">Campo obligatorio</div>
+            <div class="form-text">Documento breve (150 a 250 palabras).</div>
+          </div>
+          <div class="mb-3">
+            <label>Declaración de originalidad <span class="text-danger">*</span></label>
+            <select class="form-select form-select-solid" [ngClass]="{'is-invalid': campoInvalido(model.declaracionOriginalidad)}" name="declaracionOriginalidad" [(ngModel)]="model.declaracionOriginalidad" required>
+              <option value="" disabled selected>Seleccione una opción</option>
+              <option value="si">Sí</option>
+              <option value="no">No</option>
+            </select>
+            <div *ngIf="campoInvalido(model.declaracionOriginalidad)" class="invalid-feedback d-block">Campo obligatorio</div>
+          </div>
+          <div class="mb-3">
+            <label>Pago de derechos <span class="text-danger">*</span></label>
+            <select class="form-select form-select-solid" [ngClass]="{'is-invalid': campoInvalido(model.pagoDerechos)}" name="pagoDerechos" [(ngModel)]="model.pagoDerechos" required>
+              <option value="" disabled selected>Seleccione una opción</option>
+              <option value="presentado">Comprobante presentado</option>
+              <option value="pendiente">Pendiente</option>
+            </select>
+            <div *ngIf="campoInvalido(model.pagoDerechos)" class="invalid-feedback d-block">Campo obligatorio</div>
+          </div>
+          <div class="mb-3">
+            <label>Traducción (si aplica)</label>
+            <select class="form-select form-select-solid" name="traduccion" [(ngModel)]="model.traduccion">
+              <option value="" selected>No aplica</option>
+              <option value="presentada">Presentada</option>
+              <option value="pendiente">Pendiente</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label>¿Presenta original y copia de documentos? <span class="text-danger">*</span></label>
+            <select class="form-select form-select-solid" [ngClass]="{'is-invalid': campoInvalido(model.originalCopia)}" name="originalCopia" [(ngModel)]="model.originalCopia" required>
+              <option value="" disabled selected>Seleccione una opción</option>
+              <option value="si">Sí</option>
+              <option value="no">No</option>
+            </select>
+            <div *ngIf="campoInvalido(model.originalCopia)" class="invalid-feedback d-block">Campo obligatorio</div>
+          </div>
+          <div class="mb-3">
+            <label>Documentos adicionales (si aplica)</label>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="poderNotarial" [(ngModel)]="model.documentosAdicionales.poderNotarial" name="poderNotarial" />
+              <label class="form-check-label" for="poderNotarial">Poder notarial</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="cesionDerechos" [(ngModel)]="model.documentosAdicionales.cesionDerechos" name="cesionDerechos" />
+              <label class="form-check-label" for="cesionDerechos">Cesión de derechos/transferencia</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="prioridadExtranjera" [(ngModel)]="model.documentosAdicionales.prioridadExtranjera" name="prioridadExtranjera" />
+              <label class="form-check-label" for="prioridadExtranjera">Prioridad extranjera</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="divulgacionPrevia" [(ngModel)]="model.documentosAdicionales.divulgacionPrevia" name="divulgacionPrevia" />
+              <label class="form-check-label" for="divulgacionPrevia">Declaración de divulgación previa</label>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Botones -->
+        <div class="d-flex justify-content-end mt-6 gap-4">
+          <button type="button" class="btn btn-light" [routerLink]="['/solicitante/registrar']">Cancelar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="isLoading">Enviar Solicitud</button>
+        </div>
+      </form>
+    </div>
+  </div>

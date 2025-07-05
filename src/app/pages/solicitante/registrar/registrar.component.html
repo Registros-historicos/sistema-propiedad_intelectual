@@ -1,0 +1,24 @@
+<div class="registrar-container">
+  <h2>Registro de Propiedad Intelectual</h2>
+  <p>
+    Aquí puedes registrar tu propiedad intelectual. Selecciona el tipo de
+    propiedad que deseas registrar y completa el formulario correspondiente.
+  </p>
+
+
+  <div class="card-grid">
+    <div
+      class="card registro-card"
+      *ngFor="let registro of registros"
+      [ngClass]="registro.claseColor"
+      (click)="verRegistro(registro.ruta)"
+    >
+      <span class="material-icons icono-reporte">{{ registro.icono }}</span>
+      <h3>{{ registro.tituloKey | translate }}</h3>
+      <p>{{ registro.descripcionKey | translate }}</p>
+      <button>Registrar</button>
+    </div>
+  </div>
+
+
+</div>
