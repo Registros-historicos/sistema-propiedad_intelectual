@@ -25,7 +25,7 @@ const routes: Routes = [
       },
       {
         path: 'derecho-autor',
-        component: DerechoAutorFormComponent
+        component:  DerechoAutorFormComponent
       },
       {
         path: 'diseno-industrial',
