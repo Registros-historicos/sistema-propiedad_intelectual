@@ -1,3 +1,5 @@
+import { HISTORICAL_REGISTERS } from "src/app/pages/administrador/historical-register/constants/historical-register.constant";
+
 // Spain
 export const locale = {
   lang: 'es',
@@ -1109,6 +1111,7 @@ export const locale = {
       DASHBOARD: 'Tablero',
       REGISTERS: 'Registros',
       USERS: 'Usuarios',
+      HISTORICAL_REGISTERS: 'Registros Históricos',
       INTELECTUAL_PROPERTIES: 'Propiedades Intelectuales',
       REPORTS: 'Reportes',
       HELP: 'Ayuda',
@@ -1386,6 +1389,19 @@ export const locale = {
         TITLE: 'Registro de Solicitante',
         DESCRIPTION: 'Registra un nuevo solicitante en el sistema.',
       },
+    },
+    HISTORICAL_REGISTER: {
+      TITLE: 'Registro Histórico de Solicitudes',
+      DESCRIPTION: 'Cargar registros históricos de solicitudes de propiedad intelectual.',
+      IMPI: {
+        TITLE: 'REGISTROS IMPI',
+        DESCRIPTION: 'Cargar registros históricos de solicitudes mediante IMPI.',
+      },
+      INDAUTOR: {
+        TITLE: 'REGISTROS INDAUTOR',
+        DESCRIPTION: 'Cargar registros históricos de solicitudes mediante INDAUTOR.',
+      },
+      REGISTER_ACTION: 'Cargar Registro',
     }
   },
 };
