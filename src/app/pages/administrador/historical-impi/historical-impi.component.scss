@@ -1,0 +1,48 @@
+.container-fluid {
+  background: #fff;
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+.card {
+  border-radius: 12px;
+  border: 1px solid #ececec;
+  min-height: 600px;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+.upload-dropzone {
+  border: 2px dashed #d3d7de;
+  border-radius: 10px;
+  min-height: 140px;
+  background: #fafbfc;
+  transition: border-color 0.2s;
+  cursor: pointer;
+  position: relative;
+  margin-bottom: 0.5rem;
+
+  &.has-file {
+    border-style: solid;
+    border-color: #bcd8fb;
+    background: #f4faff;
+  }
+
+  &:hover {
+    border-color: #74a6f2;
+  }
+
+  input[type="file"] {
+    display: none;
+  }
+}
+
+.alert-primary {
+  border: none;
+  background: #f5faff;
+  color: #2e3a59;
+}
+
+.bi {
+  vertical-align: middle;
+}

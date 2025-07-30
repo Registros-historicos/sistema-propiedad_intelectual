@@ -17,6 +17,12 @@ export const ADMINISTRATOR_MENUS = [
     type: 'link',
   },
   {
+    name: 'MENU.HISTORICAL_REGISTERS',
+    icon: 'description',
+    link: '/administrador/registros/historicos',
+    type: 'link'
+  },
+  {
     name: 'MENU.USERS',
     type: 'separator',
   },

@@ -2,7 +2,7 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 
 import {AdministradorRoutingModule} from './administrador-routing.module';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {NgbCollapseModule, NgbModalModule, NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
 import {SweetAlert2Module} from '@sweetalert2/ngx-sweetalert2';
 import {ApplicantListingComponent} from './applicant-listing/applicant-listing.component';
@@ -16,6 +16,7 @@ import {DropdownMenusModule} from '../../template/widgets';
 import {TranslationModule} from '../../modules/i18n';
 import {TranslateModule} from '@ngx-translate/core';
 import {MatIcon} from '@angular/material/icon';
+import { HistoricalImpiComponent } from './historical-impi/historical-impi.component';
 
 
 @NgModule({
@@ -41,6 +42,8 @@ import {MatIcon} from '@angular/material/icon';
     TranslationModule,
     TranslateModule,
     MatIcon,
+    
+    HistoricalImpiComponent
   ],
   providers: [
     CoordinatorService,
