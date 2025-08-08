@@ -9,6 +9,7 @@ import { Observable } from 'rxjs';
 import { IModUtilModel } from 'src/app/api/models/mod-util.model';
 import { FederalEntity } from 'src/app/api/models/entity.model';
 import { TranslateService } from '@ngx-translate/core';
+import {IndautorRegistriesService} from '../../../../api/services/indautor.service';
 
 type EstatusModUtil = 'Registrada' | 'En trámite' | 'Trámite con observaciones' | 'Aprobada' | 'Concluida';
 
@@ -23,6 +24,7 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
 
   pageLength: number = 10;
   dtInstance: any;
+  selectedPage: number = 0;
 
   lengthMenu: number[] = [5, 10, 15, 20];
 
@@ -79,7 +81,8 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
   constructor(
     private service: UtilityModelsService,
     private cdr: ChangeDetectorRef,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private indautorService: IndautorRegistriesService
   ) {
   }
 
@@ -101,13 +104,44 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
         infoEmpty: this.translate.instant('TABLE.PAG_INFO_EMPTY'),
         zeroRecords: this.translate.instant('TABLE.ZERO_RECORDS'),
       },
+      paging: true,
       ajax: (dataTablesParameters: any, callback) => {
 
-        this.service.getModUtiles(dataTablesParameters).subscribe({
+        // this.service.getPatents(dataTablesParameters).subscribe({
+        //   next: (resp) => {
+        //     callback(resp);
+        //   },
+        //   error: (error) => {
+        //     console.error('Error loading data:', error);
+        //     callback({
+        //       draw: dataTablesParameters.draw,
+        //       recordsTotal: 0,
+        //       recordsFiltered: 0,
+        //       data: []
+        //     });
+        //   }
+        // });
+        this.indautorService.listImpiRegistries(this.selectedPage, dataTablesParameters.length, dataTablesParameters.search.value || null).subscribe({
           next: (resp) => {
-            callback(resp);
+            console.log('DataTablesParameters:', dataTablesParameters);
+            console.log('Response:', resp);
+            callback({
+              draw: dataTablesParameters.draw,
+              recordsTotal: resp.totalElements,
+              recordsFiltered: resp.totalElements,
+              data: resp.content.map((item: any) => ({
+                id: item.id,
+                rama: item.branch,
+                nombreModUtil: item.title,
+                institucion: item.origin_city,
+                fechaSolicitud: item.issue_date ? moment(item.issue_date).format('YYYY-MM-DD') : '',
+                descripcion: item.notes,
+                documentos: []
+              }))
+            })
           },
           error: (error) => {
+            console.log('DataTablesParameters:', dataTablesParameters);
             console.error('Error loading data:', error);
             callback({
               draw: dataTablesParameters.draw,
@@ -120,8 +154,8 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
       },
       columns: [
         {
-          title: this.translate.instant('TABLE.APPLICANT_NAME'),
-          data: 'solicitante',
+          title: this.translate.instant('TABLE.BRANCH'),
+          data: 'rama',
           render: (data, type, full) => {
             const colorClasses = ['success', 'info', 'warning', 'danger'];
             const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
@@ -144,7 +178,6 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
             const nameAndEmail = `
               <div class="d-flex flex-column" data-action="view" data-id="${full.id}">
                 <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${data}</a>
-                <span class="text-muted">${full.correo || ''}</span>
               </div>
             `;
 

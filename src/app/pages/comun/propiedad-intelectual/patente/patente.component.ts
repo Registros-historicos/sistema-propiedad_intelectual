@@ -11,6 +11,7 @@ import { IPatentModel } from 'src/app/api/models/patent.model';
 import { FederalEntity } from 'src/app/api/models/entity.model';
 import { ENTIDADES_FEDERATIVAS_DATA } from 'src/app/api/data/entity.data';
 import { ENTIDADES_FEDERATIVAS_MAP } from 'src/app/api/data/entity-institucion.data';
+import {ImpiRegistriesService} from '../../../../api/services/impi.service';
 
 type EstatusPatente = 'Registrada' | 'En trámite' | 'Trámite con observaciones' | 'Aprobada' | 'Concluida';
 
@@ -25,6 +26,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   pageLength: number = 10;
   dtInstance: any;
+  selectedPage: number = 0;
 
   lengthMenu: number[] = [5, 10, 15, 20];
 
@@ -81,11 +83,20 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private service: PatentsService,
     private cdr: ChangeDetectorRef,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private impiService: ImpiRegistriesService
   ) {
   }
 
   ngAfterViewInit(): void {
+    if (this.dtInstance) {
+      this.dtInstance.on('page', () => {
+        const pageInfo = this.dtInstance.page.info();
+        const currentPage = pageInfo.page;
+        console.log('New page:', currentPage);
+        this.selectedPage = pageInfo.page;
+      });
+    }
   }
 
   ngOnInit(): void {
@@ -108,13 +119,46 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
           callback(resp);
         });
       },*/
+      paging: true,
       ajax: (dataTablesParameters: any, callback) => {
 
-        this.service.getPatents(dataTablesParameters).subscribe({
+        // this.service.getPatents(dataTablesParameters).subscribe({
+        //   next: (resp) => {
+        //     callback(resp);
+        //   },
+        //   error: (error) => {
+        //     console.error('Error loading data:', error);
+        //     callback({
+        //       draw: dataTablesParameters.draw,
+        //       recordsTotal: 0,
+        //       recordsFiltered: 0,
+        //       data: []
+        //     });
+        //   }
+        // });
+        this.impiService.listImpiRegistries(this.selectedPage, dataTablesParameters.length, dataTablesParameters.search.value || null).subscribe({
           next: (resp) => {
-            callback(resp);
+            console.log('DataTablesParameters:', dataTablesParameters);
+            console.log('Response:', resp);
+            callback({
+              draw: dataTablesParameters.draw,
+              recordsTotal: resp.totalElements,
+              recordsFiltered: resp.totalElements,
+              data: resp.content.map((item: any) => ({
+                id: item.id,
+                solicitudId: item.record,
+                nombrePatente: item.denomination,
+                rama: item.branch || 'No disponible',
+                fechaSolicitud: item.issue_date ? moment(item.issue_date).format('YYYY-MM-DD') : '',
+                institucion: item.origin_city || 'No disponible',
+                estatus: 'No disponible',
+                descripcion: item.notes || '',
+                documentos: []
+              }))
+            })
           },
           error: (error) => {
+            console.log('DataTablesParameters:', dataTablesParameters);
             console.error('Error loading data:', error);
             callback({
               draw: dataTablesParameters.draw,
@@ -127,8 +171,8 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       columns: [
         {
-          title: this.translate.instant('TABLE.APPLICANT_NAME'),
-          data: 'solicitante',
+          title: this.translate.instant('TABLE.BRANCH'),
+          data: 'rama',
           render: (data, type, full) => {
             const colorClasses = ['success', 'info', 'warning', 'danger'];
             const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
@@ -151,7 +195,6 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
             const nameAndEmail = `
               <div class="d-flex flex-column" data-action="view" data-id="${full.id}">
                 <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${data}</a>
-                <span class="text-muted">${full.correo || ''}</span>
               </div>
             `;
 
@@ -197,6 +240,18 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       initComplete: (settings, json) => {
         this.dtInstance = settings.oInstance.api()
+        console.log('DataTables initialized:', this.dtInstance);
+        console.log('Page info():', this.dtInstance.page.info());
+        this.selectedPage = this.dtInstance.page.info().page;
+        console.log('Selected page:', this.selectedPage);
+
+        this.dtInstance.on('page', () => {
+          const pageInfo = this.dtInstance.page.info();
+          const currentPage = pageInfo.page;
+          console.log('New page:', currentPage);
+          this.selectedPage = pageInfo.page;
+        });
+
         this.cdr.detectChanges();
       }
     };
