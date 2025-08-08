@@ -37,6 +37,7 @@ export const locale = {
         VIEW: 'Ver'
       },
       APPLICANT_NAME: "Solicitante",
+      BRANCH: "Rama",
       WORK_TITLE: "Título",
       INSTITUTION: "Institución",
       DATE: "Fecha de solicitud",
@@ -1127,7 +1128,9 @@ export const locale = {
         INDUSTRIAL_DESIGNS: 'Diseños Industriales',
         VEGETAL_VARIETIES: 'Variedades Vegetales',
         INDUSTRIAL_SECRETS: 'Secretos Industriales',
-        HELP: 'Centro de Ayuda'
+        HELP: 'Centro de Ayuda',
+        IMPI_REGISTRIES: 'Registros IMPI',
+        INDAUTOR_REGISTRIES: 'Registros INDAUTOR'
       },
       COORD: {
         APPLICANTS: 'Solicitantes',

@@ -43,47 +43,59 @@ export const ADMINISTRATOR_MENUS = [
     type: 'separator',
   },
   {
-    name: 'MENU.ADMIN.PATENTS',
+    name: 'MENU.ADMIN.IMPI_REGISTRIES',
     icon: 'emoji_objects',
     link: '/administrador/propiedades/patente',
     type: 'link'
   },
   {
-    name: 'MENU.ADMIN.TRADEMARKS',
-    icon: 'branding_watermark',
-    link: '/administrador/propiedades/marca',
-    type: 'link'
-  },
-  {
-    name: 'MENU.ADMIN.UTILITY_MODELS',
-    icon: 'construction',
+    name: 'MENU.ADMIN.INDAUTOR_REGISTRIES',
+    icon: 'emoji_objects',
     link: '/administrador/propiedades/modelo-utilidad',
     type: 'link'
   },
-  {
-    name: 'MENU.ADMIN.COPYRIGHTS',
-    icon: 'copyright',
-    link: '/administrador/propiedades/derecho-autor',
-    type: 'link'
-  },
-  {
-    name: 'MENU.ADMIN.INDUSTRIAL_DESIGNS',
-    icon: 'architecture',
-    link: '/administrador/propiedades/diseno-industrial',
-    type: 'link'
-  },
-  {
-    name: 'MENU.ADMIN.VEGETAL_VARIETIES',
-    icon: 'eco',
-    link: '/administrador/propiedades/variedad-vegetal',
-    type: 'link'
-  },
-  {
-    name: 'MENU.ADMIN.INDUSTRIAL_SECRETS',
-    icon: 'lock',
-    link: '/administrador/propiedades/secreto-industrial',
-    type: 'link'
-  },
+  // {
+  //   name: 'MENU.ADMIN.PATENTS',
+  //   icon: 'emoji_objects',
+  //   link: '/administrador/propiedades/patente',
+  //   type: 'link'
+  // },
+  // {
+  //   name: 'MENU.ADMIN.TRADEMARKS',
+  //   icon: 'branding_watermark',
+  //   link: '/administrador/propiedades/marca',
+  //   type: 'link'
+  // },
+  // {
+  //   name: 'MENU.ADMIN.UTILITY_MODELS',
+  //   icon: 'construction',
+  //   link: '/administrador/propiedades/modelo-utilidad',
+  //   type: 'link'
+  // },
+  // {
+  //   name: 'MENU.ADMIN.COPYRIGHTS',
+  //   icon: 'copyright',
+  //   link: '/administrador/propiedades/derecho-autor',
+  //   type: 'link'
+  // },
+  // {
+  //   name: 'MENU.ADMIN.INDUSTRIAL_DESIGNS',
+  //   icon: 'architecture',
+  //   link: '/administrador/propiedades/diseno-industrial',
+  //   type: 'link'
+  // },
+  // {
+  //   name: 'MENU.ADMIN.VEGETAL_VARIETIES',
+  //   icon: 'eco',
+  //   link: '/administrador/propiedades/variedad-vegetal',
+  //   type: 'link'
+  // },
+  // {
+  //   name: 'MENU.ADMIN.INDUSTRIAL_SECRETS',
+  //   icon: 'lock',
+  //   link: '/administrador/propiedades/secreto-industrial',
+  //   type: 'link'
+  // },
   {
     name: 'MENU.REPORTS',
     type: 'separator',
