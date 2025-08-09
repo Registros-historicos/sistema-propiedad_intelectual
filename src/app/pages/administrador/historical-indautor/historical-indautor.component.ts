@@ -693,6 +693,14 @@ export class HistoricalIndautorComponent {
       let dataToUpload: any[] = [];
 
       try {
+
+        const isTemplateOk = await this.validateTemplateMatch();
+        if (!isTemplateOk) {
+          this.isUploading = false;
+          return; 
+        }
+
+
         if (selectedYear === 'Seleccionar todo') {
           const allData: any[] = [];
           for (const sheetName of this.availableSheets) {
@@ -782,4 +790,148 @@ export class HistoricalIndautorComponent {
       file: null,
     });
   }
+  
+  // --- VALIDACIÓN CONTRA PLANTILLA INDATUROR ---
+  
+  private async loadTemplateWorkbook(): Promise<XLSX.WorkBook> {
+    const templateUrl = 'assets/Excel/INDAUTOR.xlsx';
+    const res = await fetch(templateUrl);
+    if (!res.ok) throw new Error('No se pudo cargar la plantilla IMPI.xlsx');
+    const buf = await res.arrayBuffer();
+    return XLSX.read(new Uint8Array(buf), { type: 'array', cellDates: true });
+  }
+  
+  private getTemplateSheetName(target: string | null, tpl: XLSX.WorkBook): string {
+    if (!target) return tpl.SheetNames[0];
+    // 1) Coincidencia exacta
+    let match = tpl.SheetNames.find(s => s.trim().toLowerCase() === target.trim().toLowerCase());
+    if (match) return match;
+    // 2) Contiene el nombre/ano
+    match = tpl.SheetNames.find(s => s.toLowerCase().includes(String(target).toLowerCase()));
+    if (match) return match;
+    // 3) Fallback: primera hoja
+    return tpl.SheetNames[0];
+  }
+  
+  private extractHeadersFromSheet(wb: XLSX.WorkBook, sheetName: string): string[] {
+    const sheet = wb.Sheets[sheetName];
+    if (!sheet) return [];
+    const json = XLSX.utils.sheet_to_json(sheet, {
+      header: 1, defval: '', blankrows: false, range: 4
+    }) as any[][];
+    if (!json.length) return [];
+    const hdrRow = json[0] ?? [];
+    return hdrRow
+      .map((h, i) => (i === 0 ? null : (h !== undefined && h !== null ? String(h).trim() : 'Columna sin nombre')))
+      .filter((h) => h !== null) as string[];
+  }
+  
+  private normalizeHeaderLabel(label: string): string {
+    return label
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '') 
+      .replace(/\s+/g, ' ') 
+      .trim()
+      .toLowerCase();
+  }
+  
+  private compareHeaders(expected: string[], actual: string[]) {
+    const norm = (arr: string[]) => arr.map(this.normalizeHeaderLabel);
+    const expN = norm(expected);
+    const actN = norm(actual);
+  
+    const setExp = new Set(expN);
+    const setAct = new Set(actN);
+  
+    const missing = expN.filter(h => !setAct.has(h));
+    const extra = actN.filter(h => !setExp.has(h));
+  
+    let outOfOrder = false;
+    if (missing.length === 0 && extra.length === 0) {
+      outOfOrder = expN.length === actN.length && expN.some((h, i) => h !== actN[i]);
+    }
+  
+    return {
+      ok: missing.length === 0 && extra.length === 0 && !outOfOrder,
+      missing,
+      extra,
+      outOfOrder
+    };
+  }
+  
+  /**
+   * VALIDA QUE COINCIDAN LOS ENCABEZADOS DEL ARCHIVO CARGADO CON LA PLANTILLA INDAUTOR
+   */
+  private async validateTemplateMatch(): Promise<boolean> {
+    if (!this.workbook) return false;
+  
+    const selectedYear = this.form.get('year')?.value;
+    const tpl = await this.loadTemplateWorkbook();
+  
+    const sheetsToValidate: { uiName: string, headers: string[] }[] = [];
+  
+    if (selectedYear === 'Seleccionar todo') {
+      for (const sheetName of this.availableSheets) {
+        const { headers } = await this.readExcelSheet(sheetName);
+        sheetsToValidate.push({ uiName: sheetName, headers });
+      }
+    } else {
+      const targetSheetName = this.getSheetNameForYear(selectedYear) ?? this.workbook.SheetNames[0];
+      const { headers } = await this.readExcelSheet(targetSheetName);
+      sheetsToValidate.push({ uiName: targetSheetName, headers });
+    }
+  
+    const problems: Array<{
+      uiName: string,
+      missing: string[],
+      extra: string[],
+      outOfOrder: boolean
+    }> = [];
+  
+    for (const item of sheetsToValidate) {
+      const tplSheet = this.getTemplateSheetName(item.uiName, tpl);
+      const expected = this.extractHeadersFromSheet(tpl, tplSheet);
+      const cmp = this.compareHeaders(expected, item.headers);
+  
+      if (!cmp.ok) {
+        problems.push({
+          uiName: item.uiName,
+          missing: cmp.missing,
+          extra: cmp.extra,
+          outOfOrder: cmp.outOfOrder
+        });
+      }
+    }
+  
+    if (problems.length > 0) {
+      const detailsHtml = problems.map(p => {
+        const miss = p.missing.length ? `<li><strong>Faltan</strong>: ${p.missing.join(', ')}</li>` : '';
+        const ext = p.extra.length ? `<li><strong>Sobran</strong>: ${p.extra.join(', ')}</li>` : '';
+        const ord = p.outOfOrder ? `<li><strong>Orden distinto</strong> (ajusta al orden de la plantilla)</li>` : '';
+        return `
+          <div class="mb-3">
+            <div class="fw-bold">Hoja: ${this.escapeHtml(p.uiName)}</div>
+            <ul class="mb-0">${miss}${ext}${ord || (!miss && !ext ? '' : '')}</ul>
+          </div>`;
+      }).join('');
+  
+      await Swal.fire({
+        icon: 'error',
+        title: 'Los encabezados no coinciden con la plantilla',
+        html: `
+          <p>Revisa y corrige los encabezados (fila 5) para que coincidan con la plantilla <code>IMPI.xlsx</code>.</p>
+          ${detailsHtml}
+          <hr class="my-2">
+          <small class="text-muted">
+            Consejo: usa <em>Descargar plantilla</em> para alinear nombres y orden de columnas.
+          </small>
+        `,
+        confirmButtonText: 'Entendido'
+      });
+      return false;
+    }
+  
+    return true;
+  }
+  
+  
 }
