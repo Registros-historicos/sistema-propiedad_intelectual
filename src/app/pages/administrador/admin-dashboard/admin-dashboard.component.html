@@ -542,3 +542,71 @@
     
   </div>
 </div>
+
+<div class="row g-5 g-xl-8">
+  <div class="col-xl-6">
+    <div class="card card-xl-stretch mb-xl-8">
+      <div class="card-header border-0 pt-5">
+        <h3 class="card-title align-items-start flex-column">
+          <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.HISTORICAL_REGISTERS_IMPI"></span>
+        </h3>
+        <div class="card-toolbar">
+          <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary"
+            data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-flip="top-end">
+            <app-keenicon name="category" class="fs-2"></app-keenicon>
+          </button>
+          <app-dropdown-menu1></app-dropdown-menu1>
+          </div>
+      </div>
+      <div class="card-body p-5">
+        <div class="table-responsive">
+          <apx-chart
+            [series]="chartOptions.series"
+            [chart]="chartOptions.chart"
+            [xaxis]="chartOptions.xaxis"
+            [dataLabels]="chartOptions.dataLabels"
+            [stroke]="chartOptions.stroke"
+            [legend]="chartOptions.legend"
+            [fill]="chartOptions.fill"
+            [tooltip]="chartOptions.tooltip"
+            [colors]="chartOptions.colors"
+            [plotOptions]="chartOptions.plotOptions"
+          ></apx-chart>
+        </div>
+        </div>
+      </div>
+  </div>
+  <div class="col-xl-6">
+    <div class="card card-xl-stretch mb-xl-8">
+      <div class="card-header border-0 pt-5">
+        <h3 class="card-title align-items-start flex-column">
+          <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.HISTORICAL_REGISTERS_INDAUTOR"></span>
+        </h3>
+        <div class="card-toolbar">
+          <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary"
+            data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-flip="top-end">
+            <app-keenicon name="category" class="fs-2"></app-keenicon>
+          </button>
+          <app-dropdown-menu1></app-dropdown-menu1>
+          </div>
+      </div>
+      <div class="card-body p-5">
+        <div class="table-responsive">
+          <apx-chart
+            [series]="chartOptionsGraph2.series"
+            [chart]="chartOptionsGraph2.chart"
+            [xaxis]="chartOptionsGraph2.xaxis"
+            [dataLabels]="chartOptionsGraph2.dataLabels"
+            [stroke]="chartOptionsGraph2.stroke"
+            [legend]="chartOptionsGraph2.legend"
+            [fill]="chartOptionsGraph2.fill"
+            [tooltip]="chartOptionsGraph2.tooltip"
+            [colors]="chartOptionsGraph2.colors"
+            [plotOptions]="chartOptionsGraph2.plotOptions"
+          ></apx-chart>
+        </div>
+        </div>
+      </div>
+  </div>
+</div>
+
