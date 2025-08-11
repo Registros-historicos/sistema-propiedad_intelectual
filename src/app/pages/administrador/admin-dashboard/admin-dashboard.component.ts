@@ -1,5 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import { getCSSVariableValue } from 'src/app/template/kt/_utils';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -7,9 +6,6 @@ import { getCSSVariableValue } from 'src/app/template/kt/_utils';
   styleUrl: './admin-dashboard.component.scss'
 })
 export class AdminDashboardComponent implements OnInit {
-  chartOptions: any;
-  chartOptionsGraph2: any;
-
   protected readonly topFiveEntities = [
     {
       name: 'Veracruz', value: 800, tags: [
@@ -98,132 +94,6 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.initGraphs();
-  }
-
-  private initGraphs(): void {
-    const solicitudesData = this.getSimulatedData();
-    this.chartOptions = this.createChartOptions(350, solicitudesData);
-    const solicitudesDataGraph2 = this.getSimulatedDataGraph2();
-    this.chartOptionsGraph2 = this.createChartOptions(350, solicitudesDataGraph2);
-  }
-
-  private getSimulatedData(): any[] {
-    return [
-      { rama: 'Patente', data: [15, 18, 15, 6] }, 
-      { rama: 'Marca', data: [20, 5, 12, 8] },
-      { rama: 'Modelo de Utilidad', data: [10, 12, 10, 5] },
-      { rama: 'Diseño Industrial', data: [5, 7, 8, 2] },
-      { rama: 'Aviso Comercial', data: [8, 10, 9, 2] },
-    ];
-  }
-
-  private getSimulatedDataGraph2(): any[] {
-    return [
-      { rama: 'Programas de computación', data: [10, 4, 6, 3] }, 
-      { rama: 'Literaria', data: [11, 5, 9, 8] },
-      { rama: 'Reserva de derechos', data: [1, 10, 9, 5] },
-      { rama: 'ISSN', data: [5, 7, 8, 2] },
-      { rama: 'Dibujo', data: [8, 10, 9, 5] },
-    ];
-  }
-
-  private createChartOptions(height: number, data: any[]): any {
-    const labelColor = getCSSVariableValue('--bs-gray-500');
-    const borderColor = getCSSVariableValue('--bs-gray-200');
-
-    const series = this.mapDataToSeries(data);
-    const seriesColors = this.getSeriesColors();
-
-    return {
-      series: series,
-      chart: {
-        fontFamily: 'inherit',
-        type: 'bar',
-        height: height,
-        toolbar: { show: false },
-      },
-      plotOptions: {
-        bar: {
-          horizontal: false,
-          columnWidth: '30%', 
-          borderRadius: 5,
-        },
-      },
-      legend: { show: false },
-      dataLabels: { enabled: false },
-      stroke: {
-        show: true,
-        width: 2,
-        colors: ['transparent'],
-      },
-      xaxis: {
-        categories: ['2022', '2023', '2024', '2025'], // Años
-        axisBorder: { show: false },
-        axisTicks: { show: false },
-        labels: {
-          style: {
-            colors: labelColor,
-            fontSize: '12px',
-          },
-        },
-      },
-      yaxis: {
-        title: {
-          text: 'Número de Registros',
-          style: {
-            color: labelColor,
-            fontSize: '12px',
-          },
-        },
-        labels: {
-          style: {
-            colors: labelColor,
-            fontSize: '12px',
-          },
-        },
-      },
-      fill: { opacity: 1 },
-      states: {
-        normal: { filter: { type: 'none', value: 0 } },
-        hover: { filter: { type: 'none', value: 0 } },
-        active: {
-          allowMultipleDataPointsSelection: false,
-          filter: { type: 'none', value: 0 },
-        },
-      },
-      tooltip: {
-        style: { fontSize: '12px' },
-        y: {
-          formatter: function (val: number) {
-            return val + ' registros';
-          },
-        },
-      },
-      colors: seriesColors,
-      grid: {
-        borderColor: borderColor,
-        strokeDashArray: 4,
-        yaxis: { lines: { show: true } },
-      },
-    };
-  }
-
-  private mapDataToSeries(data: any[]): any[] {
-    return data.map(item => ({
-      name: item.rama,
-      data: item.data,
-    }));
-  }
-
-  private getSeriesColors(): string[] {
-    return [
-      getCSSVariableValue('--bs-primary'),
-      getCSSVariableValue('--bs-success'),
-      getCSSVariableValue('--bs-warning'),
-      getCSSVariableValue('--bs-danger'),
-      getCSSVariableValue('--bs-info'),
-    ];
   }
 
 }
