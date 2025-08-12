@@ -1,5 +1,6 @@
 import {  AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild  } from '@angular/core';
 import {  CopyrightsService  } from '../../../../api/services/copyright.service';
+import {  IndautorRegistriesService  } from '../../../../api/services/indautor.service';
 import {  DataTablesResponse, ENTIDADES_FEDERATIVAS_DATA, ENTIDADES_FEDERATIVAS_MAP  } from '../../../administrador/shared-services';
 import {  Config  } from 'datatables.net';
 import {  SwalComponent  } from '@sweetalert2/ngx-sweetalert2';
@@ -23,6 +24,7 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
 
   pageLength: number = 10;
   dtInstance: any;
+  selectedPage: number = 0;
 
   lengthMenu: number[] = [5, 10, 15, 20];
 
@@ -58,6 +60,20 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
   institucionesFiltradas: any[] = []
   estadoSeleccionado: number | null = null
   institucionSeleccionada: number | null = null
+
+  ramasIndautor: string[] = [
+    'Seleccionar todo',
+    'Programa de computación',
+    'Literaria',
+    'Audiovisual',
+    'Dibujo',
+    'Compilación de datos',
+    'Reserva de Derechos',
+    'ISBN',
+    'ISSN'
+  ];
+  ramaSeleccionada: string = 'Seleccionar todo';
+
   selectedFile: File | null = null;
   isViewMode: boolean = true;
   isEditingStatus: boolean = false;
@@ -79,7 +95,8 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private service: CopyrightsService,
     private cdr: ChangeDetectorRef,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private indautorService: IndautorRegistriesService
   ) {
   }
 
@@ -107,11 +124,29 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       },*/
       ajax: (dataTablesParameters: any, callback) => {
-        this.service.getCopyrights(dataTablesParameters).subscribe({
-          next: (resp) => {
-            callback(resp);
+        this.indautorService.listIndautorRegistries(this.selectedPage, dataTablesParameters.length, dataTablesParameters.search.value || null, this.ramaSeleccionada).subscribe({
+          next: (resp: any) => {
+            console.log('DataTablesParameters:', dataTablesParameters);
+            console.log('Response:', resp);
+            callback({
+              draw: dataTablesParameters.draw,
+              recordsTotal: resp.totalElements,
+              recordsFiltered: resp.totalElements,
+              data: resp.content.map((item: any) => ({
+                id: item.id,
+                solicitudId: item.record,
+                nombreObra: item.denomination,
+                rama: item.branch || 'No disponible',
+                fechaSolicitud: item.issue_date ? moment(item.issue_date).format('YYYY-MM-DD') : '',
+                institucion: item.origin_city || 'No disponible',
+                estado: 'No disponible',
+                descripcion: item.notes || '',
+                documentos: []
+              }))
+            })
           },
-          error: (error) => {
+          error: (error: any) => {
+            console.log('DataTablesParameters:', dataTablesParameters);
             console.error('Error loading data:', error);
             callback({
               draw: dataTablesParameters.draw,
@@ -217,6 +252,17 @@ export class DerechoAutorComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if (this.dtInstance) {
       this.dtInstance.page.len(newLength).draw();
+    } else {
+      this.reloadEvent.emit(true);
+    }
+  }
+
+  onRamaChange(event: any): void {
+    this.ramaSeleccionada = event.target.value;
+    
+    // Recargar la tabla con el nuevo filtro
+    if (this.dtInstance) {
+      this.dtInstance.ajax.reload();
     } else {
       this.reloadEvent.emit(true);
     }

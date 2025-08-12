@@ -60,6 +60,19 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
   estadoSeleccionado: number | null = null
   institucionSeleccionada: number | null = null
 
+  ramasIndautor: string[] = [
+    'Seleccionar todo',
+    'Programa de computación',
+    'Literaria',
+    'Audiovisual',
+    'Dibujo',
+    'Compilación de datos',
+    'Reserva de Derechos',
+    'ISBN',
+    'ISSN'
+  ];
+  ramaSeleccionada: string = 'Seleccionar todo';
+
   selectedFile: File | null = null;
   isViewMode: boolean = true;
   isEditingStatus: boolean = false;
@@ -121,8 +134,8 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
         //     });
         //   }
         // });
-        this.indautorService.listImpiRegistries(this.selectedPage, dataTablesParameters.length, dataTablesParameters.search.value || null).subscribe({
-          next: (resp) => {
+        this.indautorService.listIndautorRegistries(this.selectedPage, dataTablesParameters.length, dataTablesParameters.search.value || null, this.ramaSeleccionada).subscribe({
+          next: (resp: any) => {
             console.log('DataTablesParameters:', dataTablesParameters);
             console.log('Response:', resp);
             callback({
@@ -140,7 +153,7 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
               }))
             })
           },
-          error: (error) => {
+          error: (error: any) => {
             console.log('DataTablesParameters:', dataTablesParameters);
             console.error('Error loading data:', error);
             callback({
@@ -234,6 +247,17 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
 
     if (this.dtInstance) {
       this.dtInstance.page.len(newLength).draw();
+    } else {
+      this.reloadEvent.emit(true);
+    }
+  }
+
+  onRamaChange(event: any): void {
+    this.ramaSeleccionada = event.target.value;
+    
+    // Recargar la tabla con el nuevo filtro
+    if (this.dtInstance) {
+      this.dtInstance.ajax.reload();
     } else {
       this.reloadEvent.emit(true);
     }

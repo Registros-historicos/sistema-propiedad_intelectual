@@ -11,11 +11,15 @@ export class IndautorRegistriesService {
     private apiService: ApiCrudService
   ) {}
 
-  public listImpiRegistries(page: number, size: number, search: string | null): Observable<any> {
+  public listIndautorRegistries(page: number, size: number, search: string | null, rama?: string): Observable<any> {
     let url = 'http://localhost:8080/cepat-api/indautor-registries?pagination=true';
 
     if (search) {
       url += `&search=${encodeURIComponent(search)}`;
+    }
+
+    if (rama && rama !== 'Seleccionar todo') {
+      url += `&rama=${encodeURIComponent(rama)}`;
     }
 
     url += `&page=${page}&size=${size}`;

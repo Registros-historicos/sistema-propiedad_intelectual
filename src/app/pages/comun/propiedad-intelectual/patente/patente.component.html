@@ -10,6 +10,16 @@
 
     <div class="card-toolbar">
       <div class="d-flex justify-content-end align-items-center">
+        <!-- Filtro de RAMA -->
+        <div class="d-flex align-items-center me-4">
+          <label class="form-label text-gray-600 me-3 mb-0 fw-semibold">Filtrar por rama:</label>
+          <select class="form-select form-select-sm form-select-solid w-auto" (change)="onRamaChange($event)"
+            [(ngModel)]="ramaSeleccionada">
+            <option *ngFor="let rama of ramasImpi" [value]="rama">{{rama}}</option>
+          </select>
+        </div>
+        
+        <!-- Selector de paginación -->
         <div class="d-flex align-items-center me-4">
           <label class="form-label text-gray-600 me-3 mb-0 fw-semibold" translate="TABLE.PAGE_LENGTH.LABEL"></label>
           <select class="form-select form-select-sm form-select-solid w-auto" (change)="onPageLengthChange($event)"

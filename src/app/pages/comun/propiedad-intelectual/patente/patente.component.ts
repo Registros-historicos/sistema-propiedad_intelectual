@@ -62,6 +62,17 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   estadoSeleccionado: number | null = null
   institucionSeleccionada: number | null = null
 
+  ramasImpi: string[] = [
+    'Seleccionar todo',
+    'Patente',
+    'Modelo de Utilidad',
+    'Diseño Industrial',
+    'Marca',
+    'Aviso Comercial',
+    'Trazado de Circuito'
+  ];
+  ramaSeleccionada: string = 'Seleccionar todo';
+
   selectedFile: File | null = null;
   isViewMode: boolean = true;
   isEditingStatus: boolean = false;
@@ -136,7 +147,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         //     });
         //   }
         // });
-        this.impiService.listImpiRegistries(this.selectedPage, dataTablesParameters.length, dataTablesParameters.search.value || null).subscribe({
+        this.impiService.listImpiRegistries(this.selectedPage, dataTablesParameters.length, dataTablesParameters.search.value || null, this.ramaSeleccionada).subscribe({
           next: (resp) => {
             console.log('DataTablesParameters:', dataTablesParameters);
             console.log('Response:', resp);
@@ -263,6 +274,17 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if (this.dtInstance) {
       this.dtInstance.page.len(newLength).draw();
+    } else {
+      this.reloadEvent.emit(true);
+    }
+  }
+
+  onRamaChange(event: any): void {
+    this.ramaSeleccionada = event.target.value;
+    
+    // Recargar la tabla con el nuevo filtro
+    if (this.dtInstance) {
+      this.dtInstance.ajax.reload();
     } else {
       this.reloadEvent.emit(true);
     }
