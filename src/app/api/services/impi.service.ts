@@ -19,7 +19,7 @@ export class ImpiRegistriesService {
     }
 
     if (rama && rama !== 'Seleccionar todo') {
-      url += `&rama=${encodeURIComponent(rama)}`;
+      url += `&branches=${encodeURIComponent(rama)}`;
     }
 
     url += `&page=${page}&size=${size}`;
