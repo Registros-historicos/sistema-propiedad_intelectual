@@ -17,6 +17,7 @@ import {TranslationModule} from '../../modules/i18n';
 import {TranslateModule} from '@ngx-translate/core';
 import {MatIcon} from '@angular/material/icon';
 import { HistoricalImpiComponent } from './historical-impi/historical-impi.component';
+import { NgApexchartsModule } from 'ng-apexcharts';
 
 
 @NgModule({
@@ -43,7 +44,8 @@ import { HistoricalImpiComponent } from './historical-impi/historical-impi.compo
     TranslateModule,
     MatIcon,
     
-    HistoricalImpiComponent
+    HistoricalImpiComponent,
+    NgApexchartsModule
   ],
   providers: [
     CoordinatorService,
