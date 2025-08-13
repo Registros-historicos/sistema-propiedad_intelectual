@@ -1038,6 +1038,8 @@ export const locale = {
         INSTITUTIONS: "Instituciones",
         APPLICATION_TYPE: "Tipo de solicitud",
         FEDERAL_ENTITIES: "Entidades Federativas",
+        HISTORICAL_REGISTERS_INDAUTOR:"Registros Históricos INDAUTOR",
+        HISTORICAL_REGISTERS_IMPI:"Registros Históricos IMPI",
       },
       SUBTITLES: {
         REGISTER: "Registros",
