@@ -371,7 +371,7 @@
       <!-- begin::Header -->
       <div class="card-header border-0 pt-5">
         <h3 class="card-title align-items-start flex-column">
-          <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.FEDERAL_INSTITUTIONS"></span>
+          <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.INSTITUTIONS"></span>
           <span class="text-muted mt-1 fw-bold fs-7" translate="GRAPHICS.SUBTITLES.TOP_5"></span>
         </h3>
         <div class="card-toolbar">
@@ -451,93 +451,6 @@
     </div>
   </div>
 
-  <div class="col-xl-6">
-    <div class="card card-xl-stretch mb-xl-8">
-      <!-- begin::Header -->
-      <div class="card-header border-0 pt-5">
-        <h3 class="card-title align-items-start flex-column">
-          <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.CENTRALIZED_INSTITUTIONS"></span>
-          <span class="text-muted mt-1 fw-bold fs-7" translate="GRAPHICS.SUBTITLES.TOP_5"></span>
-        </h3>
-        <div class="card-toolbar">
-          <!-- begin::Menu -->
-          <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary"
-                  data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-flip="top-end">
-            <app-keenicon name="category" class="fs-2"></app-keenicon>
-          </button>
-          <app-dropdown-menu1></app-dropdown-menu1>
-          <!-- end::Menu -->
-        </div>
-      </div>
-      <!-- end::Header -->
-      <!-- begin::Body -->
-      <div class="card-body py-3">
-        <!-- begin::Table container -->
-        <div class="table-responsive">
-          <!-- begin::Table -->
-          <table class="table align-middle gs-0 gy-5">
-            <!-- begin::Table head -->
-            <thead>
-            <tr>
-              <th class="p-0 min-w-150px"></th>
-              <th class="p-0 min-w-200px"></th>
-              <th class="p-0 min-w-125px"></th>
-            </tr>
-            </thead>
-            <!-- end::Table head -->
-            <!-- begin::Table body -->
-            <tbody>
-              @for (institution of topFiveCentralizedInstitutions; track $index) {
-                <tr>
-                  <td>
-                    <div class="d-flex align-items-center">
-                      <div class="symbol symbol-45px me-5">
-                        <app-keenicon name="institution" class="fs-2"></app-keenicon>
-                      </div>
-                      <div class="d-flex justify-content-start flex-column">
-                        <span class="text-gray-900 fw-bolder fs-6">{{ $index + 1 }}
-                          . {{ institution.name | titlecase }}</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="text-end">
-                    @for (tag of institution.tags; track $index) {
-                      <span class="badge fw-bold me-1"
-                            [ngClass]="{
-                              'badge-light-danger': tag === 'PATENTS',
-                              'badge-light-info': tag === 'MA',
-                              'badge-light-warning': tag === 'MU',
-                              'badge-light-success': tag === 'DA',
-                              'badge-light-primary': tag === 'DI'
-                            }">
-                        {{ tag }}
-                      </span>
-                    }
-                  </td>
-                  <td class="text-center">
-                    <span class="text-muted fw-bold">{{ institution.value }} <span
-                      translate="GRAPHICS.TITLES.REQUEST"></span></span>
-                  </td>
-                </tr>
-              } @empty {
-                <tr>
-                  <td colspan="2" class="text-center text-muted"><span
-                    translate="GRAPHICS.LEGENDS.NO_CENTRALIZED_INSTITUTIONS"></span></td>
-                </tr>
-              }
-            </tbody>
-            <!-- end::Table body -->
-          </table>
-          <!-- end::Table -->
-        </div>
-        <!-- end::Table container -->
-      </div>
-      <!-- end::Body -->
-    </div>
-  </div>
-</div>
-
-<div class="row g-5 g-xl-8">
   <div class="col-xl-6">
     <div class="card card-xl-stretch mb-xl-8">
       <!-- begin::Header -->
@@ -623,3 +536,77 @@
     </div>
   </div>
 </div>
+
+<div class="row g-5 g-xl-8">
+  <div class="col-xl-6">
+    
+  </div>
+</div>
+
+
+<!-- dashboard.component.html -->
+<div class="row g-5 g-xl-8">
+  <div class="col-xl-6">
+    <div class="card card-xl-stretch mb-xl-8">
+      <div class="card-header border-0 pt-5">
+        <h3 class="card-title align-items-start flex-column">
+          <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.HISTORICAL_REGISTERS_IMPI"></span>
+        </h3>
+        <div class="card-toolbar">
+          <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary"
+            data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-flip="top-end">
+            <app-keenicon name="category" class="fs-2"></app-keenicon>
+          </button>
+          <app-dropdown-menu1></app-dropdown-menu1>
+          </div>
+      </div>
+      <div class="card-body p-5">
+        <div class="table-responsive">
+          <apx-chart
+            [series]="chartOptions.series"
+            [chart]="chartOptions.chart"
+            [xaxis]="chartOptions.xaxis"
+            [dataLabels]="chartOptions.dataLabels"
+            [stroke]="chartOptions.stroke"
+            [legend]="chartOptions.legend"
+            [fill]="chartOptions.fill"
+            [tooltip]="chartOptions.tooltip"
+            [colors]="chartOptions.colors"
+            [plotOptions]="chartOptions.plotOptions"
+          ></apx-chart>
+        </div>
+        </div>
+      </div>
+  </div>
+  <div class="col-xl-6">
+    <div class="card card-xl-stretch mb-xl-8">
+      <div class="card-header border-0 pt-5">
+        <h3 class="card-title align-items-start flex-column">
+          <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.HISTORICAL_REGISTERS_INDAUTOR"></span>
+        </h3>
+        <div class="card-toolbar">
+          <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary"
+            data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-flip="top-end">
+            <app-keenicon name="category" class="fs-2"></app-keenicon>
+          </button>
+          <app-dropdown-menu1></app-dropdown-menu1>
+          </div>
+      </div>
+      <div class="card-body p-5">
+        <div class="table-responsive">
+          <apx-chart
+            [series]="chartOptionsGraph2.series"
+            [chart]="chartOptionsGraph2.chart"
+            [xaxis]="chartOptionsGraph2.xaxis"
+            [dataLabels]="chartOptionsGraph2.dataLabels"
+            [stroke]="chartOptionsGraph2.stroke"
+            [legend]="chartOptionsGraph2.legend"
+            [fill]="chartOptionsGraph2.fill"
+            [tooltip]="chartOptionsGraph2.tooltip"
+            [colors]="chartOptionsGraph2.colors"
+            [plotOptions]="chartOptionsGraph2.plotOptions"
+          ></apx-chart>
+        </div>
+        </div>
+      </div>
+  </div>
