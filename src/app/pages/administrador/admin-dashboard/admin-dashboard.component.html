@@ -402,44 +402,49 @@
             <!-- end::Table head -->
             <!-- begin::Table body -->
             <tbody>
-              @for (institution of topFiveFederalInstitutions; track $index) {
-                <tr>
-                  <td>
-                    <div class="d-flex align-items-center">
-                      <div class="symbol symbol-45px me-5">
-                        <app-keenicon name="institution" class="fs-2"></app-keenicon>
-                      </div>
-                      <div class="d-flex justify-content-start flex-column">
-                                    <span class="text-gray-900 fw-bolder fs-6">{{ $index + 1 }}
-                                      . {{ institution.name | titlecase }}</span>
-                      </div>
+              <!-- Iteración correcta en Angular -->
+              <tr *ngFor="let institution of combinedTop; let i = index">
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="symbol symbol-45px me-5">
+                      <app-keenicon name="institution" class="fs-2"></app-keenicon>
                     </div>
-                  </td>
-                  <td class="text-end">
-                    @for (tag of institution.tags; track $index) {
-                      <span class="badge fw-bold me-1"
-                            [ngClass]="{
-                              'badge-light-danger': tag === 'PATENTS',
-                              'badge-light-info': tag === 'MA',
-                              'badge-light-warning': tag === 'MU',
-                              'badge-light-success': tag === 'DA',
-                              'badge-light-primary': tag === 'DI'
-                            }">
-                        {{ tag }}
-                      </span>
-                    }
-                  </td>
-                  <td class="text-center">
-                                <span class="text-muted fw-bold">{{ institution.value }} <span
-                                  translate="GRAPHICS.TITLES.REQUEST"></span></span>
-                  </td>
-                </tr>
-              } @empty {
-                <tr>
-                  <td colspan="2" class="text-center text-muted"><span
-                    translate="GRAPHICS.LEGENDS.NO_FEDERAL_INSTITUTIONS"></span></td>
-                </tr>
-              }
+                    <div class="d-flex justify-content-start flex-column">
+                      <!-- i es el índice (0-based) -->
+                      <span class="text-gray-900 fw-bolder fs-6">{{ i + 1 }}. {{ institution.city_name | titlecase
+                        }}</span>
+                    </div>
+                  </div>
+                </td>
+
+                <td class="text-end">
+                  <!-- Si hay tags las iteramos -->
+                  <ng-container *ngIf="institution.tags?.length">
+                    <span *ngFor="let tag of institution.tags" class="badge fw-bold me-1" [ngClass]="{
+                'badge-light-danger': tag === 'PATENTS',
+                'badge-light-info': tag === 'MA',
+                'badge-light-warning': tag === 'MU',
+                'badge-light-success': tag === 'DA',
+                'badge-light-primary': tag === 'DI'
+              }">
+                      {{ tag }}
+                    </span>
+                  </ng-container>
+                </td>
+
+                <td class="text-center">
+                  <span class="text-muted fw-bold">{{ institution.total_registries }} <span
+                      translate="GRAPHICS.TITLES.REQUEST"></span></span>
+                </td>
+              </tr>
+
+              <!-- Fila cuando el array está vacío -->
+              <tr *ngIf="!combinedTop || combinedTop.length === 0">
+                <!-- Ajusté colspan a 3 porque la tabla tiene 3 columnas en este bloque -->
+                <td colspan="3" class="text-center text-muted">
+                  <span translate="GRAPHICS.LEGENDS.NO_FEDERAL_INSTITUTIONS"></span>
+                </td>
+              </tr>
             </tbody>
             <!-- end::Table body -->
           </table>

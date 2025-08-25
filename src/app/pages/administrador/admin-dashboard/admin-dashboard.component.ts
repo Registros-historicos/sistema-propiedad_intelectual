@@ -1,6 +1,17 @@
 import {Component, OnInit} from '@angular/core';
+<<<<<<< Updated upstream
 import { getCSSVariableValue } from 'src/app/template/kt/_utils';
+=======
+import { forkJoin } from 'rxjs';
+import { ImpiRegistriesService } from 'src/app/api/services/impi.service';
+import { IndautorRegistriesService } from 'src/app/api/services/indautor.service';
+>>>>>>> Stashed changes
 
+export interface Top5 {
+  city_name: string;
+  total_registries: number;
+  tags?: any[];
+}
 @Component({
   selector: 'app-admin-dashboard',
   templateUrl: './admin-dashboard.component.html',
@@ -94,10 +105,15 @@ export class AdminDashboardComponent implements OnInit {
     }
   ];
 
-  constructor() {
+  combinedTop: Top5[] = [];
+  rawImpi: any;
+  rawIndautor: any;
+
+  constructor(private impiService: ImpiRegistriesService, private indautorService: IndautorRegistriesService) {
   }
 
   ngOnInit(): void {
+<<<<<<< Updated upstream
     this.initGraphs();
   }
 
@@ -224,6 +240,72 @@ export class AdminDashboardComponent implements OnInit {
       getCSSVariableValue('--bs-danger'),
       getCSSVariableValue('--bs-info'),
     ];
+=======
+    const impi$ = this.impiService.listImpiTop5();
+    const indautor$ = this.indautorService.listIndautorTop5();
+    forkJoin([impi$, indautor$]).subscribe({
+      next: ([impiResp, indautorResp]) => {
+        this.rawImpi = impiResp;
+        this.rawIndautor = indautorResp;
+        const impiArr: Top5[] = this.normalizeResponse(impiResp);
+        const indautorArr: Top5[] = this.normalizeResponse(indautorResp);
+        const combined = [...impiArr, ...indautorArr];
+        this.combinedTop = this.aggregateAndSort(combined, 'desc');
+        this.combinedTop = this.combinedTop.slice(0, 5);
+      }, 
+      error: (err) => {
+        console.error("Error: ", err);
+      }
+    })
+  }
+
+  normalizeResponse(resp: any): Top5[] {
+    if(!resp) return [];
+    if(Array.isArray(resp)) return resp as Top5[];
+    if(Array.isArray(resp.data)) return resp.data as Top5[];
+    if(Array.isArray(resp.result)) return resp.result as Top5[];
+    if(Array.isArray(resp.items)) return resp.items as Top5[];
+
+    try {
+
+      const arrays = Object.values(resp).filter(v => Array.isArray(v)) as [][]
+      if(!arrays.length) return [];
+
+      const values = arrays.reduce((acc: any[], cur: any[]) => acc.concat(cur), []);
+      if(values && values.length) return values as Top5[];
+      
+    } catch (error) {
+      
+    }
+    return [];
+  }
+
+  aggregateAndSort(arr: Top5[], order: 'desc'|'asc' = 'desc'): Top5[] {
+    const map = new Map<string, Top5>()
+    for (const item of arr) {
+
+      const key = (item.city_name || '').trim();
+      if(!key) continue;
+
+      const existing = map.get(key);
+      const value = Number(item.total_registries || 0);
+
+      if(existing) {
+        existing.total_registries = Number(existing.total_registries) + value;
+      } else {
+        map.set(key, {city_name: key, total_registries: value});
+      }
+    }
+
+    const aggregate = Array.from(map.values());
+    aggregate.sort((a, b) => {
+      if(a.total_registries !== b.total_registries) {
+        return order === 'desc' ? b.total_registries - a.total_registries : a.total_registries - b.total_registries;
+      };
+      return a.city_name.localeCompare(b.city_name, 'es', {sensitivity: 'base'});
+    });
+    return aggregate;
+>>>>>>> Stashed changes
   }
 
 }
