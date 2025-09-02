@@ -125,7 +125,7 @@ export const COORDINATOR_MENUS = [
     link: '/coordinador/dashboard',
     type: 'link',
   },
-  {
+  /*{
     name: 'MENU.REGISTERS',
     icon: 'add',
     type: 'separator'
@@ -145,12 +145,35 @@ export const COORDINATOR_MENUS = [
     icon: 'person_add',
     link: '/coordinador/solicitantes',
     type: 'link'
+  },*/
+  {
+    name: 'MENU.REGISTERS',
+    icon: 'add',
+    type: 'separator'
+  },
+  {
+    name: 'MENU.HISTORICAL_REGISTERS',
+    icon: 'description',
+    link: '/coordinador/registros/historicos',
+    type: 'link'
   },
   {
     name: 'MENU.INTELECTUAL_PROPERTIES',
     type: 'separator',
   },
   {
+    name: 'MENU.COORD.IMPI_REGISTRIES',
+    icon: 'emoji_objects',
+    link: '/coordinador/propiedades/patente',
+    type: 'link'
+  },
+  {
+    name: 'MENU.COORD.INDAUTOR_REGISTRIES',
+    icon: 'emoji_objects',
+    link: '/coordinador/propiedades/modelo-utilidad',
+    type: 'link'
+  },
+  /*{
     name: 'MENU.COORD.PATENTS',
     icon: 'emoji_objects',
     link: '/coordinador/propiedades/patente',
@@ -191,7 +214,7 @@ export const COORDINATOR_MENUS = [
     icon: 'lock',
     link: '/coordinador/propiedades/secreto-industrial',
     type: 'link'
-  },
+  },*/
   {
     name: 'MENU.REPORTS',
     type: 'separator',

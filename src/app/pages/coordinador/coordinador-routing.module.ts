@@ -36,6 +36,18 @@ const routes: Routes = [
                 loadComponent: () => import('./register/register.component').then(m => m.RegisterComponent)
             },
             {
+              path: 'registros/historicos',
+              loadComponent: () => import('./historical-register/historical-register.component').then(m => m.HistoricalRegisterComponent)
+            },
+            {
+              path: 'registros/historicos/indautor',
+              loadComponent: () => import('./historical-indautor/historical-indautor.component').then(m => m.HistoricalIndautorComponent)
+            },
+            {
+              path: 'registros/historicos/impi',
+              loadComponent: () => import('./historical-impi/historical-impi.component').then(m => m.HistoricalImpiComponent)
+            },
+            {
               path: 'ayuda',
               component: Error503Component
             },

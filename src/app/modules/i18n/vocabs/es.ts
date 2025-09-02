@@ -1146,7 +1146,9 @@ export const locale = {
         UTILITY_MODELS: 'Modelos de Utilidad',
         VEGETAL_VARIETIES: 'Variedades Vegetales',
         INDUSTRIAL_SECRETS: 'Secretos Industriales',
-        HELP: 'Centro de Ayuda'
+        HELP: 'Centro de Ayuda',
+        IMPI_REGISTRIES: 'Registros IMPI',
+        INDAUTOR_REGISTRIES: 'Registros INDAUTOR'
       },
       APPLICANT: {
         MYREQUESTS: 'Mis Solicitudes',
