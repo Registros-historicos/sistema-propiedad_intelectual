@@ -41,6 +41,12 @@ import { SaasComponent } from './components/toolbar/saas/saas.component';
 import {SharedModule} from "../shared/shared.module";
 import {MatIcon} from '@angular/material/icon';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+import { TableroInstitucionesComponent } from './components/tablero-instituciones/tablero-instituciones.component';
+import { TableroCategoriasComponent } from './components/tablero-registro-categoria/tablero-registro-categoria.component';
+import { ChartComponent } from "ng-apexcharts";
+import { TableroInstitucionesFederalesComponent } from './components/tablero-instituciones-federales/tablero-instituciones-federales.component';
+
+
 
 const routes: Routes = [
   {
@@ -72,6 +78,9 @@ const routes: Routes = [
     ExtendedComponent,
     ReportsComponent,
     SaasComponent,
+    TableroInstitucionesComponent,
+    TableroCategoriasComponent,
+    TableroInstitucionesFederalesComponent
   ],
   imports: [
     CommonModule,
@@ -90,8 +99,10 @@ const routes: Routes = [
     ThemeModeModule,
     SharedModule,
     MatIcon,
-    SweetAlert2Module.forRoot()
-  ],
-  exports: [RouterModule],
+    SweetAlert2Module.forRoot(),
+    ChartComponent,
+    TranslateModule
+],
+  exports: [RouterModule, TableroInstitucionesComponent, TableroCategoriasComponent, TableroInstitucionesFederalesComponent],
 })
 export class LayoutModule {}

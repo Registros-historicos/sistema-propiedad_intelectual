@@ -1,0 +1,36 @@
+<div class="card card-xl-stretch mb-xl-8">
+  <div class="card-header border-0 pt-5">
+    <h3 class="card-title align-items-start flex-column">
+        <span class="card-label fw-bolder fs-3 mb-1" [translate]="titulo"></span>
+        <span *ngIf="subtitulo" class="text-muted mt-1 fw-bold fs-7" [translate]="subtitulo"></span>
+    </h3>
+    <div class="card-toolbar">
+      <button
+        type="button"
+        class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary"
+        data-kt-menu-trigger="click"
+        data-kt-menu-placement="bottom-end"
+        data-kt-menu-flip="top-end"
+      >
+        <app-keenicon name="category" class="fs-2"></app-keenicon>
+      </button>
+      <app-dropdown-menu1></app-dropdown-menu1>
+    </div>
+  </div>
+  <div class="card-body p-5">
+    <div class="table-responsive">
+      <apx-chart
+        [series]="chartOptions.series"
+        [chart]="chartOptions.chart"
+        [xaxis]="chartOptions.xaxis"
+        [dataLabels]="chartOptions.dataLabels"
+        [stroke]="chartOptions.stroke"
+        [legend]="chartOptions.legend"
+        [fill]="chartOptions.fill"
+        [tooltip]="chartOptions.tooltip"
+        [colors]="chartOptions.colors"
+        [plotOptions]="chartOptions.plotOptions"
+      ></apx-chart>
+    </div>
+  </div>
+</div>

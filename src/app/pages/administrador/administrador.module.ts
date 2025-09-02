@@ -18,6 +18,7 @@ import {TranslateModule} from '@ngx-translate/core';
 import {MatIcon} from '@angular/material/icon';
 import { HistoricalImpiComponent } from './historical-impi/historical-impi.component';
 import { NgApexchartsModule } from 'ng-apexcharts';
+import { LayoutModule } from "src/app/template/layout";
 
 
 @NgModule({
@@ -29,11 +30,9 @@ import { NgApexchartsModule } from 'ng-apexcharts';
     FormsModule,
     AdministradorRoutingModule,
     SharedModule,
-
     NgbCollapseModule,
     NgbTooltipModule,
     NgbModalModule,
-
     SweetAlert2Module.forChild(),
     ApplicantListingComponent,
     ApplicantFormComponent,
@@ -43,10 +42,10 @@ import { NgApexchartsModule } from 'ng-apexcharts';
     TranslationModule,
     TranslateModule,
     MatIcon,
-    
     HistoricalImpiComponent,
-    NgApexchartsModule
-  ],
+    NgApexchartsModule,
+    LayoutModule
+],
   providers: [
     CoordinatorService,
     ApplicantService,
