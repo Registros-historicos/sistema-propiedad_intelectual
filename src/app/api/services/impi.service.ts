@@ -27,4 +27,15 @@ export class ImpiRegistriesService {
         })
       );
   }
+
+  public listImpiTop5(): Observable<any> {
+    let url='http://localhost:8080/cepat-api/impi-registries/top-5'
+    return this.apiService.get<any>(url)
+      .pipe(
+        map(response => {
+          return response
+        })
+      )
+  }
+
 }
