@@ -1,0 +1,144 @@
+<div class="container mt-5">
+  <div class="mb-3">
+    <button
+      [routerLink]="['/coordinador/registros/historicos']"
+      class="btn btn-outline"
+      type="button"
+    >
+      <i class="bi bi-arrow-left"></i>
+      Regresar
+    </button>
+  </div>
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <div class="mb-4">
+        <h4 class="fw-bold mb-1">
+          <i class="bi bi-file-earmark-plus fs-3 me-2"></i>
+          Cargar documento histórico IMPI
+        </h4>
+      </div>
+
+      <div class="alert alert-info mb-4">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <i class="bi bi-info-circle me-2"></i>
+            Descarga la plantilla de ejemplo para asegurar el formato correcto
+          </div>
+          <button
+            class="btn btn-sm btn-outline-primary"
+            (click)="downloadTemplate()"
+          >
+            <i class="bi bi-download me-1"></i> Descargar plantilla
+          </button>
+        </div>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Seleccionar año</label>
+          <select class="form-select" formControlName="year">
+            <option *ngFor="let year of years" [value]="year">
+              {{ year }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label fw-semibold">Seleccionar archivo</label>
+          <div
+            class="upload-dropzone"
+            [class.has-file]="file"
+            (drop)="onDrop($event)"
+            (dragover)="onDragOver($event)"
+          >
+            <ng-container *ngIf="!file">
+              <div class="d-flex flex-column align-items-center py-4">
+                <i class="bi bi-upload fs-1 text-muted"></i>
+                <div class="mt-2 text-center text-muted">
+                  Arrastra y suelta tu archivo aquí,
+                  <label
+                    class="text-primary fw-semibold cursor-pointer"
+                    style="cursor: pointer"
+                  >
+                    o selecciona un archivo
+                    <input
+                      type="file"
+                      accept=".xls,.xlsx"
+                      hidden
+                      (change)="onFileSelected($event)"
+                    />
+                  </label>
+                </div>
+                <div class="small text-muted mt-1">
+                  Formatos soportados: .xls, .xlsx
+                </div>
+              </div>
+            </ng-container>
+            <ng-container *ngIf="file">
+              <div
+                class="d-flex align-items-center justify-content-between px-3 py-3"
+              >
+                <div class="d-flex align-items-center">
+                  <i class="bi bi-file-earmark-text fs-3 me-2"></i>
+                  <span>{{ fileName }}</span>
+                </div>
+                <div>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-primary me-2"
+                    (click)="previewExcel()"
+                    title="Vista previa"
+                  >
+                    <i class="bi bi-eye"></i> Vista previa
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-link text-danger px-2"
+                    (click)="removeFile()"
+                    title="Quitar archivo"
+                  >
+                    <i class="bi bi-x-circle"></i>
+                  </button>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-center gap-3 mt-4">
+          <button
+            type="submit"
+            class="btn btn-primary d-flex align-items-center gap-2"
+            [disabled]="form.invalid || isUploading"
+          >
+            <i class="bi bi-upload"></i>
+            Guardar
+          </button>
+          <button
+            type="button"
+            class="btn btn-danger text-white"
+            (click)="cancel()"
+            [disabled]="isUploading"
+            [routerLink]="['/coordinador/registros/historicos']"
+          >
+            Cancelar
+          </button>
+        </div>
+      </form>
+
+      <div
+        class="alert alert-warning bg-light-alert mt-20"
+        style="color: #0e0d0d"
+      >
+        <div class="fw-semibold mb-1">Información importante:</div>
+        <ul class="mb-0 small">
+          <li>Los archivos deben contener registros válidos</li>
+          <li>El formato debe ser .xls o .xlsx</li>
+          <li>Revisa que el año seleccionado sea correcto</li>
+          <li>El procesamiento puede tardar varios minutos</li>
+          <li>Si el archivo contiene errores, no se procesará la carga</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
