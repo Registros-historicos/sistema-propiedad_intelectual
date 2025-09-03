@@ -1042,6 +1042,7 @@ export const locale = {
         FEDERAL_ENTITIES: "Entidades Federativas",
         HISTORICAL_REGISTERS_INDAUTOR:"Registros Históricos INDAUTOR",
         HISTORICAL_REGISTERS_IMPI:"Registros Históricos IMPI",
+        REGISTERS_BY_CATEGORY: "Registros por categoría"
       },
       SUBTITLES: {
         REGISTER: "Registros",
@@ -1124,7 +1125,7 @@ export const locale = {
       ADMIN: {
         MANAGEMENT: 'Gestión',
         COORDINATORS: 'Coordinadores',
-        APPLICANTS: 'Solicitantes',
+        CEPATS: 'CEPATs',
         INTELECTUAL_PROPERTY: 'Propiedad Intelectual',
         PATENTS: 'Patentes',
         TRADEMARKS: 'Marcas',
@@ -1403,8 +1404,8 @@ export const locale = {
         DESCRIPTION: 'Registra un nuevo coordinador en el sistema.',
       },
       GUEST: {
-        TITLE: 'Registro de Solicitante',
-        DESCRIPTION: 'Registra un nuevo solicitante en el sistema.',
+        TITLE: 'Registro CEPATs',
+        DESCRIPTION: 'Registra un nuevo CEPAT en el sistema.',
       },
     },
     HISTORICAL_REGISTER: {

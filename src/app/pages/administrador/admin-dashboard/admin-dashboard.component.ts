@@ -1,21 +1,11 @@
-import {Component, OnInit} from '@angular/core';
-<<<<<<< Updated upstream
+import { Component, OnInit } from '@angular/core';
 import { getCSSVariableValue } from 'src/app/template/kt/_utils';
-=======
-import { forkJoin } from 'rxjs';
-import { ImpiRegistriesService } from 'src/app/api/services/impi.service';
-import { IndautorRegistriesService } from 'src/app/api/services/indautor.service';
->>>>>>> Stashed changes
+import { CardItem } from 'src/app/template/layout/components/tablero-instituciones-federales/tablero-instituciones-federales.component';
 
-export interface Top5 {
-  city_name: string;
-  total_registries: number;
-  tags?: any[];
-}
 @Component({
   selector: 'app-admin-dashboard',
   templateUrl: './admin-dashboard.component.html',
-  styleUrl: './admin-dashboard.component.scss'
+  styleUrl: './admin-dashboard.component.scss',
 })
 export class AdminDashboardComponent implements OnInit {
   chartOptions: any;
@@ -23,97 +13,170 @@ export class AdminDashboardComponent implements OnInit {
 
   protected readonly topFiveEntities = [
     {
-      name: 'Veracruz', value: 800, tags: [
-        'PA', 'DA', 'MU', 'DI', 'MA'
-      ]
+      name: 'Veracruz',
+      value: 800,
+      tags: ['PA', 'DA', 'MU', 'DI', 'MA'],
     },
     {
-      name: 'Puebla', value: 700, tags: [
-        'PA', 'MU', 'MA'
-      ]
+      name: 'Puebla',
+      value: 700,
+      tags: ['PA', 'MU', 'MA'],
     },
     {
-      name: 'Oaxaca', value: 600, tags: [
-        'PA', 'DA', 'DI', 'MA'
-      ]
+      name: 'Oaxaca',
+      value: 600,
+      tags: ['PA', 'DA', 'DI', 'MA'],
     },
     {
-      name: 'Chiapas', value: 500, tags: [
-        'DA', 'MU', 'DI'
-      ]
+      name: 'Chiapas',
+      value: 500,
+      tags: ['DA', 'MU', 'DI'],
     },
     {
-      name: 'Tabasco', value: 400, tags: [
-        'PA', 'MU', 'MA'
-      ]
-    }
+      name: 'Tabasco',
+      value: 400,
+      tags: ['PA', 'MU', 'MA'],
+    },
   ];
 
   protected readonly topFiveFederalInstitutions = [
     {
-      name: 'Instituto Tecnológico de Tuxtla Gutierrez', value: 800, tags: [
-        'PA', 'DA', 'MU', 'DI', 'MA'
-      ]
+      name: 'Instituto Tecnológico de Tuxtla Gutierrez',
+      value: 800,
+      tags: ['PA', 'DA', 'MU', 'DI', 'MA'],
     },
     {
-      name: 'Instituto Tecnológico de Durango', value: 700, tags: [
-        'PA', 'MU', 'MA'
-      ]
+      name: 'Instituto Tecnológico de Durango',
+      value: 700,
+      tags: ['PA', 'MU', 'MA'],
     },
     {
-      name: 'Instituto Tecnológico de Orizaba', value: 600, tags: [
-        'PA', 'DA', 'DI', 'MA'
-      ]
+      name: 'Instituto Tecnológico de Orizaba',
+      value: 600,
+      tags: ['PA', 'DA', 'DI', 'MA'],
     },
     {
-      name: 'Instituto Tecnológico de Celaya', value: 500, tags: [
-        'DA', 'MU', 'DI'
-      ]
+      name: 'Instituto Tecnológico de Celaya',
+      value: 500,
+      tags: ['DA', 'MU', 'DI'],
     },
     {
-      name: 'Instituto Tecnológico de Acapulco', value: 400, tags: [
-        'PA', 'MU', 'MA'
-      ]
-    }
+      name: 'Instituto Tecnológico de Acapulco',
+      value: 400,
+      tags: ['PA', 'MU', 'MA'],
+    },
   ];
 
   protected readonly topFiveCentralizedInstitutions = [
     {
-      name: 'Instituto Tecnológico Superior de Zongolica', value: 400, tags: [
-        'PA', 'DA', 'MU', 'DI', 'MA'
-      ]
+      name: 'Instituto Tecnológico Superior de Zongolica',
+      value: 400,
+      tags: ['PA', 'DA', 'MU', 'DI', 'MA'],
     },
     {
-      name: 'Instituto Tecnológico Superior de Palenque', value: 350, tags: [
-        'PA', 'DA', 'DI', 'MA'
-      ]
+      name: 'Instituto Tecnológico Superior de Palenque',
+      value: 350,
+      tags: ['PA', 'DA', 'DI', 'MA'],
     },
     {
-      name: 'Instituto Tecnológico Superior de Irapuato', value: 300, tags: [
-        'PA', 'MU', 'MA'
-      ]
+      name: 'Instituto Tecnológico Superior de Irapuato',
+      value: 300,
+      tags: ['PA', 'MU', 'MA'],
     },
     {
-      name: 'Instituto Tecnológico Superior de Cintapala', value: 250, tags: [
-        'DA', 'MU', 'DI'
-      ]
+      name: 'Instituto Tecnológico Superior de Cintapala',
+      value: 250,
+      tags: ['DA', 'MU', 'DI'],
     },
     {
-      name: 'Instituto Tecnológico Superior de Comitán', value: 200, tags: [
-        'PA', 'DA', 'DI'
-      ]
-    }
+      name: 'Instituto Tecnológico Superior de Comitán',
+      value: 200,
+      tags: ['PA', 'DA', 'DI'],
+    },
   ];
 
-  combinedTop: Top5[] = [];
-  rawImpi: any;
-  rawIndautor: any;
+  protected readonly federalInstitutions: CardItem[] = [
+    {
+      icon: 'emoji_objects',
+      iconColor: 'text-danger',
+      titleTranslate: 'Patentes',
+      count: 800,
+      routerLink: '/administrador/propiedades/patente',
+    },
+    {
+      icon: 'branding_watermark',
+      iconColor: 'text-info',
+      titleTranslate: 'Marcas',
+      count: 300,
+      routerLink: '/administrador/propiedades/patente',
+    },
+    {
+      icon: 'construction',
+      iconColor: 'text-warning',
+      titleTranslate: 'Modelos de Utilidad',
+      count: 400,
+      routerLink: '/administrador/propiedades/patente',
+    },
+    {
+      icon: 'copyright',
+      iconColor: 'text-success',
+      titleTranslate: 'Derechos de Autor',
+      count: 200,
+      routerLink: '/administrador/propiedades/patente',
+    },
+    {
+      icon: 'architecture',
+      iconColor: 'text-primary',
+      titleTranslate: 'Diseños Industriales',
+      count: 300,
+      routerLink: '/administrador/propiedades/patente',
+    },
+  ];
 
-  constructor(private impiService: ImpiRegistriesService, private indautorService: IndautorRegistriesService) {
-  }
+  protected readonly instituciones = [
+    {
+      name: 'Instituto Tecnológico de Tuxtla Gutierrez',
+      value: 800,
+      tags: ['PA', 'DA', 'MU', 'DI', 'MA'],
+    },
+    {
+      name: 'Instituto Tecnológico de Durango',
+      value: 700,
+      tags: ['PA', 'MU', 'MA'],
+    },
+    {
+      name: 'Instituto Tecnológico de Orizaba',
+      value: 600,
+      tags: ['PA', 'DA', 'DI', 'MA'],
+    },
+    {
+      name: 'Instituto Tecnológico de Celaya',
+      value: 500,
+      tags: ['DA', 'MU', 'DI'],
+    },
+    {
+      name: 'Instituto Tecnológico de Acapulco',
+      value: 400,
+      tags: ['PA', 'MU', 'MA'],
+    },
+  ];
+
+  protected readonly categorias = [
+    { categoria: 'Docentes', value: 500 },
+    { categoria: 'Administrativos', value: 250 },
+    { categoria: 'Alumnos', value: 180 },
+  ];
+   protected readonly solicitudes = [
+    { categoria: 'Marcas', value: 712 },
+    { categoria: 'Modelo de Utilidad', value: 250 },
+    { categoria: 'Patente', value: 630 },
+    { categoria: 'Programas de Computación', value: 300 },
+    { categoria: 'Literaria', value: 280 },
+  ];
+
+  constructor() {}
 
   ngOnInit(): void {
-<<<<<<< Updated upstream
     this.initGraphs();
   }
 
@@ -121,12 +184,15 @@ export class AdminDashboardComponent implements OnInit {
     const solicitudesData = this.getSimulatedData();
     this.chartOptions = this.createChartOptions(350, solicitudesData);
     const solicitudesDataGraph2 = this.getSimulatedDataGraph2();
-    this.chartOptionsGraph2 = this.createChartOptions(350, solicitudesDataGraph2);
+    this.chartOptionsGraph2 = this.createChartOptions(
+      350,
+      solicitudesDataGraph2
+    );
   }
 
   private getSimulatedData(): any[] {
     return [
-      { rama: 'Patente', data: [15, 18, 15, 6] }, 
+      { rama: 'Patente', data: [15, 18, 15, 6] },
       { rama: 'Marca', data: [20, 5, 12, 8] },
       { rama: 'Modelo de Utilidad', data: [10, 12, 10, 5] },
       { rama: 'Diseño Industrial', data: [5, 7, 8, 2] },
@@ -136,7 +202,7 @@ export class AdminDashboardComponent implements OnInit {
 
   private getSimulatedDataGraph2(): any[] {
     return [
-      { rama: 'Programas de computación', data: [10, 4, 6, 3] }, 
+      { rama: 'Programas de computación', data: [10, 4, 6, 3] },
       { rama: 'Literaria', data: [11, 5, 9, 8] },
       { rama: 'Reserva de derechos', data: [1, 10, 9, 5] },
       { rama: 'ISSN', data: [5, 7, 8, 2] },
@@ -162,7 +228,7 @@ export class AdminDashboardComponent implements OnInit {
       plotOptions: {
         bar: {
           horizontal: false,
-          columnWidth: '30%', 
+          columnWidth: '30%',
           borderRadius: 5,
         },
       },
@@ -226,7 +292,7 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   private mapDataToSeries(data: any[]): any[] {
-    return data.map(item => ({
+    return data.map((item) => ({
       name: item.rama,
       data: item.data,
     }));
@@ -240,72 +306,5 @@ export class AdminDashboardComponent implements OnInit {
       getCSSVariableValue('--bs-danger'),
       getCSSVariableValue('--bs-info'),
     ];
-=======
-    const impi$ = this.impiService.listImpiTop5();
-    const indautor$ = this.indautorService.listIndautorTop5();
-    forkJoin([impi$, indautor$]).subscribe({
-      next: ([impiResp, indautorResp]) => {
-        this.rawImpi = impiResp;
-        this.rawIndautor = indautorResp;
-        const impiArr: Top5[] = this.normalizeResponse(impiResp);
-        const indautorArr: Top5[] = this.normalizeResponse(indautorResp);
-        const combined = [...impiArr, ...indautorArr];
-        this.combinedTop = this.aggregateAndSort(combined, 'desc');
-        this.combinedTop = this.combinedTop.slice(0, 5);
-      }, 
-      error: (err) => {
-        console.error("Error: ", err);
-      }
-    })
   }
-
-  normalizeResponse(resp: any): Top5[] {
-    if(!resp) return [];
-    if(Array.isArray(resp)) return resp as Top5[];
-    if(Array.isArray(resp.data)) return resp.data as Top5[];
-    if(Array.isArray(resp.result)) return resp.result as Top5[];
-    if(Array.isArray(resp.items)) return resp.items as Top5[];
-
-    try {
-
-      const arrays = Object.values(resp).filter(v => Array.isArray(v)) as [][]
-      if(!arrays.length) return [];
-
-      const values = arrays.reduce((acc: any[], cur: any[]) => acc.concat(cur), []);
-      if(values && values.length) return values as Top5[];
-      
-    } catch (error) {
-      
-    }
-    return [];
-  }
-
-  aggregateAndSort(arr: Top5[], order: 'desc'|'asc' = 'desc'): Top5[] {
-    const map = new Map<string, Top5>()
-    for (const item of arr) {
-
-      const key = (item.city_name || '').trim();
-      if(!key) continue;
-
-      const existing = map.get(key);
-      const value = Number(item.total_registries || 0);
-
-      if(existing) {
-        existing.total_registries = Number(existing.total_registries) + value;
-      } else {
-        map.set(key, {city_name: key, total_registries: value});
-      }
-    }
-
-    const aggregate = Array.from(map.values());
-    aggregate.sort((a, b) => {
-      if(a.total_registries !== b.total_registries) {
-        return order === 'desc' ? b.total_registries - a.total_registries : a.total_registries - b.total_registries;
-      };
-      return a.city_name.localeCompare(b.city_name, 'es', {sensitivity: 'base'});
-    });
-    return aggregate;
->>>>>>> Stashed changes
-  }
-
 }

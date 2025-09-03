@@ -1,0 +1,77 @@
+<div class="card card-xl-stretch mb-xl-8">
+  <div class="card-header border-0 pt-5">
+    <h3 class="card-title align-items-start flex-column">
+      <span
+        class="card-label fw-bolder fs-3 mb-1"
+        [translate]="cardTitleTranslate"
+      ></span>
+      <span
+        class="text-muted mt-1 fw-bold fs-7"
+        [translate]="cardSubtitleTranslate"
+      ></span>
+    </h3>
+    <div class="card-toolbar">
+      <!-- begin::Button-->
+      <div
+        class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary tooltip-css"
+      >
+        <mat-icon style="color: #1d6f42">description</mat-icon>
+        <span class="tooltip-text" translate="BUTTON.EXPORT_EXCEL"></span>
+      </div>
+      <!-- end::Button-->
+    </div>
+  </div>
+
+  <div class="card-body py-3">
+    <div class="table-responsive">
+      <table class="table align-middle gs-0 gy-5">
+        <thead>
+          <tr>
+            <th class="p-0 w-50px"></th>
+            <th class="p-0 min-w-200px"></th>
+            <th class="p-0 min-w-100px"></th>
+            <th class="p-0 min-w-40px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of items">
+            <th>
+              <div class="symbol symbol-50px me-2">
+                <span class="symbol-label">
+                  <mat-icon
+                    [fontIcon]="item.icon"
+                    [ngClass]="item.iconColor"
+                  ></mat-icon>
+                </span>
+              </div>
+            </th>
+            <td>
+              <span
+                class="text-gray-900 fw-bolder mb-1 fs-6"
+                [translate]="item.titleTranslate"
+              ></span>
+            </td>
+            <td>
+              <div class="d-flex flex-column w-100 me-2">
+                <div class="d-flex flex-stack mb-2">
+                  <span class="me-2 fs-6 fw-bold text-primary">
+                    {{ item.count }}
+                    <span translate="GRAPHICS.TITLES.REQUEST"></span>
+                  </span>
+                </div>
+              </div>
+            </td>
+            <td class="text-end">
+              <a
+                [routerLink]="item.routerLink"
+                class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary"
+              >
+                <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
