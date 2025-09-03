@@ -214,6 +214,15 @@ export const COORDINATOR_MENUS = [
   }
 ];
 
+export const CEPAT_MENUS = [
+  {
+    name: 'MENU.DASHBOARD',
+    icon: 'dashboard',
+    link: '/cepat/dashboard',
+    type: 'link',
+  },
+];
+
 export const APPLICANTS_MENU = [
   {
     name: 'MENU.DASHBOARD',

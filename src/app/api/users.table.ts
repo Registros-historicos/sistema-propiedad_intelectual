@@ -142,6 +142,42 @@ export class UsersTable {
       },
       website: 'teresitavenegas.com',
     },
+    {
+      id: 5,
+      username: 'cepat',
+      password: 'demo',
+      email: 'orizaba.crode@demo.com',
+      authToken: 'auth-token-6cf840f6f8ba3a3bab5edd3e0401c189',
+      refreshToken: 'auth-token-e18f8fe9150a98ea6819c280b95ea538',
+      roles: [4], // Administrator CEPAT
+      pic: './assets/media/avatars/logo-tecnm.png',
+      fullname: 'CEPAT',
+      firstname: 'CEPAT',
+      lastname: 'CEPAT',
+      occupation: 'Administrador CEPAT',
+      companyName: 'CEPAT',
+      phone: '272123456',
+      language: 'es',
+      timeZone: 'Ciudad de México, CDMX',
+      communication: {
+        email: true,
+        sms: true,
+        phone: false,
+      },
+      address: {
+        addressLine: 'Oriente 9 Emiliano Zapata',
+        city: 'Orizaba',
+        state: 'Veracruz',
+        postCode: '94320',
+      },
+      socialNetworks: {
+        linkedIn: 'https://linkedin.com/cepat',
+        facebook: 'https://facebook.com/cepat',
+        twitter: 'https://twitter.com/cepat',
+        instagram: 'https://instagram.com/cepat',
+      },
+      website: 'cepat.com',
+    },
   ];
 
   public static tokens: any = [

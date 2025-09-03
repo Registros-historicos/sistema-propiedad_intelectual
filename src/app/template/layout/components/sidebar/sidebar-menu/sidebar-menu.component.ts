@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import {ADMINISTRATOR_MENUS, APPLICANTS_MENU, COORDINATOR_MENUS} from '../../../../shared/menus';
+import {ADMINISTRATOR_MENUS, APPLICANTS_MENU, CEPAT_MENUS, COORDINATOR_MENUS} from '../../../../shared/menus';
 import { SweetAlertOptions } from 'sweetalert2';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import {AuthService} from '../../../../../modules/auth';
@@ -40,6 +40,9 @@ export class SidebarMenuComponent implements OnInit {
       case 3:
         this.menuItems = APPLICANTS_MENU;
         break;
+      case 4:
+        this.menuItems = CEPAT_MENUS;
+        break;  
       default:
         break;
     }
