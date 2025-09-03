@@ -27,4 +27,14 @@ export class IndautorRegistriesService {
         })
       );
   }
+
+  public listIndautorTop5(): Observable<any> {
+    let url='http://localhost:8080/cepat-api/indautor-registries/top-5'
+    return this.apiService.get<any>(url)
+      .pipe(
+        map(response => {
+          return response
+        })
+      )
+  }
 }
