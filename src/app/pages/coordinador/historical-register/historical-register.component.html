@@ -1,0 +1,19 @@
+<div class="registro-container">
+  <h2>{{ "HISTORICAL_REGISTER.TITLE" | translate }}</h2>
+  <p>{{ "HISTORICAL_REGISTER.DESCRIPTION" | translate }}</p>
+
+  <div class="card-grid">
+    <div
+      class="card registro-card"
+      *ngFor="let register of registers"
+      [ngClass]="register.color"
+      (click)="verRegistro(register.ruta)"
+    >
+      <span class="material-icons icono-registro">{{ register.icono }}</span>
+      <h3>{{ register.titulo | translate }}</h3>
+      <p>{{ register.descripcion | translate }}</p>
+
+      <button>{{ "HISTORICAL_REGISTER.REGISTER_ACTION" | translate }}</button>
+    </div>
+  </div>
+</div>
