@@ -45,11 +45,8 @@ import { TableroInstitucionesComponent } from './components/tablero-institucione
 import { TableroCategoriasComponent } from './components/tablero-registro-categoria/tablero-registro-categoria.component';
 import { ChartComponent } from "ng-apexcharts";
 import { TableroInstitucionesFederalesComponent } from './components/tablero-instituciones-federales/tablero-instituciones-federales.component';
-<<<<<<< HEAD
 import { TableroSolicitudesComponent } from './components/tablero-solicitudes/tablero-solicitudes.component';
 
-=======
->>>>>>> ba12b80 (feat(admin): agregar componentes parametrizados para instituciones federales y categorías)
 
 
 
@@ -85,12 +82,8 @@ const routes: Routes = [
     SaasComponent,
     TableroInstitucionesComponent,
     TableroCategoriasComponent,
-<<<<<<< HEAD
     TableroInstitucionesFederalesComponent,
     TableroSolicitudesComponent
-=======
-    TableroInstitucionesFederalesComponent
->>>>>>> ba12b80 (feat(admin): agregar componentes parametrizados para instituciones federales y categorías)
   ],
   imports: [
     CommonModule,
@@ -113,10 +106,6 @@ const routes: Routes = [
     ChartComponent,
     TranslateModule
 ],
-<<<<<<< HEAD
   exports: [RouterModule, TableroInstitucionesComponent, TableroCategoriasComponent, TableroInstitucionesFederalesComponent,TableroSolicitudesComponent],
-=======
-  exports: [RouterModule, TableroInstitucionesComponent, TableroCategoriasComponent, TableroInstitucionesFederalesComponent],
->>>>>>> ba12b80 (feat(admin): agregar componentes parametrizados para instituciones federales y categorías)
 })
 export class LayoutModule {}
