@@ -135,6 +135,9 @@ export class UserInnerComponent implements OnInit, OnDestroy {
       case 3:
         this.router.navigate(['/solicitante/perfil']);
         break;
+      case 4:
+        this.router.navigate(['/cepat/perfil']);
+        break;  
       default:
         break;
     }

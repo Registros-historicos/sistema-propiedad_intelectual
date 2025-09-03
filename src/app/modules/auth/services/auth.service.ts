@@ -79,6 +79,9 @@ export class AuthService implements OnDestroy {
         case 3:
           this.router.navigate(['/solicitante/dashboard']);
           break;
+        case 4:
+          this.router.navigate(['/cepat/dashboard']);
+          break;  
         default:
           this.router.navigate(['/auth/login']);
           break;

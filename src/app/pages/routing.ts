@@ -86,6 +86,12 @@ const Routing: Routes = [
     loadChildren: () => import('./administrador/administrador.module').then((m) => m.AdministradorModule),
   },
   {
+    path: 'cepat',
+    canActivate: [RoleGuard],
+    data: { roles: ['cepat'] },
+    loadChildren: () => import('./cepat/cepat.module').then((m) => m.CepatModule),
+  },
+  {
     path: 'builder',
     loadChildren: () => import('./builder/builder.module').then((m) => m.BuilderModule),
   },
