@@ -6,7 +6,6 @@ import { Component, Input } from '@angular/core';
   styleUrls: ['./tablero-instituciones.component.scss'],
 })
 export class TableroInstitucionesComponent {
-  // Recibe el array como parámetro desde el padre
   @Input() topFiveFederalInstitutions: {
     name: string;
     value: number;
