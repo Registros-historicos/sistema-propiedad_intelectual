@@ -1138,6 +1138,13 @@ export const locale = {
         INDUSTRIAL_SECRETS: 'Trade Secrets',
         HELP: 'Help Center'
       },
+      INDAUTOR_CATEGORIES: {
+        COMPUTER_PROGRAM: 'Computer Program',
+        LITERARY: 'Literary',
+        RIGHTS_RESERVE: 'Rights Reserved',
+        ARTISTIC: 'Artistic',
+        DATABASE_COMPILATION: 'Database Compilation',
+      },
       APPLICANT: {
         MYREQUESTS: 'My Requests',
         REQUESTS: 'Requests',

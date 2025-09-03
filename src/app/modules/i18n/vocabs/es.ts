@@ -1033,6 +1033,8 @@ export const locale = {
         RESEARCHERS: "Investigadores",
         RESEARCHER: "Investigador",
         DEPARTMENT: "Departamento",
+        IMPI: "IMPI",
+        INDAUTOR: "INDAUTOR",
         FEDERAL_INSTITUTIONS: "Instituciones Federales",
         CENTRALIZED_INSTITUTIONS: "Instituciones Descentralizadas",
         INSTITUTIONS: "Instituciones",
@@ -1147,6 +1149,13 @@ export const locale = {
         VEGETAL_VARIETIES: 'Variedades Vegetales',
         INDUSTRIAL_SECRETS: 'Secretos Industriales',
         HELP: 'Centro de Ayuda'
+      },
+       INDAUTOR_CATEGORIES: {
+        COMPUTER_PROGRAM: 'Programa de computación',
+        LITERARY: 'Literaria',
+        RIGHTS_RESERVE: 'Reserva de Derechos',
+        ARTISTIC: 'Artística',
+        DATABASE_COMPILATION: 'Compilación de datos (Base de datos)',
       },
       APPLICANT: {
         MYREQUESTS: 'Mis Solicitudes',
