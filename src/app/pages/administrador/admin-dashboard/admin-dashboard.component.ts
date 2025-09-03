@@ -166,6 +166,13 @@ export class AdminDashboardComponent implements OnInit {
     { categoria: 'Administrativos', value: 250 },
     { categoria: 'Alumnos', value: 180 },
   ];
+   protected readonly solicitudes = [
+    { categoria: 'Marcas', value: 712 },
+    { categoria: 'Modelo de Utilidad', value: 250 },
+    { categoria: 'Patente', value: 630 },
+    { categoria: 'Programas de Computación', value: 300 },
+    { categoria: 'Literaria', value: 280 },
+  ];
 
   constructor() {}
 

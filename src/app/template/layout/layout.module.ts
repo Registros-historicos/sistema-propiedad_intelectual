@@ -45,6 +45,8 @@ import { TableroInstitucionesComponent } from './components/tablero-institucione
 import { TableroCategoriasComponent } from './components/tablero-registro-categoria/tablero-registro-categoria.component';
 import { ChartComponent } from "ng-apexcharts";
 import { TableroInstitucionesFederalesComponent } from './components/tablero-instituciones-federales/tablero-instituciones-federales.component';
+import { TableroSolicitudesComponent } from './components/tablero-solicitudes/tablero-solicitudes.component';
+
 
 
 
@@ -80,7 +82,8 @@ const routes: Routes = [
     SaasComponent,
     TableroInstitucionesComponent,
     TableroCategoriasComponent,
-    TableroInstitucionesFederalesComponent
+    TableroInstitucionesFederalesComponent,
+    TableroSolicitudesComponent
   ],
   imports: [
     CommonModule,
@@ -103,6 +106,6 @@ const routes: Routes = [
     ChartComponent,
     TranslateModule
 ],
-  exports: [RouterModule, TableroInstitucionesComponent, TableroCategoriasComponent, TableroInstitucionesFederalesComponent],
+  exports: [RouterModule, TableroInstitucionesComponent, TableroCategoriasComponent, TableroInstitucionesFederalesComponent,TableroSolicitudesComponent],
 })
 export class LayoutModule {}
