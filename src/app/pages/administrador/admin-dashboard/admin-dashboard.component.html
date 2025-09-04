@@ -1,387 +1,64 @@
 <div class="row g-5 g-xl-8">
   <div class="col-xl-6">
-    <div class="card card-xl-stretch mb-xl-8">
-      <div class="card-header border-0 pt-5">
-        <h3 class="card-title align-items-start flex-column">
-          <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.IMPI"></span>
-          <span class="text-muted mt-1 fw-bold fs-7" translate="GRAPHICS.TITLES.REQUEST"></span>
-        </h3>
-        <div class="card-toolbar">
-          <!-- begin::Menu -->
-          <!--          <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary"-->
-          <!--                  data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-flip="top-end">-->
-          <!--            <app-keenicon name="category" class="fs-2"></app-keenicon>-->
-          <!--          </button>-->
-          <!-- begin::Menu 1 -->
-          <!--          <app-dropdown-menu1></app-dropdown-menu1>-->
-          <!-- end::Menu 1 -->
-          <!-- end::Menu -->
-        </div>
-      </div>
-      <!-- end::Header -->
-      <!-- begin::Body -->
-      <div class="card-body py-3">
-        <!-- begin::Table container -->
-        <div class="table-responsive">
-          <!-- begin::Table -->
-          <table class="table align-middle gs-0 gy-5">
-            <!-- begin::Table head -->
-            <thead>
-            <tr>
-              <th class="p-0 w-50px"></th>
-              <th class="p-0 min-w-200px"></th>
-              <th class="p-0 min-w-100px"></th>
-              <th class="p-0 min-w-40px"></th>
-            </tr>
-            </thead>
-            <!-- end::Table head -->
-            <!-- begin::Table body -->
-            <tbody>
-            <tr>
-              <th>
-                <div class="symbol symbol-50px me-2">
-                  <span class="symbol-label">
-                    <mat-icon fontIcon="emoji_objects" class="text-danger"></mat-icon>
-                  </span>
-                </div>
-              </th>
-              <td>
-                <span class="text-gray-900 fw-bolder mb-1 fs-6"
-                      translate="MENU.COORD.PATENTS"></span>
-              </td>
-              <td>
-                <div class="d-flex flex-column w-100 me-2">
-                  <div class="d-flex flex-stack mb-2">
-                    <span class="me-2 fs-6 fw-bold text-primary">1200 <span translate="GRAPHICS.TITLES.REQUEST"></span></span>
-                  </div>
-                </div>
-              </td>
-              <td class="text-end">
-                <a routerLink="/administrador/propiedades/patente"
-                   class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
-                  <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <th>
-                <div class="symbol symbol-50px me-2">
-                  <span class="symbol-label">
-                    <mat-icon fontIcon="branding_watermark" class="text-info"></mat-icon>
-                  </span>
-                </div>
-              </th>
-              <td>
-                <span class="text-gray-900 fw-bolder mb-1 fs-6"
-                      translate="MENU.COORD.TRADEMARKS"></span>
-              </td>
-              <td>
-                <div class="d-flex flex-column w-100 me-2">
-                  <div class="d-flex flex-stack mb-2">
-                    <span class="me-2 fs-6 fw-bold text-primary">800 <span
-                      translate="GRAPHICS.TITLES.REQUEST"></span></span>
-                  </div>
-                </div>
-              </td>
-              <td class="text-end">
-                <a routerLink="/administrador/propiedades/marca"
-                   class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
-                  <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <th>
-                <div class="symbol symbol-50px me-2">
-                  <span class="symbol-label">
-                    <mat-icon fontIcon="construction" class="text-warning"></mat-icon>
-                  </span>
-                </div>
-              </th>
-              <td>
-                <span class="text-gray-900 fw-bolder mb-1 fs-6"
-                      translate="MENU.COORD.UTILITY_MODELS"></span>
-              </td>
-              <td>
-                <div class="d-flex flex-column w-100 me-2">
-                  <div class="d-flex flex-stack mb-2">
-                    <span class="me-2 fs-6 fw-bold text-primary">600 <span
-                      translate="GRAPHICS.TITLES.REQUEST"></span></span>
-                  </div>
-                </div>
-              </td>
-              <td class="text-end">
-                <a routerLink="/administrador/propiedades/modelo-utilidad"
-                   class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
-                  <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <th>
-                <div class="symbol symbol-50px me-2">
-                  <span class="symbol-label">
-                    <mat-icon fontIcon="copyright" class="text-success"></mat-icon>
-                  </span>
-                </div>
-              </th>
-              <td>
-                <span class="text-gray-900 fw-bolder mb-1 fs-6"
-                      translate="MENU.COORD.COPYRIGHTS"></span>
-              </td>
-              <td>
-                <div class="d-flex flex-column w-100 me-2">
-                  <div class="d-flex flex-stack mb-2">
-                    <span class="me-2 fs-6 fw-bold text-primary">400 <span
-                      translate="GRAPHICS.TITLES.REQUEST"></span></span>
-                  </div>
-                </div>
-              </td>
-              <td class="text-end">
-                <a routerLink="/administrador/propiedades/derecho-autor"
-                   class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
-                  <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <th>
-                <div class="symbol symbol-50px me-2">
-                  <span class="symbol-label">
-                    <mat-icon fontIcon="architecture" class="text-primary"></mat-icon>
-                  </span>
-                </div>
-              </th>
-              <td>
-                <span class="text-gray-900 fw-bolder mb-1 fs-6"
-                      translate="MENU.COORD.INDUSTRIAL_DESIGNS"></span>
-              </td>
-              <td>
-                <div class="d-flex flex-column w-100 me-2">
-                  <div class="d-flex flex-stack mb-2">
-                    <span class="me-2 fs-6 fw-bold text-primary">300 <span
-                      translate="GRAPHICS.TITLES.REQUEST"></span></span>
-                  </div>
-                </div>
-              </td>
-              <td class="text-end">
-                <a routerLink="/administrador/propiedades/diseno-industrial"
-                   class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
-                  <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
-                </a>
-              </td>
-            </tr>
-            </tbody>
-            <!-- end::Table body -->
-          </table>
-          <!-- end::Table -->
-        </div>
-        <!-- end::Table container -->
-      </div>
-    </div>
+    <!-- <app-tablero-instituciones-federales
+      [cardTitleTranslate]="'GRAPHICS.TITLES.FEDERAL_INSTITUTIONS'"
+      [cardSubtitleTranslate]="'GRAPHICS.TITLES.REQUEST'"
+      [items]="federalInstitutions"
+    >
+    </app-tablero-instituciones-federales> -->
+    <app-tablero-institutos-general
+      titulo="Institutos Tecnológicos Federales"
+      [data]="institutosFederales"
+    ></app-tablero-institutos-general>
   </div>
 
   <div class="col-xl-6">
-    <div class="card card-xl-stretch mb-xl-8">
-      <div class="card-header border-0 pt-5">
-        <h3 class="card-title align-items-start flex-column">
-          <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.INDAUTOR"></span>
-          <span class="text-muted mt-1 fw-bold fs-7" translate="GRAPHICS.TITLES.REQUEST"></span>
-        </h3>
-        <div class="card-toolbar">
-          <!-- begin::Menu -->
-          <!--          <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary"-->
-          <!--                  data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-flip="top-end">-->
-          <!--            <app-keenicon name="category" class="fs-2"></app-keenicon>-->
-          <!--          </button>-->
-          <!-- begin::Menu 1 -->
-          <!--          <app-dropdown-menu1></app-dropdown-menu1>-->
-          <!-- end::Menu 1 -->
-          <!-- end::Menu -->
-        </div>
-      </div>
-      <!-- end::Header -->
-      <!-- begin::Body -->
-      <div class="card-body py-3">
-        <!-- begin::Table container -->
-        <div class="table-responsive">
-          <!-- begin::Table -->
-          <table class="table align-middle gs-0 gy-5">
-            <!-- begin::Table head -->
-            <thead>
-            <tr>
-              <th class="p-0 w-50px"></th>
-              <th class="p-0 min-w-200px"></th>
-              <th class="p-0 min-w-100px"></th>
-              <th class="p-0 min-w-40px"></th>
-            </tr>
-            </thead>
-            <!-- end::Table head -->
-            <!-- begin::Table body -->
-            <tbody>
-            <tr>
-              <th>
-                <div class="symbol symbol-50px me-2">
-                  <span class="symbol-label">
-                    <mat-icon fontIcon="emoji_objects" class="text-danger"></mat-icon>
-                  </span>
-                </div>
-              </th>
-              <td>
-                <span class="text-gray-900 fw-bolder mb-1 fs-6"
-                      translate="MENU.INDAUTOR_CATEGORIES.COMPUTER_PROGRAM"></span>
-              </td>
-              <td>
-                <div class="d-flex flex-column w-100 me-2">
-                  <div class="d-flex flex-stack mb-2">
-                    <span class="me-2 fs-6 fw-bold text-primary">600 <span
-                      translate="GRAPHICS.TITLES.REQUEST"></span></span>
-                  </div>
-                </div>
-              </td>
-              <td class="text-end">
-                <a routerLink="/administrador/propiedades/patente"
-                   class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
-                  <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <th>
-                <div class="symbol symbol-50px me-2">
-                  <span class="symbol-label">
-                    <mat-icon fontIcon="branding_watermark" class="text-info"></mat-icon>
-                  </span>
-                </div>
-              </th>
-              <td>
-                <span class="text-gray-900 fw-bolder mb-1 fs-6"
-                      translate="MENU.INDAUTOR_CATEGORIES.LITERARY"></span>
-              </td>
-              <td>
-                <div class="d-flex flex-column w-100 me-2">
-                  <div class="d-flex flex-stack mb-2">
-                    <span class="me-2 fs-6 fw-bold text-primary">400 <span
-                      translate="GRAPHICS.TITLES.REQUEST"></span></span>
-                  </div>
-                </div>
-              </td>
-              <td class="text-end">
-                <a routerLink="/administrador/propiedades/marca"
-                   class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
-                  <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <th>
-                <div class="symbol symbol-50px me-2">
-                  <span class="symbol-label">
-                    <mat-icon fontIcon="construction" class="text-warning"></mat-icon>
-                  </span>
-                </div>
-              </th>
-              <td>
-                <span class="text-gray-900 fw-bolder mb-1 fs-6"
-                      translate="MENU.INDAUTOR_CATEGORIES.RIGHTS_RESERVE"></span>
-              </td>
-              <td>
-                <div class="d-flex flex-column w-100 me-2">
-                  <div class="d-flex flex-stack mb-2">
-                    <span class="me-2 fs-6 fw-bold text-primary">300 <span
-                      translate="GRAPHICS.TITLES.REQUEST"></span></span>
-                  </div>
-                </div>
-              </td>
-              <td class="text-end">
-                <a routerLink="/administrador/propiedades/modelo-utilidad"
-                   class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
-                  <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <th>
-                <div class="symbol symbol-50px me-2">
-                  <span class="symbol-label">
-                    <mat-icon fontIcon="copyright" class="text-success"></mat-icon>
-                  </span>
-                </div>
-              </th>
-              <td>
-                <span class="text-gray-900 fw-bolder mb-1 fs-6"
-                      translate="MENU.INDAUTOR_CATEGORIES.ARTISTIC"></span>
-              </td>
-              <td>
-                <div class="d-flex flex-column w-100 me-2">
-                  <div class="d-flex flex-stack mb-2">
-                    <span class="me-2 fs-6 fw-bold text-primary">200 <span
-                      translate="GRAPHICS.TITLES.REQUEST"></span></span>
-                  </div>
-                </div>
-              </td>
-              <td class="text-end">
-                <a routerLink="/administrador/propiedades/derecho-autor"
-                   class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
-                  <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <th>
-                <div class="symbol symbol-50px me-2">
-                  <span class="symbol-label">
-                    <mat-icon fontIcon="architecture" class="text-primary"></mat-icon>
-                  </span>
-                </div>
-              </th>
-              <td>
-                <span class="text-gray-900 fw-bolder mb-1 fs-6"
-                      translate="MENU.INDAUTOR_CATEGORIES.DATABASE_COMPILATION"></span>
-              </td>
-              <td>
-                <div class="d-flex flex-column w-100 me-2">
-                  <div class="d-flex flex-stack mb-2">
-                    <span class="me-2 fs-6 fw-bold text-primary">150 <span
-                      translate="GRAPHICS.TITLES.REQUEST"></span></span>
-                  </div>
-                </div>
-              </td>
-              <td class="text-end">
-                <a routerLink="/administrador/propiedades/diseno-industrial"
-                   class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
-                  <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
-                </a>
-              </td>
-            </tr>
-            </tbody>
-            <!-- end::Table body -->
-          </table>
-          <!-- end::Table -->
-        </div>
-        <!-- end::Table container -->
-      </div>
-    </div>
+    <app-tablero-institutos-general
+      titulo="Institutos Descentralizados"
+      [data]="institutosDescentralizados"
+    ></app-tablero-institutos-general>
+</div>
+
+<div class="row g-5 g-xl-8">
+  <div class="col-xl-6">
+    <app-tablero-instituciones
+      [topFiveFederalInstitutions]="instituciones"
+    ></app-tablero-instituciones>
+  </div>
+
+  <div class="col-xl-6">
+    <app-tablero-institutos-general
+      titulo="Registros por institución"
+      [data]="institutosData"
+    ></app-tablero-institutos-general>
   </div>
 </div>
 
+<!-- dashboard.component.html -->
 <div class="row g-5 g-xl-8">
   <div class="col-xl-6">
     <div class="card card-xl-stretch mb-xl-8">
       <!-- begin::Header -->
       <div class="card-header border-0 pt-5">
         <h3 class="card-title align-items-start flex-column">
-          <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.INSTITUTIONS"></span>
-          <span class="text-muted mt-1 fw-bold fs-7" translate="GRAPHICS.SUBTITLES.TOP_5"></span>
+          <span
+            class="card-label fw-bolder fs-3 mb-1"
+            translate="GRAPHICS.TITLES.FEDERAL_ENTITIES"
+          ></span>
+          <span
+            class="text-muted mt-1 fw-bold fs-7"
+            translate="GRAPHICS.SUBTITLES.TOP_5"
+          ></span>
         </h3>
         <div class="card-toolbar">
-          <!-- begin::Menu -->
-          <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary"
-                  data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-flip="top-end">
-            <app-keenicon name="category" class="fs-2"></app-keenicon>
-          </button>
-          <app-dropdown-menu1></app-dropdown-menu1>
-          <!-- end::Menu -->
+          <!-- begin::Button-->
+          <div
+            class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary tooltip-css"
+          >
+            <mat-icon style="color: #1d6f42">description</mat-icon>
+            <span class="tooltip-text" translate="BUTTON.EXPORT_EXCEL"></span>
+          </div>
+          <!-- end::Button-->
         </div>
       </div>
       <!-- end::Header -->
@@ -393,142 +70,61 @@
           <table class="table align-middle gs-0 gy-5">
             <!-- begin::Table head -->
             <thead>
-            <tr>
-              <th class="p-0 min-w-150px"></th>
-              <th class="p-0 min-w-200px"></th>
-              <th class="p-0 min-w-125px"></th>
-            </tr>
-            </thead>
-            <!-- end::Table head -->
-            <!-- begin::Table body -->
-            <tbody>
-              <!-- Iteración correcta en Angular -->
-              <tr *ngFor="let institution of combinedTop; let i = index">
-                <td>
-                  <div class="d-flex align-items-center">
-                    <div class="symbol symbol-45px me-5">
-                      <app-keenicon name="institution" class="fs-2"></app-keenicon>
-                    </div>
-                    <div class="d-flex justify-content-start flex-column">
-                      <!-- i es el índice (0-based) -->
-                      <span class="text-gray-900 fw-bolder fs-6">{{ i + 1 }}. {{ institution.city_name | titlecase
-                        }}</span>
-                    </div>
-                  </div>
-                </td>
-
-                <td class="text-end">
-                  <!-- Si hay tags las iteramos -->
-                  <ng-container *ngIf="institution.tags?.length">
-                    <span *ngFor="let tag of institution.tags" class="badge fw-bold me-1" [ngClass]="{
-                'badge-light-danger': tag === 'PATENTS',
-                'badge-light-info': tag === 'MA',
-                'badge-light-warning': tag === 'MU',
-                'badge-light-success': tag === 'DA',
-                'badge-light-primary': tag === 'DI'
-              }">
-                      {{ tag }}
-                    </span>
-                  </ng-container>
-                </td>
-
-                <td class="text-center">
-                  <span class="text-muted fw-bold">{{ institution.total_registries }} <span
-                      translate="GRAPHICS.TITLES.REQUEST"></span></span>
-                </td>
+              <tr>
+                <th class="p-0 min-w-150px"></th>
+                <th class="p-0 min-w-200px"></th>
+                <th class="p-0 min-w-125px"></th>
               </tr>
-
-              <!-- Fila cuando el array está vacío -->
-              <tr *ngIf="!combinedTop || combinedTop.length === 0">
-                <!-- Ajusté colspan a 3 porque la tabla tiene 3 columnas en este bloque -->
-                <td colspan="3" class="text-center text-muted">
-                  <span translate="GRAPHICS.LEGENDS.NO_FEDERAL_INSTITUTIONS"></span>
-                </td>
-              </tr>
-            </tbody>
-            <!-- end::Table body -->
-          </table>
-          <!-- end::Table -->
-        </div>
-        <!-- end::Table container -->
-      </div>
-      <!-- end::Body -->
-    </div>
-  </div>
-
-  <div class="col-xl-6">
-    <div class="card card-xl-stretch mb-xl-8">
-      <!-- begin::Header -->
-      <div class="card-header border-0 pt-5">
-        <h3 class="card-title align-items-start flex-column">
-          <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.FEDERAL_ENTITIES"></span>
-          <span class="text-muted mt-1 fw-bold fs-7" translate="GRAPHICS.SUBTITLES.TOP_5"></span>
-        </h3>
-        <div class="card-toolbar">
-          <!-- begin::Menu -->
-          <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary"
-                  data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-flip="top-end">
-            <app-keenicon name="category" class="fs-2"></app-keenicon>
-          </button>
-          <app-dropdown-menu1></app-dropdown-menu1>
-          <!-- end::Menu -->
-        </div>
-      </div>
-      <!-- end::Header -->
-      <!-- begin::Body -->
-      <div class="card-body py-3">
-        <!-- begin::Table container -->
-        <div class="table-responsive">
-          <!-- begin::Table -->
-          <table class="table align-middle gs-0 gy-5">
-            <!-- begin::Table head -->
-            <thead>
-            <tr>
-              <th class="p-0 min-w-150px"></th>
-              <th class="p-0 min-w-200px"></th>
-              <th class="p-0 min-w-125px"></th>
-            </tr>
             </thead>
             <!-- end::Table head -->
             <!-- begin::Table body -->
             <tbody>
               @for (entity of topFiveEntities; track $index) {
-                <tr>
-                  <td>
-                    <div class="d-flex align-items-center">
-                      <div class="symbol symbol-45px me-5">
-                        <app-keenicon name="institution" class="fs-2"></app-keenicon>
-                      </div>
-                      <div class="d-flex justify-content-start flex-column">
-                        <span class="text-gray-900 fw-bolder fs-6">{{ $index + 1 }}
-                          . {{ entity.name | titlecase }}</span>
-                      </div>
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="symbol symbol-45px me-5">
+                      <app-keenicon
+                        name="institution"
+                        class="fs-2"
+                      ></app-keenicon>
                     </div>
-                  </td>
-                  <td class="text-end">
-                    @for (tag of entity.tags; track $index) {
-                      <span class="badge fw-bold me-1"
-                            [ngClass]="{
-                              'badge-light-danger': tag === 'PATENTS',
-                              'badge-light-info': tag === 'MA',
-                              'badge-light-warning': tag === 'MU',
-                              'badge-light-success': tag === 'DA',
-                              'badge-light-primary': tag === 'DI'
-                            }">
-                        {{ tag }}
-                      </span>
-                    }
-                  </td>
-                  <td class="text-center">
-                    <span class="text-muted fw-bold">{{ entity.value }} <span
-                      translate="GRAPHICS.TITLES.REQUEST"></span></span>
-                  </td>
-                </tr>
+                    <div class="d-flex justify-content-start flex-column">
+                      <span class="text-gray-900 fw-bolder fs-6"
+                        >{{ $index + 1 }} . {{ entity.name | titlecase }}</span
+                      >
+                    </div>
+                  </div>
+                </td>
+                <td class="text-end">
+                  @for (tag of entity.tags; track $index) {
+                  <span
+                    class="badge fw-bold me-1"
+                    [ngClass]="{
+                      'badge-light-danger': tag === 'PATENTS',
+                      'badge-light-info': tag === 'MA',
+                      'badge-light-warning': tag === 'MU',
+                      'badge-light-success': tag === 'DA',
+                      'badge-light-primary': tag === 'DI'
+                    }"
+                  >
+                    {{ tag }}
+                  </span>
+                  }
+                </td>
+                <td class="text-center">
+                  <span class="text-muted fw-bold"
+                    >{{ entity.value }}
+                    <span translate="GRAPHICS.TITLES.REQUEST"></span
+                  ></span>
+                </td>
+              </tr>
               } @empty {
-                <tr>
-                  <td colspan="2" class="text-center text-muted"><span
-                    translate="GRAPHICS.LEGENDS.NO_FEDERAL_ENTITIES"></span></td>
-                </tr>
+              <tr>
+                <td colspan="2" class="text-center text-muted">
+                  <span translate="GRAPHICS.LEGENDS.NO_FEDERAL_ENTITIES"></span>
+                </td>
+              </tr>
               }
             </tbody>
             <!-- end::Table body -->
@@ -540,30 +136,26 @@
       <!-- end::Body -->
     </div>
   </div>
-</div>
 
-<div class="row g-5 g-xl-8">
-  <div class="col-xl-6">
-    
-  </div>
-</div>
-
-
-<!-- dashboard.component.html -->
-<div class="row g-5 g-xl-8">
   <div class="col-xl-6">
     <div class="card card-xl-stretch mb-xl-8">
       <div class="card-header border-0 pt-5">
         <h3 class="card-title align-items-start flex-column">
-          <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.HISTORICAL_REGISTERS_IMPI"></span>
+          <span
+            class="card-label fw-bolder fs-3 mb-1"
+            translate="GRAPHICS.TITLES.HISTORICAL_REGISTERS_IMPI"
+          ></span>
         </h3>
         <div class="card-toolbar">
-          <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary"
-            data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-flip="top-end">
-            <app-keenicon name="category" class="fs-2"></app-keenicon>
-          </button>
-          <app-dropdown-menu1></app-dropdown-menu1>
+          <!-- begin::Button-->
+          <div
+            class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary tooltip-css"
+          >
+            <mat-icon style="color: #1d6f42">description</mat-icon>
+            <span class="tooltip-text" translate="BUTTON.EXPORT_EXCEL"></span>
           </div>
+          <!-- end::Button-->
+        </div>
       </div>
       <div class="card-body p-5">
         <div class="table-responsive">
@@ -580,22 +172,29 @@
             [plotOptions]="chartOptions.plotOptions"
           ></apx-chart>
         </div>
-        </div>
       </div>
+    </div>
   </div>
+
   <div class="col-xl-6">
     <div class="card card-xl-stretch mb-xl-8">
       <div class="card-header border-0 pt-5">
         <h3 class="card-title align-items-start flex-column">
-          <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.HISTORICAL_REGISTERS_INDAUTOR"></span>
+          <span
+            class="card-label fw-bolder fs-3 mb-1"
+            translate="GRAPHICS.TITLES.HISTORICAL_REGISTERS_INDAUTOR"
+          ></span>
         </h3>
         <div class="card-toolbar">
-          <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary"
-            data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-flip="top-end">
-            <app-keenicon name="category" class="fs-2"></app-keenicon>
-          </button>
-          <app-dropdown-menu1></app-dropdown-menu1>
+          <!-- begin::Button-->
+          <div
+            class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary tooltip-css"
+          >
+            <mat-icon style="color: #1d6f42">description</mat-icon>
+            <span class="tooltip-text" translate="BUTTON.EXPORT_EXCEL"></span>
           </div>
+          <!-- end::Button-->
+        </div>
       </div>
       <div class="card-body p-5">
         <div class="table-responsive">
@@ -612,6 +211,23 @@
             [plotOptions]="chartOptionsGraph2.plotOptions"
           ></apx-chart>
         </div>
-        </div>
       </div>
+    </div>
   </div>
+
+  <div class="col-xl-6">
+    <app-tablero-registro-categoria
+      [data]="categorias"
+      titulo="GRAPHICS.TITLES.REGISTERS_BY_CATEGORY"
+      [height]="400"
+    ></app-tablero-registro-categoria>
+  </div>
+
+  <div class="col-xl-6">
+    <app-tablero-registro-categoria
+      [data]="solicitudes"
+      titulo="Solicitudes generales"
+      [height]="400"
+    ></app-tablero-registro-categoria>
+  </div>
+</div>

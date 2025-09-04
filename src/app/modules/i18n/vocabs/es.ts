@@ -1028,7 +1028,7 @@ export const locale = {
     GRAPHICS: {
       TITLES: {
         REQUEST_TYPES: "Tipos de solicitud",
-        REQUEST: "Solicitudes",
+        REQUEST: "Registros",
         DEPARTMENTS: "Departamentos",
         EDUCATIONAL_PROGRAM: "Programa educativo",
         RESEARCHERS: "Investigadores",
@@ -1043,6 +1043,7 @@ export const locale = {
         FEDERAL_ENTITIES: "Entidades Federativas",
         HISTORICAL_REGISTERS_INDAUTOR:"Registros Históricos INDAUTOR",
         HISTORICAL_REGISTERS_IMPI:"Registros Históricos IMPI",
+        REGISTERS_BY_CATEGORY: "Registros por categoría",
         RECORDS_STATUS: "Registros por estatus",
         RESEARCH_GROUPS: "Cuerpos Académicos",
         RECORDS_CATEGORY: "Registros por categoría",
@@ -1053,7 +1054,7 @@ export const locale = {
         MONTHS: "Meses (2025)",
         YEARS: "Años (2019-2024)",
         TOP_3: "Top 3",
-        TOP_5: "Top 5",
+        TOP_5: "Top 10",
       },
       LEGENDS: {
         NO_FEDERAL_ENTITIES: "No hay entidades federativas con registros.",
@@ -1135,7 +1136,7 @@ export const locale = {
       ADMIN: {
         MANAGEMENT: 'Gestión',
         COORDINATORS: 'Coordinadores',
-        APPLICANTS: 'Solicitantes',
+        CEPATS: 'CEPATs',
         INTELECTUAL_PROPERTY: 'Propiedad Intelectual',
         PATENTS: 'Patentes',
         TRADEMARKS: 'Marcas',
@@ -1414,8 +1415,8 @@ export const locale = {
         DESCRIPTION: 'Registra un nuevo coordinador en el sistema.',
       },
       GUEST: {
-        TITLE: 'Registro de Solicitante',
-        DESCRIPTION: 'Registra un nuevo solicitante en el sistema.',
+        TITLE: 'Registro CEPATs',
+        DESCRIPTION: 'Registra un nuevo CEPAT en el sistema.',
       },
     },
     HISTORICAL_REGISTER: {
