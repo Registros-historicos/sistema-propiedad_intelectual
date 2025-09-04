@@ -66,7 +66,16 @@ export const locale = {
         APPLICATION_TYPE: 'Tipo de solicitud',
         APPLICANT: 'Titular',
         DATE: 'Fecha de presentación'
-      }
+      },
+      ECONOMIC_SECTORS: 'Sectores Económicos',
+      RECORDS_BY_SECTOR: 'Registros por sector',
+      SECTORS: {
+        PRIMARY: "Sector Primario",
+        SECONDARY: "Sector Secundario", 
+        TERTIARY: "Sector Terciario",
+        QUATERNARY: "Sector Cuaternario",
+        QUINARY: "Sector Quinario"
+      },
     },
     MODAL: {
       TITLE: 'Detalles',
@@ -1040,6 +1049,7 @@ export const locale = {
         FEDERAL_ENTITIES: "Entidades Federativas",
         HISTORICAL_REGISTERS_INDAUTOR:"Registros Históricos INDAUTOR",
         HISTORICAL_REGISTERS_IMPI:"Registros Históricos IMPI",
+        ECONOMIC_SECTORS:"Sectores Económicos"
       },
       SUBTITLES: {
         REGISTER: "Registros",
