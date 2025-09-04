@@ -1,0 +1,65 @@
+<div class="card card-xl-stretch mb-xl-8">
+  <div class="card-header border-0 pt-5">
+    <h3 class="card-title align-items-start flex-column">
+      <span [translate]="titulo" class="card-label fw-bolder fs-3 mb-1"  translate="GRAPHICS.TITLES.CENTRALIZED_RINSTITUTION">
+      </span>
+      <span class="text-muted mt-1 fw-bold fs-7">
+        {{ totalInstitutes }} institutos
+      </span>
+    </h3>
+    <div class="card-toolbar">
+      <span class="px-2 text-muted fw-bold fs-7" translate="GRAPHICS.TITLES.TRECORDS">
+        <span class="font-weight-bold">{{ totalRegistros | number }}</span>
+      </span>
+
+      <!-- begin::Button-->
+      <div
+        class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary tooltip-css"
+      >
+        <mat-icon style="color: #1d6f42">description</mat-icon>
+        <span class="tooltip-text" translate="BUTTON.EXPORT_EXCEL"></span>
+      </div>
+      <!-- end::Button-->
+    </div>
+  </div>
+  <div class="card-body py-3 p-0">
+    <div class="table-responsive" style="max-height: 580px; overflow-y: auto">
+      <table class="table align-middle gs-0 gy-5">
+        <tbody>
+          <tr *ngFor="let institute of data; let isLast = last">
+            <td>
+              <div class="d-flex align-items-center">
+                <div
+                  class="symbol symbol-45px me-5 d-flex justify-content-center align-items-center px-2"
+                >
+                  <mat-icon
+                    style="
+                      font-size: 30px;
+                      height: 30px;
+                      width: 45px;
+                      color: gray;
+                    "
+                    >school</mat-icon
+                  >
+                </div>
+                <div class="d-flex justify-content-start flex-column">
+                  <h4 class="text-gray-900 fw-bolder fs-6 mb-1">
+                    {{ institute.nombre_institucion }}
+                  </h4>
+                  <span class="text-muted fw-bold fs-7">
+                    {{ institute.nombre_tipo_institucion }}
+                  </span>
+                </div>
+              </div>
+            </td>
+            <td class="text-end">
+              <span class="badge badge-light-primary fw-bold fs-7">
+                {{ institute.total_registros }} registros
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

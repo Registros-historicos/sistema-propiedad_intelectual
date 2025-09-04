@@ -12,11 +12,15 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { CepatRoutingModule } from './cepat-routing.module';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import {MatIcon} from "@angular/material/icon";
+import { GraficaSolicitudesComponent } from '../../template/layout/components/grafica-solicitudes/grafica-solicitudes.component';
+import { TecnologicosDescentralizadosComponent } from '../../template/layout/components/tecnologicos-descentralizados/tecnologicos-descentralizados.component';
+import { GraficaSolicitudesInComponent } from '../../template/layout/components/grafica-solicitudes-in/grafica-solicitudes-in.component';
 
 
 @NgModule({
     declarations: [
-        DashboardComponent
+        DashboardComponent, 
+        TecnologicosDescentralizadosComponent
     ],
     imports: [
         CommonModule,
@@ -33,7 +37,9 @@ import {MatIcon} from "@angular/material/icon";
         TranslationModule,
         TranslateModule,
         NgApexchartsModule,
-        MatIcon
+        MatIcon,
+        GraficaSolicitudesComponent,
+        GraficaSolicitudesInComponent
     ],
     providers: []
 })
