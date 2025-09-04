@@ -1,11 +1,8 @@
 import {Component, OnInit} from '@angular/core';
-<<<<<<< Updated upstream
 import { getCSSVariableValue } from 'src/app/template/kt/_utils';
-=======
 import { forkJoin } from 'rxjs';
 import { ImpiRegistriesService } from 'src/app/api/services/impi.service';
 import { IndautorRegistriesService } from 'src/app/api/services/indautor.service';
->>>>>>> Stashed changes
 
 export interface Top5 {
   city_name: string;
@@ -113,7 +110,6 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
-<<<<<<< Updated upstream
     this.initGraphs();
   }
 
@@ -240,7 +236,6 @@ export class AdminDashboardComponent implements OnInit {
       getCSSVariableValue('--bs-danger'),
       getCSSVariableValue('--bs-info'),
     ];
-=======
     const impi$ = this.impiService.listImpiTop5();
     const indautor$ = this.indautorService.listIndautorTop5();
     forkJoin([impi$, indautor$]).subscribe({
@@ -305,7 +300,6 @@ export class AdminDashboardComponent implements OnInit {
       return a.city_name.localeCompare(b.city_name, 'es', {sensitivity: 'base'});
     });
     return aggregate;
->>>>>>> Stashed changes
   }
 
 }
