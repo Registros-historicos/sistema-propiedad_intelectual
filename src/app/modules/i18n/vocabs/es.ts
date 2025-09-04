@@ -28,6 +28,7 @@ export const locale = {
       COPYRIGHT: 'Enviar solicitud de derecho de autor',
       PROCESSING: 'Procesando...',
       CONFIRM_LOGOUT: 'Cerrar sesión',
+      EXPORT_EXCEL: 'Exportar a Excel',
     },
     TABLE: {
       ACTIONS: {
@@ -1042,6 +1043,10 @@ export const locale = {
         FEDERAL_ENTITIES: "Entidades Federativas",
         HISTORICAL_REGISTERS_INDAUTOR:"Registros Históricos INDAUTOR",
         HISTORICAL_REGISTERS_IMPI:"Registros Históricos IMPI",
+        RECORDS_STATUS: "Registros por estatus",
+        RESEARCH_GROUPS: "Cuerpos Académicos",
+        RECORDS_CATEGORY: "Registros por categoría",
+        RECORDS_YEAR: "Registros por año"
       },
       SUBTITLES: {
         REGISTER: "Registros",
@@ -1071,6 +1076,12 @@ export const locale = {
           YEARS: 'Años',
         }
       },
+      STATUS: {
+        UNDER_REVIEW: 'En revisión',
+        GRANTED: 'Concedida',
+        REJECTED: 'Rechazada',
+        UNDER_MAINTENANCE: 'En mantenimiento',
+      }
     },
     DEPARTMENTS: {
       IT: "Sistemas y computación",

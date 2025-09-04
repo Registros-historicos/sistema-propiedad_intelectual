@@ -206,6 +206,106 @@ export class DashboardComponent {
     };
   }
 
+  protected readonly status = [
+    {
+      label: "En revisión",
+      serie: 47
+    },
+    {
+      label: "Concedida",
+      serie: 55
+    },
+    {
+      label: "Rechazada",
+      serie: 13
+    },
+    {
+      label: "En mantenimiento",
+      serie: 43
+    }
+  ]
+
+  protected readonly cuerposAcademicos = [
+    {
+      nombre: "lorem ipsum dolor sit amet",
+      solicitudes: 300
+    },
+    {
+      nombre: "lorem ipsum dolor sit amet",
+      solicitudes: 244
+    },
+    {
+      nombre: "lorem ipsum dolor sit amet",
+      solicitudes: 86
+    },
+    {
+      nombre: "lorem ipsum dolor sit amet",
+      solicitudes: 102
+    },
+    {
+      nombre: "lorem ipsum dolor sit amet",
+      solicitudes: 40
+    },
+    {
+      nombre: "lorem ipsum dolor sit amet",
+      solicitudes: 200
+    },
+    {
+      nombre: "lorem ipsum dolor sit amet",
+      solicitudes: 244
+    },
+    {
+      nombre: "lorem ipsum dolor sit amet",
+      solicitudes: 86
+    },
+    {
+      nombre: "lorem ipsum dolor sit amet",
+      solicitudes: 102
+    },
+    {
+      nombre: "lorem ipsum dolor sit amet",
+      solicitudes: 40
+    },
+    {
+      nombre: "lorem ipsum dolor sit amet",
+      solicitudes: 200
+    },
+  ]
+
+  protected readonly categories = [
+    { category: "Docente", data: 120
+    },
+    { category: "Administrativo", data: 90 },
+    { category: "Alumno", data: 60 }
+  ]
+
+  protected readonly gender = [
+    {
+      label: "Hombre",
+      serie: 47
+    },
+    {
+      label: "Mujer",
+      serie: 55
+    },
+  ]
+
+  protected readonly anios = [
+    { category: "Enero", data: 120},
+    { category: "Febrero", data: 90 },
+    { category: "Marzo", data: 60 },
+    { category: "Abril", data: 120},
+    { category: "Mayo", data: 90 },
+    { category: "Junio", data: 60 },
+    { category: "Julio", data: 120},
+    { category: "Agosto", data: 90 },
+    { category: "Septiembre", data: 60 },
+    { category: "Octubre", data: 120},
+    { category: "Noviembre", data: 90 },
+    { category: "Diciembre", data: 60 },
+  ]
+
+
 }
 
 const initChart = function (

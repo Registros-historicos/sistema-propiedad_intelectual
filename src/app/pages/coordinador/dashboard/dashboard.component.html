@@ -1,180 +1,15 @@
 <div class="row g-5 g-xl-8">
-    <!-- begin::Col -->
+    <!-- Tablero por Departamentos -->
     <div class="col-xl-6">
-        <!-- begin::Header -->
-        <div class="card card-xl-stretch mb-xl-8">
-            <div class="card-header border-0 pt-5">
-                <h3 class="card-title align-items-start flex-column">
-                    <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.REQUEST_TYPES"></span>
-                    <span class="text-muted fw-bold fs-7" translate="GRAPHICS.SUBTITLES.REGISTER"></span>
-                </h3>
-            </div>
-            <!-- end::Header -->
-            <!-- begin::Body -->
-            <div class="card-body py-3">
-                <!-- begin::Table container -->
-                <div class="table-responsive">
-                    <!-- begin::Table -->
-                    <table class="table align-middle gs-0 gy-5">
-                        <!-- begin::Table head -->
-                        <thead>
-                            <tr>
-                                <th class="p-0 w-50px"></th>
-                                <th class="p-0 min-w-200px"></th>
-                                <th class="p-0 min-w-100px"></th>
-                                <th class="p-0 min-w-40px"></th>
-                            </tr>
-                        </thead>
-                        <!-- end::Table head -->
-                        <!-- begin::Table body -->
-                        <tbody>
-                            <tr>
-                                <th>
-                                    <div class="symbol symbol-50px me-2">
-                                        <span class="symbol-label">
-                                            <mat-icon fontIcon="emoji_objects" class="text-danger"></mat-icon>
-                                        </span>
-                                    </div>
-                                </th>
-                                <td>
-                                    <span class="text-gray-900 fw-bolder mb-1 fs-6" translate="MENU.COORD.PATENTS">
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="d-flex flex-column w-100 me-2">
-                                        <div class="d-flex flex-stack mb-2">
-                                            <span class="me-2 fs-6 fw-bold text-primary">90 solicitudes</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="text-end">
-                                    <a routerLink="/coordinador/propiedades/patente"
-                                        class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
-                                        <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    <div class="symbol symbol-50px me-2">
-                                        <span class="symbol-label">
-                                            <mat-icon fontIcon="branding_watermark" class="text-info"></mat-icon>
-                                        </span>
-                                    </div>
-                                </th>
-                                <td>
-                                    <span class="text-gray-900 fw-bolder mb-1 fs-6"
-                                        translate="MENU.COORD.TRADEMARKS"></span>
-                                </td>
-                                <td>
-                                    <div class="d-flex flex-column w-100 me-2">
-                                        <div class="d-flex flex-stack mb-2">
-                                            <span class="me-2 fs-6 fw-bold text-primary">80 solicitudes</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="text-end">
-                                    <a routerLink="/coordinador/propiedades/marca"
-                                        class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
-                                        <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    <div class="symbol symbol-50px me-2">
-                                        <span class="symbol-label">
-                                            <mat-icon fontIcon="construction" class="text-warning"></mat-icon>
-                                        </span>
-                                    </div>
-                                </th>
-                                <td>
-                                    <span class="text-gray-900 fw-bolder mb-1 fs-6"
-                                        translate="MENU.COORD.UTILITY_MODELS"></span>
-                                </td>
-                                <td>
-                                    <div class="d-flex flex-column w-100 me-2">
-                                        <div class="d-flex flex-stack mb-2">
-                                            <span class="me-2 fs-6 fw-bold text-primary">70 solicitudes</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="text-end">
-                                    <a routerLink="/coordinador/propiedades/modelo-utilidad"
-                                        class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
-                                        <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    <div class="symbol symbol-50px me-2">
-                                        <span class="symbol-label">
-                                            <mat-icon fontIcon="copyright" class="text-success"></mat-icon>
-                                        </span>
-                                    </div>
-                                </th>
-                                <td>
-                                    <span class="text-gray-900 fw-bolder mb-1 fs-6"
-                                        translate="MENU.COORD.COPYRIGHTS"></span>
-                                </td>
-                                <td>
-                                    <div class="d-flex flex-column w-100 me-2">
-                                        <div class="d-flex flex-stack mb-2">
-                                            <span class="me-2 fs-6 fw-bold text-primary">60 solicitudes</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="text-end">
-                                    <a routerLink="/coordinador/propiedades/derecho-autor"
-                                        class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
-                                        <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    <div class="symbol symbol-50px me-2">
-                                        <span class="symbol-label">
-                                            <mat-icon fontIcon="architecture" class="text-primary"></mat-icon>
-                                        </span>
-                                    </div>
-                                </th>
-                                <td>
-                                    <span class="text-gray-900 fw-bolder mb-1 fs-6"
-                                        translate="MENU.COORD.INDUSTRIAL_DESIGNS"></span>
-                                </td>
-                                <td>
-                                    <div class="d-flex flex-column w-100 me-2">
-                                        <div class="d-flex flex-stack mb-2">
-                                            <span class="me-2 fs-6 fw-bold text-primary">50 solicitudes</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="text-end">
-                                    <a routerLink="/coordinador/propiedades/diseno-industrial"
-                                        class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary">
-                                        <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
-                                    </a>
-                                </td>
-                            </tr>
-                        </tbody>
-                        <!-- end::Table body -->
-                    </table>
-                    <!-- end::Table -->
-                </div>
-                <!-- end::Table container -->
-            </div>
-        </div>
 
     </div>
-    <!-- end::Col -->
 
-    <!-- begin::Col -->
+    <!-- Tablero por Cuerpos Académicos -->
     <div class="col-xl-6">
-        <div class="card card-xl-stretch mb-xl-8">
+        <app-cuerpos-academicos [cuerposAcademicos]="cuerposAcademicos" class="card card-xl-stretch mb-xl-8"></app-cuerpos-academicos>
+        <!-- <div class="card card-xl-stretch mb-xl-8">
             <div class="card-header border-0 pt-5">
-                <!-- begin::Title-->
+                
                 <h3 class="card-title align-items-start flex-column">
                     <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.REQUEST"></span>
                     <ng-container *ngIf="selectedFilter === '1'">
@@ -184,11 +19,8 @@
                         <span class="text-muted fw-bold fs-7" translate="GRAPHICS.SUBTITLES.YEARS"></span>
                     </ng-container>
                 </h3>
-                <!-- end::Title-->
 
-                <!-- begin::Toolbar-->
                 <div class="card-toolbar">
-                    <!-- begin::Menu-->
                     <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary"
                         data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-flip="top-end">
                         <app-keenicon name="category" class="fs-2"></app-keenicon>
@@ -218,15 +50,10 @@
                         </div>
                     </div>
 
-                    <!-- end::Menu-->
                 </div>
-                <!-- end::Toolbar-->
             </div>
-            <!-- end::Header-->
 
-            <!-- begin::Body-->
             <div class="card-body">
-                <!-- begin::Chart-->
                 <div #chartRef id="kt_charts_widget_1_chart" [style.height]="'350px'">
                     <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [xaxis]="chartOptions.xaxis"
                         [yaxis]="chartOptions.yaxis" [dataLabels]="chartOptions.dataLabels"
@@ -234,192 +61,20 @@
                         [states]="chartOptions.states" [tooltip]="chartOptions.tooltip" [colors]="chartOptions.colors"
                         [markers]="chartOptions.markers" [plotOptions]="chartOptions.plotOptions"></apx-chart>
                 </div>
-                <!-- end::Chart-->
             </div>
 
-        </div>
-    </div>
-    <!-- end::Col -->
-</div>
-
-<div class="row g-5 g-xl-8">
-    <div class="col-xl-6">
-        <div class="card card-xl-stretch mb-xl-8">
-            <!-- begin::Header -->
-            <div class="card-header border-0 pt-5">
-                <h3 class="card-title align-items-start flex-column">
-                    <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.DEPARTMENTS"></span>
-                    <span class="text-muted mt-1 fw-bold fs-7" translate="GRAPHICS.SUBTITLES.TOP_3"></span>
-                </h3>
-            </div>
-            <!-- end::Header -->
-            <!-- begin::Body -->
-            <div class="card-body py-3">
-                <!-- begin::Table container -->
-                <div class="table-responsive">
-                    <!-- begin::Table -->
-                    <table class="table align-middle gs-0 gy-5">
-                        <!-- begin::Table head -->
-                        <thead>
-                            <tr>
-                                <th class="p-0 min-w-150px"></th>
-                                <th class="p-0 min-w-150px"></th>
-                                <th class="p-0 min-w-125px"></th>
-                            </tr>
-                        </thead>
-                        <!-- end::Table head -->
-                        <!-- begin::Table body -->
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <span class="text-gray-900 fw-bolder mb-1 fs-6" translate="DEPARTMENTS.IT"></span>
-                                </td>
-                                <td class="text-end">
-                                    <span class="badge badge-light-danger fw-bold me-1"
-                                        translate="ACRONYM.PATENTS"></span>
-                                    <span class="badge badge-light-info fw-bold me-1"
-                                        translate="ACRONYM.TRADEMARKS"></span>
-                                    <span class="badge badge-light-warning fw-bold me-1"
-                                        translate="ACRONYM.UTILITY_MODELS"></span>
-                                    <span class="badge badge-light-success fw-bold me-1"
-                                        translate="ACRONYM.COPYRIGHTS"></span>
-                                    <span class="badge badge-light-primary fw-bold me-1"
-                                        translate="ACRONYM.INDUSTRIAL_DESIGNS"></span>
-                                </td>
-                                <td class="text-end">
-                                    <span class="text-muted fw-bold">7200 Solicitudes</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <span class="text-gray-900 fw-bolder mb-1 fs-6"
-                                        translate="DEPARTMENTS.MECHANIC"></span>
-                                </td>
-                                <td class="text-end">
-                                    <span class="badge badge-light-danger fw-bold me-1"
-                                        translate="ACRONYM.PATENTS"></span>
-                                    <span class="badge badge-light-warning fw-bold me-1"
-                                        translate="ACRONYM.UTILITY_MODELS"></span>
-                                    <span class="badge badge-light-primary fw-bold me-1"
-                                        translate="ACRONYM.INDUSTRIAL_DESIGNS"></span>
-                                </td>
-                                <td class="text-end">
-                                    <span class="text-muted fw-bold">4600 Solicitudes</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <span class="text-gray-900 fw-bolder mb-1 fs-6"
-                                        translate="DEPARTMENTS.CHEMISTRY"></span>
-                                </td>
-                                <td class="text-end">
-                                    <span class="badge badge-light-danger fw-bold me-1"
-                                        translate="ACRONYM.PATENTS"></span>
-                                    <span class="badge badge-light-info fw-bold me-1"
-                                        translate="ACRONYM.TRADEMARKS"></span>
-                                </td>
-                                <td class="text-end">
-                                    <span class="text-muted fw-bold">890 Solicitudes</span>
-                                </td>
-                            </tr>
-                        </tbody>
-                        <!-- end::Table body -->
-                    </table>
-                    <!-- end::Table -->
-                </div>
-                <!-- end::Table container -->
-            </div>
-            <!-- end::Body -->
-        </div>
-    </div>
-    <div class="col-xl-6">
-        <div class="card card-xl-stretch mb-xl-8">
-            <!-- begin::Header -->
-            <div class="card-header border-0 pt-5">
-                <h3 class="card-title align-items-start flex-column">
-                    <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.EDUCATIONAL_PROGRAM"></span>
-                    <span class="text-muted mt-1 fw-bold fs-7" translate="GRAPHICS.SUBTITLES.TOP_3"></span>
-                </h3>
-            </div>
-            <!-- end::Header -->
-            <!-- begin::Body -->
-            <div class="card-body py-3">
-                <!-- begin::Table container -->
-                <div class="table-responsive">
-                    <!-- begin::Table -->
-                    <table class="table align-middle gs-0 gy-5">
-                        <!-- begin::Table head -->
-                        <thead>
-                            <tr>
-                                <th class="p-0 min-w-150px"></th>
-                                <th class="p-0 min-w-150px"></th>
-                                <th class="p-0 min-w-125px"></th>
-                            </tr>
-                        </thead>
-                        <!-- end::Table head -->
-                        <!-- begin::Table body -->
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <span class="text-gray-900 fw-bolder mb-1 fs-6"
-                                        translate="EDUCATIONAL_PROGRAM.SYSTEMS"></span>
-                                </td>
-                                <td class="text-end">
-                                    <span class="badge badge-light-danger fw-bold me-1"
-                                        translate="ACRONYM.PATENTS"></span>
-                                    <span class="badge badge-light-info fw-bold me-1"
-                                        translate="ACRONYM.TRADEMARKS"></span>
-                                    <span class="badge badge-light-success fw-bold me-1"
-                                        translate="ACRONYM.COPYRIGHTS"></span>
-                                </td>
-                                <td class="text-end">
-                                    <span class="text-muted fw-bold">2300 Solicitudes</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <span class="text-gray-900 fw-bolder mb-1 fs-6"
-                                        translate="EDUCATIONAL_PROGRAM.INFORMATICS"></span>
-                                </td>
-                                <td class="text-end">
-                                    <span class="badge badge-light-danger fw-bold me-1"
-                                        translate="ACRONYM.PATENTS"></span>
-                                    <span class="badge badge-light-warning fw-bold me-1"
-                                        translate="ACRONYM.UTILITY_MODELS"></span>
-                                </td>
-                                <td class="text-end">
-                                    <span class="text-muted fw-bold">1500 Solicitudes</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <span class="text-gray-900 fw-bolder mb-1 fs-6"
-                                        translate="EDUCATIONAL_PROGRAM.DATA_SCIENCE"></span>
-                                </td>
-                                <td class="text-end">
-                                    <span class="badge badge-light-danger fw-bold me-1"
-                                        translate="ACRONYM.PATENTS"></span>
-                                    <span class="badge badge-light-info fw-bold me-1"
-                                        translate="ACRONYM.TRADEMARKS"></span>
-                                </td>
-                                <td class="text-end">
-                                    <span class="text-muted fw-bold">800 Solicitudes</span>
-                                </td>
-                            </tr>
-                        </tbody>
-                        <!-- end::Table body -->
-                    </table>
-                    <!-- end::Table -->
-                </div>
-                <!-- end::Table container -->
-            </div>
-            <!-- end::Body -->
-        </div>
+        </div> -->
     </div>
 </div>
 
 <div class="row g-5 g-xl-8">
-    <div class="col-xl-12">
+    <!-- Tablero por Programas Educativos -->
+    <div class="col-xl-6">
+        
+    </div>
+
+    <!-- Tablero por Investigadoes (filtrar por Investigador) -->
+    <div class="col-xl-6">
         <div class="card card-xl-stretch mb-xl-8">
             <!-- begin::Header -->
             <div class="card-header border-0 pt-5">
@@ -583,5 +238,552 @@
             </div>
             <!-- begin::Body -->
         </div>
+    </div>
+</div>
+
+<div class="row g-5 g-xl-8">
+    <!-- Tablero de Registros por Categoría (Docente, Administrativo, Alumno) -->
+    <div class="col-xl-6">
+        <app-registros-categoria [categories]="categories" class="card card-xl-stretch mb-xl-8"></app-registros-categoria>
+        <!-- <div class="card card-xl-stretch mb-xl-8">
+            <div class="card-header border-0 pt-5">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.EDUCATIONAL_PROGRAM"></span>
+                    <span class="text-muted mt-1 fw-bold fs-7" translate="GRAPHICS.SUBTITLES.TOP_3"></span>
+                </h3>
+            </div>
+            <div class="card-body py-3">
+                <div class="table-responsive">
+                    <table class="table align-middle gs-0 gy-5">
+                        <thead>
+                            <tr>
+                                <th class="p-0 min-w-150px"></th>
+                                <th class="p-0 min-w-150px"></th>
+                                <th class="p-0 min-w-125px"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <span class="text-gray-900 fw-bolder mb-1 fs-6"
+                                        translate="EDUCATIONAL_PROGRAM.SYSTEMS"></span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="badge badge-light-danger fw-bold me-1"
+                                        translate="ACRONYM.PATENTS"></span>
+                                    <span class="badge badge-light-info fw-bold me-1"
+                                        translate="ACRONYM.TRADEMARKS"></span>
+                                    <span class="badge badge-light-success fw-bold me-1"
+                                        translate="ACRONYM.COPYRIGHTS"></span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="text-muted fw-bold">2300 Solicitudes</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="text-gray-900 fw-bolder mb-1 fs-6"
+                                        translate="EDUCATIONAL_PROGRAM.INFORMATICS"></span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="badge badge-light-danger fw-bold me-1"
+                                        translate="ACRONYM.PATENTS"></span>
+                                    <span class="badge badge-light-warning fw-bold me-1"
+                                        translate="ACRONYM.UTILITY_MODELS"></span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="text-muted fw-bold">1500 Solicitudes</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="text-gray-900 fw-bolder mb-1 fs-6"
+                                        translate="EDUCATIONAL_PROGRAM.DATA_SCIENCE"></span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="badge badge-light-danger fw-bold me-1"
+                                        translate="ACRONYM.PATENTS"></span>
+                                    <span class="badge badge-light-info fw-bold me-1"
+                                        translate="ACRONYM.TRADEMARKS"></span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="text-muted fw-bold">800 Solicitudes</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div> -->
+    </div>
+
+    <!-- Tablero de Registros por Sexo (Hombre o Mujer) -->
+    <div class="col-xl-6">
+        <app-registros-sexo [data]="gender" class="card card-xl-stretch mb-xl-8"></app-registros-sexo>
+        <!-- <div class="card card-xl-stretch mb-xl-8">
+            <div class="card-header border-0 pt-5">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.RESEARCHERS"></span>
+                    <span class="text-muted mt-1 fw-bold fs-7" translate="GRAPHICS.SUBTITLES.TOP_5"></span>
+                </h3>
+            </div>
+            <div class="card-body py-3">
+                <div class="table-responsive">
+                    <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+                        <thead>
+                            <tr class="fw-bolder text-muted">
+                                <th class="min-w-150px"><span translate="GRAPHICS.TITLES.RESEARCHER"></span></th>
+                                <th class="min-w-290px text-center"><span translate="GRAPHICS.TITLES.DEPARTMENT"></span>
+                                </th>
+                                <th class="min-w-200px text-center"><span translate="GRAPHICS.TITLES.REQUEST"></span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="symbol symbol-45px me-5">
+                                            <img src="./assets/media/avatars/300-5.jpg" alt="" />
+                                        </div>
+                                        <div class="d-flex justify-content-start flex-column">
+                                            <span class="text-gray-900 fw-bolder fs-6">Giner Alor Hernández</span>
+                                            <span class="text-muted fw-bold text-muted d-block fs-7"
+                                                translate="ACADEMIC_LEVEL.DOCTOR_CS"></span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="text-gray-900  fw-bolder d-block fs-6"
+                                        translate="DEPARTMENTS.IT"></span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex flex-column w-100 me-2">
+                                        <div class="d-flex justify-content-center flex-stack mb-2">
+                                            <span class="me-2 fs-6 fw-bold text-primary">90</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="symbol symbol-45px me-5">
+                                            <img src="./assets/media/avatars/300-23.jpg" alt="" />
+                                        </div>
+                                        <div class="d-flex justify-content-start flex-column">
+                                            <span class="text-gray-900 fw-bolder fs-6">Luis Angel Reyes Hernández</span>
+                                            <span class="text-muted fw-bold text-muted d-block fs-7"
+                                                translate="ACADEMIC_LEVEL.MASTER_CS"></span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="text-gray-900 fw-bolder d-block fs-6"
+                                        translate="DEPARTMENTS.IT"></span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex flex-column w-100 me-2">
+                                        <div class="d-flex justify-content-center flex-stack mb-2">
+                                            <span class="me-2 fs-6 fw-bold text-primary">70</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="symbol symbol-45px me-5">
+                                            <img src="./assets/media/avatars/300-2.jpg" alt="" />
+                                        </div>
+                                        <div class="d-flex justify-content-start flex-column">
+                                            <span class="text-gray-900 fw-bolder fs-6">Lisbeth Rodríguez Mazahua</span>
+                                            <span class="text-muted fw-bold text-muted d-block fs-7"
+                                                translate="ACADEMIC_LEVEL.DOCTOR_CS"></span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="text-gray-900 fw-bolder d-block fs-6"
+                                        translate="DEPARTMENTS.IT"></span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex flex-column w-100 me-2">
+                                        <div class="d-flex justify-content-center flex-stack mb-2">
+                                            <span class="me-2 fs-6 fw-bold text-primary">60</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="symbol symbol-45px me-5">
+                                            <img src="./assets/media/avatars/300-20.jpg" alt="" />
+                                        </div>
+                                        <div class="d-flex justify-content-start flex-column">
+                                            <span class="text-gray-900 fw-bolder fs-6">Mónica Ruiz Martínez</span>
+                                            <span class="text-muted fw-bold text-muted d-block fs-7"
+                                                translate="ACADEMIC_LEVEL.MASTER_CSIENCE"></span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="text-gray-900 fw-bolder d-block fs-6"
+                                        translate="DEPARTMENTS.IT"></span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex flex-column w-100 me-2">
+                                        <div class="d-flex justify-content-center flex-stack mb-2">
+                                            <span class="me-2 fs-6 fw-bold text-primary">50</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="symbol symbol-45px me-5">
+                                            <img src="./assets/media/avatars/300-23.jpg" alt="" />
+                                        </div>
+                                        <div class="d-flex justify-content-start flex-column">
+                                            <span class="text-gray-900 fw-bolder fs-6">José Luis Sánchez
+                                                Cervantes</span>
+                                            <span class="text-muted fw-bold text-muted d-block fs-7"
+                                                translate="ACADEMIC_LEVEL.DOCTOR_CS"></span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="text-gray-900 fw-bolder d-block fs-6"
+                                        translate="DEPARTMENTS.IT"></span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex flex-column w-100 me-2">
+                                        <div class="d-flex justify-content-center flex-stack mb-2">
+                                            <span class="me-2 fs-6 fw-bold text-primary">40</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div> -->
+    </div>
+</div>
+
+<div class="row g-5 g-xl-8">
+    <!-- Tablero por Año (filtrar por trimestre o rango de fecha) -->
+    <div class="col-xl-6">
+        <app-registros-anio [anios]="anios" class="card card-xl-stretch mb-xl-8"></app-registros-anio>
+        <!-- <div class="card card-xl-stretch mb-xl-8">
+            <div class="card-header border-0 pt-5">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.RESEARCHERS"></span>
+                    <span class="text-muted mt-1 fw-bold fs-7" translate="GRAPHICS.SUBTITLES.TOP_5"></span>
+                </h3>
+            </div>
+            <div class="card-body py-3">
+                <div class="table-responsive">
+                    <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+                        <thead>
+                            <tr class="fw-bolder text-muted">
+                                <th class="min-w-150px"><span translate="GRAPHICS.TITLES.RESEARCHER"></span></th>
+                                <th class="min-w-290px text-center"><span translate="GRAPHICS.TITLES.DEPARTMENT"></span>
+                                </th>
+                                <th class="min-w-200px text-center"><span translate="GRAPHICS.TITLES.REQUEST"></span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="symbol symbol-45px me-5">
+                                            <img src="./assets/media/avatars/300-5.jpg" alt="" />
+                                        </div>
+                                        <div class="d-flex justify-content-start flex-column">
+                                            <span class="text-gray-900 fw-bolder fs-6">Giner Alor Hernández</span>
+                                            <span class="text-muted fw-bold text-muted d-block fs-7"
+                                                translate="ACADEMIC_LEVEL.DOCTOR_CS"></span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="text-gray-900  fw-bolder d-block fs-6"
+                                        translate="DEPARTMENTS.IT"></span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex flex-column w-100 me-2">
+                                        <div class="d-flex justify-content-center flex-stack mb-2">
+                                            <span class="me-2 fs-6 fw-bold text-primary">90</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="symbol symbol-45px me-5">
+                                            <img src="./assets/media/avatars/300-23.jpg" alt="" />
+                                        </div>
+                                        <div class="d-flex justify-content-start flex-column">
+                                            <span class="text-gray-900 fw-bolder fs-6">Luis Angel Reyes Hernández</span>
+                                            <span class="text-muted fw-bold text-muted d-block fs-7"
+                                                translate="ACADEMIC_LEVEL.MASTER_CS"></span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="text-gray-900 fw-bolder d-block fs-6"
+                                        translate="DEPARTMENTS.IT"></span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex flex-column w-100 me-2">
+                                        <div class="d-flex justify-content-center flex-stack mb-2">
+                                            <span class="me-2 fs-6 fw-bold text-primary">70</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="symbol symbol-45px me-5">
+                                            <img src="./assets/media/avatars/300-2.jpg" alt="" />
+                                        </div>
+                                        <div class="d-flex justify-content-start flex-column">
+                                            <span class="text-gray-900 fw-bolder fs-6">Lisbeth Rodríguez Mazahua</span>
+                                            <span class="text-muted fw-bold text-muted d-block fs-7"
+                                                translate="ACADEMIC_LEVEL.DOCTOR_CS"></span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="text-gray-900 fw-bolder d-block fs-6"
+                                        translate="DEPARTMENTS.IT"></span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex flex-column w-100 me-2">
+                                        <div class="d-flex justify-content-center flex-stack mb-2">
+                                            <span class="me-2 fs-6 fw-bold text-primary">60</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="symbol symbol-45px me-5">
+                                            <img src="./assets/media/avatars/300-20.jpg" alt="" />
+                                        </div>
+                                        <div class="d-flex justify-content-start flex-column">
+                                            <span class="text-gray-900 fw-bolder fs-6">Mónica Ruiz Martínez</span>
+                                            <span class="text-muted fw-bold text-muted d-block fs-7"
+                                                translate="ACADEMIC_LEVEL.MASTER_CSIENCE"></span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="text-gray-900 fw-bolder d-block fs-6"
+                                        translate="DEPARTMENTS.IT"></span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex flex-column w-100 me-2">
+                                        <div class="d-flex justify-content-center flex-stack mb-2">
+                                            <span class="me-2 fs-6 fw-bold text-primary">50</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="symbol symbol-45px me-5">
+                                            <img src="./assets/media/avatars/300-23.jpg" alt="" />
+                                        </div>
+                                        <div class="d-flex justify-content-start flex-column">
+                                            <span class="text-gray-900 fw-bolder fs-6">José Luis Sánchez
+                                                Cervantes</span>
+                                            <span class="text-muted fw-bold text-muted d-block fs-7"
+                                                translate="ACADEMIC_LEVEL.DOCTOR_CS"></span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="text-gray-900 fw-bolder d-block fs-6"
+                                        translate="DEPARTMENTS.IT"></span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex flex-column w-100 me-2">
+                                        <div class="d-flex justify-content-center flex-stack mb-2">
+                                            <span class="me-2 fs-6 fw-bold text-primary">40</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div> -->
+    </div>
+
+    <!-- Tablero de Registros por Estatus (En revisión, concedida, rechazada, en mantenimiento) -->
+    <div class="col-xl-6">
+        <app-registro-estatus [data]="status" class="card card-xl-stretch mb-xl-8"></app-registro-estatus>
+        <!-- <div class="card card-xl-stretch mb-xl-8">
+            <div class="card-header border-0 pt-5">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.RESEARCHERS"></span>
+                    <span class="text-muted mt-1 fw-bold fs-7" translate="GRAPHICS.SUBTITLES.TOP_5"></span>
+                </h3>
+            </div>
+            <div class="card-body py-3">
+                <div class="table-responsive">
+                    <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+                        <thead>
+                            <tr class="fw-bolder text-muted">
+                                <th class="min-w-150px"><span translate="GRAPHICS.TITLES.RESEARCHER"></span></th>
+                                <th class="min-w-290px text-center"><span translate="GRAPHICS.TITLES.DEPARTMENT"></span>
+                                </th>
+                                <th class="min-w-200px text-center"><span translate="GRAPHICS.TITLES.REQUEST"></span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="symbol symbol-45px me-5">
+                                            <img src="./assets/media/avatars/300-5.jpg" alt="" />
+                                        </div>
+                                        <div class="d-flex justify-content-start flex-column">
+                                            <span class="text-gray-900 fw-bolder fs-6">Giner Alor Hernández</span>
+                                            <span class="text-muted fw-bold text-muted d-block fs-7"
+                                                translate="ACADEMIC_LEVEL.DOCTOR_CS"></span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="text-gray-900  fw-bolder d-block fs-6"
+                                        translate="DEPARTMENTS.IT"></span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex flex-column w-100 me-2">
+                                        <div class="d-flex justify-content-center flex-stack mb-2">
+                                            <span class="me-2 fs-6 fw-bold text-primary">90</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="symbol symbol-45px me-5">
+                                            <img src="./assets/media/avatars/300-23.jpg" alt="" />
+                                        </div>
+                                        <div class="d-flex justify-content-start flex-column">
+                                            <span class="text-gray-900 fw-bolder fs-6">Luis Angel Reyes Hernández</span>
+                                            <span class="text-muted fw-bold text-muted d-block fs-7"
+                                                translate="ACADEMIC_LEVEL.MASTER_CS"></span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="text-gray-900 fw-bolder d-block fs-6"
+                                        translate="DEPARTMENTS.IT"></span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex flex-column w-100 me-2">
+                                        <div class="d-flex justify-content-center flex-stack mb-2">
+                                            <span class="me-2 fs-6 fw-bold text-primary">70</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="symbol symbol-45px me-5">
+                                            <img src="./assets/media/avatars/300-2.jpg" alt="" />
+                                        </div>
+                                        <div class="d-flex justify-content-start flex-column">
+                                            <span class="text-gray-900 fw-bolder fs-6">Lisbeth Rodríguez Mazahua</span>
+                                            <span class="text-muted fw-bold text-muted d-block fs-7"
+                                                translate="ACADEMIC_LEVEL.DOCTOR_CS"></span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="text-gray-900 fw-bolder d-block fs-6"
+                                        translate="DEPARTMENTS.IT"></span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex flex-column w-100 me-2">
+                                        <div class="d-flex justify-content-center flex-stack mb-2">
+                                            <span class="me-2 fs-6 fw-bold text-primary">60</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="symbol symbol-45px me-5">
+                                            <img src="./assets/media/avatars/300-20.jpg" alt="" />
+                                        </div>
+                                        <div class="d-flex justify-content-start flex-column">
+                                            <span class="text-gray-900 fw-bolder fs-6">Mónica Ruiz Martínez</span>
+                                            <span class="text-muted fw-bold text-muted d-block fs-7"
+                                                translate="ACADEMIC_LEVEL.MASTER_CSIENCE"></span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="text-gray-900 fw-bolder d-block fs-6"
+                                        translate="DEPARTMENTS.IT"></span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex flex-column w-100 me-2">
+                                        <div class="d-flex justify-content-center flex-stack mb-2">
+                                            <span class="me-2 fs-6 fw-bold text-primary">50</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="symbol symbol-45px me-5">
+                                            <img src="./assets/media/avatars/300-23.jpg" alt="" />
+                                        </div>
+                                        <div class="d-flex justify-content-start flex-column">
+                                            <span class="text-gray-900 fw-bolder fs-6">José Luis Sánchez
+                                                Cervantes</span>
+                                            <span class="text-muted fw-bold text-muted d-block fs-7"
+                                                translate="ACADEMIC_LEVEL.DOCTOR_CS"></span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="text-gray-900 fw-bolder d-block fs-6"
+                                        translate="DEPARTMENTS.IT"></span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex flex-column w-100 me-2">
+                                        <div class="d-flex justify-content-center flex-stack mb-2">
+                                            <span class="me-2 fs-6 fw-bold text-primary">40</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div> -->
     </div>
 </div>
