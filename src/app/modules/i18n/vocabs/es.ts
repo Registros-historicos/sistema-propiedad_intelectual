@@ -1029,6 +1029,9 @@ export const locale = {
       TITLES: {
         REQUEST_TYPES: "Tipos de solicitud",
         REQUEST: "Registros",
+        TREQUESTIM: "Total de Solicitudes IMPI",
+        TREQUESTIN: "Total de Solicitudes INDAUTOR",
+        TRECORDS: "Total de Registros: ",
         DEPARTMENTS: "Departamentos",
         EDUCATIONAL_PROGRAM: "Programa educativo",
         RESEARCHERS: "Investigadores",
@@ -1038,7 +1041,9 @@ export const locale = {
         INDAUTOR: "INDAUTOR",
         FEDERAL_INSTITUTIONS: "Instituciones Federales",
         CENTRALIZED_INSTITUTIONS: "Instituciones Descentralizadas",
+        CENTRALIZED_RINSTITUTION: "Registros Por Institución",
         INSTITUTIONS: "Instituciones",
+        INSTITUTES: "Institutos",
         APPLICATION_TYPE: "Tipo de solicitud",
         FEDERAL_ENTITIES: "Entidades Federativas",
         HISTORICAL_REGISTERS_INDAUTOR:"Registros Históricos INDAUTOR",
@@ -1048,6 +1053,8 @@ export const locale = {
         RESEARCH_GROUPS: "Cuerpos Académicos",
         RECORDS_CATEGORY: "Registros por categoría",
         RECORDS_YEAR: "Registros por año"
+        PERCENTAGE:"Porcentajes",
+        TYPE:"Tipo",
       },
       SUBTITLES: {
         REGISTER: "Registros",
