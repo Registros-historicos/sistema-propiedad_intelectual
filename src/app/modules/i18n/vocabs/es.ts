@@ -1052,7 +1052,7 @@ export const locale = {
         RECORDS_STATUS: "Registros por estatus",
         RESEARCH_GROUPS: "Cuerpos Académicos",
         RECORDS_CATEGORY: "Registros por categoría",
-        RECORDS_YEAR: "Registros por año"
+        RECORDS_YEAR: "Registros por año",
         PERCENTAGE:"Porcentajes",
         TYPE:"Tipo",
       },

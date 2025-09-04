@@ -1012,22 +1012,6 @@ export class AdminDashboardComponent implements OnInit {
       getCSSVariableValue('--bs-danger'),
       getCSSVariableValue('--bs-info'),
     ];
-    const impi$ = this.impiService.listImpiTop5();
-    const indautor$ = this.indautorService.listIndautorTop5();
-    forkJoin([impi$, indautor$]).subscribe({
-      next: ([impiResp, indautorResp]) => {
-        this.rawImpi = impiResp;
-        this.rawIndautor = indautorResp;
-        const impiArr: Top5[] = this.normalizeResponse(impiResp);
-        const indautorArr: Top5[] = this.normalizeResponse(indautorResp);
-        const combined = [...impiArr, ...indautorArr];
-        this.combinedTop = this.aggregateAndSort(combined, 'desc');
-        this.combinedTop = this.combinedTop.slice(0, 5);
-      }, 
-      error: (err) => {
-        console.error("Error: ", err);
-      }
-    })
   }
 
   normalizeResponse(resp: any): Top5[] {
