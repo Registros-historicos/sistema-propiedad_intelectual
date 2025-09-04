@@ -37,6 +37,31 @@ export class AdminDashboardComponent implements OnInit {
       value: 400,
       tags: ['PA', 'MU', 'MA'],
     },
+    {
+      name: 'Yucatán',
+      value: 350,
+      tags: ['PA', 'DA', 'DI'],
+    },
+    {
+      name: 'Guerrero',
+      value: 300,
+      tags: ['MU', 'DI', 'MA'],
+    },
+    {
+      name: 'Hidalgo',
+      value: 250,
+      tags: ['PA', 'DA', 'MU'],
+    },
+    {
+      name: 'Campeche',
+      value: 200,
+      tags: ['DA', 'DI', 'MA'],
+    },
+    {
+      name: 'Quintana Roo',
+      value: 150,
+      tags: ['PA', 'MU', 'MA'],
+    },
   ];
 
   protected readonly topFiveFederalInstitutions = [
@@ -705,6 +730,145 @@ export class AdminDashboardComponent implements OnInit {
       nombre_tipo_institucion: 'Federal',
       nombre_institucion: 'Tecnológico de Estudios Superiores de Ixtapaluca',
       total_registros: 75,
+    },
+  ];
+
+  protected readonly institutosDescentralizados = [
+    {
+      tipo_institucion_param: 4,
+      nombre_tipo_institucion: 'Descentralizado',
+      nombre_institucion: 'Instituto Tecnológico Superior de Los Cabos',
+      total_registros: 55,
+    },
+    {
+      tipo_institucion_param: 4,
+      nombre_tipo_institucion: 'Descentralizado',
+      nombre_institucion: 'Instituto Tecnológico Superior de Comitán',
+      total_registros: 90,
+    },
+    {
+      tipo_institucion_param: 4,
+      nombre_tipo_institucion: 'Descentralizado',
+      nombre_institucion: 'Instituto Tecnológico Superior de Xalapa',
+      total_registros: 95,
+    },
+    {
+      tipo_institucion_param: 4,
+      nombre_tipo_institucion: 'Descentralizado',
+      nombre_institucion: 'Instituto Tecnológico Superior de La Región Mixe',
+      total_registros: 35,
+    },
+    {
+      tipo_institucion_param: 4,
+      nombre_tipo_institucion: 'Descentralizado',
+      nombre_institucion: 'Instituto Tecnológico Superior de La Zona Olmeca',
+      total_registros: 50,
+    },
+    {
+      tipo_institucion_param: 4,
+      nombre_tipo_institucion: 'Descentralizado',
+      nombre_institucion: 'Instituto Tecnológico Superior de Acatlán de Osorio',
+      total_registros: 40,
+    },
+    {
+      tipo_institucion_param: 4,
+      nombre_tipo_institucion: 'Descentralizado',
+      nombre_institucion: 'Instituto Tecnológico Superior de Acayucan',
+      total_registros: 55,
+    },
+    {
+      tipo_institucion_param: 4,
+      nombre_tipo_institucion: 'Descentralizado',
+      nombre_institucion: 'Instituto Tecnológico Superior de Álamo Temapache',
+      total_registros: 65,
+    },
+    {
+      tipo_institucion_param: 4,
+      nombre_tipo_institucion: 'Descentralizado',
+      nombre_institucion: 'Instituto Tecnológico Superior de Chicontepec',
+      total_registros: 30,
+    },
+    {
+      tipo_institucion_param: 4,
+      nombre_tipo_institucion: 'Descentralizado',
+      nombre_institucion: 'Instituto Tecnológico Superior de Cintalapa',
+      total_registros: 45,
+    },
+    {
+      tipo_institucion_param: 4,
+      nombre_tipo_institucion: 'Descentralizado',
+      nombre_institucion: 'Instituto Tecnológico Superior de Ciudad Hidalgo',
+      total_registros: 50,
+    },
+    {
+      tipo_institucion_param: 4,
+      nombre_tipo_institucion: 'Descentralizado',
+      nombre_institucion: 'Instituto Tecnológico Superior de Ciudad Serdán',
+      total_registros: 55,
+    },
+    {
+      tipo_institucion_param: 4,
+      nombre_tipo_institucion: 'Descentralizado',
+      nombre_institucion: 'Instituto Tecnológico Superior de Coalcomán',
+      total_registros: 40,
+    },
+    {
+      tipo_institucion_param: 4,
+      nombre_tipo_institucion: 'Descentralizado',
+      nombre_institucion: 'Instituto Tecnológico Superior de Coatzacoalcos',
+      total_registros: 95,
+    },
+    {
+      tipo_institucion_param: 4,
+      nombre_tipo_institucion: 'Descentralizado',
+      nombre_institucion:
+        'Instituto Tecnológico Superior de Felipe Carrillo Puerto',
+      total_registros: 60,
+    },
+    {
+      tipo_institucion_param: 4,
+      nombre_tipo_institucion: 'Descentralizado',
+      nombre_institucion: 'Instituto Tecnológico Superior de La Costa Chica',
+      total_registros: 35,
+    },
+    {
+      tipo_institucion_param: 4,
+      nombre_tipo_institucion: 'Descentralizado',
+      nombre_institucion: 'Instituto Tecnológico Superior de La Huerta',
+      total_registros: 45,
+    },
+    {
+      tipo_institucion_param: 4,
+      nombre_tipo_institucion: 'Descentralizado',
+      nombre_institucion: 'Instituto Tecnológico Superior de La Montaña',
+      total_registros: 50,
+    },
+    {
+      tipo_institucion_param: 4,
+      nombre_tipo_institucion: 'Descentralizado',
+      nombre_institucion:
+        'Instituto Tecnológico Superior de La Región de Los Llanos',
+      total_registros: 55,
+    },
+    {
+      tipo_institucion_param: 4,
+      nombre_tipo_institucion: 'Descentralizado',
+      nombre_institucion: 'Instituto Tecnológico Superior de La Región Sierra',
+      total_registros: 40,
+    },
+    {
+      tipo_institucion_param: 4,
+      nombre_tipo_institucion: 'Descentralizado',
+      nombre_institucion:
+        'Instituto Tecnológico Superior de La Sierra Negra de Ajalpan',
+      total_registros: 30,
+    },
+    {
+      tipo_institucion_param: 4,
+      nombre_tipo_institucion: 'Descentralizado',
+      nombre_institucion:
+        'Instituto Tecnológico Superior de La Sierra Norte de Puebla',
+      total_registros: 70,
     },
   ];
 
