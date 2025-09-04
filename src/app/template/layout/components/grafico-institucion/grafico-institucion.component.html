@@ -1,0 +1,57 @@
+<div class="card card-xl-stretch mb-xl-8">
+  <!-- begin::Header -->
+  <div class="card-header border-0 pt-5">
+    <h3 class="card-title align-items-start flex-column">
+      <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.INSTITUTIONS"></span> <!-- Título -->
+      <span class="text-muted mt-1 fw-bold fs-7" translate="GRAPHICS.TITLES.REQUEST"></span> <!-- Subtítulo -->
+    </h3>
+    <div class="card-toolbar"> <!-- Clase auxiliar para mantener estructura -->
+    </div>
+  </div>
+  <!-- end::Header -->
+  <!-- begin::Body -->
+  <div class="card-body py-3">
+    <!-- begin::Table container -->
+    <div class="table-responsive">
+      <!-- begin::Table -->
+
+      <!-- begin::Table -->
+      <table class="table align-middle gs-0 gy-5">
+        <!-- begin::Table head -->
+        <thead>
+          <tr>
+            <th class="p-0 w-60px"></th>
+            <th class="p-0 min-w-320px"></th>
+            <th class="p-0 min-w-125px"></th>
+          </tr>
+        </thead>
+        <!-- end::Table head -->
+        <!-- begin::Table body -->
+        <tbody>
+          <tr *ngFor="let entity of topFiveEntities; let i = index">
+            <td style="padding-right: 0;">
+              <div class="d-flex align-items-center">
+                <div class="symbol symbol-45px me-3">
+                  <mat-icon fontIcon="account_balance" class="fs-2 text-primary"></mat-icon>
+                </div>
+                <span class="text-gray-900 fw-bolder fs-6">{{ i + 1 }}.</span>
+              </div>
+            </td>
+            <td style="padding-left: 5px;">
+              <div class="me-0">
+                <span class="text-gray-900 fw-bolder fs-6">{{ entity.name }}</span>
+              </div>
+            </td>
+            <td class="text-center">
+              <span class="text-muted fw-bold">{{ entity.value }} <span
+                  translate="GRAPHICS.TITLES.REQUEST"></span></span>
+            </td>
+          </tr>
+        </tbody>
+        <!-- end::Table body -->
+      </table>
+      <!-- end::Table -->
+    </div>
+    <!-- end::Table container -->
+  </div>
+</div>

@@ -67,7 +67,16 @@ export const locale = {
         APPLICATION_TYPE: 'Tipo de solicitud',
         APPLICANT: 'Titular',
         DATE: 'Fecha de presentación'
-      }
+      },
+      ECONOMIC_SECTORS: 'Sectores Económicos',
+      RECORDS_BY_SECTOR: 'Registros por sector',
+      SECTORS: {
+        PRIMARY: "Sector Primario",
+        SECONDARY: "Sector Secundario", 
+        TERTIARY: "Sector Terciario",
+        QUATERNARY: "Sector Cuaternario",
+        QUINARY: "Sector Quinario"
+      },
     },
     MODAL: {
       TITLE: 'Detalles',
@@ -1055,6 +1064,7 @@ export const locale = {
         RECORDS_YEAR: "Registros por año",
         PERCENTAGE:"Porcentajes",
         TYPE:"Tipo",
+        ECONOMIC_SECTORS:"Sectores Económicos"
       },
       SUBTITLES: {
         REGISTER: "Registros",
