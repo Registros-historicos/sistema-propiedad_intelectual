@@ -7,7 +7,8 @@
     >
     </app-tablero-instituciones-federales> -->
     <app-tablero-institutos-general
-      [data]="institutosData"
+      titulo="Institutos Tecnológicos Federales"
+      [data]="institutosFederales"
     ></app-tablero-institutos-general>
   </div>
 
@@ -264,6 +265,7 @@
 
   <div class="col-xl-6">
     <app-tablero-institutos-general
+      titulo="Registros por institución"
       [data]="institutosData"
     ></app-tablero-institutos-general>
   </div>
@@ -466,5 +468,3 @@
     ></app-tablero-registro-categoria>
   </div>
 </div>
-
-

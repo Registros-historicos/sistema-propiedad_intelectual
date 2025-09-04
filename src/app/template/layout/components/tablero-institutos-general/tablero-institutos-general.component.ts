@@ -14,6 +14,7 @@ export interface Instituto {
 })
 export class TableroInstitutosGeneralComponent implements OnInit {
   @Input() data: Instituto[] = [];
+  @Input() titulo: string = ''
 
   totalInstitutes: number = 0;
   totalRegistros: number = 0;
