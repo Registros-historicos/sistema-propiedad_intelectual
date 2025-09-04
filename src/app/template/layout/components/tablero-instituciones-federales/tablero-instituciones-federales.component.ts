@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { MatIcon } from "@angular/material/icon";
 
 export interface CardItem {
   icon: string;
