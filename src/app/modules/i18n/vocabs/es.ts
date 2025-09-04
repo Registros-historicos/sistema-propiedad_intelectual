@@ -1027,7 +1027,7 @@ export const locale = {
     GRAPHICS: {
       TITLES: {
         REQUEST_TYPES: "Tipos de solicitud",
-        REQUEST: "Solicitudes",
+        REQUEST: "Registros",
         DEPARTMENTS: "Departamentos",
         EDUCATIONAL_PROGRAM: "Programa educativo",
         RESEARCHERS: "Investigadores",
@@ -1049,7 +1049,7 @@ export const locale = {
         MONTHS: "Meses (2025)",
         YEARS: "Años (2019-2024)",
         TOP_3: "Top 3",
-        TOP_5: "Top 5",
+        TOP_5: "Top 10",
       },
       LEGENDS: {
         NO_FEDERAL_ENTITIES: "No hay entidades federativas con registros.",

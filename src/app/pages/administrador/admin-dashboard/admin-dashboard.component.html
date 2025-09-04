@@ -1,11 +1,14 @@
 <div class="row g-5 g-xl-8">
   <div class="col-xl-6">
-    <app-tablero-instituciones-federales
+    <!-- <app-tablero-instituciones-federales
       [cardTitleTranslate]="'GRAPHICS.TITLES.FEDERAL_INSTITUTIONS'"
       [cardSubtitleTranslate]="'GRAPHICS.TITLES.REQUEST'"
       [items]="federalInstitutions"
     >
-    </app-tablero-instituciones-federales>
+    </app-tablero-instituciones-federales> -->
+    <app-tablero-institutos-general
+      [data]="institutosData"
+    ></app-tablero-institutos-general>
   </div>
 
   <div class="col-xl-6">
@@ -260,6 +263,15 @@
   </div>
 
   <div class="col-xl-6">
+    <app-tablero-institutos-general
+      [data]="institutosData"
+    ></app-tablero-institutos-general>
+  </div>
+</div>
+
+<!-- dashboard.component.html -->
+<div class="row g-5 g-xl-8">
+  <div class="col-xl-6">
     <div class="card card-xl-stretch mb-xl-8">
       <!-- begin::Header -->
       <div class="card-header border-0 pt-5">
@@ -359,10 +371,7 @@
       <!-- end::Body -->
     </div>
   </div>
-</div>
 
-<!-- dashboard.component.html -->
-<div class="row g-5 g-xl-8">
   <div class="col-xl-6">
     <div class="card card-xl-stretch mb-xl-8">
       <div class="card-header border-0 pt-5">
@@ -440,9 +449,7 @@
       </div>
     </div>
   </div>
-</div>
 
-<div class="row g-5 g-xl-8">
   <div class="col-xl-6">
     <app-tablero-registro-categoria
       [data]="categorias"
@@ -454,8 +461,10 @@
   <div class="col-xl-6">
     <app-tablero-registro-categoria
       [data]="solicitudes"
-      titulo="Solicitudes por categoria"
+      titulo="Solicitudes generales"
       [height]="400"
     ></app-tablero-registro-categoria>
   </div>
 </div>
+
+

@@ -12,6 +12,7 @@ import {MatIcon} from '@angular/material/icon';
 import { RouterModule, Routes } from '@angular/router';
 import { Routing } from '../../pages/routing';
 import { LayoutComponent } from '../layout/layout.component';
+import { TableroInstitutosGeneralComponent } from '../layout/components/tablero-institutos-general/tablero-institutos-general.component';
 
 const routes: Routes = [
   {
@@ -28,7 +29,8 @@ const routes: Routes = [
     TableroInstitucionesComponent,
     TableroCategoriasComponent,
     TableroInstitucionesFederalesComponent,
-    TableroSolicitudesComponent
+    TableroSolicitudesComponent,
+    TableroInstitutosGeneralComponent
   ],
   imports: [
     CommonModule,
@@ -45,7 +47,7 @@ const routes: Routes = [
     TableroCategoriasComponent,
     TableroInstitucionesFederalesComponent,
     TableroSolicitudesComponent,
-    
+    TableroInstitutosGeneralComponent
   ]
 })
 export class SharedModule {
