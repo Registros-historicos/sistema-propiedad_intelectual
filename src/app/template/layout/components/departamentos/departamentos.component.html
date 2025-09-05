@@ -1,6 +1,6 @@
 <div class="card card-xl-stretch mb-xl-8">
   <div class="card-header border-0 pt-5">
-    <h3 class="card-title fw-bold fs-3">Cuerpos Académicos</h3>
+    <h3 class="card-title fw-bold fs-3">Departamentos</h3>
     <div class="d-flex align-items-center gap-2">
       <div class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary tooltip-css" (click)="exportToExcel()">
         <mat-icon style="color: #1D6F42;">description</mat-icon>
@@ -10,25 +10,34 @@
   </div>
   <div class="card-body h-100">
 
+    <!-- <div *ngFor="let departamento of departamentos" class="mb-4 border-bottom pb-2"
+      style="max-height:400px; overflow-y: auto;">
+      <div class="d-flex justify-content-between align-items-center">
+        <span class="fw-bold">{{departamento.nombre}}</span>
+        <span class="badge bg-success">{{departamento.totalSolicitudes}} solicitudes</span>
+      </div>
+
+    </div> -->
+
     <div class="table-responsive flex-grow-1" style="max-height: 400px; overflow-y: auto;">
       <!-- begin::Table -->
       <table class="table align-middle gs-0 gy-5">
         <!-- begin::Table head -->
         <thead class="sticky-top bg-white">
           <tr>
-            <th class="p-0 min-w-250px"></th>
-            <th class="p-0 min-w-150px"></th>
+            <th class="p-0 min-w-300px"></th>
+            <th class="p-0 min-w-155px"></th>
           </tr>
         </thead>
         <!-- end::Table head -->
         <!-- begin::Table body -->
         <tbody>
-          <tr *ngFor="let cuerpo of cuerposAcademicos">
+          <tr *ngFor="let departamento of departamentos">
             <td>
-              <span class="text-gray-900 fw-bold mb-1 fs-5">{{cuerpo.nombre}}</span>
+              <span class="text-gray-900 fw-bold mb-1 fs-5">{{departamento.nombre}}</span>
             </td>
             <td class="text-end">
-              <span class="badge badge-light-primary fw-bold fs-7">{{cuerpo.solicitudes}} Solicitudes</span>
+              <span class="badge badge-light-success fw-bold fs-7">{{departamento.totalSolicitudes}} Solicitudes</span>
             </td>
           </tr>
         </tbody>
@@ -39,6 +48,7 @@
   </div>
 </div>
 
+<!-- begin::TooltipStyles -->
 <style>
   .tooltip-css {
     position: relative;
@@ -69,3 +79,4 @@
     transform: translateX(-50%) translateY(0);
   }
 </style>
+<!-- end::TooltipStyles -->

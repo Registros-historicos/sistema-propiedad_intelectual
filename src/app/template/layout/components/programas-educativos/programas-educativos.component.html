@@ -1,0 +1,71 @@
+<div class="card card-xl-stretch mb-xl-8">
+    <div class="card-header border-0 pt-5">
+        <h3 class="card-title fw-bold fs-3">Programas educativos</h3>
+        <div class="d-flex align-items-center gap-2">
+            <div class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary tooltip-css">
+                <mat-icon style="color: #1D6F42;">description</mat-icon>
+                <span class="tooltip-text">Exportar a Excel</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body h-100">
+
+        <div class="table-responsive flex-grow-1" style="max-height: 400px; overflow-y: auto;">
+            <!-- begin::Table -->
+            <table class="table align-middle gs-0 gy-5">
+                <!-- begin::Table head -->
+                <thead class="sticky-top bg-white">
+                    <tr>
+                        <th class="p-0 min-w-250px"></th>
+                        <th class="p-0 min-w-150px"></th>
+                    </tr>
+                </thead>
+                <!-- end::Table head -->
+                <!-- begin::Table body -->
+                <tbody>
+                    <tr *ngFor="let pe of programasEducativos">
+                        <td>
+                            <span class="text-gray-900 fw-bold mb-1 fs-5">{{pe.nombre}}</span>
+                        </td>
+                        <td class="text-end">
+                            <span class="badge badge-light-warning fw-bold fs-7">{{pe.solicitudes}} Solicitudes</span>
+                        </td>
+                    </tr>
+                </tbody>
+                <!-- end::Table body -->
+            </table>
+            <!-- end::Table -->
+        </div>
+    </div>
+</div>
+
+<style>
+    .tooltip-css {
+        position: relative;
+        display: inline-block;
+    }
+
+    .tooltip-css .tooltip-text {
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity .15s ease, transform .15s ease;
+        position: absolute;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%) translateY(6px);
+        padding: 6px 10px;
+        white-space: nowrap;
+        border-radius: 4px;
+        background: #212121;
+        color: #fff;
+        font-size: 12px;
+        z-index: 1000;
+    }
+
+    .tooltip-css:hover .tooltip-text,
+    .tooltip-css:focus .tooltip-text {
+        visibility: visible;
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+</style>

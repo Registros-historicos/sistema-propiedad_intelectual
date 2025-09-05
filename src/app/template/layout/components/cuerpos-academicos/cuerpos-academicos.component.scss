@@ -28,3 +28,9 @@
     opacity: 1;
     transform: translateX(-50%) translateY(0);
 }
+
+.card-body {
+  background: #fff;
+  height: 350px;
+  overflow-y: auto;
+}
