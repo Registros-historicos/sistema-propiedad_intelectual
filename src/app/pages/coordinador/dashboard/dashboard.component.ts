@@ -306,6 +306,11 @@ export class DashboardComponent {
     { category: "Diciembre", series1: 60, series2: 105 },
   ];
 
+  protected readonly categorias = [
+    { categoria: 'Docentes', value: 500 },
+    { categoria: 'Administrativos', value: 250 },
+    { categoria: 'Alumnos', value: 180 },
+  ];
 
 }
 

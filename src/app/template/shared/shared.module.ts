@@ -27,6 +27,9 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { GraficaSolicitudesComponent } from '../layout/components/grafica-solicitudes/grafica-solicitudes.component';
 import { GraficaSolicitudesInComponent } from '../layout/components/grafica-solicitudes-in/grafica-solicitudes-in.component';
+import { DepartamentosComponent } from '../layout/components/departamentos/departamentos.component';
+import { InvestigadoresComponent } from '../layout/components/investigadores/investigadores.component';
+import { ProgramasEducativosComponent } from '../layout/components/programas-educativos/programas-educativos.component';
 
 @NgModule({
   declarations: [
@@ -45,8 +48,11 @@ import { GraficaSolicitudesInComponent } from '../layout/components/grafica-soli
     TableroInstitutosGeneralComponent,
     TableroInstitucionesComponent,
     GraficaSolicitudesComponent,
-    GraficaSolicitudesInComponent
-  ],
+    GraficaSolicitudesInComponent,
+    DepartamentosComponent,
+    InvestigadoresComponent,
+    ProgramasEducativosComponent
+    ],
   imports: [
     CommonModule,
     NgApexchartsModule,
@@ -78,7 +84,10 @@ import { GraficaSolicitudesInComponent } from '../layout/components/grafica-soli
     TableroSolicitudesComponent,
     TableroInstitutosGeneralComponent,
     GraficaSolicitudesComponent,
-    GraficaSolicitudesInComponent
+    GraficaSolicitudesInComponent,
+    DepartamentosComponent,
+    InvestigadoresComponent,
+    ProgramasEducativosComponent
   ]
 })
 export class SharedModule {
