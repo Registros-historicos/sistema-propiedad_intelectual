@@ -1,0 +1,67 @@
+  <div class="card card-xl-stretch mb-xl-8" style="height: 540px;">
+    <!-- begin::Header -->
+    <div class="card-header border-0 pt-5">
+      <h3 class="card-title align-items-start flex-column">
+        <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.ECONOMIC_SECTORS"></span>
+        <span class="text-muted mt-1 fw-bold fs-7" translate="GRAPHICS.SUBTITLES.REGISTER"></span>
+      </h3>
+     <div class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary tooltip-css">
+           <mat-icon style="color: #1D6F42;">description</mat-icon>
+           <span class="tooltip-text" translate="BUTTON.EXPORT_EXCEL"></span>
+      </div>
+    </div>
+    <!-- end::Header -->
+    <!-- begin::Body -->
+    <div class="card-body py-3" style="overflow: hidden;">
+      <!-- begin::Table container -->
+      <div class="table-responsive flex-grow-1" style="max-height: 400px; overflow-y: auto;">
+        <!-- begin::Table -->
+        <table class="table align-middle gs-0 gy-5">
+          <!-- begin::Table head -->
+          <thead class="sticky-top bg-white">
+            <tr>
+              <th class="p-0 min-w-60px"></th>
+              <th class="p-0 min-w-320px"></th>
+              <th class="p-0 min-w-125px"></th>
+            </tr>
+          </thead>
+          <!-- end::Table head -->
+          <!-- begin::Table body -->
+          <tbody>
+            <tr *ngFor="let sector of sectoresList">
+              <td>
+                <div class="d-flex align-items-center">
+                  <div class="symbol symbol-45px me-5">
+                    <mat-icon [fontIcon]="sector.icon" class="fs-2"></mat-icon>
+                  </div>
+                  <div class="d-flex justify-content-start flex-column">
+                    <span class="text-gray-900 fw-bolder fs-6">{{ sector.name }}</span>
+                  </div>
+                </div>
+              </td>
+              <td class="text-end">
+                <span *ngFor="let tag of sector.tags" 
+                      class="badge fw-bold me-1"
+                      [ngClass]="{
+                        'badge-light-danger': tag === 'Sector Primario',
+                        'badge-light-info': tag === 'Sector Secundario',
+                        'badge-light-warning': tag === 'Sector Terciario',
+                        'badge-light-success': tag === 'Sector Cuaternario',
+                        'badge-light-primary': tag === 'Sector Quinario'
+                      }">
+                  {{ tag }}
+                </span>
+              </td>
+              <td class="text-center">
+                <span class="text-muted fw-bold">{{ sector.value }} <span translate="GRAPHICS.SUBTITLES.REGISTER"></span></span>
+              </td>
+            </tr>
+          </tbody>
+          <!-- end::Table body -->
+        </table>
+        <!-- end::Table -->
+      </div>
+      <!-- end::Table container -->
+    </div>
+    <!-- end::Body -->
+  </div>

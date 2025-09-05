@@ -28,6 +28,7 @@ export const locale = {
       COPYRIGHT: 'Enviar solicitud de derecho de autor',
       PROCESSING: 'Procesando...',
       CONFIRM_LOGOUT: 'Cerrar sesión',
+      EXPORT_EXCEL: 'Exportar a Excel',
     },
     TABLE: {
       ACTIONS: {
@@ -66,7 +67,16 @@ export const locale = {
         APPLICATION_TYPE: 'Tipo de solicitud',
         APPLICANT: 'Titular',
         DATE: 'Fecha de presentación'
-      }
+      },
+      ECONOMIC_SECTORS: 'Sectores Económicos',
+      RECORDS_BY_SECTOR: 'Registros por sector',
+      SECTORS: {
+        PRIMARY: "Sector Primario",
+        SECONDARY: "Sector Secundario", 
+        TERTIARY: "Sector Terciario",
+        QUATERNARY: "Sector Cuaternario",
+        QUINARY: "Sector Quinario"
+      },
     },
     MODAL: {
       TITLE: 'Detalles',
@@ -1027,7 +1037,10 @@ export const locale = {
     GRAPHICS: {
       TITLES: {
         REQUEST_TYPES: "Tipos de solicitud",
-        REQUEST: "Solicitudes",
+        REQUEST: "Registros",
+        TREQUESTIM: "Total de Solicitudes IMPI",
+        TREQUESTIN: "Total de Solicitudes INDAUTOR",
+        TRECORDS: "Total de Registros: ",
         DEPARTMENTS: "Departamentos",
         EDUCATIONAL_PROGRAM: "Programa educativo",
         RESEARCHERS: "Investigadores",
@@ -1037,18 +1050,29 @@ export const locale = {
         INDAUTOR: "INDAUTOR",
         FEDERAL_INSTITUTIONS: "Instituciones Federales",
         CENTRALIZED_INSTITUTIONS: "Instituciones Descentralizadas",
+        CENTRALIZED_RINSTITUTION: "Registros Por Institución",
         INSTITUTIONS: "Instituciones",
+        INSTITUTES: "Institutos",
         APPLICATION_TYPE: "Tipo de solicitud",
         FEDERAL_ENTITIES: "Entidades Federativas",
         HISTORICAL_REGISTERS_INDAUTOR:"Registros Históricos INDAUTOR",
         HISTORICAL_REGISTERS_IMPI:"Registros Históricos IMPI",
+        REGISTERS_BY_CATEGORY: "Registros por categoría",
+        RECORDS_STATUS: "Registros por estatus",
+        RESEARCH_GROUPS: "Cuerpos Académicos",
+        RECORDS_CATEGORY: "Registros por categoría",
+        RECORDS_YEAR: "Registros por año",
+        RECORDS_GENDER: "Registros por sexo",
+        PERCENTAGE:"Porcentajes",
+        TYPE:"Tipo",
+        ECONOMIC_SECTORS:"Sectores Económicos"
       },
       SUBTITLES: {
         REGISTER: "Registros",
         MONTHS: "Meses (2025)",
         YEARS: "Años (2019-2024)",
         TOP_3: "Top 3",
-        TOP_5: "Top 5",
+        TOP_5: "Top 10",
       },
       LEGENDS: {
         NO_FEDERAL_ENTITIES: "No hay entidades federativas con registros.",
@@ -1071,6 +1095,12 @@ export const locale = {
           YEARS: 'Años',
         }
       },
+      STATUS: {
+        UNDER_REVIEW: 'En revisión',
+        GRANTED: 'Concedida',
+        REJECTED: 'Rechazada',
+        UNDER_MAINTENANCE: 'En mantenimiento',
+      }
     },
     DEPARTMENTS: {
       IT: "Sistemas y computación",
@@ -1124,7 +1154,7 @@ export const locale = {
       ADMIN: {
         MANAGEMENT: 'Gestión',
         COORDINATORS: 'Coordinadores',
-        APPLICANTS: 'Solicitantes',
+        CEPATS: 'CEPATs',
         INTELECTUAL_PROPERTY: 'Propiedad Intelectual',
         PATENTS: 'Patentes',
         TRADEMARKS: 'Marcas',
@@ -1403,8 +1433,8 @@ export const locale = {
         DESCRIPTION: 'Registra un nuevo coordinador en el sistema.',
       },
       GUEST: {
-        TITLE: 'Registro de Solicitante',
-        DESCRIPTION: 'Registra un nuevo solicitante en el sistema.',
+        TITLE: 'Registro CEPATs',
+        DESCRIPTION: 'Registra un nuevo CEPAT en el sistema.',
       },
     },
     HISTORICAL_REGISTER: {

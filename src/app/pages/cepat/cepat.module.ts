@@ -12,11 +12,13 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { CepatRoutingModule } from './cepat-routing.module';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import {MatIcon} from "@angular/material/icon";
+import { TecnologicosDescentralizadosComponent } from '../../template/layout/components/tecnologicos-descentralizados/tecnologicos-descentralizados.component';
 
 
 @NgModule({
     declarations: [
-        DashboardComponent
+        DashboardComponent, 
+        TecnologicosDescentralizadosComponent,
     ],
     imports: [
         CommonModule,

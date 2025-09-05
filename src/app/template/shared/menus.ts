@@ -27,14 +27,14 @@ export const ADMINISTRATOR_MENUS = [
     type: 'separator',
   },
   {
-    name: 'MENU.ADMIN.COORDINATORS',
+    name: 'MENU.ADMIN.CEPATS',
     icon: 'person',
     link: '/administrador/coordinadores',
     type: 'link'
   },
   {
-    name: 'MENU.ADMIN.APPLICANTS',
-    icon: 'person_add',
+    name: 'MENU.ADMIN.COORDINATORS',
+    icon: 'person',
     link: '/administrador/solicitantes',
     type: 'link'
   },

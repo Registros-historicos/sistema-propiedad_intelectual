@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbCollapseModule, NgbModalModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { SharedModule } from '../../template/shared/shared.module';
@@ -12,6 +12,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { CoordinadorRoutingModule } from './coordinador-routing.module';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import {MatIcon} from "@angular/material/icon";
+import { RegistroEstatusComponent } from 'src/app/template/layout/components/registro-estatus/registro-estatus.component';
 
 
 @NgModule({
@@ -33,7 +34,7 @@ import {MatIcon} from "@angular/material/icon";
         TranslationModule,
         TranslateModule,
         NgApexchartsModule,
-        MatIcon
+        MatIcon,
     ],
     providers: []
 })

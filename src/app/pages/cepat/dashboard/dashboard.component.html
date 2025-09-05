@@ -1,1 +1,89 @@
-<p>dashboard works!</p>
+<div class="row g-5 g-xl-8">
+
+  <!-- Tablero de Institutos Tecnológicos Federales -->
+  <div class="col-xl-6">
+    <!-- Componente de Tabla o Gráfico -->
+    <app-tablero-institutos-general
+      titulo="Institutos Tecnológicos Federales"
+      [data]="institutosFederales"
+    ></app-tablero-institutos-general>
+  </div>
+
+  <!-- Tablero de Institutos Tecnológicos Descentralizados -->
+  <div class="col-xl-6">
+    <!-- Componente de Tabla o Gráfico -->
+    <app-tablero-institutos-general
+      titulo="Institutos Descentralizados"
+      [data]="institutosDescentralizados"
+    ></app-tablero-institutos-general>
+
+    <!-- end::Table -->
+  </div>
+</div>
+
+<div class="row g-5 g-xl-8">
+
+  <!-- Tablero de Registros por Sector -->
+  <div class="col-xl-6">
+    <!-- Componente de Tabla o Gráfico -->
+    <app-grafica-sector></app-grafica-sector>
+  </div>
+
+  <!-- Tablero por Institución -->
+  <div class="col-xl-6">
+    <!-- Componente de Tabla o Gráfico -->
+    <app-tablero-institutos-general
+      titulo="Registros por institución"
+      [data]="institutosData"
+    ></app-tablero-institutos-general>
+
+    <!-- end::Table -->
+  </div>
+</div>
+
+<div class="row g-5 g-xl-8">
+
+  <!-- Tablero de Solicitudes IMPI -->
+  <div class="col-xl-6">
+    <!-- Componente de Tabla o Gráfico -->
+    <app-grafica-solicitudes></app-grafica-solicitudes>
+  </div>
+
+  <!-- Tablero de Solicitudes INDAUTOR -->
+  <div class="col-xl-6">
+    <!-- Componente de Tabla o Gráfico -->
+    <app-grafica-solicitudes-in></app-grafica-solicitudes-in>
+
+    <!-- end::Table -->
+  </div>
+</div>
+
+<div class="row g-5 g-xl-8">
+
+  <!-- Tablero de Registros por Sexo -->
+  <div class="col-xl-6">
+    <!-- Componente de Tabla o Gráfico -->
+    <app-registros-sexo [data]="gender" class="card card-xl-stretch mb-xl-8"></app-registros-sexo>
+  </div>
+
+  <!-- Tablero por Año -->
+  <div class="col-xl-6">
+    <!-- Componente de Tabla o Gráfico -->
+    <app-registros-anio [anios]="anios" class="card card-xl-stretch mb-xl-8"></app-registros-anio>
+
+    <!-- end::Table -->
+  </div>
+</div>
+
+<div class="row g-5 g-xl-8">
+
+  <!-- Tablero de Registros por Estatus -->
+  <div class="col-xl-6">
+    <!-- Componente de Tabla o Gráfico -->
+    <app-registro-estatus [data]="status" class="card card-xl-stretch mb-xl-8"></app-registro-estatus>
+  </div>
+
+  <!-- Tablero de Solicitudes INDAUTOR -->
+  <div class="col-xl-6">
+  </div>
+</div>

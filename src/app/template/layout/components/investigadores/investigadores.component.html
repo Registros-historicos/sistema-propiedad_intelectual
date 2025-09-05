@@ -1,0 +1,54 @@
+<div class="card card-xl-stretch mb-xl-8">
+  <div class="card-header border-0 pt-5">
+    <h3 class="card-title fw-bold fs-3">Investigadores</h3>
+    <div class="d-flex align-items-center gap-2">
+      <input type="text" class="form-control form-control-sm me-2" style="max-width:180px;" placeholder="Buscar por nombre..." [(ngModel)]="filtroNombre" />
+      <div class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary tooltip-css" (click)="exportToExcel()">
+        <mat-icon style="color: #1D6F42;">description</mat-icon>
+        <span class="tooltip-text" >Exportar a Excel</span>
+      </div>
+    </div>
+  </div>
+  <div class="card-body pt-5" style="max-height:400px; overflow-y:auto;">
+    <div *ngFor="let investigador of investigadoresFiltrados" class="table-responsive flex-grow-1 mb-5">
+      <div class="d-flex justify-content-between align-items-center">
+        <span class="fw-bold">{{investigador.nombre}}</span>
+        <span class="badge bg-info">{{investigador.solicitudes}} solicitudes</span>
+      </div>
+      <span class="text-muted">Departamento: {{investigador.departamento}}</span>
+    </div>
+  </div>
+</div>
+
+<!-- begin::TooltipStyles -->
+<style>
+.tooltip-css {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip-css .tooltip-text {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity .15s ease, transform .15s ease;
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%) translateY(6px);
+    padding: 6px 10px;
+    white-space: nowrap;
+    border-radius: 4px;
+    background: #212121;
+    color: #fff;
+    font-size: 12px;
+    z-index: 1000;
+}
+
+.tooltip-css:hover .tooltip-text,
+.tooltip-css:focus .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+</style>
+<!-- end::TooltipStyles -->

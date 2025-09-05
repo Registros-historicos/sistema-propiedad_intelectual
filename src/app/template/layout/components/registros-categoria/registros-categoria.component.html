@@ -1,0 +1,21 @@
+<div>
+    <div class="card-header border-0 pt-5">
+        <h3 class="card-title align-items-start flex-column">
+            <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.RECORDS_CATEGORY"></span>
+        </h3>
+        <div class="card-toolbar">
+            <div class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary tooltip-css">
+                <mat-icon style="color: #1D6F42;">description</mat-icon>
+                <span class="tooltip-text" translate="BUTTON.EXPORT_EXCEL"></span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-5">
+        <div class="table-responsive" style="min-height:400px;">
+            <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [xaxis]="chartOptions.xaxis"
+                [dataLabels]="chartOptions.dataLabels" [stroke]="chartOptions.stroke" [legend]="chartOptions.legend"
+                [fill]="chartOptions.fill" [tooltip]="chartOptions.tooltip" [colors]="chartOptions.colors"
+                [plotOptions]="chartOptions.plotOptions"></apx-chart>
+        </div>
+    </div>
+</div>

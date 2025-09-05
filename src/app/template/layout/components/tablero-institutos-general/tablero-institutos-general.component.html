@@ -1,0 +1,129 @@
+<!-- <div class="card card-xl-stretch mb-xl-8">
+  <div class="card-header border-0 pt-5">
+    <h3 class="card-title align-items-start flex-column">
+      <span class="card-label fw-bolder fs-3 mb-1">
+        Institutos Tecnológicos
+      </span>
+      <span class="text-muted mt-1 fw-bold fs-7">
+        {{ totalInstitutes }} institutos
+      </span>
+    </h3>
+    <div class="card-toolbar">
+      <span class="text-muted fw-bold fs-7">
+        Total de registros:
+        <span class="font-weight-bold">{{ totalRegistros | number }}</span>
+      </span>
+    </div>
+  </div>
+  <div class="card-body py-3 p-0">
+    <div class="table-responsive" style="max-height: 750px; overflow-y: auto">
+      <table class="table align-middle gs-0 gy-5">
+        <tbody>
+          <tr *ngFor="let institute of data; let isLast = last">
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="symbol symbol-45px me-5">
+                  <span class="svg-icon svg-icon-2hx">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <path
+                        d="M14 18V16H18V18H14ZM14 12V14H18V12H14ZM14 6V8H18V6H14ZM8 6V8H12V6H8ZM8 12V14H12V12H8ZM8 18V16H12V18H8ZM4 21V3C4 2.4 4.4 2 5 2H19C19.6 2 20 2.4 20 3V21C20 21.6 19.6 22 19 22H5C4.4 22 4 21.6 4 21ZM12 20V4H6V20H12Z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </span>
+                </div>
+                <div class="d-flex justify-content-start flex-column">
+                  <h4 class="text-gray-900 fw-bolder fs-6 mb-1">
+                    {{ institute.nombre_institucion }}
+                  </h4>
+                  <span class="text-muted fw-bold fs-7">
+                    {{ institute.nombre_tipo_institucion }}
+                  </span>
+                </div>
+              </div>
+            </td>
+            <td class="text-end">
+              <span class="badge badge-light-primary fw-bold fs-7">
+                {{ institute.total_registros }} registros
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div> -->
+
+<div class="card card-xl-stretch mb-xl-8">
+  <div class="card-header border-0 pt-5">
+    <h3 class="card-title align-items-start flex-column">
+      <span [translate]="titulo" class="card-label fw-bolder fs-3 mb-1">
+        Registros por institución
+      </span>
+      <span class="text-muted mt-1 fw-bold fs-7">
+        {{ totalInstitutes }} institutos
+      </span>
+    </h3>
+    <div class="card-toolbar">
+      <span class="px-2 text-muted fw-bold fs-7">
+        Total de registros:
+        <span class="font-weight-bold">{{ totalRegistros | number }}</span>
+      </span>
+
+      <!-- begin::Button-->
+      <div
+        class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary tooltip-css"
+      >
+        <mat-icon style="color: #1d6f42">description</mat-icon>
+        <span class="tooltip-text" translate="BUTTON.EXPORT_EXCEL"></span>
+      </div>
+      <!-- end::Button-->
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive" style="max-height: 400px; overflow-y: auto">
+      <table class="table align-middle gs-0 gy-5">
+        <tbody>
+          <tr *ngFor="let institute of data; let isLast = last">
+            <td>
+              <div class="d-flex align-items-center">
+                <div
+                  class="symbol symbol-45px me-5 d-flex justify-content-center align-items-center px-2"
+                >
+                  <mat-icon
+                    style="
+                      font-size: 30px;
+                      height: 30px;
+                      width: 45px;
+                      color: gray;
+                    "
+                    >school</mat-icon
+                  >
+                </div>
+                <div class="d-flex justify-content-start flex-column">
+                  <h4 class="text-gray-900 fw-bolder fs-6 mb-1">
+                    {{ institute.nombre_institucion }}
+                  </h4>
+                  <span class="text-muted fw-bold fs-7">
+                    {{ institute.nombre_tipo_institucion }}
+                  </span>
+                </div>
+              </div>
+            </td>
+            <td class="text-end">
+              <span class="badge badge-light-primary fw-bold fs-7">
+                {{ institute.total_registros }} registros
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

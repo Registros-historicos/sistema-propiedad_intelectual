@@ -1,6 +1,8 @@
 .tooltip-css {
     position: relative;
-    display: inline-block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .tooltip-css .tooltip-text {
@@ -26,3 +28,6 @@
     opacity: 1;
     transform: translateX(-50%) translateY(0);
 }
+
+#kt_charts_widget_1_chart { display:flex; justify-content:center; }
+#kt_charts_widget_1_chart .apexcharts-canvas { max-width: 480px; width:100%; }

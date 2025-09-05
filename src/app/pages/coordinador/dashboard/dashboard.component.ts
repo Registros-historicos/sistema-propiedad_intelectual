@@ -206,6 +206,112 @@ export class DashboardComponent {
     };
   }
 
+  protected readonly status = [
+    {
+      label: "En revisión",
+      serie: 47
+    },
+    {
+      label: "Concedida",
+      serie: 55
+    },
+    {
+      label: "Rechazada",
+      serie: 13
+    },
+    {
+      label: "En mantenimiento",
+      serie: 43
+    }
+  ]
+
+  protected readonly cuerposAcademicos = [
+    {
+      nombre: "lorem ipsum dolor sit amet",
+      solicitudes: 300
+    },
+    {
+      nombre: "lorem ipsum dolor sit amet",
+      solicitudes: 244
+    },
+    {
+      nombre: "lorem ipsum dolor sit amet",
+      solicitudes: 86
+    },
+    {
+      nombre: "lorem ipsum dolor sit amet",
+      solicitudes: 102
+    },
+    {
+      nombre: "lorem ipsum dolor sit amet",
+      solicitudes: 40
+    },
+    {
+      nombre: "lorem ipsum dolor sit amet",
+      solicitudes: 200
+    },
+    {
+      nombre: "lorem ipsum dolor sit amet",
+      solicitudes: 244
+    },
+    {
+      nombre: "lorem ipsum dolor sit amet",
+      solicitudes: 86
+    },
+    {
+      nombre: "lorem ipsum dolor sit amet",
+      solicitudes: 102
+    },
+    {
+      nombre: "lorem ipsum dolor sit amet",
+      solicitudes: 40
+    },
+    {
+      nombre: "lorem ipsum dolor sit amet",
+      solicitudes: 200
+    },
+  ]
+
+  protected readonly categories = [
+    {
+      category: "Docente", data: 120
+    },
+    { category: "Administrativo", data: 90 },
+    { category: "Alumno", data: 60 }
+  ]
+
+  protected readonly gender = [
+    {
+      label: "Hombre",
+      serie: 47
+    },
+    {
+      label: "Mujer",
+      serie: 55
+    },
+  ]
+
+  protected readonly anios = [
+    { category: "Enero", series1: 120, series2: 80 },
+    { category: "Febrero", series1: 90, series2: 110 },
+    { category: "Marzo", series1: 60, series2: 95 },
+    { category: "Abril", series1: 120, series2: 75 },
+    { category: "Mayo", series1: 90, series2: 130 },
+    { category: "Junio", series1: 60, series2: 85 },
+    { category: "Julio", series1: 120, series2: 100 },
+    { category: "Agosto", series1: 90, series2: 115 },
+    { category: "Septiembre", series1: 60, series2: 70 },
+    { category: "Octubre", series1: 120, series2: 140 },
+    { category: "Noviembre", series1: 90, series2: 95 },
+    { category: "Diciembre", series1: 60, series2: 105 },
+  ];
+
+  protected readonly categorias = [
+    { categoria: 'Docentes', value: 500 },
+    { categoria: 'Administrativos', value: 250 },
+    { categoria: 'Alumnos', value: 180 },
+  ];
+
 }
 
 const initChart = function (
@@ -243,7 +349,7 @@ const initChart = function (
   // @ts-ignore
   ctx.translate(options.size / 2, options.size / 2);
   // @ts-ignore
-  ctx.rotate((-1 / 2 + options.rotate / 180) * Math.PI); 
+  ctx.rotate((-1 / 2 + options.rotate / 180) * Math.PI);
 
   const radius = (options.size - options.lineWidth) / 2;
 
