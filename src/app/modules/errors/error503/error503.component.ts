@@ -41,8 +41,11 @@ export class Error503Component {
       case 2:
         this.router.navigate(['coordinador']);
         break;
-      default:
+      case 3:
         this.router.navigate(['solicitante']);
+        break;  
+      case 4:
+        this.router.navigate(['cepat']);
         break;
     }
   }
