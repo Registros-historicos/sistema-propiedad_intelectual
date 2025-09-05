@@ -32,6 +32,14 @@ export class RegistroEstatusComponent {
         type: "pie",
       },
       labels,
+      dataLabels: {
+        enabled: true,
+        style: {
+          fontSize: "16px",  
+          fontWeight: 'bold',
+          colors: ['#fff']  
+        },
+      },
       legend: {
         position: 'right',
         horizontalAlign: 'right',
@@ -40,7 +48,10 @@ export class RegistroEstatusComponent {
       },
       plotOptions: {
         pie: {
-          customScale: 0.8
+          customScale: 0.8,
+          dataLabels: {
+            offset: 0,
+          }
         }
       },
       responsive: [
@@ -56,7 +67,9 @@ export class RegistroEstatusComponent {
               fontSize: '30px'
             },
             dataLabels: {
-              style: { fontSize: '12px' }
+              style: { 
+                fontSize: '16px'
+              }
             }
           }
         }

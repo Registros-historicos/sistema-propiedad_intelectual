@@ -273,7 +273,8 @@ export class DashboardComponent {
   ]
 
   protected readonly categories = [
-    { category: "Docente", data: 120
+    {
+      category: "Docente", data: 120
     },
     { category: "Administrativo", data: 90 },
     { category: "Alumno", data: 60 }
@@ -291,19 +292,19 @@ export class DashboardComponent {
   ]
 
   protected readonly anios = [
-    { category: "Enero", data: 120},
-    { category: "Febrero", data: 90 },
-    { category: "Marzo", data: 60 },
-    { category: "Abril", data: 120},
-    { category: "Mayo", data: 90 },
-    { category: "Junio", data: 60 },
-    { category: "Julio", data: 120},
-    { category: "Agosto", data: 90 },
-    { category: "Septiembre", data: 60 },
-    { category: "Octubre", data: 120},
-    { category: "Noviembre", data: 90 },
-    { category: "Diciembre", data: 60 },
-  ]
+    { category: "Enero", series1: 120, series2: 80 },
+    { category: "Febrero", series1: 90, series2: 110 },
+    { category: "Marzo", series1: 60, series2: 95 },
+    { category: "Abril", series1: 120, series2: 75 },
+    { category: "Mayo", series1: 90, series2: 130 },
+    { category: "Junio", series1: 60, series2: 85 },
+    { category: "Julio", series1: 120, series2: 100 },
+    { category: "Agosto", series1: 90, series2: 115 },
+    { category: "Septiembre", series1: 60, series2: 70 },
+    { category: "Octubre", series1: 120, series2: 140 },
+    { category: "Noviembre", series1: 90, series2: 95 },
+    { category: "Diciembre", series1: 60, series2: 105 },
+  ];
 
 
 }
@@ -343,7 +344,7 @@ const initChart = function (
   // @ts-ignore
   ctx.translate(options.size / 2, options.size / 2);
   // @ts-ignore
-  ctx.rotate((-1 / 2 + options.rotate / 180) * Math.PI); 
+  ctx.rotate((-1 / 2 + options.rotate / 180) * Math.PI);
 
   const radius = (options.size - options.lineWidth) / 2;
 

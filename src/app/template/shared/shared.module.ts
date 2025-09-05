@@ -25,6 +25,8 @@ import { MatIcon } from '@angular/material/icon';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { GraficaSolicitudesComponent } from '../layout/components/grafica-solicitudes/grafica-solicitudes.component';
+import { GraficaSolicitudesInComponent } from '../layout/components/grafica-solicitudes-in/grafica-solicitudes-in.component';
 
 @NgModule({
   declarations: [
@@ -42,6 +44,8 @@ import { RouterModule } from '@angular/router';
     TableroSolicitudesComponent,
     TableroInstitutosGeneralComponent,
     TableroInstitucionesComponent,
+    GraficaSolicitudesComponent,
+    GraficaSolicitudesInComponent
   ],
   imports: [
     CommonModule,
@@ -72,7 +76,9 @@ import { RouterModule } from '@angular/router';
     TableroCategoriasComponent,
     TableroInstitucionesFederalesComponent,
     TableroSolicitudesComponent,
-    TableroInstitutosGeneralComponent
+    TableroInstitutosGeneralComponent,
+    GraficaSolicitudesComponent,
+    GraficaSolicitudesInComponent
   ]
 })
 export class SharedModule {

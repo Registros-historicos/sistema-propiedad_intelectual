@@ -1,15 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { getCSSVariableValue } from 'src/app/template/kt/_utils';
-import { NgApexchartsModule } from 'ng-apexcharts';
-import { CommonModule } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
-import { RouterModule } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-grafica-solicitudes-in',
-  standalone: true,
-  imports: [CommonModule, NgApexchartsModule, MatIconModule, RouterModule,TranslateModule],
   templateUrl: './grafica-solicitudes-in.component.html',
   styleUrls: ['./grafica-solicitudes-in.component.scss']
 })

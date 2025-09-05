@@ -1,7 +1,7 @@
 <div>
     <div class="card-header border-0 pt-5">
         <h3 class="card-title align-items-start flex-column">
-            <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.RECORDS_STATUS"></span>
+            <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.RECORDS_GENDER"></span>
         </h3>
 
         <div class="card-toolbar">
@@ -18,9 +18,10 @@
     <div class="card-body h-100">
         <!-- begin::PieCharts -->
         <div #chartRef id="kt_charts_widget_1_chart"
-            class="flex-grow-1 w-100 d-flex justify-content-center align-items-center" style="min-height:400px;">
+            style="max-height:350px;">
             <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [labels]="chartOptions.labels"
-                [responsive]="chartOptions.responsive" [legend]="chartOptions.legend" [plotOptions]="chartOptions.plotOptions"></apx-chart>
+                [responsive]="chartOptions.responsive" [legend]="chartOptions.legend" [plotOptions]="chartOptions.plotOptions"
+                [dataLabels]="chartOptions.dataLabels" [stroke]="chartOptions.stroke"></apx-chart>
         </div>
         <!-- end::PieCharts -->
     </div>

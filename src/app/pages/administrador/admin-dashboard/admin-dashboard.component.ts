@@ -1062,4 +1062,49 @@ export class AdminDashboardComponent implements OnInit {
     return aggregate;
   }
 
+  protected readonly gender = [
+    {
+      label: "Hombre",
+      serie: 47
+    },
+    {
+      label: "Mujer",
+      serie: 55
+    },
+  ]
+
+  protected readonly anios = [
+    { category: "Enero", series1: 120, series2: 80 },
+    { category: "Febrero", series1: 90, series2: 110 },
+    { category: "Marzo", series1: 60, series2: 95 },
+    { category: "Abril", series1: 120, series2: 75 },
+    { category: "Mayo", series1: 90, series2: 130 },
+    { category: "Junio", series1: 60, series2: 85 },
+    { category: "Julio", series1: 120, series2: 100 },
+    { category: "Agosto", series1: 90, series2: 115 },
+    { category: "Septiembre", series1: 60, series2: 70 },
+    { category: "Octubre", series1: 120, series2: 140 },
+    { category: "Noviembre", series1: 90, series2: 95 },
+    { category: "Diciembre", series1: 60, series2: 105 },
+  ];
+
+  protected readonly status = [
+    {
+      label: "En revisión",
+      serie: 47
+    },
+    {
+      label: "Concedida",
+      serie: 55
+    },
+    {
+      label: "Rechazada",
+      serie: 13
+    },
+    {
+      label: "En mantenimiento",
+      serie: 43
+    }
+  ]
+
 }

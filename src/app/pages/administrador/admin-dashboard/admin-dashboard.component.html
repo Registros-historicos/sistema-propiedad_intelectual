@@ -17,6 +17,7 @@
       titulo="Institutos Descentralizados"
       [data]="institutosDescentralizados"
     ></app-tablero-institutos-general>
+  </div>
 </div>
 
 <div class="row g-5 g-xl-8">
@@ -65,7 +66,7 @@
       <!-- begin::Body -->
       <div class="card-body py-3">
         <!-- begin::Table container -->
-        <div class="table-responsive">
+        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
           <!-- begin::Table -->
           <table class="table align-middle gs-0 gy-5">
             <!-- begin::Table head -->
@@ -138,7 +139,14 @@
   </div>
 
   <div class="col-xl-6">
-    <div class="card card-xl-stretch mb-xl-8">
+    <app-grafica-sector></app-grafica-sector>
+  </div>
+</div>
+
+<div class="row g-5 g-xl-8">
+  <div class="col-xl-6">
+    <app-grafica-solicitudes></app-grafica-solicitudes>
+    <!-- <div class="card card-xl-stretch mb-xl-8">
       <div class="card-header border-0 pt-5">
         <h3 class="card-title align-items-start flex-column">
           <span
@@ -147,14 +155,12 @@
           ></span>
         </h3>
         <div class="card-toolbar">
-          <!-- begin::Button-->
           <div
             class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary tooltip-css"
           >
             <mat-icon style="color: #1d6f42">description</mat-icon>
             <span class="tooltip-text" translate="BUTTON.EXPORT_EXCEL"></span>
           </div>
-          <!-- end::Button-->
         </div>
       </div>
       <div class="card-body p-5">
@@ -173,11 +179,12 @@
           ></apx-chart>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 
   <div class="col-xl-6">
-    <div class="card card-xl-stretch mb-xl-8">
+    <app-grafica-solicitudes-in></app-grafica-solicitudes-in>
+    <!-- <div class="card card-xl-stretch mb-xl-8">
       <div class="card-header border-0 pt-5">
         <h3 class="card-title align-items-start flex-column">
           <span
@@ -186,14 +193,12 @@
           ></span>
         </h3>
         <div class="card-toolbar">
-          <!-- begin::Button-->
           <div
             class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary tooltip-css"
           >
             <mat-icon style="color: #1d6f42">description</mat-icon>
             <span class="tooltip-text" translate="BUTTON.EXPORT_EXCEL"></span>
           </div>
-          <!-- end::Button-->
         </div>
       </div>
       <div class="card-body p-5">
@@ -212,10 +217,22 @@
           ></apx-chart>
         </div>
       </div>
-    </div>
+    </div> -->
+    <!-- <app-tablero-registro-categoria
+      [data]="categorias"
+      titulo="GRAPHICS.TITLES.REGISTERS_BY_CATEGORY"
+      [height]="400"
+    ></app-tablero-registro-categoria> -->
   </div>
+</div>
 
+<div class="row g-5 g-xl-8">
   <div class="col-xl-6">
+    <!-- <app-tablero-registro-categoria
+      [data]="solicitudes"
+      titulo="Solicitudes generales"
+      [height]="400"
+    ></app-tablero-registro-categoria> -->
     <app-tablero-registro-categoria
       [data]="categorias"
       titulo="GRAPHICS.TITLES.REGISTERS_BY_CATEGORY"
@@ -224,10 +241,16 @@
   </div>
 
   <div class="col-xl-6">
-    <app-tablero-registro-categoria
-      [data]="solicitudes"
-      titulo="Solicitudes generales"
-      [height]="400"
-    ></app-tablero-registro-categoria>
+    <app-registros-sexo [data]="gender" class="card card-xl-stretch mb-xl-8"></app-registros-sexo>
+  </div>
+</div>
+
+<div class="row g-5 g-xl-8">
+  <div class="col-xl-6">
+    <app-registros-anio [anios]="anios" class="card card-xl-stretch mb-xl-8"></app-registros-anio>
+  </div>
+
+  <div class="col-xl-6">
+    <app-registro-estatus [data]="status" class="card card-xl-stretch mb-xl-8"></app-registro-estatus>
   </div>
 </div>

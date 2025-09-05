@@ -2,8 +2,9 @@ import { Component, Input } from '@angular/core';
 import { getCSSVariableValue } from 'src/app/template/kt/_utils';
 
 interface Data {
-  data: number;
   category: string;
+  series1: number;
+  series2: number;
 }
 
 @Component({
@@ -29,13 +30,19 @@ export class RegistrosAnioComponent {
   }
 
   initializeChart() {
-    const data = this.anios.map(s => s.data);
     const categories = this.anios.map(s => s.category);
+    const series1Data = this.anios.map(s => s.series1);
+    const series2Data = this.anios.map(s => s.series2);
 
     this.chartOptions = {
       series: [
         {
-          data,
+          name: 'Registros Tipo A',
+          data: series1Data,
+        },
+        {
+          name: 'Registros Tipo B',
+          data: series2Data,
         },
       ],
       chart: {
@@ -167,7 +174,12 @@ export class RegistrosAnioComponent {
       ...this.chartOptions,
       series: [
         {
-          data: filteredData.map(s => s.data),
+          name: 'IMPI',
+          data: filteredData.map(s => s.series1),
+        },
+        {
+          name: 'INDAUTOR',
+          data: filteredData.map(s => s.series2),
         },
       ],
       xaxis: {

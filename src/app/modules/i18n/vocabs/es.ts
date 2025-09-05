@@ -1062,6 +1062,7 @@ export const locale = {
         RESEARCH_GROUPS: "Cuerpos Académicos",
         RECORDS_CATEGORY: "Registros por categoría",
         RECORDS_YEAR: "Registros por año",
+        RECORDS_GENDER: "Registros por sexo",
         PERCENTAGE:"Porcentajes",
         TYPE:"Tipo",
         ECONOMIC_SECTORS:"Sectores Económicos"
