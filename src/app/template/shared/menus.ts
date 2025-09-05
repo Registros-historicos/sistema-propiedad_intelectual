@@ -244,6 +244,53 @@ export const CEPAT_MENUS = [
     link: '/cepat/dashboard',
     type: 'link',
   },
+  {
+    name: 'MENU.REGISTERS',
+    icon: 'add',
+    type: 'separator'
+  },
+  {
+    name: 'MENU.HISTORICAL_REGISTERS',
+    icon: 'description',
+    link: '/cepat/registros/historicos',
+    type: 'link'
+  },
+  {
+    name: 'MENU.INTELECTUAL_PROPERTIES',
+    type: 'separator',
+  },
+  {
+    name: 'MENU.ADMIN.IMPI_REGISTRIES',
+    icon: 'emoji_objects',
+    link: '/cepat/propiedades/patente',
+    type: 'link'
+  },
+  {
+    name: 'MENU.ADMIN.INDAUTOR_REGISTRIES',
+    icon: 'emoji_objects',
+    link: '/cepat/propiedades/modelo-utilidad',
+    type: 'link'
+  },
+  {
+    name: 'MENU.REPORTS',
+    type: 'separator',
+  },
+  {
+    name: 'MENU.REPORTS',
+    icon: 'bar_chart',
+    link: '/cepat/reportes',
+    type: 'link'
+  },
+  {
+    name: 'MENU.HELP',
+    type: 'separator',
+  },
+  {
+    name: 'MENU.COORD.HELP',
+    icon: 'help',
+    link: '/cepat/ayuda',
+    type: 'link'
+  }
 ];
 
 export const APPLICANTS_MENU = [

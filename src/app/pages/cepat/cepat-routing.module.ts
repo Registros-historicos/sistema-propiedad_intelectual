@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import {Error503Component} from '../../modules/errors/error503/error503.component';
+import { Error503Component } from '../../modules/errors/error503/error503.component';
 
 const routes: Routes = [
     {
@@ -16,8 +16,32 @@ const routes: Routes = [
                 loadChildren: () => import('../../modules/profile/profile.module').then((m) => m.ProfileModule),
             },
             {
-              path: 'ayuda',
-              component: Error503Component
+                path: 'propiedades',
+                loadChildren: () => import('../comun/propiedad-intelectual/propiedad-intelectual.module').then(m => m.PropiedadIntelectualModule)
+            },
+            {
+                path: 'registros/historicos',
+                loadComponent: () => import('./historical-register/historical-register.component').then(m => m.HistoricalRegisterComponent)
+            },
+            {
+                path: 'registros/historicos/indautor',
+                loadComponent: () => import('./historical-indautor/historical-indautor.component').then(m => m.HistoricalIndautorComponent)
+            },
+            {
+                path: 'registros/historicos/impi',
+                loadComponent: () => import('./historical-impi/historical-impi.component').then(m => m.HistoricalImpiComponent)
+            },
+            {
+                path: 'registro',
+                loadComponent: () => import('../administrador/register/register.component').then(m => m.RegisterComponent)
+            },
+            {
+                path: 'reportes',
+                loadChildren: () => import('../reportes/reportes.module').then((m) => m.ReportesModule),
+            },
+            {
+                path: 'ayuda',
+                component: Error503Component
             },
             {
                 path: '',
