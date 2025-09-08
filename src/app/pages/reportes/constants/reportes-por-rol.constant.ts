@@ -38,6 +38,55 @@ export const REPORTES_POR_ROL: Record<Rol, ReporteCard[]> = {
       color: 'orange',
       icono: 'apartment' 
     },
+    {
+      titulo: 'REPORTS.ADMIN.INSTITUTION.TITLE',
+      descripcion: 'REPORTS.ADMIN.INSTITUTION.DESCRIPTION',
+      archivo: 'reporte-instituciones.pdf',
+      color: 'blue',
+      icono: 'school' 
+    },
+    {
+      titulo: 'REPORTS.ADMIN.STATE.TITLE',
+      descripcion: 'REPORTS.ADMIN.STATE.DESCRIPTION',
+      archivo: 'reporte-entidad-federativa.pdf',
+      color: 'green',
+      icono: 'map' 
+    },
+    {
+      titulo: 'REPORTS.ADMIN.TYPE.TITLE',
+      descripcion: 'REPORTS.ADMIN.TYPE.DESCRIPTION',
+      archivo: 'reporte-clasificación.pdf',
+      color: 'orange',
+      icono: 'apartment' 
+    },
+    {
+      titulo: 'REPORTS.ADMIN.TYPE.TITLE',
+      descripcion: 'REPORTS.ADMIN.TYPE.DESCRIPTION',
+      archivo: 'reporte-clasificación.pdf',
+      color: 'orange',
+      icono: 'apartment' 
+    },
+    {
+      titulo: 'REPORTS.ADMIN.STATE.TITLE',
+      descripcion: 'REPORTS.ADMIN.STATE.DESCRIPTION',
+      archivo: 'reporte-entidad-federativa.pdf',
+      color: 'green',
+      icono: 'map' 
+    },
+    {
+      titulo: 'REPORTS.ADMIN.TYPE.TITLE',
+      descripcion: 'REPORTS.ADMIN.TYPE.DESCRIPTION',
+      archivo: 'reporte-clasificación.pdf',
+      color: 'orange',
+      icono: 'apartment' 
+    },
+    {
+      titulo: 'REPORTS.ADMIN.TYPE.TITLE',
+      descripcion: 'REPORTS.ADMIN.TYPE.DESCRIPTION',
+      archivo: 'reporte-clasificación.pdf',
+      color: 'orange',
+      icono: 'apartment' 
+    },
   ],
   coordinador: [
     {
