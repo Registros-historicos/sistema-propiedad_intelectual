@@ -63,7 +63,7 @@ Dentro del repositorio contamos con 2 ramas principales: `main` y `develop`.
 
 Para mantener un flujo adecuado de trabajo en equipo adecuado con Git, se recomienda seguir el siguiente flujo de trabajo:
 1. **Rama `master`**: Esta rama contiene el código en producción. No se debe realizar ningún commit directamente en esta rama.
-2. **Rama `develop`**: Esta rama contiene el código en desarrollo. Aquí se deben realizar los commits y pull requests.
+2. **Rama `develop`**: Esta rama contiene el código en desarrollo. Esta es la rama destino para todas las pull requests.
 3. **Ramas de características (feature branches)**: Para cada nueva funcionalidad o corrección de errores, se debe crear una rama a partir de `develop`. El nombre de la rama debe seguir el formato `feature-nombre-de-la-funcionalidad` o `fix-nombre-del-error`.
 4. **Pull Requests**: Una vez que se haya completado el trabajo en una rama de características, se debe crear un Pull Request hacia la rama `develop`. Dentro de la descripción del Pull Request, se debe detallar el trabajo realizado y cualquier información relevante para la revisión. Además se debe asignar como Revisor al usuario Braulio-Palagot quien revisará los cambios y los aprobará o solicitará modificaciones en caso de ser necesario.
 5. **Revisión y Aprobación**: El revisor revisará el código, realizará comentarios y aprobará el Pull Request si todo está correcto. Una vez aprobado, se procederá a hacer el merge de la rama de características a `develop` y se eliminará la rama de características.
