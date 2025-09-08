@@ -31,6 +31,13 @@ export const REPORTES_POR_ROL: Record<Rol, ReporteCard[]> = {
       color: 'orange',
       icono: 'apartment' 
     },
+    {
+      titulo: 'REPORTS.ADMIN.TYPE.TITLE',
+      descripcion: 'REPORTS.ADMIN.TYPE.DESCRIPTION',
+      archivo: 'reporte-clasificación.pdf',
+      color: 'orange',
+      icono: 'apartment' 
+    },
   ],
   coordinador: [
     {
