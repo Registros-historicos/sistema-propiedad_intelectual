@@ -32,12 +32,12 @@ export const ADMINISTRATOR_MENUS = [
     link: '/administrador/coordinadores',
     type: 'link'
   },
-  {
-    name: 'MENU.ADMIN.COORDINATORS',
-    icon: 'person',
-    link: '/administrador/solicitantes',
-    type: 'link'
-  },
+  // {
+  //   name: 'MENU.ADMIN.COORDINATORS',
+  //   icon: 'person',
+  //   link: '/administrador/solicitantes',
+  //   type: 'link'
+  // },
   {
     name: 'MENU.INTELECTUAL_PROPERTIES',
     type: 'separator',
@@ -243,6 +243,27 @@ export const CEPAT_MENUS = [
     icon: 'dashboard',
     link: '/cepat/dashboard',
     type: 'link',
+  },
+    {
+    name: 'MENU.REGISTERS',
+    icon: 'add',
+    type: 'separator'
+  },
+  {
+    name: 'MENU.USERS',
+    icon: 'person_add',
+    link: '/cepat/registro',
+    type: 'link',
+  },
+  {
+    name: 'MENU.USERS',
+    type: 'separator',
+  },
+  {
+    name: 'MENU.ADMIN.COORDINATORS',
+    icon: 'person',
+    link: '/cepat/coordinador/list',
+    type: 'link'
   },
   {
     name: 'MENU.REGISTERS',

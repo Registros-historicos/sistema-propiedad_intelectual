@@ -1,0 +1,19 @@
+<div class="registro-container">
+  <h2>{{ "USER_REGISTER.TITLE" | translate }}</h2>
+  <p>{{ "USER_REGISTER.DESCRIPTION" | translate }}</p>
+
+  <div class="card-grid">
+    <div
+      class="card registro-card"
+      *ngFor="let registro of registros"
+      [ngClass]="registro.color"
+      (click)="verRegistro(registro.ruta)"
+    >
+      <span class="material-icons icono-registro">{{ registro.icono }}</span>
+      <h3>{{ registro.titulo | translate }}</h3>
+      <p>{{ registro.descripcion | translate }}</p>
+
+      <button>{{ "USER_REGISTER.REGISTER" | translate }}</button>
+    </div>
+  </div>
+</div>

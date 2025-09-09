@@ -33,7 +33,15 @@ const routes: Routes = [
             },
             {
                 path: 'registro',
-                loadComponent: () => import('../administrador/register/register.component').then(m => m.RegisterComponent)
+                loadComponent: () => import('./register-cepat/register-cepat.component').then(m => m.RegisterCepatComponent)
+            },
+            {
+                path: 'coordinador/registro',
+                loadComponent: () => import('../administrador/coordinator-form/coordinator-form.component').then(m => m.CoordinatorFormComponent)
+            },
+            {
+                path: 'coordinador/list',
+                loadComponent: () => import('../administrador/coordinator-listing/coordinator-listing.component').then(m => m.CoordinatorListingComponent)
             },
             {
                 path: 'reportes',
