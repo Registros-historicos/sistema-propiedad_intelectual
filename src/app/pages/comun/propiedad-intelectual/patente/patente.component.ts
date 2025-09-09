@@ -114,32 +114,10 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         infoEmpty: this.translate.instant('TABLE.PAG_INFO_EMPTY'),
         zeroRecords: this.translate.instant('TABLE.ZERO_RECORDS'),
       },
-      /* ajax: (dataTablesParameters: any, callback) => {
-        this.applicantService.getApplicants(dataTablesParameters).subscribe(resp => {
-          callback(resp);
-        });
-      },*/
       paging: true,
       ajax: (dataTablesParameters: any, callback) => {
-
-        // this.service.getPatents(dataTablesParameters).subscribe({
-        //   next: (resp) => {
-        //     callback(resp);
-        //   },
-        //   error: (error) => {
-        //     console.error('Error loading data:', error);
-        //     callback({
-        //       draw: dataTablesParameters.draw,
-        //       recordsTotal: 0,
-        //       recordsFiltered: 0,
-        //       data: []
-        //     });
-        //   }
-        // });
         this.impiService.listImpiRegistries(this.selectedPage, dataTablesParameters.length, dataTablesParameters.search.value || null).subscribe({
           next: (resp) => {
-            console.log('DataTablesParameters:', dataTablesParameters);
-            console.log('Response:', resp);
             callback({
               draw: dataTablesParameters.draw,
               recordsTotal: resp.totalElements,
@@ -153,13 +131,13 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
                 institucion: item.origin_city || 'No disponible',
                 estatus: 'No disponible',
                 descripcion: item.notes || '',
-                documentos: []
+                documentos: [],
+                numeroExpediente: item.numero_expediente || '', // Nueva columna
+                numeroTitulo: item.numero_titulo || ''           // Nueva columna
               }))
             })
           },
           error: (error) => {
-            console.log('DataTablesParameters:', dataTablesParameters);
-            console.error('Error loading data:', error);
             callback({
               draw: dataTablesParameters.draw,
               recordsTotal: 0,
@@ -229,6 +207,20 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
           data: 'fechaSolicitud',
           render: (data) => {
             return `<span class="fw-semibold text-gray-600">${moment(data).format('DD-MM-YYYY')}</span>`;
+          },
+        },
+        {
+          title: 'Número de expediente', // Nueva columna
+          data: 'numeroExpediente',
+          render: (data) => {
+            return `<span class="fw-semibold text-gray-600">${data || ''}</span>`;
+          },
+        },
+        {
+          title: 'Número de título', // Nueva columna
+          data: 'numeroTitulo',
+          render: (data) => {
+            return `<span class="fw-semibold text-gray-600">${data || ''}</span>`;
           },
         }
       ],

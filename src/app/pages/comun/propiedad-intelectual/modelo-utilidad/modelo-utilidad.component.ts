@@ -106,25 +106,8 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
       },
       paging: true,
       ajax: (dataTablesParameters: any, callback) => {
-
-        // this.service.getPatents(dataTablesParameters).subscribe({
-        //   next: (resp) => {
-        //     callback(resp);
-        //   },
-        //   error: (error) => {
-        //     console.error('Error loading data:', error);
-        //     callback({
-        //       draw: dataTablesParameters.draw,
-        //       recordsTotal: 0,
-        //       recordsFiltered: 0,
-        //       data: []
-        //     });
-        //   }
-        // });
         this.indautorService.listImpiRegistries(this.selectedPage, dataTablesParameters.length, dataTablesParameters.search.value || null).subscribe({
           next: (resp) => {
-            console.log('DataTablesParameters:', dataTablesParameters);
-            console.log('Response:', resp);
             callback({
               draw: dataTablesParameters.draw,
               recordsTotal: resp.totalElements,
@@ -136,13 +119,13 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
                 institucion: item.origin_city,
                 fechaSolicitud: item.issue_date ? moment(item.issue_date).format('YYYY-MM-DD') : '',
                 descripcion: item.notes,
+                numeroExpediente: item.numero_expediente,      // Nueva columna
+                numeroCertificado: item.numero_certificado,    // Nueva columna
                 documentos: []
               }))
             })
           },
           error: (error) => {
-            console.log('DataTablesParameters:', dataTablesParameters);
-            console.error('Error loading data:', error);
             callback({
               draw: dataTablesParameters.draw,
               recordsTotal: 0,
@@ -212,6 +195,20 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
           data: 'fechaSolicitud',
           render: (data) => {
             return `<span class="fw-semibold text-gray-600">${moment(data).format('DD-MM-YYYY')}</span>`;
+          },
+        },
+        {
+          title: 'Número de expediente', // Nueva columna
+          data: 'numeroExpediente',
+          render: (data) => {
+            return `<span class="fw-semibold text-gray-600">${data || ''}</span>`;
+          },
+        },
+        {
+          title: 'Número de certificado', // Nueva columna
+          data: 'numeroCertificado',
+          render: (data) => {
+            return `<span class="fw-semibold text-gray-600">${data || ''}</span>`;
           },
         }
       ],
