@@ -24,8 +24,8 @@
 
   <div class="card-body pt-0">
     <app-crud [datatableConfig]="datatableConfig" route="/coordinador/propiedades/patente"
-      (deleteEvent)="delete($event)" (followEvent)="follow($event)" (viewEvent)="view($event)" [reload]="reloadEvent"
-      [modal]="isViewMode ? formModal : formModalFollow">
+      (deleteEvent)="delete($event)" (editEvent)="edit($event)" (viewEvent)="view($event)" [reload]="reloadEvent"
+      [modal]="isViewMode ? formModal : formModalEdit">
     </app-crud>
   </div>
 </div>
@@ -55,34 +55,36 @@
         </div>
       </div>
 
-      <div class="fv-row mb-7">
-        <label class="fw-semibold fs-6 mb-2 text-gray-600" translate="MODAL.FORM.PATENT.NAME"></label>
-        <textarea type="text" class="form-control form-control-solid bg-light" [value]="patenteModel.nombrePatente"
-          readonly style="resize: none; overflow: hidden;" rows="auto"></textarea>
-      </div>
+  <!-- Denominación ahora irá en pareja con Rama más abajo -->
 
       <div class="row g-9 mb-7">
         <div class="fv-row col-md-6">
-          <label class="fw-semibold fs-6 mb-2 text-gray-600" translate="MODAL.FORM.APPLICANT"></label>
-          <input type="text" class="form-control form-control-solid bg-light" [value]="patenteModel.solicitante"
-            readonly />
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">N. Expediente</label>
+          <input type="text" class="form-control form-control-solid bg-light" [value]="patenteModel.numeroExpediente" readonly />
         </div>
 
         <div class="fv-row col-md-6">
-          <label class="fw-semibold fs-6 mb-2 text-gray-600" translate="MODAL.FORM.EMAIL"></label>
-          <input type="email" class="form-control form-control-solid bg-light" [value]="patenteModel.correo" readonly />
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">N. de Título</label>
+          <input type="text" class="form-control form-control-solid bg-light" [value]="patenteModel.numeroTitulo" readonly />
         </div>
       </div>
 
+      <!-- 2) Denominación | Rama -->
       <div class="row g-9 mb-7">
         <div class="fv-row col-md-6">
-          <label class="fw-semibold fs-6 mb-2 text-gray-600" translate="MODAL.FORM.DATE"></label>
-          <input type="text" class="form-control form-control-solid bg-light" [value]="patenteModel.fechaSolicitud"
-            readonly />
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Denominación</label>
+          <input type="text" class="form-control form-control-solid bg-light" [value]="patenteModel.denominacion || patenteModel.nombrePatente" readonly />
         </div>
-
         <div class="fv-row col-md-6">
-          <label class="fw-semibold fs-6 mb-2 text-gray-600" translate="MODAL.FORM.STATUS"></label>
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Rama</label>
+          <input type="text" class="form-control form-control-solid bg-light" [value]="patenteModel.rama" readonly />
+        </div>
+      </div>
+
+      <!-- 3) Estatus | Medio de Ingreso -->
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Estatus</label>
           <div class="form-control form-control-solid d-flex align-items-center">
             <span class="badge" [ngClass]="{
                     'badge-light-success': patenteModel.estatus === 'Aprobada',
@@ -95,85 +97,140 @@
             </span>
           </div>
         </div>
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Medio de Ingreso</label>
+          <input type="text" class="form-control form-control-solid bg-light" [value]="patenteModel.medioIngreso" readonly />
+        </div>
       </div>
 
       <div class="row g-9 mb-7">
         <div class="fv-row col-md-6">
-          <label class="fw-semibold fs-6 mb-2 text-gray-600" translate="MODAL.FORM.FEDERAL_ENTITY.LABEL"></label>
-          <select class="form-select form-select-solid bg-light" [(ngModel)]="estadoSeleccionado"
-            (ngModelChange)="onEstadoChange($event)" readonly disabled>
-            <option value="" translate="MODAL.FORM.FEDERAL_ENTITY.OPTIONS_LABEL"></option>
-            <option *ngFor="let entidad of entidadesFederativas" [value]="entidad.id">
-              {{entidad.nombre}}
-            </option>
-          </select>
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Tecnológico de Origen</label>
+          <input type="text" class="form-control form-control-solid bg-light" [value]="patenteModel.tecnologicoOrigen" readonly />
         </div>
-
         <div class="fv-row col-md-6">
-          <label class="fw-semibold fs-6 mb-2 text-gray-600" translate="MODAL.FORM.INSTITUTION.LABEL"></label>
-          <select class="form-select form-select-solid bg-light" [(ngModel)]="institucionSeleccionada"
-            (ngModelChange)="onInstitucionChange($event)" readonly disabled>
-            <option value="" translate="MODAL.FORM.INSTITUTION.OPTIONS_LABEL"></option>
-            <option *ngFor="let institucion of institucionesFiltradas" [value]="institucion.id">
-              {{institucion.nombre}}
-            </option>
-          </select>
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">CePat</label>
+          <input type="text" class="form-control form-control-solid bg-light" [value]="patenteModel.cePat" readonly />
         </div>
       </div>
 
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Año Renovación</label>
+          <input type="text" class="form-control form-control-solid bg-light" [value]="patenteModel.anioRenovacion" readonly />
+        </div>
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Tipo de Sector</label>
+          <input type="text" class="form-control form-control-solid bg-light" [value]="patenteModel.tipoSector" readonly />
+        </div>
+      </div>
+
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Sector</label>
+          <input type="text" class="form-control form-control-solid bg-light" [value]="patenteModel.sector" readonly />
+        </div>
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Subsector</label>
+          <input type="text" class="form-control form-control-solid bg-light" [value]="patenteModel.subsector" readonly />
+        </div>
+      </div>
+
+      <!-- 7) Fecha de Solicitud | 8) Fecha de Expedición -->
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Fecha de Solicitud</label>
+          <input type="text" class="form-control form-control-solid bg-light" [value]="patenteModel.fechaSolicitud" readonly />
+        </div>
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Fecha de Expedición</label>
+          <input type="text" class="form-control form-control-solid bg-light" [value]="patenteModel.fechaExpedicion" readonly />
+        </div>
+      </div>
+
+      <!-- 9) Archivo | 10) Observaciones -->
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Archivo</label>
+          <input type="text" class="form-control form-control-solid bg-light" [value]="patenteModel.archivo" readonly />
+        </div>
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Observaciones</label>
+          <textarea class="form-control form-control-solid bg-light" [value]="patenteModel.observaciones" rows="3" readonly></textarea>
+        </div>
+      </div>
+
+      <!-- Campos no requeridos eliminados (Entidad/Institución) -->
+
+      <!-- 11) Descripción (único no en parejas) -->
       <div class="fv-row mb-7">
-        <label class="fw-semibold fs-6 mb-2 text-gray-600" translate="MODAL.FORM.DESCRIPTION"></label>
-        <textarea class="form-control form-control-solid bg-light" [value]="patenteModel.descripcion" rows="3"
-          readonly></textarea>
+        <label class="fw-semibold fs-6 mb-2 text-gray-600">Descripción</label>
+        <textarea class="form-control form-control-solid bg-light" [value]="patenteModel.descripcion" rows="3" readonly></textarea>
       </div>
 
-      <div class="fw-bold fs-3 rotate collapsible mb-7" data-bs-toggle="collapse" role="button"
-        (click)="collapse2.toggle()" [attr.aria-expanded]="!isCollapsed2"
-        aria-controls="kt_modal_update_coordinator_documents">
-        <app-keenicon name="folder" class="fs-3 me-2"></app-keenicon>
-        <span translate="MODAL.FORM.DOCUMENTATION"></span>
-        <span class="ms-2 rotate-180">
-          <i class="ki-duotone ki-down fs-3" [ngClass]="{ 'ki-up': !isCollapsed2 }"></i>
-        </span>
+      <!-- Inventores dinámicos -->
+      <div class="separator separator-dashed my-7"></div>
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div class="fw-bold fs-4">Inventores</div>
+        <button type="button" class="btn btn-sm btn-primary" (click)="addInventor()">
+          Agregar autor
+        </button>
       </div>
 
-      <div class="collapse" #collapse2="ngbCollapse" [(ngbCollapse)]="isCollapsed2">
-        <div class="card card-flush">
-          <div class="card-body pt-0">
-            <div *ngIf="patenteModel.documentos && patenteModel.documentos.length > 0; else noDocuments">
-              <div *ngFor="let documento of patenteModel.documentos; let i = index"
-                class="d-flex align-items-center border border-gray-300 border-dashed rounded p-4 mb-3">
-
-                <div class="symbol symbol-50px me-4">
-                  <div class="symbol-label bg-light-danger">
-                    <app-keenicon name="document" class="fs-2 text-danger"></app-keenicon>
-                  </div>
-                </div>
-
-                <div class="flex-grow-1">
-                  <div class="fw-bold text-gray-800 fs-6">{{documento}}</div>
-                </div>
-
-                <div class="d-flex align-items-center">
-                  <button type="button" class="btn btn-sm btn-light-primary me-2" (click)="downloadDocument(documento)"
-                    translate="BUTTON.DOWNLOAD">
-                  </button>
-
-                  <button type="button" class="btn btn-sm btn-light-info" translate="BUTTON.SEE">
-                  </button>
-                </div>
-              </div>
+      <div *ngFor="let inv of patenteModel.inventores; let i = index" class="card card-flush mb-5">
+        <div class="card-header py-3">
+          <div class="card-title fw-bold">Autor {{ i + 1 }}</div>
+          <div class="card-toolbar" *ngIf="i > 0">
+            <button type="button" class="btn btn-sm btn-light-danger" (click)="removeInventor(i)">Quitar</button>
+          </div>
+        </div>
+        <div class="card-body pt-3">
+          <div class="row g-6">
+            <div class="col-md-6">
+              <label class="form-label text-gray-600">CURP</label>
+              <input class="form-control form-control-solid bg-light" [value]="inv.curp" readonly />
             </div>
-
-            <ng-template #noDocuments>
-              <div class="text-center py-8">
-                <app-keenicon name="file-deleted" class="fs-3x text-muted mb-4"></app-keenicon>
-                <div class="text-muted fs-6" translate="MODAL.FORM.DOCUMENTATION_EMPTY"></div>
-              </div>
-            </ng-template>
+            <div class="col-md-6">
+              <label class="form-label text-gray-600">Nombre Completo</label>
+              <input class="form-control form-control-solid bg-light" [value]="inv.nombreCompleto" readonly />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label text-gray-600">Sexo</label>
+              <input class="form-control form-control-solid bg-light" [value]="inv.sexo" readonly />
+            </div>
+            <div class="col-md-8">
+              <label class="form-label text-gray-600">Tipo de investigador</label>
+              <input class="form-control form-control-solid bg-light" [value]="inv.tipoInvestigador" readonly />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-gray-600">Institución</label>
+              <input class="form-control form-control-solid bg-light" [value]="inv.institucion" readonly />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-gray-600">Programa Educativo</label>
+              <input class="form-control form-control-solid bg-light" [value]="inv.programaEducativo" readonly />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-gray-600">Cuerpo Académico</label>
+              <input class="form-control form-control-solid bg-light" [value]="inv.cuerpoAcademico" readonly />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-gray-600">Departamento</label>
+              <input class="form-control form-control-solid bg-light" [value]="inv.departamento" readonly />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-gray-600">Fecha de Afiliación</label>
+              <input class="form-control form-control-solid bg-light" [value]="inv.fechaAfiliacion" readonly />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-gray-600">Fecha de Fin</label>
+              <input class="form-control form-control-solid bg-light" [value]="inv.fechaFin" readonly />
+            </div>
           </div>
         </div>
       </div>
+
+  <!-- Sección de Documentación eliminada (no requerida) -->
 
     </div>
   </div>
@@ -181,6 +238,187 @@
   <div class="modal-footer">
     <button type="button" class="btn btn-primary" (click)="closeForm(modal)" translate="BUTTON.CLOSE">
     </button>
+  </div>
+</ng-template>
+
+<ng-template #formModalEdit let-modal>
+  <div class="modal-header bg-warning">
+    <h3 class="modal-title text-white">
+      <app-keenicon name="pencil" class="fs-2 me-2 text-white"></app-keenicon>
+      Editar Registro IMPI
+    </h3>
+    <button type="button" class="btn-close btn-close-white" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"></button>
+  </div>
+
+  <div class="modal-body">
+    <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-650px">
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">N. Expediente</label>
+          <input type="text" class="form-control" [(ngModel)]="patenteModel.numeroExpediente" />
+        </div>
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">N. de Título</label>
+          <input type="text" class="form-control" [(ngModel)]="patenteModel.numeroTitulo" />
+        </div>
+      </div>
+
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Denominación</label>
+          <input type="text" class="form-control" [(ngModel)]="patenteModel.denominacion" />
+        </div>
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Rama</label>
+          <input type="text" class="form-control" [(ngModel)]="patenteModel.rama" />
+        </div>
+      </div>
+
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Estatus</label>
+          <select class="form-select" [(ngModel)]="patenteModel.estatus">
+            <option value="Registrada">Registrada</option>
+            <option value="En trámite">En trámite</option>
+            <option value="Trámite con observaciones">Trámite con observaciones</option>
+            <option value="Aprobada">Aprobada</option>
+            <option value="Concluida">Concluida</option>
+          </select>
+        </div>
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Medio de Ingreso</label>
+          <input type="text" class="form-control" [(ngModel)]="patenteModel.medioIngreso" />
+        </div>
+      </div>
+
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Tecnológico de Origen</label>
+          <input type="text" class="form-control" [(ngModel)]="patenteModel.tecnologicoOrigen" />
+        </div>
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">CePat</label>
+          <input type="text" class="form-control" [(ngModel)]="patenteModel.cePat" />
+        </div>
+      </div>
+
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Año Renovación</label>
+          <input type="text" class="form-control" [(ngModel)]="patenteModel.anioRenovacion" />
+        </div>
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Tipo de Sector</label>
+          <input type="text" class="form-control" [(ngModel)]="patenteModel.tipoSector" />
+        </div>
+      </div>
+
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Sector</label>
+          <input type="text" class="form-control" [(ngModel)]="patenteModel.sector" />
+        </div>
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Subsector</label>
+          <input type="text" class="form-control" [(ngModel)]="patenteModel.subsector" />
+        </div>
+      </div>
+
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Fecha de Solicitud</label>
+          <input type="date" class="form-control" [(ngModel)]="patenteModel.fechaSolicitud" />
+        </div>
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Fecha de Expedición</label>
+          <input type="date" class="form-control" [(ngModel)]="patenteModel.fechaExpedicion" />
+        </div>
+      </div>
+
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Archivo</label>
+          <input type="text" class="form-control" [(ngModel)]="patenteModel.archivo" />
+        </div>
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Observaciones</label>
+          <textarea class="form-control" rows="3" [(ngModel)]="patenteModel.observaciones"></textarea>
+        </div>
+      </div>
+
+      <div class="fv-row mb-7">
+        <label class="fw-semibold fs-6 mb-2 text-gray-600">Descripción</label>
+        <textarea class="form-control" rows="3" [(ngModel)]="patenteModel.descripcion"></textarea>
+      </div>
+
+      <div class="separator separator-dashed my-7"></div>
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div class="fw-bold fs-4">Inventores</div>
+        <button type="button" class="btn btn-sm btn-primary" (click)="addInventor()">Agregar autor</button>
+      </div>
+      <div *ngFor="let inv of patenteModel.inventores; let i = index" class="card card-flush mb-5">
+        <div class="card-header py-3">
+          <div class="card-title fw-bold">Autor {{ i + 1 }}</div>
+          <div class="card-toolbar" *ngIf="i > 0">
+            <button type="button" class="btn btn-sm btn-light-danger" (click)="removeInventor(i)">Quitar</button>
+          </div>
+        </div>
+        <div class="card-body pt-3">
+          <div class="row g-6">
+            <div class="col-md-6">
+              <label class="form-label text-gray-600">CURP</label>
+              <input class="form-control" [(ngModel)]="inv.curp" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-gray-600">Nombre Completo</label>
+              <input class="form-control" [(ngModel)]="inv.nombreCompleto" />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label text-gray-600">Sexo</label>
+              <select class="form-select" [(ngModel)]="inv.sexo">
+                <option value="">Seleccione</option>
+                <option value="M">M</option>
+                <option value="F">F</option>
+              </select>
+            </div>
+            <div class="col-md-8">
+              <label class="form-label text-gray-600">Tipo de investigador</label>
+              <input class="form-control" [(ngModel)]="inv.tipoInvestigador" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-gray-600">Institución</label>
+              <input class="form-control" [(ngModel)]="inv.institucion" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-gray-600">Programa Educativo</label>
+              <input class="form-control" [(ngModel)]="inv.programaEducativo" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-gray-600">Cuerpo Académico</label>
+              <input class="form-control" [(ngModel)]="inv.cuerpoAcademico" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-gray-600">Departamento</label>
+              <input class="form-control" [(ngModel)]="inv.departamento" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-gray-600">Fecha de Afiliación</label>
+              <input class="form-control" type="date" [(ngModel)]="inv.fechaAfiliacion" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-gray-600">Fecha de Fin</label>
+              <input class="form-control" type="date" [(ngModel)]="inv.fechaFin" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-light" (click)="closeForm(modal)">Cancelar</button>
+    <button type="button" class="btn btn-warning" (click)="saveEdit(modal)">Guardar</button>
   </div>
 </ng-template>
 

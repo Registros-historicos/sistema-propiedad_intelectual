@@ -15,6 +15,39 @@ import {ImpiRegistriesService} from '../../../../api/services/impi.service';
 
 type EstatusPatente = 'Registrada' | 'En trámite' | 'Trámite con observaciones' | 'Aprobada' | 'Concluida';
 
+// Nuevos tipos para el formulario extendido
+interface Inventor {
+  curp: string;
+  nombreCompleto: string;
+  sexo: 'M' | 'F' | '';
+  tipoInvestigador: string;
+  institucion: string;
+  programaEducativo: string;
+  cuerpoAcademico: string;
+  departamento: string;
+  fechaAfiliacion: string; // YYYY-MM-DD
+  fechaFin: string; // YYYY-MM-DD
+}
+
+type PatenteUIModel = IPatentModel & {
+  // Campos adicionales de IMPI
+  numeroExpediente?: string;
+  numeroTitulo?: string;
+  denominacion?: string; // alias de nombrePatente
+  rama?: string;
+  medioIngreso?: string;
+  tecnologicoOrigen?: string;
+  cePat?: string;
+  anioRenovacion?: string;
+  tipoSector?: string;
+  sector?: string;
+  subsector?: string;
+  fechaExpedicion?: string;
+  archivo?: string;
+  observaciones?: string;
+  inventores?: Inventor[];
+};
+
 @Component({
   selector: 'app-patente',
   templateUrl: './patente.component.html',
@@ -44,7 +77,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   placeholder: string = '';
 
   aPatente: Observable<IPatentModel>
-  patenteModel: IPatentModel = {
+  patenteModel: PatenteUIModel = {
     id: 0,
     solicitudId: "",
     nombrePatente: "",
@@ -54,7 +87,36 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     descripcion: "",
     institucion: "",
     correo: "",
-    documentos: [""]
+    documentos: [""],
+    // Campos adicionales inicializados
+    numeroExpediente: "",
+    numeroTitulo: "",
+    denominacion: "",
+    rama: "",
+    medioIngreso: "",
+    tecnologicoOrigen: "",
+    cePat: "",
+    anioRenovacion: "",
+    tipoSector: "",
+    sector: "",
+    subsector: "",
+    fechaExpedicion: "",
+  archivo: "",
+    observaciones: "",
+    inventores: [
+      {
+        curp: "",
+        nombreCompleto: "",
+        sexo: "",
+        tipoInvestigador: "",
+        institucion: "",
+        programaEducativo: "",
+        cuerpoAcademico: "",
+        departamento: "",
+        fechaAfiliacion: "",
+        fechaFin: "",
+      },
+    ],
   };
 
   entidadesFederativas: FederalEntity[] = ENTIDADES_FEDERATIVAS_DATA
@@ -105,6 +167,30 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     private translate: TranslateService,
     private impiService: ImpiRegistriesService
   ) {
+  }
+
+  // Helpers para autores
+  addInventor(): void {
+    if (!this.patenteModel.inventores) this.patenteModel.inventores = [];
+    this.patenteModel.inventores.push({
+      curp: "",
+      nombreCompleto: "",
+      sexo: "",
+      tipoInvestigador: "",
+      institucion: "",
+      programaEducativo: "",
+      cuerpoAcademico: "",
+      departamento: "",
+      fechaAfiliacion: "",
+      fechaFin: "",
+    });
+  }
+
+  removeInventor(index: number): void {
+    if (!this.patenteModel.inventores) return;
+    if (index > 0 && index < this.patenteModel.inventores.length) {
+      this.patenteModel.inventores.splice(index, 1);
+    }
   }
 
   ngAfterViewInit(): void {
@@ -351,7 +437,12 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cdr.detectChanges();
 
     this.service.getPatent(id).subscribe((patente: IPatentModel) => {
-      this.patenteModel = { ...patente };
+      // Mezclar datos del servicio con campos UI adicionales (si existen)
+      this.patenteModel = {
+        ...this.patenteModel,
+        ...patente,
+        denominacion: patente.nombrePatente || this.patenteModel.denominacion,
+      };
       this.inicializarSeleccionesDesdePatente();
     });
   }
@@ -364,6 +455,59 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       this.patenteModel = { ...patente };
       this.observacionesChanged = false;
       this.resetEditMode();
+    });
+  }
+
+  // Segundo botón: Editar
+  edit(id: number) {
+    this.isViewMode = false;
+    this.cdr.detectChanges();
+
+    this.service.getPatent(id).subscribe((patente: IPatentModel) => {
+      // Mezclar para no perder campos de UI
+      this.patenteModel = { ...this.patenteModel, ...patente };
+      // Derivar denominación si viene vacío
+      if (!this.patenteModel.denominacion) {
+        this.patenteModel.denominacion = this.patenteModel.nombrePatente;
+      }
+    });
+  }
+
+  saveEdit(modal: any) {
+    const payload: IPatentModel = {
+      // Campos base del modelo del backend (evitar enviar los extra de UI si no existen en API)
+      id: this.patenteModel.id,
+      solicitudId: this.patenteModel.solicitudId,
+      nombrePatente: this.patenteModel.denominacion || this.patenteModel.nombrePatente,
+      solicitante: this.patenteModel.solicitante,
+      fechaSolicitud: this.patenteModel.fechaSolicitud,
+      estatus: this.patenteModel.estatus as IPatentModel['estatus'],
+      descripcion: this.patenteModel.descripcion || '',
+      institucion: this.patenteModel.institucion || '',
+      correo: this.patenteModel.correo || '',
+      documentos: this.patenteModel.documentos || [],
+      observaciones: this.patenteModel.observaciones || ''
+    };
+
+    this.service.updatePatent(this.patenteModel.id, payload).subscribe({
+      next: (updated) => {
+        this.showAlert({
+          icon: 'success',
+          title: 'Actualizado',
+          text: 'El registro fue actualizado correctamente.'
+        });
+        this.reloadEvent.emit(true);
+        this.isViewMode = true;
+        modal.dismiss('saved');
+      },
+      error: (err) => {
+        console.error('Error al actualizar patente', err);
+        this.showAlert({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo actualizar el registro.'
+        });
+      }
     });
   }
 

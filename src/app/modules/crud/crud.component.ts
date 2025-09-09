@@ -128,12 +128,12 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
 
         const buttons = [];
 
-        if (this.editEvent.observed) {
-          buttons.push(editButton);
-        }
-
         if (this.viewEvent.observed) {
           buttons.push(viewButton);
+        }
+
+        if (this.editEvent.observed) {
+          buttons.push(editButton);
         }
 
         if (this.followEvent.observed) {
