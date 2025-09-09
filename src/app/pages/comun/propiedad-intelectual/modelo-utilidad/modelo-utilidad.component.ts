@@ -13,8 +13,9 @@ import {IndautorRegistriesService} from '../../../../api/services/indautor.servi
 
 type EstatusModUtil = 'Registrada' | 'En trámite' | 'Trámite con observaciones' | 'Aprobada' | 'Concluida';
 
+// Datos locales para maquetado en este componente (independiente de IMPI)
 export const FAKE_IMPI_DATA = [
-  { id: 1, rama: 'Invención', titulo: 'Sistema Cuántico de Encriptación de Datos', institucion: 'TecNM - I.T. Orizaba', fechaSolicitud: '2025-09-08', numeroExpediente: 'EXP-0001', numeroCertificado: 'CERT-0001' },
+  { id: 1, rama: 'Indautor', titulo: 'indautor', institucion: 'TecNM - I.T. Orizaba', fechaSolicitud: '2025-09-08', numeroExpediente: 'EXP-0001', numeroCertificado: 'CERT-0001' },
   { id: 2, rama: 'Modelo de Utilidad', titulo: 'Dispositivo Portátil para Purificación de Agua', institucion: 'Universidad Nacional Autónoma de México', fechaSolicitud: '2025-09-05', numeroExpediente: 'EXP-0002', numeroCertificado: 'CERT-0002' },
   { id: 3, rama: 'Diseño Industrial', titulo: 'Silla Ergonómica con Materiales Reciclados', institucion: 'Tecnológico de Monterrey', fechaSolicitud: '2025-09-01', numeroExpediente: 'EXP-0003', numeroCertificado: 'CERT-0003' },
   { id: 4, rama: 'Invención', titulo: 'Algoritmo de IA para Detección Temprana de Cáncer', institucion: 'Instituto Politécnico Nacional', fechaSolicitud: '2025-08-28', numeroExpediente: 'EXP-0004', numeroCertificado: 'CERT-0004' },
