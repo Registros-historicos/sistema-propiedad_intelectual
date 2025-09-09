@@ -1,32 +1,49 @@
 <div class="reportes-container">
   <h2>{{ 'REPORTS.TITLE' | translate }}</h2>
   <p>{{ 'REPORTS.DESC' | translate }}</p>
+<!-- GRID DE REPORTES -->
+<div class="card-grid">
+  <div
+    class="reporte-card"
+    *ngFor="let item of reportes; trackBy: trackByArchivo"
+    [ngClass]="item.color"
+  >
+    <h3>{{ item.titulo | translate }}</h3>
+    <p>{{ item.descripcion | translate }}</p>
 
-  <div class="card-grid">
-    <div
-      class="card reporte-card"
-      *ngFor="let reporte of reportes"
-      [ngClass]="reporte.color"
-      (click)="verReporte(reporte.archivo)"
-    >
-      <span class="material-icons icono-reporte">{{ reporte.icono }}</span>
-      <h3>{{ reporte.titulo | translate }}</h3>
-      <p>{{ reporte.descripcion | translate }}</p>
-      <button>{{ 'REPORTS.BUTTON' | translate }}</button>
-    </div>
+    <button type="button" class="btn" (click)="openModal(item)">
+      {{ 'REPORTS.BUTTON' | translate }}
+    </button>
   </div>
+</div>
 
+<!-- Backdrop -->
+<div class="modal-backdrop" *ngIf="modalOpen" (click)="closeModal()" aria-hidden="true"></div>
 
-  <div *ngIf="isLoading" class="custom-loading-overlay">
-    <div class="custom-loading-box">
-      <p class="loading-text">
-        {{ 'REPORTS.LOADING' | translate }}
-        <span class="loading-dots">
-          <span></span>
-          <span></span>
-          <span></span>
-        </span>
-      </p>
-    </div>
+<!-- Modal -->
+<div class="modal" *ngIf="modalOpen" role="dialog" aria-modal="true" tabindex="0" (click)="closeModal()">
+  <div class="modal__content" (click)="$event.stopPropagation()">
+    <header class="modal__header">
+      <!-- Protegemos el pipe translate de undefined -->
+      <h2 id="modalTitle" *ngIf="selectedReporte as r">
+        {{ r.titulo | translate }}
+      </h2>
+      <button type="button" class="modal__close" (click)="closeModal()" aria-label="Cerrar">✕</button>
+    </header>
+
+    <form #f="ngForm" (ngSubmit)="onSubmit(f.value)" class="modal__form">
+      <div class="form-row">
+        <label>Fecha de creación</label>
+        <input type="date" name="fecha" ngModel />
+      </div>
+
+      <footer class="modal__footer">
+        <button type="button" class="btn btn--secondary" (click)="closeModal()">Cancelar</button>
+        <button type="submit" class="btn btn--primary">{{ 'REPORTS.BUTTON' | translate }}</button>
+      </footer>
+    </form>
+    <p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
+
   </div>
+</div>
 </div>
