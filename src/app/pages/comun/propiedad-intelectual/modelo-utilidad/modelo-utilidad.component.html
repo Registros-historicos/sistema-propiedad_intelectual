@@ -24,743 +24,354 @@
 
   <div class="card-body pt-0">
     <app-crud [datatableConfig]="datatableConfig" route="/coordinador/propiedades/modelo-utilidad"
-      (deleteEvent)="delete($event)" (followEvent)="follow($event)" (viewEvent)="view($event)" [reload]="reloadEvent"
-      [modal]="isViewMode ? formModal : formModalFollow">
+      (deleteEvent)="delete($event)" (editEvent)="edit($event)" (viewEvent)="view($event)" [reload]="reloadEvent"
+      [modal]="isViewMode ? formModal : formModalEdit">
     </app-crud>
   </div>
 </div>
 
 <swal #noticeSwal [swalOptions]="swalOptions"></swal>
 
+<!-- Modal Ver (solo lectura) INDAUTOR -->
 <ng-template #formModal let-modal>
   <div class="modal-header">
-    <h3 class="modal-title">
-      <span translate="MODAL.TITLE"></span>
-    </h3>
+    <h3 class="modal-title">REGISTROS INDAUTOR - Ver</h3>
     <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
   </div>
-
   <div class="modal-body">
     <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-650px">
-
-      <!-- ✅ Información básica -->
-      <div class="notice d-flex bg-light-info rounded border-info border border-dashed mb-7 p-6">
-        <app-keenicon name="information-5" class="fs-2tx text-info me-4"></app-keenicon>
-        <div class="d-flex flex-stack flex-grow-1">
-          <div class="fw-semibold">
-            <h4 class="text-gray-900 fw-bold" translate="MODAL.INFO.TITLE"></h4>
-            <div class="fs-6 text-gray-700">
-              <span translate="MODAL.INFO.BODY"></span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="fv-row mb-7">
-        <label class="fw-semibold fs-6 mb-2 text-gray-600" translate="MODAL.FORM.UTILITY_MODEL.NAME"></label>
-        <textarea type="text" class="form-control form-control-solid bg-light" [value]="modUtilModel.nombreModUtil"
-                  readonly style="resize: none; overflow: hidden;" rows="auto"></textarea>
-      </div>
-
+      <!-- 1: N. Expediente | N. Certificado -->
       <div class="row g-9 mb-7">
         <div class="fv-row col-md-6">
-          <label class="fw-semibold fs-6 mb-2 text-gray-600" translate="MODAL.FORM.APPLICANT"></label>
-          <input type="text" class="form-control form-control-solid bg-light" [value]="modUtilModel.solicitante"
-                 readonly />
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">N. Expediente</label>
+          <input class="form-control form-control-solid bg-light" [value]="indautorModel.numeroExpediente" readonly />
         </div>
-
         <div class="fv-row col-md-6">
-          <label class="fw-semibold fs-6 mb-2 text-gray-600" translate="MODAL.FORM.EMAIL"></label>
-          <input type="email" class="form-control form-control-solid bg-light" [value]="modUtilModel.correo" readonly />
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">N. Certificado</label>
+          <input class="form-control form-control-solid bg-light" [value]="indautorModel.numeroCertificado" readonly />
         </div>
       </div>
-
-      <!-- 🆕 MODIFICADO: Fecha y Entidad Federativa en la misma fila -->
+      <!-- 2: Título | Rama -->
       <div class="row g-9 mb-7">
         <div class="fv-row col-md-6">
-          <label class="fw-semibold fs-6 mb-2 text-gray-600" translate="MODAL.FORM.DATE"></label>
-          <input type="text" class="form-control form-control-solid bg-light" [value]="modUtilModel.fechaSolicitud"
-                 readonly />
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Titulo</label>
+          <input class="form-control form-control-solid bg-light" [value]="indautorModel.titulo" readonly />
         </div>
-
         <div class="fv-row col-md-6">
-          <label class="fw-semibold fs-6 mb-2 text-gray-600" translate="MODAL.FORM.FEDERAL_ENTITY.LABEL"></label>
-          <select class="form-select form-select-solid bg-light" [(ngModel)]="estadoSeleccionado"
-                  (ngModelChange)="onEstadoChange($event)" readonly disabled>
-            <option value="" translate="MODAL.FORM.FEDERAL_ENTITY.OPTIONS_LABEL"></option>
-            <option *ngFor="let entidad of entidadesFederativas" [value]="entidad.id">
-              {{entidad.nombre}}
-            </option>
-          </select>
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Rama</label>
+          <input class="form-control form-control-solid bg-light" [value]="indautorModel.rama" readonly />
         </div>
       </div>
-
-      <!-- 🆕 NUEVO: Institución abarcando todo el ancho -->
+      <!-- 3: Estatus | Medio de Ingreso -->
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Estatus</label>
+          <input class="form-control form-control-solid bg-light" [value]="indautorModel.estatus" readonly />
+        </div>
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Medio de Ingreso</label>
+          <input class="form-control form-control-solid bg-light" [value]="indautorModel.medioIngreso" readonly />
+        </div>
+      </div>
+      <!-- 4: Tecnológico de Origen | CePat -->
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Tecnológico de Origen</label>
+          <input class="form-control form-control-solid bg-light" [value]="indautorModel.tecnologicoOrigen" readonly />
+        </div>
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">CePat</label>
+          <input class="form-control form-control-solid bg-light" [value]="indautorModel.cePat" readonly />
+        </div>
+      </div>
+      <!-- 5: Año Renovación | Tipo de Sector -->
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Año Renovación</label>
+          <input class="form-control form-control-solid bg-light" [value]="indautorModel.anioRenovacion" readonly />
+        </div>
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Tipo de Sector</label>
+          <input class="form-control form-control-solid bg-light" [value]="indautorModel.tipoSector" readonly />
+        </div>
+      </div>
+      <!-- 6: Sector | Subsector -->
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Sector</label>
+          <input class="form-control form-control-solid bg-light" [value]="indautorModel.sector" readonly />
+        </div>
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Subsector</label>
+          <input class="form-control form-control-solid bg-light" [value]="indautorModel.subsector" readonly />
+        </div>
+      </div>
+      <!-- 7: Fecha de Solicitud | Fecha de Expedición -->
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Fecha de Solicitud</label>
+          <input class="form-control form-control-solid bg-light" [value]="indautorModel.fechaSolicitud" readonly />
+        </div>
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Fecha de Expedición</label>
+          <input class="form-control form-control-solid bg-light" [value]="indautorModel.fechaExpedicion" readonly />
+        </div>
+      </div>
+      <!-- 8: Archivo | Observaciones -->
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Archivo</label>
+          <input class="form-control form-control-solid bg-light" [value]="indautorModel.archivo" readonly />
+        </div>
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Observaciones</label>
+          <textarea class="form-control form-control-solid bg-light" [value]="indautorModel.observaciones" rows="1" readonly></textarea>
+        </div>
+      </div>
+      <!-- 9: Descripción -->
       <div class="fv-row mb-7">
-        <label class="fw-semibold fs-6 mb-2 text-gray-600" translate="MODAL.FORM.INSTITUTION.LABEL"></label>
-        <select class="form-select form-select-solid bg-light" [(ngModel)]="institucionSeleccionada"
-                (ngModelChange)="onInstitucionChange($event)" readonly disabled>
-          <option value="" translate="MODAL.FORM.INSTITUTION.OPTIONS_LABEL"></option>
-          <option *ngFor="let institucion of institucionesFiltradas" [value]="institucion.id">
-            {{institucion.nombre}}
-          </option>
-        </select>
+        <label class="fw-semibold fs-6 mb-2 text-gray-600">Descripción</label>
+        <textarea class="form-control form-control-solid bg-light" [value]="indautorModel.descripcion" rows="3" readonly></textarea>
       </div>
 
-      <div class="fv-row mb-7">
-        <label class="fw-semibold fs-6 mb-2 text-gray-600" translate="MODAL.FORM.DESCRIPTION"></label>
-        <textarea class="form-control form-control-solid bg-light" [value]="modUtilModel.descripcion" rows="3"
-                  readonly></textarea>
-      </div>
-
-      <!-- 🆕 NUEVA SECCIÓN: ÁREA DE REVISIÓN -->
-      <div class="separator separator-dashed my-7"></div>
-
-      <div class="fw-bold fs-2 text-gray-800 mb-7">
-        <app-keenicon name="clipboard-check" class="fs-2 me-2 text-primary"></app-keenicon>
-        Área de Revisión
-      </div>
-
-      <!-- 🆕 Documentos (reorganizado) -->
-      <div class="fw-bold fs-3 rotate collapsible mb-7" data-bs-toggle="collapse" role="button"
-           (click)="collapse2.toggle()" [attr.aria-expanded]="!isCollapsed2"
-           aria-controls="kt_modal_update_coordinator_documents">
-        <app-keenicon name="folder" class="fs-3 me-2"></app-keenicon>
-        <span translate="MODAL.FORM.DOCUMENTATION"></span>
-        <span class="ms-2 rotate-180">
-          <i class="ki-duotone ki-down fs-3"></i>
-        </span>
-      </div>
-
-      <div class="collapse" #collapse2="ngbCollapse" [(ngbCollapse)]="isCollapsed2">
-        <div class="card card-flush mb-7">
-          <div class="card-body pt-0">
-            <div *ngIf="modUtilModel.documentos && modUtilModel.documentos.length > 0; else noDocuments">
-              <div *ngFor="let documento of modUtilModel.documentos; let i = index"
-                   class="d-flex align-items-center border border-gray-300 border-dashed rounded p-4 mb-3">
-
-                <div class="symbol symbol-50px me-4">
-                  <div class="symbol-label bg-light-danger">
-                    <app-keenicon name="document" class="fs-2 text-danger"></app-keenicon>
-                  </div>
-                </div>
-
-                <div class="flex-grow-1">
-                  <div class="fw-bold text-gray-800 fs-6">{{documento}}</div>
-                </div>
-
-                <div class="d-flex align-items-center">
-                  <button type="button" class="btn btn-sm btn-light-primary me-2" (click)="downloadDocument(documento)"
-                          translate="BUTTON.DOWNLOAD">
-                  </button>
-
-                  <button type="button" class="btn btn-sm btn-light-info" translate="BUTTON.SEE">
-                  </button>
-                </div>
-              </div>
+      <!-- Inventores solo lectura -->
+      <div class="separator separator-dashed my-7" *ngIf="inventoresVisibles.length"></div>
+      <div class="fw-bold fs-4 mb-4" *ngIf="inventoresVisibles.length">Inventores ({{ inventoresVisibles.length }})</div>
+      <div *ngIf="inventoresVisibles.length === 0" class="text-muted">Sin inventores</div>
+      <div *ngFor="let inv of inventoresVisibles; let i = index" class="card card-flush mb-5">
+        <div class="card-header py-3">
+          <div class="card-title fw-bold">Autor {{ i + 1 }}</div>
+        </div>
+        <div class="card-body pt-3">
+          <div class="row g-6">
+            <div class="col-md-6">
+              <label class="form-label text-gray-600">CURP</label>
+              <input class="form-control form-control-solid bg-light" [value]="inv.curp" readonly />
             </div>
-
-            <ng-template #noDocuments>
-              <div class="text-center py-8">
-                <app-keenicon name="file-deleted" class="fs-3x text-muted mb-4"></app-keenicon>
-                <div class="text-muted fs-6" translate="MODAL.FORM.DOCUMENTATION_EMPTY"></div>
-              </div>
-            </ng-template>
-          </div>
-        </div>
-      </div>
-
-      <!-- 🆕 Estatus (MODIFICADO) - Ancho completo con flujo controlado -->
-      <div class="fv-row mb-7">
-        <label class="fw-semibold fs-6 mb-2 text-gray-600" translate="MODAL.FORM.STATUS"></label>
-
-        <!-- 🔹 Modo Solo Lectura -->
-        <div *ngIf="!isEditingStatus" class="form-control form-control-solid d-flex align-items-center justify-content-between bg-light">
-          <span [class]="getStatusBadgeClass(modUtilModel.estatus)" class="badge">
-            {{modUtilModel.estatus}}
-          </span>
-
-          <!-- 🆕 Ícono de editar estatus (solo si se puede editar) -->
-          <button type="button"
-                  class="btn btn-sm btn-icon btn-light-primary"
-                  (click)="enableEditMode()"
-                  *ngIf="canEditStatus()"
-                  title="Actualizar estatus">
-            <app-keenicon name="pencil" class="fs-6"></app-keenicon>
-          </button>
-
-          <!-- 🆕 Mensaje cuando no se puede editar -->
-          <span *ngIf="!canEditStatus()" class="text-muted fst-italic fs-7">
-            Concluida - Finalizó el proceso
-          </span>
-        </div>
-
-        <!-- 🔹 Modo Edición CON SOLUCIÓN 2 -->
-        <div *ngIf="isEditingStatus">
-          <!-- 🆕 Usar ngIf con key única para forzar recreación -->
-          <select *ngIf="editingSelectKey"
-                  class="form-select form-select-solid"
-                  [(ngModel)]="editedStatus"
-                  [class.is-invalid]="statusError"
-                  name="editedStatusSelect">
-            <option value="" disabled selected>Seleccionar nuevo estatus...</option>
-            <option *ngFor="let option of getValidStatusOptions()" [value]="option.value">
-              {{option.label}}
-            </option>
-          </select>
-          <div *ngIf="statusError" class="invalid-feedback">
-            Por favor selecciona un estatus válido
-          </div>
-
-          <!-- 🆕 Información sobre las transiciones -->
-          <div class="form-text text-muted mt-2">
-            <app-keenicon name="information-4" class="fs-6 me-1"></app-keenicon>
-            Solo se muestran los estados válidos según el flujo de aprobación
-          </div>
-        </div>
-      </div>
-
-      <!-- 🆕 NUEVO: Apartado de Observaciones (MODIFICADO) -->
-      <div class="fv-row mb-7">
-        <label class="fw-semibold fs-6 mb-2 text-gray-600">
-          <app-keenicon name="notepad-edit" class="fs-5 me-2"></app-keenicon>
-          Observaciones de Revisión
-        </label>
-
-        <!-- 🔹 Modo Solo Lectura -->
-        <div *ngIf="!isEditingStatus">
-          <div class="form-control form-control-solid bg-light" style="min-height: 100px;">
-            <span *ngIf="modUtilModel.observaciones; else noObservations">
-              {{modUtilModel.observaciones}}
-            </span>
-            <ng-template #noObservations>
-              <span class="text-muted fst-italic">Sin observaciones</span>
-            </ng-template>
-          </div>
-        </div>
-
-        <!-- 🔹 Modo Edición -->
-        <div *ngIf="isEditingStatus">
-          <textarea
-            class="form-control form-control-solid"
-            [(ngModel)]="editedObservations"
-            rows="4"
-            placeholder="Agregar observaciones sobre la revisión de documentos y estatus...">
-          </textarea>
-          <div class="form-text text-muted">
-            Las observaciones ayudan al solicitante a entender el estado de su solicitud.
+            <div class="col-md-6">
+              <label class="form-label text-gray-600">Nombre Completo</label>
+              <input class="form-control form-control-solid bg-light" [value]="inv.nombreCompleto" readonly />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label text-gray-600">Sexo</label>
+              <input class="form-control form-control-solid bg-light" [value]="inv.sexo" readonly />
+            </div>
+            <div class="col-md-8">
+              <label class="form-label text-gray-600">Tipo de investigador</label>
+              <input class="form-control form-control-solid bg-light" [value]="inv.tipoInvestigador" readonly />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-gray-600">Institución</label>
+              <input class="form-control form-control-solid bg-light" [value]="inv.institucion" readonly />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-gray-600">Programa Educativo</label>
+              <input class="form-control form-control-solid bg-light" [value]="inv.programaEducativo" readonly />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-gray-600">Cuerpo Académico</label>
+              <input class="form-control form-control-solid bg-light" [value]="inv.cuerpoAcademico" readonly />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-gray-600">Departamento</label>
+              <input class="form-control form-control-solid bg-light" [value]="inv.departamento" readonly />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-gray-600">Fecha de Afiliación</label>
+              <input class="form-control form-control-solid bg-light" [value]="inv.fechaAfiliacion" readonly />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-gray-600">Fecha de Fin</label>
+              <input class="form-control form-control-solid bg-light" [value]="inv.fechaFin" readonly />
+            </div>
           </div>
         </div>
       </div>
 
     </div>
   </div>
-
-  <!-- 🆕 MODAL FOOTER MODIFICADO - SIN BOTÓN CANCELAR -->
   <div class="modal-footer">
-    <div class="d-flex justify-content-center align-items-center w-100 gap-3">
-
-      <!-- 🔹 Botón Modificar Estatus (Modo Solo Lectura) -->
-      <button type="button"
-              class="btn btn-warning"
-              (click)="enableEditMode()"
-              *ngIf="!isEditingStatus && canEditStatus()">
-        <app-keenicon name="pencil" class="fs-6 me-2"></app-keenicon>
-        Modificar Estatus
-      </button>
-
-      <!-- 🔹 Solo Botón Guardar (Modo Edición) -->
-      <button type="button"
-              class="btn btn-success"
-              (click)="saveChanges()"
-              [disabled]="isSaving"
-              *ngIf="isEditingStatus">
-        <app-keenicon name="check" class="fs-6 me-2"></app-keenicon>
-        <span *ngIf="!isSaving">Guardar</span>
-        <span *ngIf="isSaving">Guardando...</span>
-      </button>
-
-      <!-- 🔹 Botón Cerrar con diseño mejorado -->
-      <button type="button"
-              class="btn btn-light-primary"
-              (click)="closeForm(modal)"
-              [disabled]="isSaving">
-        <app-keenicon name="cross-circle" class="fs-6 me-2"></app-keenicon>
-        <span translate="BUTTON.CLOSE"></span>
-      </button>
-
-    </div>
-  </div>
-</ng-template>
-
-<ng-template #formModalFollow let-modal>
-  <div class="modal-header bg-primary">
-    <h3 class="modal-title text-white">
-      <app-keenicon name="chart" class="fs-2 me-2 text-white"></app-keenicon>
-      <span translate="MODAL.FOLLOW_UP.TITLE"></span>
-    </h3>
-    <button type="button" class="btn-close btn-close-white" aria-label="Close"
-      (click)="modal.dismiss('Cross click')"></button>
-  </div>
-
-  <div class="modal-body">
-    <div class="d-flex flex-column scroll-y me-n7 pe-7">
-
-      <div class="tracking-header">
-        <h4 class="mb-2">{{modUtilModel.nombreModUtil}}</h4>
-        <div class="d-flex justify-content-center align-items-center gap-4">
-          <div class="text-center">
-            <div class="fs-7 opacity-75" translate="MODAL.FOLLOW_UP.APPLICATION_ID"></div>
-            <div class="fw-bold">{{modUtilModel.solicitudId}}</div>
-          </div>
-          <div class="text-center">
-            <div class="fs-7 opacity-75" translate="MODAL.FOLLOW_UP.APPLICANT"></div>
-            <div class="fw-bold">{{modUtilModel.solicitante}}</div>
-          </div>
-          <div class="text-center">
-            <div class="fs-7 opacity-75" translate="MODAL.FOLLOW_UP.PROGRESS"></div>
-            <div class="fw-bold">{{getStatusProgress(modUtilModel.estatus)}}%</div>
-          </div>
-        </div>
-
-        <div class="progress-indicator mt-4">
-          <div class="progress-bar" [style.width.%]="getStatusProgress(modUtilModel.estatus)"></div>
-        </div>
-      </div>
-
-      <div class="card card-flush mb-6">
-        <div class="card-body text-center py-8">
-          <div class="symbol symbol-75px mx-auto mb-4">
-            <div class="symbol-label" [ngClass]="{
-              'bg-success': modUtilModel.estatus === 'Aprobada' || modUtilModel.estatus === 'Concluida',
-              'bg-primary': modUtilModel.estatus === 'Registrada',
-              'bg-warning': modUtilModel.estatus === 'En trámite',
-              'bg-danger': modUtilModel.estatus === 'Trámite con observaciones'
-            }">
-              <app-keenicon [name]="getStatusIcon(modUtilModel.estatus)" class="fs-1 text-white"></app-keenicon>
-            </div>
-          </div>
-          <h3 class="fw-bold text-gray-800 mb-2">{{modUtilModel.estatus}}</h3>
-          <div class="fs-6 text-gray-600">{{getStatusDescription(modUtilModel.estatus)}}</div>
-        </div>
-      </div>
-
-      <div class="card card-flush mb-6">
-        <div class="card-header">
-          <div class="card-title">
-            <h4 class="fw-bold text-gray-800">
-              <app-keenicon name="timeline" class="fs-2 me-2"></app-keenicon>
-              <span translate="MODAL.FOLLOW_UP.HISTORY_TITLE"></span>
-            </h4>
-          </div>
-        </div>
-        <div class="card-body">
-          <div class="timeline">
-
-            <div class="timeline-item" [ngClass]="{
-              'active': modUtilModel.estatus === 'Registrada',
-              'completed': getStatusOrder(modUtilModel.estatus) > 1
-            }">
-              <div class="timeline-line"></div>
-              <div class="timeline-icon symbol symbol-circle symbol-40px">
-                <div class="symbol-label" [ngClass]="{
-                  'bg-success': getStatusOrder(modUtilModel.estatus) > 1,
-                  'bg-primary': modUtilModel.estatus === 'Registrada',
-                  'bg-light-gray': getStatusOrder(modUtilModel.estatus) < 1
-                }">
-                  <app-keenicon name="check" class="fs-2" [ngClass]="{
-                    'text-white': getStatusOrder(modUtilModel.estatus) >= 1,
-                    'text-gray-400': getStatusOrder(modUtilModel.estatus) < 1
-                  }"></app-keenicon>
-                </div>
-              </div>
-              <div class="timeline-content">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                  <h5 class="fw-bold text-gray-800 mb-0" translate="MODAL.FOLLOW_UP.STATUS.REGISTERED"></h5>
-                  <span class="status-badge" [ngClass]="{
-                    'current': modUtilModel.estatus === 'Registrada',
-                    'completed': getStatusOrder(modUtilModel.estatus) > 1
-                  }">
-                    <app-keenicon [name]="modUtilModel.estatus === 'Registrada' ? 'timer' : 'check'"
-                      class="fs-4"></app-keenicon>
-                    <span
-                      translate="{{modUtilModel.estatus === 'Registrada' ? 'MODAL.FOLLOW_UP.STATUS_LABELS.CURRENT' : 'MODAL.FOLLOW_UP.STATUS_LABELS.COMPLETED'}}"></span>
-                  </span>
-                </div>
-                <p class="text-gray-700 mb-0" translate="MODAL.FOLLOW_UP.DETAILS.REGISTERED.DESCRIPTION"></p>
-                <div class="fs-7 text-gray-500 mt-2">
-                  <app-keenicon name="calendar" class="fs-5 me-1"></app-keenicon>
-                  <span translate="MODAL.FOLLOW_UP.DETAILS.REGISTERED.DATE_LABEL"></span>
-                  {{modUtilModel.fechaSolicitud}}
-                </div>
-              </div>
-            </div>
-
-            <div class="timeline-item" [ngClass]="{
-              'active': modUtilModel.estatus === 'En trámite',
-              'completed': getStatusOrder(modUtilModel.estatus) > 2 && modUtilModel.estatus !== 'Trámite con observaciones'
-            }">
-              <div class="timeline-line"></div>
-              <div class="timeline-icon symbol symbol-circle symbol-40px">
-                <div class="symbol-label" [ngClass]="{
-                  'bg-success': getStatusOrder(modUtilModel.estatus) > 2 && modUtilModel.estatus !== 'Trámite con observaciones',
-                  'bg-warning': modUtilModel.estatus === 'En trámite',
-                  'bg-light-gray': getStatusOrder(modUtilModel.estatus) < 2
-                }">
-                  <app-keenicon [name]="modUtilModel.estatus === 'En trámite' ? 'timer' : 'check'" class="fs-2"
-                    [ngClass]="{
-                    'text-white': getStatusOrder(modUtilModel.estatus) >= 2,
-                    'text-gray-400': getStatusOrder(modUtilModel.estatus) < 2
-                  }"></app-keenicon>
-                </div>
-              </div>
-              <div class="timeline-content">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                  <h5 class="fw-bold text-gray-800 mb-0" translate="MODAL.FOLLOW_UP.STATUS.IN_PROCESS"></h5>
-                  <span class="status-badge" [ngClass]="{
-                    'current': modUtilModel.estatus === 'En trámite',
-                    'completed': getStatusOrder(modUtilModel.estatus) > 2 && modUtilModel.estatus !== 'Trámite con observaciones'
-                  }">
-                    <app-keenicon [name]="modUtilModel.estatus === 'En trámite' ? 'timer' : 'check'"
-                      class="fs-4"></app-keenicon>
-                    <span
-                      translate="{{modUtilModel.estatus === 'En trámite' ? 'MODAL.FOLLOW_UP.STATUS_LABELS.CURRENT' : 'MODAL.FOLLOW_UP.STATUS_LABELS.COMPLETED'}}"></span>
-                  </span>
-                </div>
-                <p class="text-gray-700 mb-0" translate="MODAL.FOLLOW_UP.DETAILS.IN_PROCESS.DESCRIPTION"></p>
-              </div>
-            </div>
-
-            <div class="timeline-item observation" *ngIf="modUtilModel.estatus === 'Trámite con observaciones'">
-              <div class="timeline-line"></div>
-              <div class="timeline-icon symbol symbol-circle symbol-40px">
-                <div class="symbol-label bg-danger">
-                  <app-keenicon name="information" class="fs-2 text-white"></app-keenicon>
-                </div>
-              </div>
-              <div class="timeline-content">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                  <h5 class="fw-bold text-gray-800 mb-0" translate="MODAL.FOLLOW_UP.STATUS.WITH_OBSERVATIONS"></h5>
-                  <span class="status-badge observation">
-                    <app-keenicon name="exclamation" class="fs-4"></app-keenicon>
-                    <span translate="MODAL.FOLLOW_UP.STATUS_LABELS.REQUIRES_ATTENTION"></span>
-                  </span>
-                </div>
-                <p class="text-gray-700 mb-0" translate="MODAL.FOLLOW_UP.DETAILS.WITH_OBSERVATIONS.DESCRIPTION"></p>
-                <div class="fs-7 text-gray-500 mt-2">
-                  <app-keenicon name="time" class="fs-5 me-1"></app-keenicon>
-                  <span translate="MODAL.FOLLOW_UP.DETAILS.WITH_OBSERVATIONS.DEADLINE"></span>
-                </div>
-              </div>
-            </div>
-
-            <div class="timeline-item" [ngClass]="{
-              'active': modUtilModel.estatus === 'Aprobada',
-              'completed': modUtilModel.estatus === 'Concluida'
-            }">
-              <div class="timeline-line"></div>
-              <div class="timeline-icon symbol symbol-circle symbol-40px">
-                <div class="symbol-label" [ngClass]="{
-                  'bg-success': getStatusOrder(modUtilModel.estatus) >= 4,
-                  'bg-light-gray': getStatusOrder(modUtilModel.estatus) < 4
-                }">
-                  <app-keenicon name="check" class="fs-2" [ngClass]="{
-                    'text-white': getStatusOrder(modUtilModel.estatus) >= 4,
-                    'text-gray-400': getStatusOrder(modUtilModel.estatus) < 4
-                  }"></app-keenicon>
-                </div>
-              </div>
-              <div class="timeline-content">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                  <h5 class="fw-bold text-gray-800 mb-0" translate="MODAL.FOLLOW_UP.STATUS.APPROVED"></h5>
-                  <span class="status-badge" [ngClass]="{
-                    'current': modUtilModel.estatus === 'Aprobada',
-                    'completed': modUtilModel.estatus === 'Concluida'
-                  }">
-                    <app-keenicon [name]="modUtilModel.estatus === 'Aprobada' ? 'timer' : 'check'"
-                      class="fs-4"></app-keenicon>
-                    <span
-                      translate="{{modUtilModel.estatus === 'Aprobada' ? 'MODAL.FOLLOW_UP.STATUS_LABELS.CURRENT' : 'MODAL.FOLLOW_UP.STATUS_LABELS.COMPLETED'}}"></span>
-                  </span>
-                </div>
-                <p class="text-gray-700 mb-0" translate="MODAL.FOLLOW_UP.DETAILS.APPROVED.DESCRIPTION"></p>
-              </div>
-            </div>
-
-            <div class="timeline-item" [ngClass]="{
-              'active': modUtilModel.estatus === 'Concluida'
-            }">
-              <div class="timeline-icon symbol symbol-circle symbol-40px">
-                <div class="symbol-label" [ngClass]="{
-                  'bg-info': modUtilModel.estatus === 'Concluida',
-                  'bg-light-gray': modUtilModel.estatus !== 'Concluida'
-                }">
-                  <app-keenicon name="check-circle" class="fs-2" [ngClass]="{
-                    'text-white': modUtilModel.estatus === 'Concluida',
-                    'text-gray-400': modUtilModel.estatus !== 'Concluida'
-                  }"></app-keenicon>
-                </div>
-              </div>
-              <div class="timeline-content">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                  <h5 class="fw-bold text-gray-800 mb-0" translate="MODAL.FOLLOW_UP.STATUS.COMPLETED"></h5>
-                  <span class="status-badge" [ngClass]="{'current': modUtilModel.estatus === 'Concluida'}">
-                    <app-keenicon name="check-circle" class="fs-4"></app-keenicon>
-                    <span
-                      translate="{{modUtilModel.estatus === 'Concluida' ? 'MODAL.FOLLOW_UP.STATUS_LABELS.FINISHED' : 'MODAL.FOLLOW_UP.STATUS_LABELS.PENDING'}}"></span>
-                  </span>
-                </div>
-                <p class="text-gray-700 mb-0" translate="MODAL.FOLLOW_UP.DETAILS.COMPLETED.DESCRIPTION"></p>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <div class="modal-footer">
-    <button type="button" class="btn btn-light" (click)="closeForm(modal)">
-      <app-keenicon name="cross" class="fs-3 me-1"></app-keenicon>
-      <span translate="MODAL.FOLLOW_UP.BUTTONS.CLOSE"></span>
+    <button type="button" class="btn btn-light-primary" (click)="closeForm(modal)">
+      <app-keenicon name="cross-circle" class="fs-6 me-2"></app-keenicon>
+      Cerrar
     </button>
   </div>
 </ng-template>
 
-<ng-template #formModalFollow let-modal>
+<!-- Modal Editar INDAUTOR -->
+<ng-template #formModalEdit let-modal>
   <div class="modal-header bg-primary">
-    <h3 class="modal-title text-white">
-      <app-keenicon name="chart" class="fs-2 me-2 text-white"></app-keenicon>
-      <span translate="MODAL.FOLLOW_UP.TITLE"></span>
-    </h3>
-    <button type="button" class="btn-close btn-close-white" aria-label="Close"
-      (click)="modal.dismiss('Cross click')"></button>
+    <h3 class="modal-title text-white">REGISTROS INDAUTOR - Editar</h3>
+    <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
   </div>
-
   <div class="modal-body">
-    <div class="d-flex flex-column scroll-y me-n7 pe-7">
-
-      <div class="tracking-header">
-        <h4 class="mb-2">{{modUtilModel.nombreModUtil}}</h4>
-        <div class="d-flex justify-content-center align-items-center gap-4">
-          <div class="text-center">
-            <div class="fs-7 opacity-75" translate="MODAL.FOLLOW_UP.APPLICATION_ID"></div>
-            <div class="fw-bold">{{modUtilModel.solicitudId}}</div>
-          </div>
-          <div class="text-center">
-            <div class="fs-7 opacity-75" translate="MODAL.FOLLOW_UP.APPLICANT"></div>
-            <div class="fw-bold">{{modUtilModel.solicitante}}</div>
-          </div>
-          <div class="text-center">
-            <div class="fs-7 opacity-75" translate="MODAL.FOLLOW_UP.PROGRESS"></div>
-            <div class="fw-bold">{{getStatusProgress(modUtilModel.estatus)}}%</div>
-          </div>
+    <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-650px">
+      <!-- 1: N. Expediente | N. Certificado -->
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="required fw-semibold fs-6 mb-2 text-gray-600">N. Expediente</label>
+          <input class="form-control form-control-solid" [(ngModel)]="indautorModel.numeroExpediente" />
         </div>
-
-        <div class="progress-indicator mt-4">
-          <div class="progress-bar" [style.width.%]="getStatusProgress(modUtilModel.estatus)"></div>
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">N. Certificado</label>
+          <input class="form-control form-control-solid" [(ngModel)]="indautorModel.numeroCertificado" />
         </div>
       </div>
-
-      <div class="card card-flush mb-6">
-        <div class="card-body text-center py-8">
-          <div class="symbol symbol-75px mx-auto mb-4">
-            <div class="symbol-label" [ngClass]="{
-              'bg-success': modUtilModel.estatus === 'Aprobada' || modUtilModel.estatus === 'Concluida',
-              'bg-primary': modUtilModel.estatus === 'Registrada',
-              'bg-warning': modUtilModel.estatus === 'En trámite',
-              'bg-danger': modUtilModel.estatus === 'Trámite con observaciones'
-            }">
-              <app-keenicon [name]="getStatusIcon(modUtilModel.estatus)" class="fs-1 text-white"></app-keenicon>
-            </div>
-          </div>
-          <h3 class="fw-bold text-gray-800 mb-2">{{modUtilModel.estatus}}</h3>
-          <div class="fs-6 text-gray-600">{{getStatusDescription(modUtilModel.estatus)}}</div>
+      <!-- 2: Título | Rama -->
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="required fw-semibold fs-6 mb-2 text-gray-600">Titulo</label>
+          <input class="form-control form-control-solid" [(ngModel)]="indautorModel.titulo" />
+        </div>
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Rama</label>
+          <input class="form-control form-control-solid" [(ngModel)]="indautorModel.rama" />
         </div>
       </div>
-
-      <div class="card card-flush mb-6">
-        <div class="card-header">
-          <div class="card-title">
-            <h4 class="fw-bold text-gray-800">
-              <app-keenicon name="timeline" class="fs-2 me-2"></app-keenicon>
-              <span translate="MODAL.FOLLOW_UP.HISTORY_TITLE"></span>
-            </h4>
-          </div>
+      <!-- 3: Estatus | Medio de Ingreso -->
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Estatus</label>
+          <input class="form-control form-control-solid" [(ngModel)]="indautorModel.estatus" />
         </div>
-        <div class="card-body">
-          <div class="timeline">
-
-            <div class="timeline-item" [ngClass]="{
-              'active': modUtilModel.estatus === 'Registrada',
-              'completed': getStatusOrder(modUtilModel.estatus) > 1
-            }">
-              <div class="timeline-line"></div>
-              <div class="timeline-icon symbol symbol-circle symbol-40px">
-                <div class="symbol-label" [ngClass]="{
-                  'bg-success': getStatusOrder(modUtilModel.estatus) > 1,
-                  'bg-primary': modUtilModel.estatus === 'Registrada',
-                  'bg-light-gray': getStatusOrder(modUtilModel.estatus) < 1
-                }">
-                  <app-keenicon name="check" class="fs-2" [ngClass]="{
-                    'text-white': getStatusOrder(modUtilModel.estatus) >= 1,
-                    'text-gray-400': getStatusOrder(modUtilModel.estatus) < 1
-                  }"></app-keenicon>
-                </div>
-              </div>
-              <div class="timeline-content">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                  <h5 class="fw-bold text-gray-800 mb-0" translate="MODAL.FOLLOW_UP.STATUS.REGISTERED"></h5>
-                  <span class="status-badge" [ngClass]="{
-                    'current': modUtilModel.estatus === 'Registrada',
-                    'completed': getStatusOrder(modUtilModel.estatus) > 1
-                  }">
-                    <app-keenicon [name]="modUtilModel.estatus === 'Registrada' ? 'timer' : 'check'"
-                      class="fs-4"></app-keenicon>
-                    <span
-                      translate="{{modUtilModel.estatus === 'Registrada' ? 'MODAL.FOLLOW_UP.STATUS_LABELS.CURRENT' : 'MODAL.FOLLOW_UP.STATUS_LABELS.COMPLETED'}}"></span>
-                  </span>
-                </div>
-                <p class="text-gray-700 mb-0" translate="MODAL.FOLLOW_UP.DETAILS.REGISTERED.DESCRIPTION"></p>
-                <div class="fs-7 text-gray-500 mt-2">
-                  <app-keenicon name="calendar" class="fs-5 me-1"></app-keenicon>
-                  <span translate="MODAL.FOLLOW_UP.DETAILS.REGISTERED.DATE_LABEL"></span>
-                  {{modUtilModel.fechaSolicitud}}
-                </div>
-              </div>
-            </div>
-
-            <div class="timeline-item" [ngClass]="{
-              'active': modUtilModel.estatus === 'En trámite',
-              'completed': getStatusOrder(modUtilModel.estatus) > 2 && modUtilModel.estatus !== 'Trámite con observaciones'
-            }">
-              <div class="timeline-line"></div>
-              <div class="timeline-icon symbol symbol-circle symbol-40px">
-                <div class="symbol-label" [ngClass]="{
-                  'bg-success': getStatusOrder(modUtilModel.estatus) > 2 && modUtilModel.estatus !== 'Trámite con observaciones',
-                  'bg-warning': modUtilModel.estatus === 'En trámite',
-                  'bg-light-gray': getStatusOrder(modUtilModel.estatus) < 2
-                }">
-                  <app-keenicon [name]="modUtilModel.estatus === 'En trámite' ? 'timer' : 'check'" class="fs-2"
-                    [ngClass]="{
-                    'text-white': getStatusOrder(modUtilModel.estatus) >= 2,
-                    'text-gray-400': getStatusOrder(modUtilModel.estatus) < 2
-                  }"></app-keenicon>
-                </div>
-              </div>
-              <div class="timeline-content">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                  <h5 class="fw-bold text-gray-800 mb-0" translate="MODAL.FOLLOW_UP.STATUS.IN_PROCESS"></h5>
-                  <span class="status-badge" [ngClass]="{
-                    'current': modUtilModel.estatus === 'En trámite',
-                    'completed': getStatusOrder(modUtilModel.estatus) > 2 && modUtilModel.estatus !== 'Trámite con observaciones'
-                  }">
-                    <app-keenicon [name]="modUtilModel.estatus === 'En trámite' ? 'timer' : 'check'"
-                      class="fs-4"></app-keenicon>
-                    <span
-                      translate="{{modUtilModel.estatus === 'En trámite' ? 'MODAL.FOLLOW_UP.STATUS_LABELS.CURRENT' : 'MODAL.FOLLOW_UP.STATUS_LABELS.COMPLETED'}}"></span>
-                  </span>
-                </div>
-                <p class="text-gray-700 mb-0" translate="MODAL.FOLLOW_UP.DETAILS.IN_PROCESS.DESCRIPTION"></p>
-              </div>
-            </div>
-
-            <div class="timeline-item observation" *ngIf="modUtilModel.estatus === 'Trámite con observaciones'">
-              <div class="timeline-line"></div>
-              <div class="timeline-icon symbol symbol-circle symbol-40px">
-                <div class="symbol-label bg-danger">
-                  <app-keenicon name="information" class="fs-2 text-white"></app-keenicon>
-                </div>
-              </div>
-              <div class="timeline-content">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                  <h5 class="fw-bold text-gray-800 mb-0" translate="MODAL.FOLLOW_UP.STATUS.WITH_OBSERVATIONS"></h5>
-                  <span class="status-badge observation">
-                    <app-keenicon name="exclamation" class="fs-4"></app-keenicon>
-                    <span translate="MODAL.FOLLOW_UP.STATUS_LABELS.REQUIRES_ATTENTION"></span>
-                  </span>
-                </div>
-                <p class="text-gray-700 mb-0" translate="MODAL.FOLLOW_UP.DETAILS.WITH_OBSERVATIONS.DESCRIPTION"></p>
-                <div class="fs-7 text-gray-500 mt-2">
-                  <app-keenicon name="time" class="fs-5 me-1"></app-keenicon>
-                  <span translate="MODAL.FOLLOW_UP.DETAILS.WITH_OBSERVATIONS.DEADLINE"></span>
-                </div>
-              </div>
-            </div>
-
-            <div class="timeline-item" [ngClass]="{
-              'active': modUtilModel.estatus === 'Aprobada',
-              'completed': modUtilModel.estatus === 'Concluida'
-            }">
-              <div class="timeline-line"></div>
-              <div class="timeline-icon symbol symbol-circle symbol-40px">
-                <div class="symbol-label" [ngClass]="{
-                  'bg-success': getStatusOrder(modUtilModel.estatus) >= 4,
-                  'bg-light-gray': getStatusOrder(modUtilModel.estatus) < 4
-                }">
-                  <app-keenicon name="check" class="fs-2" [ngClass]="{
-                    'text-white': getStatusOrder(modUtilModel.estatus) >= 4,
-                    'text-gray-400': getStatusOrder(modUtilModel.estatus) < 4
-                  }"></app-keenicon>
-                </div>
-              </div>
-              <div class="timeline-content">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                  <h5 class="fw-bold text-gray-800 mb-0" translate="MODAL.FOLLOW_UP.STATUS.APPROVED"></h5>
-                  <span class="status-badge" [ngClass]="{
-                    'current': modUtilModel.estatus === 'Aprobada',
-                    'completed': modUtilModel.estatus === 'Concluida'
-                  }">
-                    <app-keenicon [name]="modUtilModel.estatus === 'Aprobada' ? 'timer' : 'check'"
-                      class="fs-4"></app-keenicon>
-                    <span
-                      translate="{{modUtilModel.estatus === 'Aprobada' ? 'MODAL.FOLLOW_UP.STATUS_LABELS.CURRENT' : 'MODAL.FOLLOW_UP.STATUS_LABELS.COMPLETED'}}"></span>
-                  </span>
-                </div>
-                <p class="text-gray-700 mb-0" translate="MODAL.FOLLOW_UP.DETAILS.APPROVED.DESCRIPTION"></p>
-              </div>
-            </div>
-
-            <div class="timeline-item" [ngClass]="{
-              'active': modUtilModel.estatus === 'Concluida'
-            }">
-              <div class="timeline-icon symbol symbol-circle symbol-40px">
-                <div class="symbol-label" [ngClass]="{
-                  'bg-info': modUtilModel.estatus === 'Concluida',
-                  'bg-light-gray': modUtilModel.estatus !== 'Concluida'
-                }">
-                  <app-keenicon name="check-circle" class="fs-2" [ngClass]="{
-                    'text-white': modUtilModel.estatus === 'Concluida',
-                    'text-gray-400': modUtilModel.estatus !== 'Concluida'
-                  }"></app-keenicon>
-                </div>
-              </div>
-              <div class="timeline-content">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                  <h5 class="fw-bold text-gray-800 mb-0" translate="MODAL.FOLLOW_UP.STATUS.COMPLETED"></h5>
-                  <span class="status-badge" [ngClass]="{'current': modUtilModel.estatus === 'Concluida'}">
-                    <app-keenicon name="check-circle" class="fs-4"></app-keenicon>
-                    <span
-                      translate="{{modUtilModel.estatus === 'Concluida' ? 'MODAL.FOLLOW_UP.STATUS_LABELS.FINISHED' : 'MODAL.FOLLOW_UP.STATUS_LABELS.PENDING'}}"></span>
-                  </span>
-                </div>
-                <p class="text-gray-700 mb-0" translate="MODAL.FOLLOW_UP.DETAILS.COMPLETED.DESCRIPTION"></p>
-              </div>
-            </div>
-
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Medio de Ingreso</label>
+          <input class="form-control form-control-solid" [(ngModel)]="indautorModel.medioIngreso" />
+        </div>
+      </div>
+      <!-- 4: Tecnológico de Origen | CePat -->
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Tecnológico de Origen</label>
+          <input class="form-control form-control-solid" [(ngModel)]="indautorModel.tecnologicoOrigen" />
+        </div>
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">CePat</label>
+          <input class="form-control form-control-solid" [(ngModel)]="indautorModel.cePat" />
+        </div>
+      </div>
+      <!-- 5: Año Renovación | Tipo de Sector -->
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Año Renovación</label>
+          <input class="form-control form-control-solid" [(ngModel)]="indautorModel.anioRenovacion" />
+        </div>
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Tipo de Sector</label>
+          <input class="form-control form-control-solid" [(ngModel)]="indautorModel.tipoSector" />
+        </div>
+      </div>
+      <!-- 6: Sector | Subsector -->
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Sector</label>
+          <input class="form-control form-control-solid" [(ngModel)]="indautorModel.sector" />
+        </div>
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Subsector</label>
+          <input class="form-control form-control-solid" [(ngModel)]="indautorModel.subsector" />
+        </div>
+      </div>
+      <!-- 7: Fecha de Solicitud | Fecha de Expedición -->
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="required fw-semibold fs-6 mb-2 text-gray-600">Fecha de Solicitud</label>
+          <input type="date" class="form-control form-control-solid" [(ngModel)]="indautorModel.fechaSolicitud" />
+        </div>
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Fecha de Expedición</label>
+          <input type="date" class="form-control form-control-solid" [(ngModel)]="indautorModel.fechaExpedicion" />
+        </div>
+      </div>
+      <!-- 8: Archivo | Observaciones -->
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Archivo</label>
+          <input class="form-control form-control-solid" [(ngModel)]="indautorModel.archivo" />
+        </div>
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Observaciones</label>
+          <textarea class="form-control form-control-solid" [(ngModel)]="indautorModel.observaciones" rows="1"></textarea>
+        </div>
+      </div>
+      <!-- 9: Descripción -->
+      <div class="fv-row mb-7">
+        <label class="fw-semibold fs-6 mb-2 text-gray-600">Descripción</label>
+        <textarea class="form-control form-control-solid" [(ngModel)]="indautorModel.descripcion" rows="3"></textarea>
+      </div>
+      <!-- Inventores -->
+      <div class="separator separator-dashed my-7"></div>
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div class="fw-bold fs-5 text-gray-800">Inventores <span class="badge badge-light-primary ms-2">{{ indautorModel.inventores.length }}</span></div>
+        <button type="button" class="btn btn-sm btn-light-primary" (click)="addInventor()">
+          <app-keenicon name="plus" class="fs-5 me-1"></app-keenicon>
+          Agregar inventor
+        </button>
+      </div>
+      <div *ngIf="!indautorModel.inventores || indautorModel.inventores.length === 0" class="text-muted">Sin inventores</div>
+      <div *ngFor="let inv of indautorModel.inventores; let i = index" class="border rounded p-4 mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="fw-semibold">Inventor {{ i + 1 }}</div>
+          <button type="button" class="btn btn-icon btn-sm btn-light-danger" (click)="removeInventor(i)">
+            <i class="ki-duotone ki-trash fs-4"></i>
+          </button>
+        </div>
+        <div class="row g-6">
+          <div class="col-md-6">
+            <label class="fw-semibold fs-7 mb-1">CURP</label>
+            <input class="form-control form-control-solid" [(ngModel)]="inv.curp" />
+          </div>
+          <div class="col-md-6">
+            <label class="fw-semibold fs-7 mb-1">Nombre Completo</label>
+            <input class="form-control form-control-solid" [(ngModel)]="inv.nombreCompleto" />
+          </div>
+          <div class="col-md-4">
+            <label class="fw-semibold fs-7 mb-1">Sexo</label>
+            <select class="form-select form-select-solid" [(ngModel)]="inv.sexo">
+              <option value="">-</option>
+              <option value="M">M</option>
+              <option value="F">F</option>
+            </select>
+          </div>
+          <div class="col-md-8">
+            <label class="fw-semibold fs-7 mb-1">Tipo de investigador</label>
+            <input class="form-control form-control-solid" [(ngModel)]="inv.tipoInvestigador" />
+          </div>
+          <div class="col-md-6">
+            <label class="fw-semibold fs-7 mb-1">Institución</label>
+            <input class="form-control form-control-solid" [(ngModel)]="inv.institucion" />
+          </div>
+          <div class="col-md-6">
+            <label class="fw-semibold fs-7 mb-1">Programa Educativo</label>
+            <input class="form-control form-control-solid" [(ngModel)]="inv.programaEducativo" />
+          </div>
+          <div class="col-md-6">
+            <label class="fw-semibold fs-7 mb-1">Cuerpo Académico</label>
+            <input class="form-control form-control-solid" [(ngModel)]="inv.cuerpoAcademico" />
+          </div>
+          <div class="col-md-6">
+            <label class="fw-semibold fs-7 mb-1">Departamento</label>
+            <input class="form-control form-control-solid" [(ngModel)]="inv.departamento" />
+          </div>
+          <div class="col-md-6">
+            <label class="fw-semibold fs-7 mb-1">Fecha de Afiliación</label>
+            <input type="date" class="form-control form-control-solid" [(ngModel)]="inv.fechaAfiliacion" />
+          </div>
+          <div class="col-md-6">
+            <label class="fw-semibold fs-7 mb-1">Fecha de Fin</label>
+            <input type="date" class="form-control form-control-solid" [(ngModel)]="inv.fechaFin" />
           </div>
         </div>
       </div>
-
     </div>
   </div>
-
   <div class="modal-footer">
+    <button type="button" class="btn btn-success" (click)="saveEdit(modal)">
+      <app-keenicon name="check" class="fs-6 me-2"></app-keenicon>
+      Guardar
+    </button>
     <button type="button" class="btn btn-light" (click)="closeForm(modal)">
-      <app-keenicon name="cross" class="fs-3 me-1"></app-keenicon>
-      <span translate="MODAL.FOLLOW_UP.BUTTONS.CLOSE"></span>
+      Cancelar
     </button>
   </div>
 </ng-template>
