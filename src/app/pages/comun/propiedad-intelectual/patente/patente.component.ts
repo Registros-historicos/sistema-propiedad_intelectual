@@ -60,6 +60,8 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   pageLength: number = 10;
   dtInstance: any;
   selectedPage: number = 0;
+  // Flag para trabajar con el arreglo local de la tabla
+  useLocalFakeData: boolean = true;
 
   lengthMenu: number[] = [5, 10, 15, 20];
 
@@ -207,11 +209,10 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.placeholder = this.translate.instant('TABLE.PLACEHOLDER_SEARCH')
 
-    // Para mostrar el mismo arreglo y columnas que en INDAUTOR/local, cambia serverSide a false y usa FAKE_IMPI_DATA
-  const useLocalFakeData = true; // usar dataset local propio de este componente
+    // Para mostrar el mismo arreglo y columnas que en INDAUTOR/local, usa el dataset local propio de este componente
 
     this.datatableConfig = {
-      serverSide: !useLocalFakeData,
+      serverSide: !this.useLocalFakeData,
       lengthMenu: this.lengthMenu,
       pageLength: this.pageLength,
       language: {
@@ -223,7 +224,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         zeroRecords: this.translate.instant('TABLE.ZERO_RECORDS'),
       },
       paging: true,
-      ...(useLocalFakeData ? {
+  ...(this.useLocalFakeData ? {
         data: this.FAKE_IMPI_DATA_LOCAL.map(item => ({
           id: item.id,
           rama: item.rama,
@@ -427,24 +428,54 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   delete(id: number) {
-    this.service.deletePatent(id).subscribe(() => {
-      this.reloadEvent.emit(true);
-    });
+    if (this.useLocalFakeData) {
+      const numericId = Number(id);
+      const idx = this.FAKE_IMPI_DATA_LOCAL.findIndex(x => x.id === numericId);
+      if (idx > -1) {
+        this.FAKE_IMPI_DATA_LOCAL.splice(idx, 1);
+        if (this.dtInstance) {
+          this.dtInstance.rows((i: number, rowData: any) => rowData.id === numericId).remove().draw(false);
+        }
+      }
+      return;
+    } else {
+      this.service.deletePatent(id).subscribe(() => {
+        this.reloadEvent.emit(true);
+      });
+    }
   }
 
   view(id: number) {
     this.isViewMode = true;
     this.cdr.detectChanges();
 
-    this.service.getPatent(id).subscribe((patente: IPatentModel) => {
-      // Mezclar datos del servicio con campos UI adicionales (si existen)
-      this.patenteModel = {
-        ...this.patenteModel,
-        ...patente,
-        denominacion: patente.nombrePatente || this.patenteModel.denominacion,
-      };
-      this.inicializarSeleccionesDesdePatente();
-    });
+    if (this.useLocalFakeData) {
+      const numericId = Number(id);
+      const item = this.FAKE_IMPI_DATA_LOCAL.find(x => x.id === numericId);
+      if (item) {
+        this.patenteModel = {
+          ...this.patenteModel,
+          id: item.id,
+          nombrePatente: item.titulo,
+          denominacion: item.titulo,
+          rama: item.rama,
+          institucion: item.institucion,
+          fechaSolicitud: item.fechaSolicitud,
+          numeroExpediente: item.numeroExpediente,
+          numeroTitulo: item.numeroCertificado,
+        } as PatenteUIModel;
+      }
+    } else {
+      this.service.getPatent(id).subscribe((patente: IPatentModel) => {
+        // Mezclar datos del servicio con campos UI adicionales (si existen)
+        this.patenteModel = {
+          ...this.patenteModel,
+          ...patente,
+          denominacion: patente.nombrePatente || this.patenteModel.denominacion,
+        };
+        this.inicializarSeleccionesDesdePatente();
+      });
+    }
   }
 
   follow(id: number) {
@@ -463,52 +494,103 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isViewMode = false;
     this.cdr.detectChanges();
 
-    this.service.getPatent(id).subscribe((patente: IPatentModel) => {
-      // Mezclar para no perder campos de UI
-      this.patenteModel = { ...this.patenteModel, ...patente };
-      // Derivar denominación si viene vacío
-      if (!this.patenteModel.denominacion) {
-        this.patenteModel.denominacion = this.patenteModel.nombrePatente;
+    if (this.useLocalFakeData) {
+      const numericId = Number(id);
+      const item = this.FAKE_IMPI_DATA_LOCAL.find(x => x.id === numericId);
+      if (item) {
+        this.patenteModel = {
+          ...this.patenteModel,
+          id: item.id,
+          nombrePatente: item.titulo,
+          denominacion: item.titulo,
+          rama: item.rama,
+          institucion: item.institucion,
+          fechaSolicitud: item.fechaSolicitud,
+          numeroExpediente: item.numeroExpediente,
+          numeroTitulo: item.numeroCertificado,
+        } as PatenteUIModel;
       }
-    });
+    } else {
+      this.service.getPatent(id).subscribe((patente: IPatentModel) => {
+        // Mezclar para no perder campos de UI
+        this.patenteModel = { ...this.patenteModel, ...patente };
+        // Derivar denominación si viene vacío
+        if (!this.patenteModel.denominacion) {
+          this.patenteModel.denominacion = this.patenteModel.nombrePatente;
+        }
+      });
+    }
   }
 
   saveEdit(modal: any) {
-    const payload: IPatentModel = {
-      // Campos base del modelo del backend (evitar enviar los extra de UI si no existen en API)
-      id: this.patenteModel.id,
-      solicitudId: this.patenteModel.solicitudId,
-      nombrePatente: this.patenteModel.denominacion || this.patenteModel.nombrePatente,
-      solicitante: this.patenteModel.solicitante,
-      fechaSolicitud: this.patenteModel.fechaSolicitud,
-      estatus: this.patenteModel.estatus as IPatentModel['estatus'],
-      descripcion: this.patenteModel.descripcion || '',
-      institucion: this.patenteModel.institucion || '',
-      correo: this.patenteModel.correo || '',
-      documentos: this.patenteModel.documentos || [],
-      observaciones: this.patenteModel.observaciones || ''
-    };
+    if (this.useLocalFakeData) {
+      const idx = this.FAKE_IMPI_DATA_LOCAL.findIndex(x => x.id === this.patenteModel.id);
+      if (idx > -1) {
+        // Actualizar únicamente los campos que impactan en la tabla
+        this.FAKE_IMPI_DATA_LOCAL[idx].titulo = this.patenteModel.denominacion || this.patenteModel.nombrePatente || '';
+        this.FAKE_IMPI_DATA_LOCAL[idx].rama = this.patenteModel.rama || '';
+        this.FAKE_IMPI_DATA_LOCAL[idx].fechaSolicitud = this.patenteModel.fechaSolicitud || '';
+        this.FAKE_IMPI_DATA_LOCAL[idx].numeroExpediente = this.patenteModel.numeroExpediente || '';
+        this.FAKE_IMPI_DATA_LOCAL[idx].numeroCertificado = this.patenteModel.numeroTitulo || '';
 
-    this.service.updatePatent(this.patenteModel.id, payload).subscribe({
-      next: (updated) => {
-        this.showAlert({
-          icon: 'success',
-          title: 'Actualizado',
-          text: 'El registro fue actualizado correctamente.'
-        });
-        this.reloadEvent.emit(true);
-        this.isViewMode = true;
-        modal.dismiss('saved');
-      },
-      error: (err) => {
-        console.error('Error al actualizar patente', err);
-        this.showAlert({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudo actualizar el registro.'
-        });
+        if (this.dtInstance) {
+          const updatedRow = {
+            id: this.FAKE_IMPI_DATA_LOCAL[idx].id,
+            rama: this.FAKE_IMPI_DATA_LOCAL[idx].rama,
+            nombrePatente: this.FAKE_IMPI_DATA_LOCAL[idx].titulo,
+            institucion: this.FAKE_IMPI_DATA_LOCAL[idx].institucion,
+            fechaSolicitud: this.FAKE_IMPI_DATA_LOCAL[idx].fechaSolicitud,
+            numeroExpediente: this.FAKE_IMPI_DATA_LOCAL[idx].numeroExpediente,
+            numeroTitulo: this.FAKE_IMPI_DATA_LOCAL[idx].numeroCertificado,
+          };
+          const row = this.dtInstance.row((i: number, data: any) => data.id === updatedRow.id);
+          if (row && row.data) {
+            row.data(updatedRow).draw(false);
+          } else {
+            this.dtInstance.rows().draw(false);
+          }
+        }
       }
-    });
+      this.showAlert({ icon: 'success', title: 'Actualizado', text: 'El registro fue actualizado correctamente.' });
+      this.isViewMode = true;
+      modal.dismiss('saved');
+      return;
+    } else {
+      const payload: IPatentModel = {
+        id: this.patenteModel.id,
+        solicitudId: this.patenteModel.solicitudId,
+        nombrePatente: this.patenteModel.denominacion || this.patenteModel.nombrePatente,
+        solicitante: this.patenteModel.solicitante,
+        fechaSolicitud: this.patenteModel.fechaSolicitud,
+        estatus: this.patenteModel.estatus as IPatentModel['estatus'],
+        descripcion: this.patenteModel.descripcion || '',
+        institucion: this.patenteModel.institucion || '',
+        correo: this.patenteModel.correo || '',
+        documentos: this.patenteModel.documentos || [],
+        observaciones: this.patenteModel.observaciones || ''
+      };
+
+      this.service.updatePatent(this.patenteModel.id, payload).subscribe({
+        next: (updated) => {
+          this.showAlert({
+            icon: 'success',
+            title: 'Actualizado',
+            text: 'El registro fue actualizado correctamente.'
+          });
+          this.reloadEvent.emit(true);
+          this.isViewMode = true;
+          modal.dismiss('saved');
+        },
+        error: (err) => {
+          console.error('Error al actualizar patente', err);
+          this.showAlert({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo actualizar el registro.'
+          });
+        }
+      });
+    }
   }
 
   getStatusBadgeClass(status: string): string {
@@ -746,6 +828,12 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         this.showAlert(alertaError);
       }
     });
+  }
+
+  // Inventores no vacíos para visualización
+  get inventoresVisibles(): Inventor[] {
+    const invs = this.patenteModel.inventores || [];
+    return invs.filter(i => !!(i && (i.curp || i.nombreCompleto || i.institucion)));
   }
 
   onObservacionesChange(): void {
