@@ -170,13 +170,13 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Datos locales de maquetado para IMPI en este componente (independiente de otros)
   private readonly FAKE_IMPI_DATA_LOCAL: ImpiLocalItem[] = [
-    { id: 1, rama: 'Invención', titulo: 'Sistema Cuántico de Encriptación de Datos', institucion: 'TecNM - I.T. Orizaba', fechaSolicitud: '2025-09-08', numeroExpediente: 'EXP-0001', numeroCertificado: 'CERT-0001', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [
+  { id: 1, rama: 'Invención', titulo: 'Sistema Cuántico de Encriptación de Datos', institucion: 'TecNM / Instituto Tecnológico de Ensenada', fechaSolicitud: '2025-09-08', numeroExpediente: 'EXP-0001', numeroCertificado: 'CERT-0001', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [
       {
         curp: 'PEAJ900101HDFRRN01',
         nombreCompleto: 'Pedro Álvarez Juárez',
         sexo: 'M',
         tipoInvestigador: 'Profesor-Investigador',
-        institucion: 'TecNM - I.T. Orizaba',
+    institucion: 'TecNM / Instituto Tecnológico de Ensenada',
         programaEducativo: 'Ingeniería en Sistemas',
         cuerpoAcademico: 'Cómputo Aplicado',
         departamento: 'Sistemas y Computación',
@@ -184,13 +184,13 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         fechaFin: ''
       }
     ] },
-    { id: 2, rama: 'Modelo de Utilidad', titulo: 'Dispositivo Portátil para Purificación de Agua', institucion: 'Universidad Nacional Autónoma de México', fechaSolicitud: '2025-09-05', numeroExpediente: 'EXP-0002', numeroCertificado: 'CERT-0002', estatus: 'Registrada', descripcion: '', observaciones: '', inventores: [
+  { id: 2, rama: 'Modelo de Utilidad', titulo: 'Dispositivo Portátil para Purificación de Agua', institucion: 'TecNM / Instituto Tecnológico de La Paz', fechaSolicitud: '2025-09-05', numeroExpediente: 'EXP-0002', numeroCertificado: 'CERT-0002', estatus: 'Registrada', descripcion: '', observaciones: '', inventores: [
       {
         curp: 'LOPR920202MDFRRS02',
         nombreCompleto: 'Lourdes Pérez Ríos',
         sexo: 'F',
         tipoInvestigador: 'Estudiante',
-        institucion: 'UNAM',
+    institucion: 'TecNM / Instituto Tecnológico de La Paz',
         programaEducativo: 'Química',
         cuerpoAcademico: 'Procesos Químicos',
         departamento: 'Química',
@@ -202,7 +202,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         nombreCompleto: 'Hugo Gómez Martínez',
         sexo: 'M',
         tipoInvestigador: 'Técnico Académico',
-        institucion: 'UNAM',
+    institucion: 'TecNM / Instituto Tecnológico de La Paz',
         programaEducativo: 'Ingeniería Química',
         cuerpoAcademico: 'Procesos Químicos',
         departamento: 'Ingeniería',
@@ -210,19 +210,19 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         fechaFin: ''
       }
     ] },
-    { id: 3, rama: 'Diseño Industrial', titulo: 'Silla Ergonómica con Materiales Reciclados', institucion: 'Tecnológico de Monterrey', fechaSolicitud: '2025-09-01', numeroExpediente: 'EXP-0003', numeroCertificado: 'CERT-0003', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
-    { id: 4, rama: 'Invención', titulo: 'Algoritmo de IA para Detección Temprana de Cáncer', institucion: 'Instituto Politécnico Nacional', fechaSolicitud: '2025-08-28', numeroExpediente: 'EXP-0004', numeroCertificado: 'CERT-0004', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
-    { id: 5, rama: 'Modelo de Utilidad', titulo: 'Mecanismo de Cierre Automático para Contenedores', institucion: 'Universidad de Guadalajara', fechaSolicitud: '2025-08-25', numeroExpediente: 'EXP-0005', numeroCertificado: 'CERT-0005', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
-    { id: 6, rama: 'Invención', titulo: 'Dron Autónomo para Monitoreo Agrícola', institucion: 'TecNM - I.T. Orizaba', fechaSolicitud: '2025-08-22', numeroExpediente: 'EXP-0006', numeroCertificado: 'CERT-0006', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
-    { id: 7, rama: 'Diseño Industrial', titulo: 'Lámpara LED de Bajo Consumo con Forma Orgánica', institucion: 'Universidad Iberoamericana', fechaSolicitud: '2025-08-19', numeroExpediente: 'EXP-0007', numeroCertificado: 'CERT-0007', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
-    { id: 8, rama: 'Modelo de Utilidad', titulo: 'Filtro de Aire Mejorado para Automóviles', institucion: 'Universidad Autónoma de Nuevo León', fechaSolicitud: '2025-08-15', numeroExpediente: 'EXP-0008', numeroCertificado: 'CERT-0008', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
-    { id: 9, rama: 'Invención', titulo: 'Batería de Grafeno de Carga Ultra Rápida', institucion: 'TecNM - I.T. Orizaba', fechaSolicitud: '2025-08-11', numeroExpediente: 'EXP-0009', numeroCertificado: 'CERT-0009', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
-    { id: 10, rama: 'Diseño Industrial', titulo: 'Mobiliario Urbano Inteligente con Paneles Solares', institucion: 'Tecnológico de Monterrey', fechaSolicitud: '2025-08-07', numeroExpediente: 'EXP-0010', numeroCertificado: 'CERT-0010', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
-    { id: 11, rama: 'Invención', titulo: 'Software de Simulación de Reacciones Químicas', institucion: 'Instituto Politécnico Nacional', fechaSolicitud: '2025-08-04', numeroExpediente: 'EXP-0011', numeroCertificado: 'CERT-0011', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
-    { id: 12, rama: 'Modelo de Utilidad', titulo: 'Sistema de Riego por Goteo de Alta Eficiencia', institucion: 'Universidad de Guadalajara', fechaSolicitud: '2025-08-01', numeroExpediente: 'EXP-0012', numeroCertificado: 'CERT-0012', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
-    { id: 13, rama: 'Invención', titulo: 'Prótesis Robótica Controlada por Señales Neuronales', institucion: 'Universidad Nacional Autónoma de México', fechaSolicitud: '2025-07-29', numeroExpediente: 'EXP-0013', numeroCertificado: 'CERT-0013', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
-    { id: 14, rama: 'Diseño Industrial', titulo: 'Empaque Ecológico para Alimentos a Base de Algas', institucion: 'Universidad Iberoamericana', fechaSolicitud: '2025-07-25', numeroExpediente: 'EXP-0014', numeroCertificado: 'CERT-0014', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
-    { id: 15, rama: 'Modelo de Utilidad', titulo: 'Herramienta Multifuncional para Ciclismo Urbano', institucion: 'TecNM - I.T. Orizaba', fechaSolicitud: '2025-07-21', numeroExpediente: 'EXP-0015', numeroCertificado: 'CERT-0015', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] }
+  { id: 3, rama: 'Diseño Industrial', titulo: 'Silla Ergonómica con Materiales Reciclados', institucion: 'TecNM / Instituto Tecnológico de Campeche', fechaSolicitud: '2025-09-01', numeroExpediente: 'EXP-0003', numeroCertificado: 'CERT-0003', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
+  { id: 4, rama: 'Invención', titulo: 'Algoritmo de IA para Detección Temprana de Cáncer', institucion: 'TecNM / Instituto Tecnológico Superior de Calkiní', fechaSolicitud: '2025-08-28', numeroExpediente: 'EXP-0004', numeroCertificado: 'CERT-0004', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
+  { id: 5, rama: 'Modelo de Utilidad', titulo: 'Mecanismo de Cierre Automático para Contenedores', institucion: 'TecNM / Instituto Tecnológico de la Selva', fechaSolicitud: '2025-08-25', numeroExpediente: 'EXP-0005', numeroCertificado: 'CERT-0005', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
+  { id: 6, rama: 'Invención', titulo: 'Dron Autónomo para Monitoreo Agrícola', institucion: 'TecNM / Instituto Tecnológico de Tapachula', fechaSolicitud: '2025-08-22', numeroExpediente: 'EXP-0006', numeroCertificado: 'CERT-0006', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
+  { id: 7, rama: 'Diseño Industrial', titulo: 'Lámpara LED de Bajo Consumo con Forma Orgánica', institucion: 'TecNM / Instituto Tecnológico de Tuxtla Gutiérrez', fechaSolicitud: '2025-08-19', numeroExpediente: 'EXP-0007', numeroCertificado: 'CERT-0007', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
+  { id: 8, rama: 'Modelo de Utilidad', titulo: 'Filtro de Aire Mejorado para Automóviles', institucion: 'TecNM / Instituto Tecnológico Superior de Cintalapa', fechaSolicitud: '2025-08-15', numeroExpediente: 'EXP-0008', numeroCertificado: 'CERT-0008', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
+  { id: 9, rama: 'Invención', titulo: 'Batería de Grafeno de Carga Ultra Rápida', institucion: 'TecNM / Instituto Tecnológico Superior de Comitán', fechaSolicitud: '2025-08-11', numeroExpediente: 'EXP-0009', numeroCertificado: 'CERT-0009', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
+  { id: 10, rama: 'Diseño Industrial', titulo: 'Mobiliario Urbano Inteligente con Paneles Solares', institucion: 'TecNM / Instituto Tecnológico de Gustavo A. Madero', fechaSolicitud: '2025-08-07', numeroExpediente: 'EXP-0010', numeroCertificado: 'CERT-0010', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
+  { id: 11, rama: 'Invención', titulo: 'Software de Simulación de Reacciones Químicas', institucion: 'TecNM / Instituto Tecnológico de Gustavo A. Madero II', fechaSolicitud: '2025-08-04', numeroExpediente: 'EXP-0011', numeroCertificado: 'CERT-0011', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
+  { id: 12, rama: 'Modelo de Utilidad', titulo: 'Sistema de Riego por Goteo de Alta Eficiencia', institucion: 'TecNM / Instituto Tecnológico José Mario Molina Pasquel y Henríquez', fechaSolicitud: '2025-08-01', numeroExpediente: 'EXP-0012', numeroCertificado: 'CERT-0012', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
+  { id: 13, rama: 'Invención', titulo: 'Prótesis Robótica Controlada por Señales Neuronales', institucion: 'TecNM / Instituto Tecnológico de Celaya', fechaSolicitud: '2025-07-29', numeroExpediente: 'EXP-0013', numeroCertificado: 'CERT-0013', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
+  { id: 14, rama: 'Diseño Industrial', titulo: 'Empaque Ecológico para Alimentos a Base de Algas', institucion: 'TecNM / Instituto Tecnológico de León', fechaSolicitud: '2025-07-25', numeroExpediente: 'EXP-0014', numeroCertificado: 'CERT-0014', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
+  { id: 15, rama: 'Modelo de Utilidad', titulo: 'Herramienta Multifuncional para Ciclismo Urbano', institucion: 'TecNM / Instituto Tecnológico de Irapuato', fechaSolicitud: '2025-07-21', numeroExpediente: 'EXP-0015', numeroCertificado: 'CERT-0015', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] }
   ];
 
   constructor(
