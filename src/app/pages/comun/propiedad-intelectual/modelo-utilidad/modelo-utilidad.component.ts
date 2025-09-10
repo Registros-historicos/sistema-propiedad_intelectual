@@ -13,23 +13,69 @@ import {IndautorRegistriesService} from '../../../../api/services/indautor.servi
 
 type EstatusModUtil = 'Registrada' | 'En trámite' | 'Trámite con observaciones' | 'Aprobada' | 'Concluida';
 
-export const FAKE_IMPI_DATA = [
-  { id: 1, rama: 'Invención', titulo: 'Sistema Cuántico de Encriptación de Datos', institucion: 'TecNM - I.T. Orizaba', fechaSolicitud: '2025-09-08', numeroExpediente: 'EXP-0001', numeroCertificado: 'CERT-0001' },
-  { id: 2, rama: 'Modelo de Utilidad', titulo: 'Dispositivo Portátil para Purificación de Agua', institucion: 'Universidad Nacional Autónoma de México', fechaSolicitud: '2025-09-05', numeroExpediente: 'EXP-0002', numeroCertificado: 'CERT-0002' },
-  { id: 3, rama: 'Diseño Industrial', titulo: 'Silla Ergonómica con Materiales Reciclados', institucion: 'Tecnológico de Monterrey', fechaSolicitud: '2025-09-01', numeroExpediente: 'EXP-0003', numeroCertificado: 'CERT-0003' },
-  { id: 4, rama: 'Invención', titulo: 'Algoritmo de IA para Detección Temprana de Cáncer', institucion: 'Instituto Politécnico Nacional', fechaSolicitud: '2025-08-28', numeroExpediente: 'EXP-0004', numeroCertificado: 'CERT-0004' },
-  { id: 5, rama: 'Modelo de Utilidad', titulo: 'Mecanismo de Cierre Automático para Contenedores', institucion: 'Universidad de Guadalajara', fechaSolicitud: '2025-08-25', numeroExpediente: 'EXP-0005', numeroCertificado: 'CERT-0005' },
-  { id: 6, rama: 'Invención', titulo: 'Dron Autónomo para Monitoreo Agrícola', institucion: 'TecNM - I.T. Orizaba', fechaSolicitud: '2025-08-22', numeroExpediente: 'EXP-0006', numeroCertificado: 'CERT-0006' },
-  { id: 7, rama: 'Diseño Industrial', titulo: 'Lámpara LED de Bajo Consumo con Forma Orgánica', institucion: 'Universidad Iberoamericana', fechaSolicitud: '2025-08-19', numeroExpediente: 'EXP-0007', numeroCertificado: 'CERT-0007' },
-  { id: 8, rama: 'Modelo de Utilidad', titulo: 'Filtro de Aire Mejorado para Automóviles', institucion: 'Universidad Autónoma de Nuevo León', fechaSolicitud: '2025-08-15', numeroExpediente: 'EXP-0008', numeroCertificado: 'CERT-0008' },
-  { id: 9, rama: 'Invención', titulo: 'Batería de Grafeno de Carga Ultra Rápida', institucion: 'TecNM - I.T. Orizaba', fechaSolicitud: '2025-08-11', numeroExpediente: 'EXP-0009', numeroCertificado: 'CERT-0009' },
-  { id: 10, rama: 'Diseño Industrial', titulo: 'Mobiliario Urbano Inteligente con Paneles Solares', institucion: 'Tecnológico de Monterrey', fechaSolicitud: '2025-08-07', numeroExpediente: 'EXP-0010', numeroCertificado: 'CERT-0010' },
-  { id: 11, rama: 'Invención', titulo: 'Software de Simulación de Reacciones Químicas', institucion: 'Instituto Politécnico Nacional', fechaSolicitud: '2025-08-04', numeroExpediente: 'EXP-0011', numeroCertificado: 'CERT-0011' },
-  { id: 12, rama: 'Modelo de Utilidad', titulo: 'Sistema de Riego por Goteo de Alta Eficiencia', institucion: 'Universidad de Guadalajara', fechaSolicitud: '2025-08-01', numeroExpediente: 'EXP-0012', numeroCertificado: 'CERT-0012' },
-  { id: 13, rama: 'Invención', titulo: 'Prótesis Robótica Controlada por Señales Neuronales', institucion: 'Universidad Nacional Autónoma de México', fechaSolicitud: '2025-07-29', numeroExpediente: 'EXP-0013', numeroCertificado: 'CERT-0013' },
-  { id: 14, rama: 'Diseño Industrial', titulo: 'Empaque Ecológico para Alimentos a Base de Algas', institucion: 'Universidad Iberoamericana', fechaSolicitud: '2025-07-25', numeroExpediente: 'EXP-0014', numeroCertificado: 'CERT-0014' },
-  { id: 15, rama: 'Modelo de Utilidad', titulo: 'Herramienta Multifuncional para Ciclismo Urbano', institucion: 'TecNM - I.T. Orizaba', fechaSolicitud: '2025-07-21', numeroExpediente: 'EXP-0015', numeroCertificado: 'CERT-0015' }
-];
+// ===== INDAUTOR: Tipos y dataset local =====
+interface IndInventor {
+  curp: string;
+  nombreCompleto: string;
+  sexo: 'M' | 'F' | '';
+  tipoInvestigador: string;
+  institucion: string;
+  programaEducativo: string;
+  cuerpoAcademico: string;
+  departamento: string;
+  fechaAfiliacion: string; // YYYY-MM-DD
+  fechaFin: string; // YYYY-MM-DD
+}
+
+interface IndautorLocalItem {
+  id: number;
+  rama: string;
+  titulo: string;
+  institucion: string;
+  fechaSolicitud: string; // YYYY-MM-DD
+  numeroExpediente: string;
+  numeroCertificado: string;
+  estatus?: EstatusModUtil;
+  medioIngreso?: string;
+  tecnologicoOrigen?: string;
+  cePat?: string;
+  anioRenovacion?: string;
+  tipoSector?: string;
+  sector?: string;
+  subsector?: string;
+  fechaExpedicion?: string; // YYYY-MM-DD
+  archivo?: string;
+  observaciones?: string;
+  descripcion?: string;
+  inventores?: IndInventor[];
+}
+
+type IndautorUIModel = {
+  id: number;
+  titulo: string;
+  rama: string;
+  institucion: string;
+  fechaSolicitud: string;
+  numeroExpediente: string;
+  numeroCertificado: string;
+  estatus: EstatusModUtil | '';
+  medioIngreso: string;
+  tecnologicoOrigen: string;
+  cePat: string;
+  anioRenovacion: string;
+  tipoSector: string;
+  sector: string;
+  subsector: string;
+  fechaExpedicion: string;
+  archivo: string;
+  observaciones: string;
+  descripcion: string;
+  inventores: IndInventor[];
+};
+
+// Datos locales para maquetado en este componente (independiente de IMPI)
+// Mantengo el mock anterior sin uso por compatibilidad, pero usaremos el dataset local de INDAUTOR
+export const FAKE_IMPI_DATA = [] as any[];
 
 @Component({
   selector: 'app-modelo-utilidad',
@@ -73,6 +119,44 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
     documentos: [""]
   };
 
+  // INDAUTOR: trabajo en modo local como en IMPI
+  useLocalFakeData: boolean = true;
+  indautorModel: IndautorUIModel = {
+    id: 0,
+    titulo: '',
+    rama: '',
+    institucion: '',
+    fechaSolicitud: '',
+    numeroExpediente: '',
+    numeroCertificado: '',
+    estatus: 'En trámite',
+    medioIngreso: '',
+    tecnologicoOrigen: '',
+    cePat: '',
+    anioRenovacion: '',
+    tipoSector: '',
+    sector: '',
+    subsector: '',
+    fechaExpedicion: '',
+    archivo: '',
+    observaciones: '',
+    descripcion: '',
+    inventores: [
+      {
+        curp: '',
+        nombreCompleto: '',
+        sexo: '',
+        tipoInvestigador: '',
+        institucion: '',
+        programaEducativo: '',
+        cuerpoAcademico: '',
+        departamento: '',
+        fechaAfiliacion: '',
+        fechaFin: ''
+      }
+    ]
+  };
+
   entidadesFederativas: FederalEntity[] = ENTIDADES_FEDERATIVAS_DATA
   institucionesFiltradas: any[] = []
   estadoSeleccionado: number | null = null
@@ -110,7 +194,7 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
   ngOnInit(): void {
     this.placeholder = this.translate.instant('TABLE.PLACEHOLDER_SEARCH')
 
-    // Sobreescribe la configuración para usar los datos locales
+    // INDAUTOR: configuración de DataTable usando dataset local
     this.datatableConfig = {
       serverSide: false,
       lengthMenu: this.lengthMenu,
@@ -124,7 +208,15 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
         zeroRecords: this.translate.instant('TABLE.ZERO_RECORDS'),
       },
       paging: true,
-      data: FAKE_IMPI_DATA,
+      data: this.FAKE_INDAUTOR_DATA_LOCAL.map(item => ({
+        id: item.id,
+        rama: item.rama,
+        titulo: item.titulo,
+        institucion: item.institucion,
+        fechaSolicitud: item.fechaSolicitud,
+        numeroExpediente: item.numeroExpediente,
+        numeroCertificado: item.numeroCertificado
+      })),
       columns: [
         {
           title: this.translate.instant('TABLE.BRANCH'),
@@ -272,34 +364,198 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
     this.modUtilModel.institucion = '';
   }
 
+  // ===== INDAUTOR: CRUD local =====
   delete(id: number) {
-    this.service.deleteModUtil(id).subscribe(() => {
-      this.reloadEvent.emit(true);
-    });
+    if (this.useLocalFakeData) {
+      const numericId = Number(id);
+      const idx = this.FAKE_INDAUTOR_DATA_LOCAL.findIndex(x => x.id === numericId);
+      if (idx > -1) {
+        this.FAKE_INDAUTOR_DATA_LOCAL.splice(idx, 1);
+        if (this.dtInstance) {
+          this.dtInstance.rows((i: number, rowData: any) => rowData.id === numericId).remove().draw(false);
+        }
+      }
+      return;
+    } else {
+      // Fallback a servicio si se habilita serverSide en el futuro
+      this.service.deleteModUtil(id).subscribe(() => {
+        this.reloadEvent.emit(true);
+      });
+    }
   }
 
   view(id: number) {
     this.isViewMode = true;
     this.cdr.detectChanges();
 
-    this.service.getModUtil(id).subscribe((modUtil: IModUtilModel) => {
-      this.modUtilModel = { ...modUtil };
-      this.inicializarSeleccionesDesdeModUtil();
-      this.observacionesChanged = false;
-      this.resetEditMode();
-    });
+    if (this.useLocalFakeData) {
+      const numericId = Number(id);
+      const item = this.FAKE_INDAUTOR_DATA_LOCAL.find(x => x.id === numericId);
+      if (item) {
+        this.indautorModel = {
+          id: item.id,
+          titulo: item.titulo || '',
+          rama: item.rama || '',
+          institucion: item.institucion || '',
+          fechaSolicitud: item.fechaSolicitud || '',
+          numeroExpediente: item.numeroExpediente || '',
+          numeroCertificado: item.numeroCertificado || '',
+          estatus: item.estatus || 'En trámite',
+          medioIngreso: item.medioIngreso || '',
+          tecnologicoOrigen: item.tecnologicoOrigen || '',
+          cePat: item.cePat || '',
+          anioRenovacion: item.anioRenovacion || '',
+          tipoSector: item.tipoSector || '',
+          sector: item.sector || '',
+          subsector: item.subsector || '',
+          fechaExpedicion: item.fechaExpedicion || '',
+          archivo: item.archivo || '',
+          observaciones: item.observaciones || '',
+          descripcion: item.descripcion || '',
+          inventores: item.inventores && item.inventores.length ? JSON.parse(JSON.stringify(item.inventores)) : []
+        };
+      }
+    } else {
+      // Fallback si se habilita backend
+      this.service.getModUtil(id).subscribe((modUtil: IModUtilModel) => {
+        // mapear a UI si fuera necesario
+        this.indautorModel = {
+          id: modUtil.id,
+          titulo: modUtil.nombreModUtil || '',
+          rama: 'INDAUTOR',
+          institucion: modUtil.institucion || '',
+          fechaSolicitud: modUtil.fechaSolicitud || '',
+          numeroExpediente: '',
+          numeroCertificado: '',
+          estatus: (modUtil.estatus as EstatusModUtil) || 'En trámite',
+          medioIngreso: '',
+          tecnologicoOrigen: '',
+          cePat: '',
+          anioRenovacion: '',
+          tipoSector: '',
+          sector: '',
+          subsector: '',
+          fechaExpedicion: '',
+          archivo: '',
+          observaciones: modUtil.observaciones || '',
+          descripcion: modUtil.descripcion || '',
+          inventores: []
+        };
+      });
+    }
   }
 
-  follow(id: number) {
+  // Segundo botón: Editar
+  edit(id: number) {
     this.isViewMode = false;
     this.cdr.detectChanges();
 
-    this.service.getModUtil(id).subscribe((modUtil: IModUtilModel) => {
-      this.modUtilModel = { ...modUtil };
-      this.inicializarSeleccionesDesdeModUtil();
-      this.observacionesChanged = false;
-      this.resetEditMode();
-    });
+    if (this.useLocalFakeData) {
+      const numericId = Number(id);
+      const item = this.FAKE_INDAUTOR_DATA_LOCAL.find(x => x.id === numericId);
+      if (item) {
+        this.indautorModel = {
+          id: item.id,
+          titulo: item.titulo || '',
+          rama: item.rama || '',
+          institucion: item.institucion || '',
+          fechaSolicitud: item.fechaSolicitud || '',
+          numeroExpediente: item.numeroExpediente || '',
+          numeroCertificado: item.numeroCertificado || '',
+          estatus: item.estatus || 'En trámite',
+          medioIngreso: item.medioIngreso || '',
+          tecnologicoOrigen: item.tecnologicoOrigen || '',
+          cePat: item.cePat || '',
+          anioRenovacion: item.anioRenovacion || '',
+          tipoSector: item.tipoSector || '',
+          sector: item.sector || '',
+          subsector: item.subsector || '',
+          fechaExpedicion: item.fechaExpedicion || '',
+          archivo: item.archivo || '',
+          observaciones: item.observaciones || '',
+          descripcion: item.descripcion || '',
+          inventores: item.inventores && item.inventores.length ? JSON.parse(JSON.stringify(item.inventores)) : []
+        };
+      }
+    } else {
+      this.service.getModUtil(id).subscribe((modUtil: IModUtilModel) => {
+        this.indautorModel = {
+          id: modUtil.id,
+          titulo: modUtil.nombreModUtil || '',
+          rama: 'INDAUTOR',
+          institucion: modUtil.institucion || '',
+          fechaSolicitud: modUtil.fechaSolicitud || '',
+          numeroExpediente: '',
+          numeroCertificado: '',
+          estatus: (modUtil.estatus as EstatusModUtil) || 'En trámite',
+          medioIngreso: '',
+          tecnologicoOrigen: '',
+          cePat: '',
+          anioRenovacion: '',
+          tipoSector: '',
+          sector: '',
+          subsector: '',
+          fechaExpedicion: '',
+          archivo: '',
+          observaciones: modUtil.observaciones || '',
+          descripcion: modUtil.descripcion || '',
+          inventores: []
+        };
+      });
+    }
+  }
+
+  saveEdit(modal: any) {
+    if (this.useLocalFakeData) {
+      const idx = this.FAKE_INDAUTOR_DATA_LOCAL.findIndex(x => x.id === this.indautorModel.id);
+      if (idx > -1) {
+        const target = this.FAKE_INDAUTOR_DATA_LOCAL[idx];
+        target.titulo = this.indautorModel.titulo || '';
+        target.rama = this.indautorModel.rama || '';
+        target.institucion = this.indautorModel.institucion || target.institucion || '';
+        target.fechaSolicitud = this.indautorModel.fechaSolicitud || '';
+        target.numeroExpediente = this.indautorModel.numeroExpediente || '';
+        target.numeroCertificado = this.indautorModel.numeroCertificado || '';
+        target.estatus = (this.indautorModel.estatus as EstatusModUtil) || target.estatus;
+        target.medioIngreso = this.indautorModel.medioIngreso || '';
+        target.tecnologicoOrigen = this.indautorModel.tecnologicoOrigen || '';
+        target.cePat = this.indautorModel.cePat || '';
+        target.anioRenovacion = this.indautorModel.anioRenovacion || '';
+        target.tipoSector = this.indautorModel.tipoSector || '';
+        target.sector = this.indautorModel.sector || '';
+        target.subsector = this.indautorModel.subsector || '';
+        target.fechaExpedicion = this.indautorModel.fechaExpedicion || '';
+        target.archivo = this.indautorModel.archivo || '';
+        target.observaciones = this.indautorModel.observaciones || '';
+        target.descripcion = this.indautorModel.descripcion || '';
+        target.inventores = (this.indautorModel.inventores || []).map(i => ({...i}));
+
+        if (this.dtInstance) {
+          const updatedRow = {
+            id: target.id,
+            rama: target.rama,
+            titulo: target.titulo,
+            institucion: target.institucion,
+            fechaSolicitud: target.fechaSolicitud,
+            numeroExpediente: target.numeroExpediente,
+            numeroCertificado: target.numeroCertificado,
+          };
+          const row = this.dtInstance.row((i: number, data: any) => data.id === updatedRow.id);
+          if (row && row.data) {
+            row.data(updatedRow).draw(false);
+          } else {
+            this.dtInstance.rows().draw(false);
+          }
+        }
+      }
+      this.showAlert({ icon: 'success', title: 'Actualizado', text: 'El registro fue actualizado correctamente.' });
+      this.isViewMode = true;
+      modal.dismiss('saved');
+      return;
+    } else {
+      // Fallback a backend si aplica
+      this.showAlert({ icon: 'info', title: 'Sin backend', text: 'Guardado solo disponible en modo local.' });
+    }
   }
 
   getStatusBadgeClass(status: string): string {
@@ -609,24 +865,29 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
   closeForm(modal: any) {
     modal.dismiss('cancel');
 
-    this.modUtilModel = {
+    // Reset modelo INDAUTOR
+    this.indautorModel = {
       id: 0,
-      solicitudId: '',
-      nombreModUtil: '',
-      solicitante: '',
-      correo: '',
-      fechaSolicitud: '',
+      titulo: '',
+      rama: '',
       institucion: '',
+      fechaSolicitud: '',
+      numeroExpediente: '',
+      numeroCertificado: '',
       estatus: 'En trámite',
+      medioIngreso: '',
+      tecnologicoOrigen: '',
+      cePat: '',
+      anioRenovacion: '',
+      tipoSector: '',
+      sector: '',
+      subsector: '',
+      fechaExpedicion: '',
+      archivo: '',
+      observaciones: '',
       descripcion: '',
-      documentos: []
+      inventores: []
     };
-
-    this.estadoSeleccionado = 0;
-    this.institucionSeleccionada = 0;
-    this.institucionesFiltradas = [];
-    this.observacionesChanged = false;
-    this.resetEditMode();
   }
 
   getStatusOrder(status: string): number {
@@ -679,4 +940,72 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
   ngOnDestroy(): void {
     this.reloadEvent.unsubscribe();
   }
+
+  // ===== Helpers INDAUTOR =====
+  addInventor(): void {
+    if (!this.indautorModel.inventores) this.indautorModel.inventores = [];
+    this.indautorModel.inventores.push({
+      curp: '',
+      nombreCompleto: '',
+      sexo: '',
+      tipoInvestigador: '',
+      institucion: '',
+      programaEducativo: '',
+      cuerpoAcademico: '',
+      departamento: '',
+      fechaAfiliacion: '',
+      fechaFin: ''
+    });
+  }
+
+  removeInventor(index: number): void {
+    if (!this.indautorModel.inventores) return;
+    if (index > -1 && index < this.indautorModel.inventores.length) {
+      this.indautorModel.inventores.splice(index, 1);
+    }
+  }
+
+  get inventoresVisibles(): IndInventor[] {
+    const invs = this.indautorModel.inventores || [];
+    return invs.filter(i => !!(i && (i.curp || i.nombreCompleto || i.institucion)));
+  }
+
+  // Dataset local con ejemplos (1 inventor en id=1, 2 inventores en id=2)
+  private readonly FAKE_INDAUTOR_DATA_LOCAL: IndautorLocalItem[] = [
+    { id: 1, rama: 'INDAUTOR', titulo: 'Colección de Cuentos Cortos', institucion: 'TecNM / Instituto Tecnológico de Ensenada', fechaSolicitud: '2025-09-08', numeroExpediente: 'IND-EXP-0001', numeroCertificado: 'IND-CERT-0001', estatus: 'En trámite', descripcion: 'Obra literaria', observaciones: '', inventores: [
+      { curp: 'PEAJ900101HDFRRN01', nombreCompleto: 'Pedro Álvarez Juárez', sexo: 'M', tipoInvestigador: 'Autor', institucion: 'TecNM / Instituto Tecnológico de Ensenada', programaEducativo: 'Lengua y Literatura', cuerpoAcademico: 'Humanidades', departamento: 'Sociales', fechaAfiliacion: '2020-03-15', fechaFin: '' }
+    ] },
+    { id: 2, rama: 'INDAUTOR', titulo: 'Suite para Piano en Re menor', institucion: 'TecNM / Instituto Tecnológico de La Paz', fechaSolicitud: '2025-09-05', numeroExpediente: 'IND-EXP-0002', numeroCertificado: 'IND-CERT-0002', estatus: 'Registrada', descripcion: 'Obra musical', observaciones: '', inventores: [
+      { curp: 'LOPR920202MDFRRS02', nombreCompleto: 'Lourdes Pérez Ríos', sexo: 'F', tipoInvestigador: 'Compositora', institucion: 'TecNM / Instituto Tecnológico de La Paz', programaEducativo: 'Música', cuerpoAcademico: 'Artes', departamento: 'Música', fechaAfiliacion: '2023-01-10', fechaFin: '' },
+      { curp: 'HOGM850606HDFTRN03', nombreCompleto: 'Hugo Gómez Martínez', sexo: 'M', tipoInvestigador: 'Arreglista', institucion: 'TecNM / Instituto Tecnológico de La Paz', programaEducativo: 'Ingeniería de Audio', cuerpoAcademico: 'Artes', departamento: 'Música', fechaAfiliacion: '2021-09-01', fechaFin: '' }
+    ] },
+    { id: 3, rama: 'INDAUTOR', titulo: 'Aplicación Educativa Interactiva', institucion: 'TecNM / Instituto Tecnológico de Campeche', fechaSolicitud: '2025-09-01', numeroExpediente: 'IND-EXP-0003', numeroCertificado: 'IND-CERT-0003', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
+    { id: 4, rama: 'Invención', titulo: 'Manual de Robótica Educativa', institucion: 'TecNM / Instituto Tecnológico Superior de Calkiní', fechaSolicitud: '2025-08-30', numeroExpediente: 'IND-EXP-0004', numeroCertificado: 'IND-CERT-0004', estatus: 'En trámite', descripcion: 'Material educativo', observaciones: '', inventores: [] },
+    { id: 5, rama: 'Modelo de Utilidad', titulo: 'Cómic: Aventuras en el Laboratorio', institucion: 'TecNM / Instituto Tecnológico de la Selva', fechaSolicitud: '2025-08-28', numeroExpediente: 'IND-EXP-0005', numeroCertificado: 'IND-CERT-0005', estatus: 'Registrada', descripcion: 'Obra gráfica', observaciones: '', inventores: [] },
+    { id: 6, rama: 'Diseño Industrial', titulo: 'Álbum Fotográfico de Arquitectura', institucion: 'TecNM / Instituto Tecnológico de Tapachula', fechaSolicitud: '2025-08-26', numeroExpediente: 'IND-EXP-0006', numeroCertificado: 'IND-CERT-0006', estatus: 'En trámite', descripcion: 'Obra fotográfica', observaciones: '', inventores: [] },
+    { id: 7, rama: 'Invención', titulo: 'Suite de Software para Laboratorio', institucion: 'TecNM / Instituto Tecnológico de Tuxtla Gutiérrez', fechaSolicitud: '2025-08-24', numeroExpediente: 'IND-EXP-0007', numeroCertificado: 'IND-CERT-0007', estatus: 'Aprobada', descripcion: 'Software', observaciones: '', inventores: [
+      { curp: 'LARC930303HDFABC04', nombreCompleto: 'Luis Álvarez Rocha', sexo: 'M', tipoInvestigador: 'Desarrollador', institucion: 'TecNM / Instituto Tecnológico de Tuxtla Gutiérrez', programaEducativo: 'Ingeniería en Sistemas', cuerpoAcademico: 'Cómputo Aplicado', departamento: 'Sistemas y Computación', fechaAfiliacion: '2022-02-01', fechaFin: '' }
+    ] },
+    { id: 8, rama: 'Modelo de Utilidad', titulo: 'Cancionero Popular Vol. I', institucion: 'TecNM / Instituto Tecnológico Superior de Cintalapa', fechaSolicitud: '2025-08-22', numeroExpediente: 'IND-EXP-0008', numeroCertificado: 'IND-CERT-0008', estatus: 'En trámite', descripcion: 'Obra musical', observaciones: '', inventores: [] },
+    { id: 9, rama: 'Diseño Industrial', titulo: 'Guía de Diseño de Interfaz de Usuario', institucion: 'TecNM / Instituto Tecnológico Superior de Comitán', fechaSolicitud: '2025-08-20', numeroExpediente: 'IND-EXP-0009', numeroCertificado: 'IND-CERT-0009', estatus: 'Trámite con observaciones', descripcion: 'Manual técnico', observaciones: 'Revisar derechos de imágenes', inventores: [] },
+    { id: 10, rama: 'Invención', titulo: 'Documental: Voces del Campo', institucion: 'TecNM / Instituto Tecnológico Superior de Palenque', fechaSolicitud: '2025-08-18', numeroExpediente: 'IND-EXP-0010', numeroCertificado: 'IND-CERT-0010', estatus: 'En trámite', descripcion: 'Obra audiovisual', observaciones: '', inventores: [] },
+    { id: 11, rama: 'Modelo de Utilidad', titulo: 'Material Didáctico de Matemáticas', institucion: 'TecNM / Instituto Tecnológico de Chihuahua', fechaSolicitud: '2025-08-16', numeroExpediente: 'IND-EXP-0011', numeroCertificado: 'IND-CERT-0011', estatus: 'Registrada', descripcion: 'Material educativo', observaciones: '', inventores: [] },
+    { id: 12, rama: 'Diseño Industrial', titulo: 'Antología de Relatos Cortos', institucion: 'TecNM / Instituto Tecnológico de Chihuahua II', fechaSolicitud: '2025-08-14', numeroExpediente: 'IND-EXP-0012', numeroCertificado: 'IND-CERT-0012', estatus: 'En trámite', descripcion: 'Obra literaria', observaciones: '', inventores: [] },
+    { id: 13, rama: 'Invención', titulo: 'Guion Cinematográfico: Horizonte Azul', institucion: 'TecNM / Instituto Tecnológico de Ciudad Juárez', fechaSolicitud: '2025-08-12', numeroExpediente: 'IND-EXP-0013', numeroCertificado: 'IND-CERT-0013', estatus: 'En trámite', descripcion: 'Guion', observaciones: '', inventores: [
+      { curp: 'MORJ940404MDFXYZ05', nombreCompleto: 'María Ortiz Ramírez', sexo: 'F', tipoInvestigador: 'Guionista', institucion: 'TecNM / Instituto Tecnológico de Ciudad Juárez', programaEducativo: 'Cine', cuerpoAcademico: 'Artes', departamento: 'Comunicación', fechaAfiliacion: '2021-05-15', fechaFin: '' }
+    ] },
+    { id: 14, rama: 'Modelo de Utilidad', titulo: 'Libro de Texto: Programación I', institucion: 'TecNM / Instituto Tecnológico de Delicias', fechaSolicitud: '2025-08-10', numeroExpediente: 'IND-EXP-0014', numeroCertificado: 'IND-CERT-0014', estatus: 'Aprobada', descripcion: 'Libro de texto', observaciones: '', inventores: [] },
+    { id: 15, rama: 'Diseño Industrial', titulo: 'Colección de Ilustraciones Botánicas', institucion: 'TecNM / Instituto Tecnológico de Parral', fechaSolicitud: '2025-08-08', numeroExpediente: 'IND-EXP-0015', numeroCertificado: 'IND-CERT-0015', estatus: 'En trámite', descripcion: 'Obra artística', observaciones: '', inventores: [] },
+    { id: 16, rama: 'Invención', titulo: 'Curso en Línea: Fundamentos de IA', institucion: 'TecNM / Instituto Tecnológico Superior de Nuevo Casas Grandes', fechaSolicitud: '2025-08-06', numeroExpediente: 'IND-EXP-0016', numeroCertificado: 'IND-CERT-0016', estatus: 'Registrada', descripcion: 'Curso en línea', observaciones: '', inventores: [
+      { curp: 'GALA950505HDFQWE06', nombreCompleto: 'Gabriel Alvarado', sexo: 'M', tipoInvestigador: 'Instructor', institucion: 'TecNM / Instituto Tecnológico Superior de Nuevo Casas Grandes', programaEducativo: 'Ing. Sistemas', cuerpoAcademico: 'Cómputo Aplicado', departamento: 'Sistemas', fechaAfiliacion: '2020-09-01', fechaFin: '' },
+      { curp: 'SULP970707MDFQWE07', nombreCompleto: 'Susana López', sexo: 'F', tipoInvestigador: 'Coautora', institucion: 'TecNM / Instituto Tecnológico Superior de Nuevo Casas Grandes', programaEducativo: 'Ing. Sistemas', cuerpoAcademico: 'Cómputo Aplicado', departamento: 'Sistemas', fechaAfiliacion: '2022-01-10', fechaFin: '' }
+    ] },
+    { id: 17, rama: 'Modelo de Utilidad', titulo: 'Recetario de Cocina Tradicional', institucion: 'TecNM / Instituto Tecnológico de Gustavo A. Madero', fechaSolicitud: '2025-08-04', numeroExpediente: 'IND-EXP-0017', numeroCertificado: 'IND-CERT-0017', estatus: 'En trámite', descripcion: 'Compilación culinaria', observaciones: '', inventores: [] },
+    { id: 18, rama: 'Diseño Industrial', titulo: 'Poesía Reunida: 2019-2025', institucion: 'TecNM / Instituto Tecnológico de Gustavo A. Madero II', fechaSolicitud: '2025-08-02', numeroExpediente: 'IND-EXP-0018', numeroCertificado: 'IND-CERT-0018', estatus: 'Concluida', descripcion: 'Obra literaria', observaciones: '', inventores: [] },
+    { id: 19, rama: 'Invención', titulo: 'Base de Datos de Flora Local', institucion: 'TecNM / Instituto Tecnológico José Mario Molina Pasquel y Henríquez', fechaSolicitud: '2025-07-31', numeroExpediente: 'IND-EXP-0019', numeroCertificado: 'IND-CERT-0019', estatus: 'En trámite', descripcion: 'Base de datos', observaciones: 'Falta carta de autenticidad', inventores: [] },
+    { id: 20, rama: 'Modelo de Utilidad', titulo: 'Audiolibro: Historias del Mar', institucion: 'TecNM / Instituto Tecnológico de Celaya', fechaSolicitud: '2025-07-29', numeroExpediente: 'IND-EXP-0020', numeroCertificado: 'IND-CERT-0020', estatus: 'En trámite', descripcion: 'Obra sonora', observaciones: '', inventores: [] },
+    { id: 21, rama: 'Diseño Industrial', titulo: 'Catálogo de Arte Digital', institucion: 'TecNM / Instituto Tecnológico de León', fechaSolicitud: '2025-07-27', numeroExpediente: 'IND-EXP-0021', numeroCertificado: 'IND-CERT-0021', estatus: 'Trámite con observaciones', descripcion: 'Obra artística', observaciones: 'Adjuntar permisos de uso', inventores: [] },
+    { id: 22, rama: 'Invención', titulo: 'Tutoriales Interactivos de Física', institucion: 'TecNM / Instituto Tecnológico de Irapuato', fechaSolicitud: '2025-07-25', numeroExpediente: 'IND-EXP-0022', numeroCertificado: 'IND-CERT-0022', estatus: 'Registrada', descripcion: 'Material educativo', observaciones: '', inventores: [] },
+    { id: 23, rama: 'Modelo de Utilidad', titulo: 'Monografía de la Región Sierra', institucion: 'TecNM / Instituto Tecnológico de Morelia', fechaSolicitud: '2025-07-23', numeroExpediente: 'IND-EXP-0023', numeroCertificado: 'IND-CERT-0023', estatus: 'En trámite', descripcion: 'Investigación', observaciones: '', inventores: [] }
+  ];
 }
