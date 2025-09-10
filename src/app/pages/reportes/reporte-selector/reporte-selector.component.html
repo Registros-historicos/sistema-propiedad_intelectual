@@ -8,7 +8,7 @@
     *ngFor="let item of reportes; trackBy: trackByArchivo"
     [ngClass]="item.color"
   >
-    <h3>{{ item.titulo | translate }}</h3>
+  <h3>{{ item.titulo | translate }}</h3>
     <p>{{ item.descripcion | translate }}</p>
 
     <button type="button" class="btn" (click)="openModal(item)">
@@ -36,6 +36,8 @@
         <label>Fecha de creación</label>
         <input type="date" name="fecha" ngModel />
       </div>
+
+      <input type="hidden" name="persona" *ngIf="user$ | async as user" [value]="user.fullname" ngModel />
 
       <footer class="modal__footer">
         <button type="button" class="btn btn--secondary" (click)="closeModal()">Cancelar</button>
