@@ -29,6 +29,30 @@ interface Inventor {
   fechaFin: string; // YYYY-MM-DD
 }
 
+// Estructura del dataset local usado por la tabla y los modales
+interface ImpiLocalItem {
+  id: number;
+  rama: string;
+  titulo: string;
+  institucion: string;
+  fechaSolicitud: string; // YYYY-MM-DD
+  numeroExpediente: string;
+  numeroCertificado: string; // N. de Título
+  estatus?: EstatusPatente;
+  medioIngreso?: string;
+  tecnologicoOrigen?: string;
+  cePat?: string;
+  anioRenovacion?: string;
+  tipoSector?: string;
+  sector?: string;
+  subsector?: string;
+  fechaExpedicion?: string; // YYYY-MM-DD
+  archivo?: string;
+  observaciones?: string;
+  descripcion?: string;
+  inventores?: Inventor[];
+}
+
 type PatenteUIModel = IPatentModel & {
   // Campos adicionales de IMPI
   numeroExpediente?: string;
@@ -145,22 +169,60 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   // Datos locales de maquetado para IMPI en este componente (independiente de otros)
-  private readonly FAKE_IMPI_DATA_LOCAL = [
-    { id: 1, rama: 'Invención', titulo: 'Sistema Cuántico de Encriptación de Datos', institucion: 'TecNM - I.T. Orizaba', fechaSolicitud: '2025-09-08', numeroExpediente: 'EXP-0001', numeroCertificado: 'CERT-0001' },
-    { id: 2, rama: 'Modelo de Utilidad', titulo: 'Dispositivo Portátil para Purificación de Agua', institucion: 'Universidad Nacional Autónoma de México', fechaSolicitud: '2025-09-05', numeroExpediente: 'EXP-0002', numeroCertificado: 'CERT-0002' },
-    { id: 3, rama: 'Diseño Industrial', titulo: 'Silla Ergonómica con Materiales Reciclados', institucion: 'Tecnológico de Monterrey', fechaSolicitud: '2025-09-01', numeroExpediente: 'EXP-0003', numeroCertificado: 'CERT-0003' },
-    { id: 4, rama: 'Invención', titulo: 'Algoritmo de IA para Detección Temprana de Cáncer', institucion: 'Instituto Politécnico Nacional', fechaSolicitud: '2025-08-28', numeroExpediente: 'EXP-0004', numeroCertificado: 'CERT-0004' },
-    { id: 5, rama: 'Modelo de Utilidad', titulo: 'Mecanismo de Cierre Automático para Contenedores', institucion: 'Universidad de Guadalajara', fechaSolicitud: '2025-08-25', numeroExpediente: 'EXP-0005', numeroCertificado: 'CERT-0005' },
-    { id: 6, rama: 'Invención', titulo: 'Dron Autónomo para Monitoreo Agrícola', institucion: 'TecNM - I.T. Orizaba', fechaSolicitud: '2025-08-22', numeroExpediente: 'EXP-0006', numeroCertificado: 'CERT-0006' },
-    { id: 7, rama: 'Diseño Industrial', titulo: 'Lámpara LED de Bajo Consumo con Forma Orgánica', institucion: 'Universidad Iberoamericana', fechaSolicitud: '2025-08-19', numeroExpediente: 'EXP-0007', numeroCertificado: 'CERT-0007' },
-    { id: 8, rama: 'Modelo de Utilidad', titulo: 'Filtro de Aire Mejorado para Automóviles', institucion: 'Universidad Autónoma de Nuevo León', fechaSolicitud: '2025-08-15', numeroExpediente: 'EXP-0008', numeroCertificado: 'CERT-0008' },
-    { id: 9, rama: 'Invención', titulo: 'Batería de Grafeno de Carga Ultra Rápida', institucion: 'TecNM - I.T. Orizaba', fechaSolicitud: '2025-08-11', numeroExpediente: 'EXP-0009', numeroCertificado: 'CERT-0009' },
-    { id: 10, rama: 'Diseño Industrial', titulo: 'Mobiliario Urbano Inteligente con Paneles Solares', institucion: 'Tecnológico de Monterrey', fechaSolicitud: '2025-08-07', numeroExpediente: 'EXP-0010', numeroCertificado: 'CERT-0010' },
-    { id: 11, rama: 'Invención', titulo: 'Software de Simulación de Reacciones Químicas', institucion: 'Instituto Politécnico Nacional', fechaSolicitud: '2025-08-04', numeroExpediente: 'EXP-0011', numeroCertificado: 'CERT-0011' },
-    { id: 12, rama: 'Modelo de Utilidad', titulo: 'Sistema de Riego por Goteo de Alta Eficiencia', institucion: 'Universidad de Guadalajara', fechaSolicitud: '2025-08-01', numeroExpediente: 'EXP-0012', numeroCertificado: 'CERT-0012' },
-    { id: 13, rama: 'Invención', titulo: 'Prótesis Robótica Controlada por Señales Neuronales', institucion: 'Universidad Nacional Autónoma de México', fechaSolicitud: '2025-07-29', numeroExpediente: 'EXP-0013', numeroCertificado: 'CERT-0013' },
-    { id: 14, rama: 'Diseño Industrial', titulo: 'Empaque Ecológico para Alimentos a Base de Algas', institucion: 'Universidad Iberoamericana', fechaSolicitud: '2025-07-25', numeroExpediente: 'EXP-0014', numeroCertificado: 'CERT-0014' },
-    { id: 15, rama: 'Modelo de Utilidad', titulo: 'Herramienta Multifuncional para Ciclismo Urbano', institucion: 'TecNM - I.T. Orizaba', fechaSolicitud: '2025-07-21', numeroExpediente: 'EXP-0015', numeroCertificado: 'CERT-0015' }
+  private readonly FAKE_IMPI_DATA_LOCAL: ImpiLocalItem[] = [
+    { id: 1, rama: 'Invención', titulo: 'Sistema Cuántico de Encriptación de Datos', institucion: 'TecNM - I.T. Orizaba', fechaSolicitud: '2025-09-08', numeroExpediente: 'EXP-0001', numeroCertificado: 'CERT-0001', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [
+      {
+        curp: 'PEAJ900101HDFRRN01',
+        nombreCompleto: 'Pedro Álvarez Juárez',
+        sexo: 'M',
+        tipoInvestigador: 'Profesor-Investigador',
+        institucion: 'TecNM - I.T. Orizaba',
+        programaEducativo: 'Ingeniería en Sistemas',
+        cuerpoAcademico: 'Cómputo Aplicado',
+        departamento: 'Sistemas y Computación',
+        fechaAfiliacion: '2020-03-15',
+        fechaFin: ''
+      }
+    ] },
+    { id: 2, rama: 'Modelo de Utilidad', titulo: 'Dispositivo Portátil para Purificación de Agua', institucion: 'Universidad Nacional Autónoma de México', fechaSolicitud: '2025-09-05', numeroExpediente: 'EXP-0002', numeroCertificado: 'CERT-0002', estatus: 'Registrada', descripcion: '', observaciones: '', inventores: [
+      {
+        curp: 'LOPR920202MDFRRS02',
+        nombreCompleto: 'Lourdes Pérez Ríos',
+        sexo: 'F',
+        tipoInvestigador: 'Estudiante',
+        institucion: 'UNAM',
+        programaEducativo: 'Química',
+        cuerpoAcademico: 'Procesos Químicos',
+        departamento: 'Química',
+        fechaAfiliacion: '2023-01-10',
+        fechaFin: ''
+      },
+      {
+        curp: 'HOGM850606HDFTRN03',
+        nombreCompleto: 'Hugo Gómez Martínez',
+        sexo: 'M',
+        tipoInvestigador: 'Técnico Académico',
+        institucion: 'UNAM',
+        programaEducativo: 'Ingeniería Química',
+        cuerpoAcademico: 'Procesos Químicos',
+        departamento: 'Ingeniería',
+        fechaAfiliacion: '2021-09-01',
+        fechaFin: ''
+      }
+    ] },
+    { id: 3, rama: 'Diseño Industrial', titulo: 'Silla Ergonómica con Materiales Reciclados', institucion: 'Tecnológico de Monterrey', fechaSolicitud: '2025-09-01', numeroExpediente: 'EXP-0003', numeroCertificado: 'CERT-0003', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
+    { id: 4, rama: 'Invención', titulo: 'Algoritmo de IA para Detección Temprana de Cáncer', institucion: 'Instituto Politécnico Nacional', fechaSolicitud: '2025-08-28', numeroExpediente: 'EXP-0004', numeroCertificado: 'CERT-0004', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
+    { id: 5, rama: 'Modelo de Utilidad', titulo: 'Mecanismo de Cierre Automático para Contenedores', institucion: 'Universidad de Guadalajara', fechaSolicitud: '2025-08-25', numeroExpediente: 'EXP-0005', numeroCertificado: 'CERT-0005', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
+    { id: 6, rama: 'Invención', titulo: 'Dron Autónomo para Monitoreo Agrícola', institucion: 'TecNM - I.T. Orizaba', fechaSolicitud: '2025-08-22', numeroExpediente: 'EXP-0006', numeroCertificado: 'CERT-0006', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
+    { id: 7, rama: 'Diseño Industrial', titulo: 'Lámpara LED de Bajo Consumo con Forma Orgánica', institucion: 'Universidad Iberoamericana', fechaSolicitud: '2025-08-19', numeroExpediente: 'EXP-0007', numeroCertificado: 'CERT-0007', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
+    { id: 8, rama: 'Modelo de Utilidad', titulo: 'Filtro de Aire Mejorado para Automóviles', institucion: 'Universidad Autónoma de Nuevo León', fechaSolicitud: '2025-08-15', numeroExpediente: 'EXP-0008', numeroCertificado: 'CERT-0008', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
+    { id: 9, rama: 'Invención', titulo: 'Batería de Grafeno de Carga Ultra Rápida', institucion: 'TecNM - I.T. Orizaba', fechaSolicitud: '2025-08-11', numeroExpediente: 'EXP-0009', numeroCertificado: 'CERT-0009', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
+    { id: 10, rama: 'Diseño Industrial', titulo: 'Mobiliario Urbano Inteligente con Paneles Solares', institucion: 'Tecnológico de Monterrey', fechaSolicitud: '2025-08-07', numeroExpediente: 'EXP-0010', numeroCertificado: 'CERT-0010', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
+    { id: 11, rama: 'Invención', titulo: 'Software de Simulación de Reacciones Químicas', institucion: 'Instituto Politécnico Nacional', fechaSolicitud: '2025-08-04', numeroExpediente: 'EXP-0011', numeroCertificado: 'CERT-0011', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
+    { id: 12, rama: 'Modelo de Utilidad', titulo: 'Sistema de Riego por Goteo de Alta Eficiencia', institucion: 'Universidad de Guadalajara', fechaSolicitud: '2025-08-01', numeroExpediente: 'EXP-0012', numeroCertificado: 'CERT-0012', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
+    { id: 13, rama: 'Invención', titulo: 'Prótesis Robótica Controlada por Señales Neuronales', institucion: 'Universidad Nacional Autónoma de México', fechaSolicitud: '2025-07-29', numeroExpediente: 'EXP-0013', numeroCertificado: 'CERT-0013', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
+    { id: 14, rama: 'Diseño Industrial', titulo: 'Empaque Ecológico para Alimentos a Base de Algas', institucion: 'Universidad Iberoamericana', fechaSolicitud: '2025-07-25', numeroExpediente: 'EXP-0014', numeroCertificado: 'CERT-0014', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
+    { id: 15, rama: 'Modelo de Utilidad', titulo: 'Herramienta Multifuncional para Ciclismo Urbano', institucion: 'TecNM - I.T. Orizaba', fechaSolicitud: '2025-07-21', numeroExpediente: 'EXP-0015', numeroCertificado: 'CERT-0015', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] }
   ];
 
   constructor(
@@ -463,6 +525,19 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
           fechaSolicitud: item.fechaSolicitud,
           numeroExpediente: item.numeroExpediente,
           numeroTitulo: item.numeroCertificado,
+          estatus: item.estatus || this.patenteModel.estatus,
+          medioIngreso: item.medioIngreso || '',
+          tecnologicoOrigen: item.tecnologicoOrigen || '',
+          cePat: item.cePat || '',
+          anioRenovacion: item.anioRenovacion || '',
+          tipoSector: item.tipoSector || '',
+          sector: item.sector || '',
+          subsector: item.subsector || '',
+          fechaExpedicion: item.fechaExpedicion || '',
+          archivo: item.archivo || '',
+          observaciones: item.observaciones || '',
+          descripcion: item.descripcion || '',
+          inventores: item.inventores && item.inventores.length ? JSON.parse(JSON.stringify(item.inventores)) : []
         } as PatenteUIModel;
       }
     } else {
@@ -508,6 +583,19 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
           fechaSolicitud: item.fechaSolicitud,
           numeroExpediente: item.numeroExpediente,
           numeroTitulo: item.numeroCertificado,
+          estatus: item.estatus || this.patenteModel.estatus,
+          medioIngreso: item.medioIngreso || '',
+          tecnologicoOrigen: item.tecnologicoOrigen || '',
+          cePat: item.cePat || '',
+          anioRenovacion: item.anioRenovacion || '',
+          tipoSector: item.tipoSector || '',
+          sector: item.sector || '',
+          subsector: item.subsector || '',
+          fechaExpedicion: item.fechaExpedicion || '',
+          archivo: item.archivo || '',
+          observaciones: item.observaciones || '',
+          descripcion: item.descripcion || '',
+          inventores: item.inventores && item.inventores.length ? JSON.parse(JSON.stringify(item.inventores)) : []
         } as PatenteUIModel;
       }
     } else {
@@ -526,12 +614,27 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.useLocalFakeData) {
       const idx = this.FAKE_IMPI_DATA_LOCAL.findIndex(x => x.id === this.patenteModel.id);
       if (idx > -1) {
-        // Actualizar únicamente los campos que impactan en la tabla
-        this.FAKE_IMPI_DATA_LOCAL[idx].titulo = this.patenteModel.denominacion || this.patenteModel.nombrePatente || '';
-        this.FAKE_IMPI_DATA_LOCAL[idx].rama = this.patenteModel.rama || '';
-        this.FAKE_IMPI_DATA_LOCAL[idx].fechaSolicitud = this.patenteModel.fechaSolicitud || '';
-        this.FAKE_IMPI_DATA_LOCAL[idx].numeroExpediente = this.patenteModel.numeroExpediente || '';
-        this.FAKE_IMPI_DATA_LOCAL[idx].numeroCertificado = this.patenteModel.numeroTitulo || '';
+        // Actualizar todos los campos del modal en el arreglo local
+        const target = this.FAKE_IMPI_DATA_LOCAL[idx];
+        target.titulo = this.patenteModel.denominacion || this.patenteModel.nombrePatente || '';
+        target.rama = this.patenteModel.rama || '';
+        target.institucion = this.patenteModel.institucion || target.institucion || '';
+        target.fechaSolicitud = this.patenteModel.fechaSolicitud || '';
+        target.numeroExpediente = this.patenteModel.numeroExpediente || '';
+        target.numeroCertificado = this.patenteModel.numeroTitulo || '';
+        target.estatus = (this.patenteModel.estatus as EstatusPatente) || target.estatus;
+        target.medioIngreso = this.patenteModel.medioIngreso || '';
+        target.tecnologicoOrigen = this.patenteModel.tecnologicoOrigen || '';
+        target.cePat = this.patenteModel.cePat || '';
+        target.anioRenovacion = this.patenteModel.anioRenovacion || '';
+        target.tipoSector = this.patenteModel.tipoSector || '';
+        target.sector = this.patenteModel.sector || '';
+        target.subsector = this.patenteModel.subsector || '';
+        target.fechaExpedicion = this.patenteModel.fechaExpedicion || '';
+        target.archivo = this.patenteModel.archivo || '';
+        target.observaciones = this.patenteModel.observaciones || '';
+        target.descripcion = this.patenteModel.descripcion || '';
+        target.inventores = (this.patenteModel.inventores || []).map(i => ({...i}));
 
         if (this.dtInstance) {
           const updatedRow = {
