@@ -209,18 +209,50 @@ export class ReporteSelectorComponent implements OnInit {
     document.body.style.overflow = 'hidden';
     this.errorMsg = '';
 
-    // ahora archivo == kind
-    this.currentKind = item.archivo;
-    this.currentFields = KINDS_FORM_CONFIG[this.currentKind] ?? [
-      { name: 'desde', label: 'Desde', type: 'date' },
-      { name: 'hasta', label: 'Hasta', type: 'date' },
-    ];
+    this.currentKind = this.mapToKind(item);
+  }
 
-    const group: Record<string, any> = {};
-    for (const f of this.currentFields) {
-      group[f.name] = ['', f.validators || []];
+  // Mapea tu estructura actual (PDFs + repetidos) → kind único para el modal
+  private mapToKind(item: ReporteCard): string {
+    const a = (item.archivo || '').toLowerCase();
+    const t = item.titulo || '';
+
+    // 1) si ya viene un kind, lo respetamos
+    const knownKinds = new Set([
+      'reporte_it_federales',
+      'reporte_it_descentralizados',
+      'reporte_top10_instituciones',
+      'reporte_top10_entidades',
+      'reporte_registros_anio',
+      'reporte_registros_sector',
+      'reporte_registros_estatus',
+      'reporte_solicitudes_general',
+      'reporte_por_institucion',
+      'reporte_registros_sexo',
+      'reporte_registros_categoria',
+    ]);
+    if (knownKinds.has(item.archivo)) return item.archivo;
+
+    // 2) si es PDF o está repetido, desambiguamos por el título (keys i18n)
+    switch (t) {
+      case 'REPORTS.ADMIN.FEDERAL.TITLE':          return 'reporte_it_federales';
+      case 'REPORTS.ADMIN.DECENTRALIZED.TITLE':    return 'reporte_it_descentralizados';
+      case 'REPORTS.ADMIN.TOP_INSTITUTIONS.TITLE': return 'reporte_top10_instituciones';
+      case 'REPORTS.ADMIN.TOP_STATES.TITLE':       return 'reporte_top10_entidades';
+      case 'REPORTS.ADMIN.YEAR.TITLE':             return 'reporte_registros_anio';
+      case 'REPORTS.ADMIN.SECTOR.TITLE':           return 'reporte_registros_sector';
+      case 'REPORTS.ADMIN.STATUS.TITLE':           return 'reporte_registros_estatus';
+      case 'REPORTS.ADMIN.GENERAL.TITLE':          return 'reporte_solicitudes_general';
+      case 'REPORTS.ADMIN.INSTITUTION.TITLE':      return 'reporte_por_institucion';
+      case 'REPORTS.ADMIN.SEX.TITLE':              return 'reporte_registros_sexo';
+      case 'REPORTS.ADMIN.CATEGORY.TITLE':         return 'reporte_registros_categoria';
+      default:
+        // 3) fallback por nombre de archivo PDF (por si lo necesitas)
+        if (a.includes('entidad')) return 'reporte_it_federales';
+        if (a.includes('clasificación')) return 'reporte_registros_estatus';
+        if (a.includes('fecha')) return 'reporte_registros_anio';
+        return 'reporte_solicitudes_general';
     }
-    this.form = this.fb.group(group);
   }
 
   closeModal(): void {
