@@ -15,14 +15,14 @@ export const REPORTES_POR_ROL: Record<Rol, ReporteCard[]> = {
       descripcion: 'REPORTS.ADMIN.FEDERAL.DESCRIPTION',
       archivo: 'reporte_entidad_federativa',
       color: 'blue',
-      icono: 'apartment'
+      icono: 'location_city'
     },
     {
       titulo: 'REPORTS.ADMIN.DECENTRALIZED.TITLE',
       descripcion: 'REPORTS.ADMIN.DECENTRALIZED.DESCRIPTION',
       archivo: 'reporte_entidad_federativa',
       color: 'cyan',
-      icono: 'domain'
+      icono: 'apartment'
     },
     {
       titulo: 'REPORTS.ADMIN.TOP_INSTITUTIONS.TITLE',
@@ -36,7 +36,7 @@ export const REPORTES_POR_ROL: Record<Rol, ReporteCard[]> = {
       descripcion: 'REPORTS.ADMIN.TOP_STATES.DESCRIPTION',
       archivo: 'reporte-entidad-federativa.pdf',
       color: 'indigo',
-      icono: 'leaderboard'
+      icono: 'workspace_premium'
     },
     {
       titulo: 'REPORTS.ADMIN.YEAR.TITLE',
@@ -50,7 +50,7 @@ export const REPORTES_POR_ROL: Record<Rol, ReporteCard[]> = {
       descripcion: 'REPORTS.ADMIN.SECTOR.DESCRIPTION',
       archivo: 'reporte_entidad_federativa',
       color: 'orange',
-      icono: 'business_center'
+      icono: 'warehouse'
     },
     {
       titulo: 'REPORTS.ADMIN.STATUS.TITLE',
@@ -71,7 +71,7 @@ export const REPORTES_POR_ROL: Record<Rol, ReporteCard[]> = {
       descripcion: 'REPORTS.ADMIN.INSTITUTION.DESCRIPTION',
       archivo: 'reporte_entidad_federativa',
       color: 'green',
-      icono: 'school'
+      icono: 'business'
     },
     {
       titulo: 'REPORTS.ADMIN.SEX.TITLE',
@@ -85,7 +85,7 @@ export const REPORTES_POR_ROL: Record<Rol, ReporteCard[]> = {
       descripcion: 'REPORTS.ADMIN.CATEGORY.DESCRIPTION',
       archivo: 'reporte_entidad_federativa',
       color: 'yellow',
-      icono: 'group'
+      icono: 'groups'
     }
   ],
   coordinador: [
@@ -101,7 +101,7 @@ export const REPORTES_POR_ROL: Record<Rol, ReporteCard[]> = {
       descripcion: 'REPORTS.COORDINATOR.ACADEMIC.DESCRIPTION',
       archivo: 'reporte-cuerpo-académico.pdf',
       color: 'pink',
-      icono: 'group' 
+      icono: 'groups' 
     },
     {
       titulo: 'REPORTS.COORDINATOR.PROGRAM.TITLE',

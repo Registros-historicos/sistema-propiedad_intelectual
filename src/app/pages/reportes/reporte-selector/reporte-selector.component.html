@@ -8,6 +8,7 @@
     *ngFor="let item of reportes; trackBy: trackByArchivo"
     [ngClass]="item.color"
   >
+  <span class="material-icons icono-reporte">{{ item.icono }}</span>
   <h3>{{ item.titulo | translate }}</h3>
     <p>{{ item.descripcion | translate }}</p>
 
@@ -41,7 +42,7 @@
 
       <footer class="modal__footer">
         <button type="button" class="btn btn--secondary" (click)="closeModal()">Cancelar</button>
-        <button type="submit" class="btn btn--primary">{{ 'REPORTS.BUTTON' | translate }}</button>
+        <button type="submit" class="btn btn--primary">{{ 'REPORTS.BUTTON' | translate }}<span class="material-icons">picture_as_pdf</span></button>
       </footer>
     </form>
     <p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>

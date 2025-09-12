@@ -75,7 +75,7 @@
       transition: background-color 0.2s ease;
 
       &:hover {
-        background-color: #f2f2f2;
+        background-color: #dad7d7;
       }
     }
 
@@ -378,6 +378,9 @@
 }
 
 .btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   appearance: none;
   border: none;
   border-radius: 8px;
@@ -387,11 +390,21 @@
 
   &.btn--secondary {
     background: #f1f1f1;
+
+    &:hover {
+      background-color: #e0e0e0;
+    }
   }
 
   &.btn--primary {
     background: #1976d2;
     color: #fff;
+
+    &:hover {
+      background-color: #1565c0;
+    }
   }
 }
-
+.btn span {
+  margin-left: 0.5rem;
+}
