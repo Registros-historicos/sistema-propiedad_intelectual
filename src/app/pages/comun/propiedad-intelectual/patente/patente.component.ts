@@ -332,6 +332,20 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       }),
       columns: [
         {
+          title: 'Número de expediente', // Nueva columna
+          data: 'numeroExpediente',
+          render: (data) => {
+            return `<span class="fw-semibold text-gray-600">${data || ''}</span>`;
+          },
+        },
+        {
+          title: 'Número de título', // Nueva columna
+          data: 'numeroTitulo',
+          render: (data) => {
+            return `<span class="fw-semibold text-gray-600">${data || ''}</span>`;
+          },
+        },
+        {
           title: this.translate.instant('TABLE.BRANCH'),
           data: 'rama',
           render: (data, type, full) => {
@@ -390,20 +404,6 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
           data: 'fechaSolicitud',
           render: (data) => {
             return `<span class="fw-semibold text-gray-600">${moment(data).format('DD-MM-YYYY')}</span>`;
-          },
-        },
-        {
-          title: 'Número de expediente', // Nueva columna
-          data: 'numeroExpediente',
-          render: (data) => {
-            return `<span class="fw-semibold text-gray-600">${data || ''}</span>`;
-          },
-        },
-        {
-          title: 'Número de título', // Nueva columna
-          data: 'numeroTitulo',
-          render: (data) => {
-            return `<span class="fw-semibold text-gray-600">${data || ''}</span>`;
           },
         }
       ],
