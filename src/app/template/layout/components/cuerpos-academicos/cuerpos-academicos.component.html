@@ -24,13 +24,22 @@
         <!-- begin::Table body -->
         <tbody>
           <tr *ngFor="let cuerpo of cuerposAcademicos">
-            <td>
-              <span class="text-gray-900 fw-bold mb-1 fs-5">{{cuerpo.nombre}}</span>
-            </td>
-            <td class="text-end">
-              <span class="badge badge-light-primary fw-bold fs-7">{{cuerpo.solicitudes}} Solicitudes</span>
-            </td>
-          </tr>
+        <td>
+          <div class="d-flex align-items-start gap-2">
+            <mat-icon *ngIf="cuerpo.icono" style="color: rgb(1, 8, 49); flex-shrink:0;">
+              {{ cuerpo.icono }}
+            </mat-icon>
+            <span class="text-gray-900 fw-bold mb-1 fs-5" 
+              style="white-space: normal; word-wrap: break-word;">
+            {{ cuerpo.nombre }}
+            </span>
+          </div>
+        </td>
+
+        <td class="text-end">
+          <span class="badge badge-light-primary fw-bold fs-7">{{cuerpo.solicitudes}} Solicitudes</span>
+        </td>
+        </tr>
         </tbody>
         <!-- end::Table body -->
       </table>
