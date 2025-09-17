@@ -225,28 +225,42 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   { id: 15, rama: 'Modelo de Utilidad', titulo: 'Herramienta Multifuncional para Ciclismo Urbano', institucion: 'TecNM / Instituto Tecnológico de Irapuato', fechaSolicitud: '2025-07-21', numeroExpediente: 'EXP-0015', numeroCertificado: 'CERT-0015', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] }
   ];
 
+  tranlatesPlaceholders: any = {};
+
   constructor(
     private service: PatentsService,
     private cdr: ChangeDetectorRef,
     private translate: TranslateService,
     private impiService: ImpiRegistriesService
   ) {
+    this.tranlatesPlaceholders = {
+      METHOD_SUBMISSION: this.translate.instant('FORMS.PLACEHOLDERS.METHOD_SUBMISSION'),
+      TYPE_SECTOR: this.translate.instant('FORMS.PLACEHOLDERS.TYPE_SECTOR'),
+      SECTOR: this.translate.instant('FORMS.PLACEHOLDERS.SECTOR'),
+      SUBSECTOR: this.translate.instant('FORMS.PLACEHOLDERS.SUBSECTOR'),
+      COMMENTS: this.translate.instant('FORMS.PLACEHOLDERS.COMMENTS'),
+      DESCRIPTION: this.translate.instant('FORMS.PLACEHOLDERS.DESCRIPTION'),
+      TYPE_RESEARCHER: this.translate.instant('FORMS.PLACEHOLDERS.TYPE_RESEARCHER'),
+      ACADEMIC_PROGRAM: this.translate.instant('FORMS.PLACEHOLDERS.ACADEMIC_PROGRAM'),
+      ACADEMIC_RESEARCH: this.translate.instant('FORMS.PLACEHOLDERS.ACADEMIC_RESEARCH'),
+      DEPARTMENT: this.translate.instant('FORMS.PLACEHOLDERS.DEPARTMENT'),
+    }
   }
 
   // Helpers para autores
   addInventor(): void {
     if (!this.patenteModel.inventores) this.patenteModel.inventores = [];
     this.patenteModel.inventores.push({
-      curp: "",
-      nombreCompleto: "",
-      sexo: "",
-      tipoInvestigador: "",
-      institucion: "",
-      programaEducativo: "",
-      cuerpoAcademico: "",
-      departamento: "",
-      fechaAfiliacion: "",
-      fechaFin: "",
+      curp: "PEAJ900101HDFRRN01",
+      nombreCompleto: "Pedro Álvarez Juárez",
+      sexo: "M",
+      tipoInvestigador: "Profesor-Investigador",
+      institucion: "Instituto Tecnológico de Orizaba",
+      programaEducativo: "Ingeniería en Sistemas Computacionales",
+      cuerpoAcademico: "CA de Sistemas Computacionales",
+      departamento: "Sistemas Computacionales",
+      fechaAfiliacion: "2025-09-12",
+      fechaFin: "2027-09-12",
     });
   }
 
@@ -526,17 +540,17 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
           numeroExpediente: item.numeroExpediente,
           numeroTitulo: item.numeroCertificado,
           estatus: item.estatus || this.patenteModel.estatus,
-          medioIngreso: item.medioIngreso || '',
-          tecnologicoOrigen: item.tecnologicoOrigen || '',
-          cePat: item.cePat || '',
-          anioRenovacion: item.anioRenovacion || '',
-          tipoSector: item.tipoSector || '',
-          sector: item.sector || '',
-          subsector: item.subsector || '',
-          fechaExpedicion: item.fechaExpedicion || '',
-          archivo: item.archivo || '',
-          observaciones: item.observaciones || '',
-          descripcion: item.descripcion || '',
+          medioIngreso: item.medioIngreso || 'Cuenta Pase IMPI',
+          tecnologicoOrigen: item.tecnologicoOrigen || 'Instituto Tecnológico de Morelia',
+          cePat: item.cePat || 'Centro Nacional de Investigación y Desarrollo Tecnológico (CENIDET)',
+          anioRenovacion: item.anioRenovacion || '2029',
+          tipoSector: item.tipoSector || 'Primario',
+          sector: item.sector || 'Agricultura',
+          subsector: item.subsector || 'Cultivo de granos y cereales (maíz, trigo, sorgo, arroz, avena, cebada)',
+          fechaExpedicion: item.fechaExpedicion || '2025-09-10',
+          archivo: item.archivo || 'registro_impi_0001.pdf',
+          observaciones: item.observaciones || 'Requiere documentación adicional',
+          descripcion: item.descripcion || 'Sistema automatizado que utiliza nanotecnología para la purificación de agua residual, incorporando sensores IoT para monitoreo en tiempo real',
           inventores: item.inventores && item.inventores.length ? JSON.parse(JSON.stringify(item.inventores)) : []
         } as PatenteUIModel;
       }
@@ -584,17 +598,17 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
           numeroExpediente: item.numeroExpediente,
           numeroTitulo: item.numeroCertificado,
           estatus: item.estatus || this.patenteModel.estatus,
-          medioIngreso: item.medioIngreso || '',
-          tecnologicoOrigen: item.tecnologicoOrigen || '',
-          cePat: item.cePat || '',
-          anioRenovacion: item.anioRenovacion || '',
-          tipoSector: item.tipoSector || '',
-          sector: item.sector || '',
-          subsector: item.subsector || '',
-          fechaExpedicion: item.fechaExpedicion || '',
-          archivo: item.archivo || '',
-          observaciones: item.observaciones || '',
-          descripcion: item.descripcion || '',
+          medioIngreso: item.medioIngreso || 'Cuenta Pase IMPI',
+          tecnologicoOrigen: item.tecnologicoOrigen || 'Instituto Tecnológico de Morelia',
+          cePat: item.cePat || 'Centro Nacional de Investigación y Desarrollo Tecnológico (CENIDET)',
+          anioRenovacion: item.anioRenovacion || '2029',
+          tipoSector: item.tipoSector || 'Primario',
+          sector: item.sector || 'Agricultura',
+          subsector: item.subsector || 'Cultivo de granos y cereales (maíz, trigo, sorgo, arroz, avena, cebada)',
+          fechaExpedicion: item.fechaExpedicion || '2025-09-10',
+          archivo: item.archivo || 'registro_impi_0001.pdf',
+          observaciones: item.observaciones || 'Requiere documentación adicional',
+          descripcion: item.descripcion || 'Sistema automatizado que utiliza nanotecnología para la purificación de agua residual, incorporando sensores IoT para monitoreo en tiempo real',
           inventores: item.inventores && item.inventores.length ? JSON.parse(JSON.stringify(item.inventores)) : []
         } as PatenteUIModel;
       }
