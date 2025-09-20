@@ -24,9 +24,18 @@
                 <!-- begin::Table body -->
                 <tbody>
                     <tr *ngFor="let pe of programasEducativos">
-                        <td>
-                            <span class="text-gray-900 fw-bold mb-1 fs-5">{{pe.nombre}}</span>
+                    <td class="text-start">
+                    <div class="d-flex align-items-center gap-2">
+                            <mat-icon *ngIf="pe.icono" style="color: rgb(1, 8, 49); flex-shrink: 0;">
+                            {{ pe.icono }}
+                            </mat-icon>
+                            <span class="text-gray-900 fw-bold mb-1 fs-5" 
+                            style="white-space: normal; word-break: break-word; text-align: left;">
+                            {{ pe.nombre }}
+                            </span>
+                        </div>
                         </td>
+
                         <td class="text-end">
                             <span class="badge badge-light-warning fw-bold fs-7">{{pe.solicitudes}} Solicitudes</span>
                         </td>

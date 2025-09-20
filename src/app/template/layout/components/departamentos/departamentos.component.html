@@ -33,9 +33,17 @@
         <!-- begin::Table body -->
         <tbody>
           <tr *ngFor="let departamento of departamentos">
-            <td>
-              <span class="text-gray-900 fw-bold mb-1 fs-5">{{departamento.nombre}}</span>
-            </td>
+        <td>
+          <div class="d-flex align-items-start gap-2">
+            <mat-icon *ngIf="departamento.icono" style="color: rgb(1, 8, 49);">
+              {{ departamento.icono }}
+            </mat-icon>
+            <span class="text-gray-900 fw-bold mb-1 fs-5" 
+                  style="white-space: normal; word-wrap: break-word;">
+              {{ departamento.nombre }}
+            </span>
+          </div>
+        </td>
             <td class="text-end">
               <span class="badge badge-light-success fw-bold fs-7">{{departamento.totalSolicitudes}} Solicitudes</span>
             </td>
