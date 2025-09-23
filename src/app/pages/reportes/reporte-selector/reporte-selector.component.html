@@ -208,8 +208,19 @@
     </button>
   </footer>
 </form>
-
-
     <p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
+  </div>
+
+  <div *ngIf="isLoading" class="custom-loading-overlay">
+    <div class="custom-loading-box">
+      <p class="loading-text">
+        {{ 'REPORTS.LOADING' | translate }}
+        <span class="loading-dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      </p>
+    </div>
   </div>
 </div>

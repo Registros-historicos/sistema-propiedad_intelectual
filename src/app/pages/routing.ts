@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { RoleGuard } from '../guards/role.guard';
 import { Error503Component } from '../modules/errors/error503/error503.component';
+import { VisorPdfComponent } from './reportes/visor-pdf/visor-pdf.component';
 
 const Routing: Routes = [
   {
@@ -131,6 +132,12 @@ const Routing: Routes = [
   {
     path: 'apps/permissions',
     loadChildren: () => import('./permission/permission.module').then((m) => m.PermissionModule),
+  },
+  {
+  path: 'visor-pdf',
+  component: VisorPdfComponent,
+  canActivate: [RoleGuard], // opcional
+  data: { roles: ['administrador','coordinador','solicitante'] }
   },
   {
     path: '',

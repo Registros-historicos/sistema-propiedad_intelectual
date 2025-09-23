@@ -8,6 +8,7 @@ import { Observable } from 'rxjs';
 import { UserType, AuthService } from 'src/app/modules/auth';
 import { Validators } from '@angular/forms';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { HttpResponse } from '@angular/common/http';
 
 // --- catálogos / enums ---
 const ESTADOS = [
@@ -272,15 +273,16 @@ export class ReporteSelectorComponent implements OnInit {
     }
 
     const payload = this.buildPayload(formValues);
-
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'x-api-key': environment.REPORTS_API_KEY // defínalo en environments
+      'x-api-key': environment.REPORTS_API_KEY
     });
 
     this.errorMsg = '';
     this.isLoading = true;
     this.progress = 0;
+
+    const tipo = this.perfil;
 
     this.http.post(environment.REPORTS_API_URL, payload, {
       headers,
@@ -288,21 +290,29 @@ export class ReporteSelectorComponent implements OnInit {
       observe: 'response',
       reportProgress: true
     }).subscribe({
-      next: (event) => {
-        // progreso (si el runtime lo emite)
-        const anyEvent: any = event as any;
-        if (anyEvent?.type === HttpEventType.DownloadProgress && anyEvent.total) {
-          this.progress = Math.round(100 * anyEvent.loaded / anyEvent.total);
+      next: (event: HttpResponse<Blob> | any) => {
+        if (event?.type === HttpEventType.DownloadProgress && event.total) {
+          this.progress = Math.round(100 * event.loaded / event.total);
+          return;
         }
 
-        if (event.body instanceof Blob) {
+        if (event instanceof HttpResponse && event.body instanceof Blob) {
           const blob = event.body;
-          const cd  = event.headers?.get('Content-Disposition') || event.headers?.get('content-disposition');
+          const cd = event.headers?.get('Content-Disposition') || event.headers?.get('content-disposition');
           const filename = this.getFilenameFromDisposition(cd) || this.suggestFileName();
-          this.downloadBlob(blob, filename);
+
+          // 👉 1) Crear URL temporal del PDF
+          const url = URL.createObjectURL(blob);
+          console.log('Blob URL:', url);
+          // 👉 2) Apagar loader y cerrar modal ANTES de navegar
           this.isLoading = false;
           this.progress = 100;
           this.closeModal();
+
+          // 👉 3) Navegar al visor enviando el blobUrl y metadatos
+          this.router.navigateByUrl('/visor-pdf', {
+          state: { url, filename, tipo }
+          });
         }
       },
       error: (err: HttpErrorResponse) => {
