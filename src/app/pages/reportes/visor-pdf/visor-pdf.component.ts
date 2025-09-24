@@ -24,7 +24,8 @@ export class VisorPdfComponent implements OnInit, OnDestroy {
       this.errorMsg = 'No se pudo cargar el reporte. Regrese e inténtelo de nuevo.';
       return;
     }
-    this.rawUrl = url as string;
+    //this.rawUrl = url as string;
+    this.rawUrl = 'assets/reportes/admin/' + (filename as string);
     this.filename = filename as string;
     this.tipo = tipo as string;
     this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.rawUrl);
