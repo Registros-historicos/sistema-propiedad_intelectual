@@ -38,9 +38,8 @@
     <ng-container *ngSwitchCase="'reporte_it_federales'">
       <div class="form-row">
         <label>Entidad Federativa</label>
-        <select name="estado" ngModel>
-          <option value="">Todas</option>
-          <option>CDMX</option><option>Jalisco</option><option>Veracruz</option><option>Puebla</option>
+        <select name="estadoId" ngModel>
+          <option *ngFor="let e of entidades" [value]="e.id">{{ e.nombre }}</option>
         </select>
       </div>
       <div class="form-row"><label>Desde</label><input type="date" name="desde" ngModel /></div>
@@ -51,9 +50,8 @@
     <ng-container *ngSwitchCase="'reporte_it_descentralizados'">
       <div class="form-row">
         <label>Entidad Federativa</label>
-        <select name="estado" ngModel>
-          <option value="">Todas</option>
-          <option>CDMX</option><option>Jalisco</option><option>Veracruz</option><option>Puebla</option>
+        <select name="estadoId" ngModel>
+          <option *ngFor="let e of entidades" [value]="e.id">{{ e.nombre }}</option>
         </select>
       </div>
       <div class="form-row"><label>Desde</label><input type="date" name="desde" ngModel /></div>

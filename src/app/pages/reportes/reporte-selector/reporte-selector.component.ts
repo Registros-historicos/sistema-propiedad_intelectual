@@ -9,53 +9,8 @@ import { UserType, AuthService } from 'src/app/modules/auth';
 import { Validators } from '@angular/forms';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { HttpResponse } from '@angular/common/http';
-
-// --- catálogos / enums ---
-const ESTADOS = [
-  'Aguascalientes','Baja California','Baja California Sur','Campeche','Coahuila','Colima','Chiapas','Chihuahua',
-  'CDMX','Durango','Guanajuato','Guerrero','Hidalgo','Jalisco','México','Michoacán','Morelos','Nayarit','Nuevo León',
-  'Oaxaca','Puebla','Querétaro','Quintana Roo','San Luis Potosí','Sinaloa','Sonora','Tabasco','Tamaulipas','Tlaxcala',
-  'Veracruz','Yucatán','Zacatecas'
-].map(s => ({ value: s, label: s }));
-
-const TIPOS_SOLICITUD = [
-  { value: 'IMPI', label: 'IMPI' },
-  { value: 'INDAUTOR', label: 'INDAUTOR' },
-];
-
-const TRIMESTRES = [
-  { value: 'Q1', label: 'Q1 (Ene–Mar)' },
-  { value: 'Q2', label: 'Q2 (Abr–Jun)' },
-  { value: 'Q3', label: 'Q3 (Jul–Sep)' },
-  { value: 'Q4', label: 'Q4 (Oct–Dic)' },
-];
-
-const SECTORES = [
-  { value: 'Primario', label: 'Primario' },
-  { value: 'Secundario', label: 'Secundario' },
-  { value: 'Terciario', label: 'Terciario' },
-];
-
-const ESTATUS = [
-  { value: 'en_revision', label: 'En revisión' },
-  { value: 'concedida', label: 'Concedida' },
-  { value: 'rechazada', label: 'Rechazada' },
-  { value: 'mantenimiento', label: 'En mantenimiento' },
-];
-
-const SEXOS = [
-  { value: 'H', label: 'Hombre' },
-  { value: 'M', label: 'Mujer' },
-];
-
-const CATEGORIAS = [
-  { value: 'Docente', label: 'Docente' },
-  { value: 'Administrativo', label: 'Administrativo' },
-  { value: 'Alumno', label: 'Alumno' },
-];
-
-// helper de visibilidad
-const showIf = (predicate: (m: any) => boolean) => predicate;
+import { ENTIDADES_FEDERATIVAS_DATA } from 'src/app/api/data/entity.data';
+import { FederalEntity } from 'src/app/api/models/entity.model';
 
 // tipos campo
 type FieldType = 'text' | 'date' | 'select' | 'year';
@@ -68,96 +23,6 @@ interface FieldConfig {
   validators?: any[];
   visibleIf?: (model: any) => boolean;
 }
-
-const KINDS_FORM_CONFIG: Record<string, FieldConfig[]> = {
-  // a) Federales: Estado + Rango temporal
-  reporte_it_federales: [
-    { name: 'estado', label: 'Entidad Federativa', type: 'select', options: ESTADOS },
-    { name: 'desde',  label: 'Desde', type: 'date' },
-    { name: 'hasta',  label: 'Hasta', type: 'date' },
-  ],
-
-  // b) Descentralizados: Estado + Rango temporal
-  reporte_it_descentralizados: [
-    { name: 'estado', label: 'Entidad Federativa', type: 'select', options: ESTADOS },
-    { name: 'desde',  label: 'Desde', type: 'date' },
-    { name: 'hasta',  label: 'Hasta', type: 'date' },
-  ],
-
-  // c) Top Ten Instituciones (sin filtros requeridos)
-  reporte_top10_instituciones: [
-    { name: 'desde',  label: 'Desde', type: 'date' },
-    { name: 'hasta',  label: 'Hasta', type: 'date' },
-  ],
-
-  // d) Top Ten Entidades Federativas (sin filtros requeridos)
-  reporte_top10_entidades: [
-    { name: 'desde',  label: 'Desde', type: 'date' },
-    { name: 'hasta',  label: 'Hasta', type: 'date' },
-  ],
-
-  // e) Registros por Año (trimestre o rango)
-  reporte_registros_anio: [
-    // modo: trimestre o rango
-    { name: 'modo', label: 'Modo de filtro', type: 'select',
-      options: [{ value: 'trimestre', label: 'Trimestre' }, { value: 'rango', label: 'Rango de fecha' }],
-      validators: [Validators.required]
-    },
-    // filtros comunes
-    { name: 'tipo_solicitud', label: 'Tipo', type: 'select', options: TIPOS_SOLICITUD },
-    // trimestre + año
-    { name: 'anio', label: 'Año', type: 'year', visibleIf: showIf(m => m.modo === 'trimestre') },
-    { name: 'trimestre', label: 'Trimestre', type: 'select', options: TRIMESTRES, visibleIf: showIf(m => m.modo === 'trimestre') },
-    // rango
-    { name: 'desde',  label: 'Desde', type: 'date', visibleIf: showIf(m => m.modo === 'rango') },
-    { name: 'hasta',  label: 'Hasta', type: 'date', visibleIf: showIf(m => m.modo === 'rango') },
-  ],
-
-  // f) Registros por Sector: Sector + Institución + Rango
-  reporte_registros_sector: [
-    { name: 'sector', label: 'Sector', type: 'select', options: SECTORES, validators: [Validators.required] },
-    { name: 'institucion', label: 'Institución', type: 'text', placeholder: 'TecNM / Instituto…' },
-    { name: 'desde',  label: 'Desde', type: 'date' },
-    { name: 'hasta',  label: 'Hasta', type: 'date' },
-  ],
-
-  // g) Registros por Estatus: Estatus + Institución + Rango
-  reporte_registros_estatus: [
-    { name: 'estatus', label: 'Estatus', type: 'select', options: ESTATUS, validators: [Validators.required] },
-    { name: 'institucion', label: 'Institución', type: 'text', placeholder: 'TecNM / Instituto…' },
-    { name: 'desde',  label: 'Desde', type: 'date' },
-    { name: 'hasta',  label: 'Hasta', type: 'date' },
-  ],
-
-  // h) General de Solicitudes: Rango + Institución + Sector
-  reporte_solicitudes_general: [
-    { name: 'desde',  label: 'Desde', type: 'date' },
-    { name: 'hasta',  label: 'Hasta', type: 'date' },
-    { name: 'institucion', label: 'Institución', type: 'text', placeholder: 'TecNM / Instituto…' },
-    { name: 'sector', label: 'Sector', type: 'select', options: SECTORES },
-  ],
-
-  // i) Por Institución: Institución + Sector + Rango
-  reporte_por_institucion: [
-    { name: 'institucion', label: 'Institución', type: 'text', validators: [Validators.required], placeholder: 'TecNM / Instituto…' },
-    { name: 'sector', label: 'Sector', type: 'select', options: SECTORES },
-    { name: 'desde',  label: 'Desde', type: 'date' },
-    { name: 'hasta',  label: 'Hasta', type: 'date' },
-  ],
-
-  // j) Registros por Sexo: Sexo + Institución + Categoría
-  reporte_registros_sexo: [
-    { name: 'sexo', label: 'Sexo', type: 'select', options: SEXOS, validators: [Validators.required] },
-    { name: 'institucion', label: 'Institución', type: 'text', placeholder: 'TecNM / Instituto…' },
-    { name: 'categoria', label: 'Categoría', type: 'select', options: CATEGORIAS },
-  ],
-
-  // k) Registros por Categoría: Categoría + Institución
-  reporte_registros_categoria: [
-    { name: 'categoria', label: 'Categoría', type: 'select', options: CATEGORIAS, validators: [Validators.required] },
-    { name: 'institucion', label: 'Institución', type: 'text', placeholder: 'TecNM / Instituto…' },
-  ],
-};
 
 @Component({
   selector: 'app-reporte-selector',
@@ -173,6 +38,7 @@ export class ReporteSelectorComponent implements OnInit {
   form!: FormGroup;
   currentKind = '';
   currentFields: FieldConfig[] = [];
+  entidades: FederalEntity[] = ENTIDADES_FEDERATIVAS_DATA;
   
   user$: Observable<UserType>;
 
@@ -200,6 +66,10 @@ export class ReporteSelectorComponent implements OnInit {
     else if (url.includes('/solicitante/')) this.perfil = 'solicitante';
 
     this.reportes = REPORTES_POR_ROL[this.perfil];
+
+    this.entidades = [...ENTIDADES_FEDERATIVAS_DATA].sort(
+      (a, b) => a.nombre.localeCompare(b.nombre, 'es')
+    );
   }
 
   // ===== Modal =====
@@ -215,8 +85,7 @@ export class ReporteSelectorComponent implements OnInit {
 
   // Mapea tu estructura actual (PDFs + repetidos) → kind único para el modal
   private mapToKind(item: ReporteCard): string {
-    const a = (item.archivo || '').toLowerCase();
-    const t = item.titulo || '';
+    
 
     // 1) si ya viene un kind, lo respetamos
     const knownKinds = new Set([
@@ -231,9 +100,16 @@ export class ReporteSelectorComponent implements OnInit {
       'reporte_por_institucion',
       'reporte_registros_sexo',
       'reporte_registros_categoria',
+      'reporte_registros_departamento',
     ]);
     if (knownKinds.has(item.archivo)) return item.archivo;
 
+    return this.rename();
+  }
+
+  rename(){
+    const a = (this.selectedReporte?.archivo || '').toLowerCase();
+    const t = this.selectedReporte?.titulo || '';
     // 2) si es PDF o está repetido, desambiguamos por el título (keys i18n)
     switch (t) {
       case 'REPORTS.ADMIN.FEDERAL.TITLE':          return 'reporte_it_federales';
@@ -247,6 +123,7 @@ export class ReporteSelectorComponent implements OnInit {
       case 'REPORTS.ADMIN.INSTITUTION.TITLE':      return 'reporte_por_institucion';
       case 'REPORTS.ADMIN.SEX.TITLE':              return 'reporte_registros_sexo';
       case 'REPORTS.ADMIN.CATEGORY.TITLE':         return 'reporte_registros_categoria';
+      case 'REPORTS.COORDINATOR.DEPARTMENT.TITLE':       return 'reporte_registros_departamento';
       default:
         // 3) fallback por nombre de archivo PDF (por si lo necesitas)
         if (a.includes('entidad')) return 'reporte_it_federales';
@@ -299,7 +176,7 @@ export class ReporteSelectorComponent implements OnInit {
         if (event instanceof HttpResponse && event.body instanceof Blob) {
           const blob = event.body;
           const cd = event.headers?.get('Content-Disposition') || event.headers?.get('content-disposition');
-          const filename = this.getFilenameFromDisposition(cd) || this.suggestFileName();
+          const filename = this.rename()+'.pdf';
 
           // 👉 1) Crear URL temporal del PDF
           const url = URL.createObjectURL(blob);
@@ -395,10 +272,6 @@ export class ReporteSelectorComponent implements OnInit {
 }
   private todayISO(): string { return new Date().toISOString().slice(0,10); }
 
-  showLoading(): void {
-    this.isLoading = true;
-    this.progress = 0;
-  }
   trackByArchivo(_index: number, r: ReporteCard): string {
     return r.archivo;
   }
