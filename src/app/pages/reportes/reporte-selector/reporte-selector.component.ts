@@ -86,8 +86,6 @@ export class ReporteSelectorComponent implements OnInit {
   // Mapea tu estructura actual (PDFs + repetidos) → kind único para el modal
   private mapToKind(item: ReporteCard): string {
     
-
-    // 1) si ya viene un kind, lo respetamos
     const knownKinds = new Set([
       'reporte_it_federales',
       'reporte_it_descentralizados',

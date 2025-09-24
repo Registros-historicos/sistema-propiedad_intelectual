@@ -34,14 +34,14 @@ export const REPORTES_POR_ROL: Record<Rol, ReporteCard[]> = {
     {
       titulo: 'REPORTS.ADMIN.TOP_STATES.TITLE',
       descripcion: 'REPORTS.ADMIN.TOP_STATES.DESCRIPTION',
-      archivo: 'reporte-entidad-federativa.pdf',
+      archivo: 'reporte_entidad_federativa',
       color: 'indigo',
       icono: 'workspace_premium'
     },
     {
       titulo: 'REPORTS.ADMIN.YEAR.TITLE',
       descripcion: 'REPORTS.ADMIN.YEAR.DESCRIPTION',
-      archivo: 'reporte-fecha-de-solicitud.pdf',
+      archivo: 'reporte_registros_anio',
       color: 'teal',
       icono: 'date_range'
     },
@@ -55,7 +55,7 @@ export const REPORTES_POR_ROL: Record<Rol, ReporteCard[]> = {
     {
       titulo: 'REPORTS.ADMIN.STATUS.TITLE',
       descripcion: 'REPORTS.ADMIN.STATUS.DESCRIPTION',
-      archivo: 'reporte-clasificación.pdf',
+      archivo: 'reporte_registros_estatus',
       color: 'red',
       icono: 'assignment_turned_in'
     },
