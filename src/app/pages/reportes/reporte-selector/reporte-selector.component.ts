@@ -165,11 +165,6 @@ export class ReporteSelectorComponent implements OnInit {
       reportProgress: true
     }).subscribe({
       next: (event: HttpResponse<Blob> | any) => {
-        if (event?.type === HttpEventType.DownloadProgress && event.total) {
-          this.progress = Math.round(100 * event.loaded / event.total);
-          return;
-        }
-
         if (event instanceof HttpResponse && event.body instanceof Blob) {
           const blob = event.body;
           const cd = event.headers?.get('Content-Disposition') || event.headers?.get('content-disposition');
