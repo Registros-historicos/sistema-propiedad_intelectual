@@ -1,7 +1,7 @@
 <div class="reportes-container">
   <h2>{{ 'REPORTS.TITLE' | translate }}</h2>
   <p>{{ 'REPORTS.DESC' | translate }}</p>
-<!-- GRID DE REPORTES -->
+
 <div class="card-grid">
   <div
     class="reporte-card"
@@ -33,6 +33,8 @@
 
     <form #f="ngForm" (ngSubmit)="onSubmit(f.value)" class="modal__form">
   <ng-container [ngSwitch]="currentKind">
+
+    <!-- Parametros especificos para cada ventana modal. La solución aun debe ser pulida -->
 
     <!-- a) Federales -->
     <ng-container *ngSwitchCase="'reporte_it_federales'">

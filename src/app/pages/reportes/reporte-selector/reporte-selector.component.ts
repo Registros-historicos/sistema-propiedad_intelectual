@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ReporteCard, REPORTES_POR_ROL, Rol } from '../constants/reportes-por-rol.constant';
 import { NgZone } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpEventType, HttpHeaders } from '@angular/common/http';
-import { environment } from 'src/environments/environment'; // <-- ajuste si su ruta difiere
+import { environment } from 'src/environments/environment'; // En su momento, se deberá tomar las variables de entorno desde el backend final
 import { Observable } from 'rxjs';
 import { UserType, AuthService } from 'src/app/modules/auth';
 import { FormBuilder, FormGroup } from '@angular/forms';
@@ -82,7 +82,7 @@ export class ReporteSelectorComponent implements OnInit {
     this.currentKind = this.mapToKind(item);
   }
 
-  // Mapea tu estructura actual (PDFs + repetidos) → kind único para el modal
+  // Mapea la estructura actual (PDFs + repetidos)
   private mapToKind(item: ReporteCard): string {
     
     const knownKinds = new Set([
@@ -107,7 +107,7 @@ export class ReporteSelectorComponent implements OnInit {
   rename(){
     const a = (this.selectedReporte?.archivo || '').toLowerCase();
     const t = this.selectedReporte?.titulo || '';
-    // 2) si es PDF o está repetido, desambiguamos por el título (keys i18n)
+    // si es PDF o está repetido, desambiguamos por el título
     switch (t) {
       case 'REPORTS.ADMIN.FEDERAL.TITLE':          return 'reporte_it_federales';
       case 'REPORTS.ADMIN.DECENTRALIZED.TITLE':    return 'reporte_it_descentralizados';
@@ -122,7 +122,7 @@ export class ReporteSelectorComponent implements OnInit {
       case 'REPORTS.ADMIN.CATEGORY.TITLE':         return 'reporte_registros_categoria';
       case 'REPORTS.COORDINATOR.DEPARTMENT.TITLE':       return 'reporte_registros_departamento';
       default:
-        // 3) fallback por nombre de archivo PDF (por si lo necesitas)
+        // fallback por nombre de archivo PDF 
         if (a.includes('entidad')) return 'reporte_it_federales';
         if (a.includes('clasificación')) return 'reporte_registros_estatus';
         if (a.includes('fecha')) return 'reporte_registros_anio';
@@ -139,7 +139,7 @@ export class ReporteSelectorComponent implements OnInit {
   @HostListener('document:keydown.escape')
   onEsc(): void { if (this.modalOpen) this.closeModal(); }
 
-  // ===== POST a la API  =====
+  /* Se envia la solicitud al API de reportes */
   onSubmit(formValues?: any): void {
     if (!this.selectedReporte?.archivo) {
       this.errorMsg = 'No se encontró el archivo del reporte.';
@@ -175,15 +175,12 @@ export class ReporteSelectorComponent implements OnInit {
           const cd = event.headers?.get('Content-Disposition') || event.headers?.get('content-disposition');
           const filename = this.rename()+'.pdf';
 
-          // 1) Crear URL temporal del PDF
           const url = URL.createObjectURL(blob);
-          console.log('Blob URL:', url);
-          // 2) Apagar loader y cerrar modal ANTES de navegar
+
           this.isLoading = false;
           this.progress = 100;
           this.closeModal();
 
-          // 3) Navegar al visor enviando el blobUrl y metadatos
           this.router.navigateByUrl('/visor-pdf', {
           state: { url, filename, tipo }
           });
@@ -204,12 +201,15 @@ export class ReporteSelectorComponent implements OnInit {
     return `Error ${err.status}: ${err.statusText}`;
   }
 
+  /* Construye el payload para la solicitud al API, está pendiente de actualizaciones */
   private buildPayload(formValues?: any): any {
     const kind = this.selectedReporte?.archivo || 'reporte_generico';
     const fecha = (formValues?.fecha as string) || this.todayISO();
     const persona = (formValues?.persona as string) || 'Usuario';
 
-    // JSON que nos compartió (reporte_entidad_federativa)
+    /* JSON para pruebas del API
+    En este momento el API no usa los filtros y espera los datos a graficar, posteriormente esperará solo
+    los filtros y hará las consultas internamente. */
     return {
       kind,
       fecha,

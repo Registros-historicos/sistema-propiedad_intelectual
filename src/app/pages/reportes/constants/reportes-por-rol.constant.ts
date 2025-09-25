@@ -9,6 +9,7 @@ export interface ReporteCard {
 export type Rol = 'admin' | 'coordinador' | 'solicitante';
 
 export const REPORTES_POR_ROL: Record<Rol, ReporteCard[]> = {
+    // Se agregaron reportes para el rol de administrador
     admin: [
     {
       titulo: 'REPORTS.ADMIN.FEDERAL.TITLE',

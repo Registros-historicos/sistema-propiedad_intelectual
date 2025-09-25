@@ -17,14 +17,17 @@ export class VisorPdfComponent implements OnInit, OnDestroy {
 
   constructor(private router: Router, private sanitizer: DomSanitizer) {}
 
+  /* Cuando llegamos al visor PDF, obtenemos la URL y el nombre del archivo. En este caso podemos ver que,
+  podemos utilizar la url para mostrar el PDF regresado por el API para reportes ó archivos locales para fines de visualización */
   ngOnInit(): void {
     const { url, filename, tipo } = history.state || {};
     if (!url) {
       this.errorMsg = 'No se pudo cargar el reporte. Regrese e inténtelo de nuevo.';
       return;
     }
-    this.rawUrl = url as string;
-    //this.rawUrl = 'assets/reportes/admin/' + (filename as string);
+
+    //this.rawUrl = url as string; // Usa  la URL del API generada
+    this.rawUrl = 'assets/reportes/admin/' + (filename as string); // Usa archivos locales para pruebas
     this.filename = filename as string;
     this.tipo = tipo as string;
     this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.rawUrl);

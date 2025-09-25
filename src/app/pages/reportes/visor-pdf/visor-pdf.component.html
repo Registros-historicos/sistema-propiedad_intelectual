@@ -1,9 +1,9 @@
 <div class="visor-container">
   <div class="reports-title">
-    <button class="btn" type="button" (click)="back()">← Regresar</button>
+    <button type="button" class="btn btn btn-secondary me-3" (click)="back()">Regresar</button>
     <h2>{{ filename || 'Reporte.pdf' }}</h2>
   </div>
-
+  <!-- Mostrar visor PDF (dependiendo de la url o la ruta) o mensaje de error -->
   <div class="visor-wrapper" *ngIf="pdfUrl; else err">
     <object class="visor-pdf"
             [data]="pdfUrl"
