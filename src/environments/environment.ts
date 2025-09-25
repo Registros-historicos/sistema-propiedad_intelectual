@@ -159,6 +159,8 @@ export const environment = {
       thumbnail: './assets/media/demos/demo20.png',
     },
   },
+  REPORTS_API_URL: 'https://api-reportes-1087492711571.us-central1.run.app/v1/reports',
+  REPORTS_API_KEY: 'qwWGOsxxxxGxK7J78vzaep4qE/16JUP8lQoNGY8/Q0w='
 };
 
 /*

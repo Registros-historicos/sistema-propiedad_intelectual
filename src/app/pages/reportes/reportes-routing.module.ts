@@ -13,3 +13,4 @@ const routes: Routes = [
   exports: [RouterModule]
 })
 export class ReportesRoutingModule {}
+export class VisorPdfRoutingModule {}
