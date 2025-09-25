@@ -216,24 +216,6 @@ export class ReporteSelectorComponent implements OnInit {
       user: persona,
       data: [
         { institucion: 'TecNM / Instituto Tecnológico de Apizaco', tipo: 'Federal',        patentes: 0, da: 0, mu: 0, di: 0, mc: 0 },
-        { institucion: 'TecNM / Instituto Tecnológico Superior de Tlaxco', tipo: 'Federal', patentes: 1, da: 1, mu: 1, di: 0, mc: 0 },
-        { institucion: 'TecNM / Instituto Tecnológico de Acayucan', tipo: 'Federal',        patentes: 0, da: 0, mu: 0, di: 0, mc: 1 },
-        { institucion: 'TecNM / Instituto Tecnológico de Boca del Río', tipo: 'Federal',    patentes: 2, da: 1, mu: 0, di: 1, mc: 0 },
-        { institucion: 'TecNM / Instituto Tecnológico de Cerro Azul', tipo: 'Federal',      patentes: 0, da: 0, mu: 1, di: 0, mc: 0 },
-        { institucion: 'TecNM / Instituto Tecnológico de Minatitlán', tipo: 'Federal',      patentes: 1, da: 2, mu: 0, di: 0, mc: 1 },
-        { institucion: 'TecNM / Instituto Tecnológico de Orizaba', tipo: 'Descentralizado', patentes: 0, da: 0, mu: 0, di: 1, mc: 0 },
-        { institucion: 'TecNM / Instituto Tecnológico de Veracruz', tipo: 'Descentralizado',patentes: 1, da: 1, mu: 1, di: 0, mc: 0 },
-        { institucion: 'TecNM / Instituto Tecnológico Superior de Alvarado', tipo: 'Descentralizado', patentes: 0, da: 0, mu: 0, di: 0, mc: 1 },
-        { institucion: 'TecNM / Instituto Tecnológico Superior de Coatzacoalcos', tipo: 'Descentralizado', patentes: 2, da: 1, mu: 0, di: 1, mc: 0 },
-        { institucion: 'TecNM / Instituto Tecnológico Superior de Huatusco', tipo: 'Descentralizado', patentes: 0, da: 0, mu: 1, di: 0, mc: 0 },
-        { institucion: 'TecNM / Instituto Tecnológico Superior de Juan Rodríguez Clara', tipo: 'Descentralizado', patentes: 1, da: 2, mu: 0, di: 0, mc: 1 },
-        { institucion: 'TecNM / Instituto Tecnológico Superior de la Región Olmeca', tipo: 'Descentralizado', patentes: 0, da: 0, mu: 0, di: 1, mc: 0 },
-        { institucion: 'TecNM / Instituto Tecnológico Superior de Las Choapas', tipo: 'Descentralizado', patentes: 1, da: 1, mu: 1, di: 0, mc: 0 },
-        { institucion: 'TecNM / Instituto Tecnológico Superior de Martínez de la Torre', tipo: 'Descentralizado', patentes: 0, da: 0, mu: 0, di: 0, mc: 1 },
-        { institucion: 'TecNM / Instituto Tecnológico Superior de Misantla', tipo: 'Descentralizado', patentes: 2, da: 1, mu: 0, di: 1, mc: 0 },
-        { institucion: 'TecNM / Instituto Tecnológico Superior de Naranjos', tipo: 'Descentralizado', patentes: 0, da: 0, mu: 1, di: 0, mc: 0 },
-        { institucion: 'TecNM / Instituto Tecnológico Superior de Pánuco', tipo: 'Descentralizado', patentes: 1, da: 2, mu: 0, di: 0, mc: 1 },
-        { institucion: 'TecNM / Instituto Tecnológico Superior de Papantla', tipo: 'Descentralizado', patentes: 0, da: 1, mu: 1, di: 1, mc: 0 }
       ]
     };
 
