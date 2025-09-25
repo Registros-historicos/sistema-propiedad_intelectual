@@ -6,7 +6,6 @@ import { HttpClient, HttpErrorResponse, HttpEventType, HttpHeaders } from '@angu
 import { environment } from 'src/environments/environment'; // <-- ajuste si su ruta difiere
 import { Observable } from 'rxjs';
 import { UserType, AuthService } from 'src/app/modules/auth';
-import { Validators } from '@angular/forms';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { HttpResponse } from '@angular/common/http';
 import { ENTIDADES_FEDERATIVAS_DATA } from 'src/app/api/data/entity.data';
@@ -140,7 +139,7 @@ export class ReporteSelectorComponent implements OnInit {
   @HostListener('document:keydown.escape')
   onEsc(): void { if (this.modalOpen) this.closeModal(); }
 
-  // ===== POST a la API y descarga del PDF =====
+  // ===== POST a la API  =====
   onSubmit(formValues?: any): void {
     if (!this.selectedReporte?.archivo) {
       this.errorMsg = 'No se encontró el archivo del reporte.';
@@ -176,15 +175,15 @@ export class ReporteSelectorComponent implements OnInit {
           const cd = event.headers?.get('Content-Disposition') || event.headers?.get('content-disposition');
           const filename = this.rename()+'.pdf';
 
-          // 👉 1) Crear URL temporal del PDF
+          // 1) Crear URL temporal del PDF
           const url = URL.createObjectURL(blob);
           console.log('Blob URL:', url);
-          // 👉 2) Apagar loader y cerrar modal ANTES de navegar
+          // 2) Apagar loader y cerrar modal ANTES de navegar
           this.isLoading = false;
           this.progress = 100;
           this.closeModal();
 
-          // 👉 3) Navegar al visor enviando el blobUrl y metadatos
+          // 3) Navegar al visor enviando el blobUrl y metadatos
           this.router.navigateByUrl('/visor-pdf', {
           state: { url, filename, tipo }
           });
@@ -195,35 +194,6 @@ export class ReporteSelectorComponent implements OnInit {
         this.errorMsg = this.parseApiError(err);
       }
     });
-  }
-
-  // ===== Utilidades =====
-  private downloadBlob(blob: Blob, filename: string) {
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename.endsWith('.pdf') ? filename : `${filename}.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    window.URL.revokeObjectURL(url);
-  }
-
-  private getFilenameFromDisposition(disposition?: string | null): string | null {
-    if (!disposition) return null;
-    // ej: Content-Disposition: attachment; filename="reporte_admin.pdf"
-    const match = /filename\*?=(?:UTF-8''|")?([^\";]+)/i.exec(disposition);
-    if (match?.[1]) {
-      try { return decodeURIComponent(match[1].replace(/"/g, '')); }
-      catch { return match[1].replace(/"/g, ''); }
-    }
-    return null;
-  }
-
-  private suggestFileName(): string {
-    const base = this.selectedReporte?.archivo?.replace(/\.[^.]+$/, '') || 'reporte';
-    const fecha = new Date().toISOString().slice(0,10);
-    return `${base}-${fecha}.pdf`;
   }
 
   private parseApiError(err: HttpErrorResponse): string {

@@ -18,14 +18,13 @@ export class VisorPdfComponent implements OnInit, OnDestroy {
   constructor(private router: Router, private sanitizer: DomSanitizer) {}
 
   ngOnInit(): void {
-    // Recuperar state (desde navigate)
     const { url, filename, tipo } = history.state || {};
     if (!url) {
       this.errorMsg = 'No se pudo cargar el reporte. Regrese e inténtelo de nuevo.';
       return;
     }
-    //this.rawUrl = url as string;
-    this.rawUrl = 'assets/reportes/admin/' + (filename as string);
+    this.rawUrl = url as string;
+    //this.rawUrl = 'assets/reportes/admin/' + (filename as string);
     this.filename = filename as string;
     this.tipo = tipo as string;
     this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.rawUrl);
