@@ -2,20 +2,214 @@
   <h2>{{ 'REPORTS.TITLE' | translate }}</h2>
   <p>{{ 'REPORTS.DESC' | translate }}</p>
 
-  <div class="card-grid">
-    <div
-      class="card reporte-card"
-      *ngFor="let reporte of reportes"
-      [ngClass]="reporte.color"
-      (click)="verReporte(reporte.archivo)"
-    >
-      <span class="material-icons icono-reporte">{{ reporte.icono }}</span>
-      <h3>{{ reporte.titulo | translate }}</h3>
-      <p>{{ reporte.descripcion | translate }}</p>
-      <button>{{ 'REPORTS.BUTTON' | translate }}</button>
-    </div>
-  </div>
+<div class="card-grid">
+  <div
+    class="reporte-card"
+    *ngFor="let item of reportes; trackBy: trackByArchivo"
+    [ngClass]="item.color"
+  >
+  <span class="material-icons icono-reporte">{{ item.icono }}</span>
+  <h3>{{ item.titulo | translate }}</h3>
+    <p>{{ item.descripcion | translate }}</p>
 
+    <button type="button" class="btn" (click)="openModal(item)">
+      {{ 'REPORTS.BUTTON' | translate }}
+    </button>
+  </div>
+</div>
+
+<!-- Backdrop -->
+<div class="modal-backdrop" *ngIf="modalOpen" (click)="closeModal()" aria-hidden="true"></div>
+
+<!-- Modal -->
+<div class="modal" *ngIf="modalOpen" role="dialog" aria-modal="true" tabindex="0" (click)="closeModal()">
+  <div class="modal__content" (click)="$event.stopPropagation()">
+    <header class="modal__header">
+      <h2 id="modalTitle" *ngIf="selectedReporte as r">
+        {{ r.titulo | translate }}
+      </h2>
+      <button type="button" class="modal__close" (click)="closeModal()" aria-label="Cerrar">✕</button>
+    </header>
+
+    <form #f="ngForm" (ngSubmit)="onSubmit(f.value)" class="modal__form">
+  <ng-container [ngSwitch]="currentKind">
+
+    <!-- Parametros especificos para cada ventana modal. La solución aun debe ser pulida -->
+
+    <!-- a) Federales -->
+    <ng-container *ngSwitchCase="'reporte_it_federales'">
+      <div class="form-row">
+        <label>Entidad Federativa</label>
+        <select name="estadoId" ngModel required>
+          <option *ngFor="let e of entidades" [value]="e.id">{{ e.nombre }}</option>
+        </select>
+      </div>
+      <div class="form-row"><label>Desde</label><input type="date" name="desde" ngModel required /></div>
+      <div class="form-row"><label>Hasta</label><input type="date" name="hasta" ngModel required /></div>
+    </ng-container>
+
+    <!-- b) Descentralizados -->
+    <ng-container *ngSwitchCase="'reporte_it_descentralizados'">
+      <div class="form-row">
+        <label>Entidad Federativa</label>
+        <select name="estadoId" ngModel required>
+          <option *ngFor="let e of entidades" [value]="e.id">{{ e.nombre }}</option>
+        </select>
+      </div>
+      <div class="form-row"><label>Desde</label><input type="date" name="desde" ngModel required /></div>
+      <div class="form-row"><label>Hasta</label><input type="date" name="hasta" ngModel required /></div>
+    </ng-container>
+
+    <!-- c) Top 10 Instituciones -->
+    <ng-container *ngSwitchCase="'reporte_top10_instituciones'">
+      <span>Este reporte no requiere parámetros.</span>
+      <p>Se generará automáticamente al hacer clic en "Generar Reporte".</p>
+    </ng-container>
+
+    <!-- d) Top 10 Entidades -->
+    <ng-container *ngSwitchCase="'reporte_top10_entidades'">
+      <span>Este reporte no requiere parámetros.</span>
+      <p>Se generará automáticamente al hacer clic en "Generar Reporte".</p>
+    </ng-container>
+
+    <!-- e) Registros por Año -->
+    <ng-container *ngSwitchCase="'reporte_registros_anio'">
+      <div class="form-row">
+        <label>Tipo</label>
+        <select name="tipo_solicitud" ngModel required>
+          <option value="">Todos</option>
+          <option value="IMPI">IMPI</option>
+          <option value="INDAUTOR">INDAUTOR</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Modo de filtro</label>
+        <select name="modo" ngModel required>
+          <option value="trimestre">Trimestre</option>
+          <option value="rango">Rango de fecha</option>
+        </select>
+      </div>
+      <div class="form-row"><label>Año</label><input type="number" name="anio" min="2000" max="2100" ngModel required /></div>
+      <div class="form-row">
+        <label>Trimestre</label>
+        <select name="trimestre" ngModel required>
+          <option value="Q1">Q1 (Ene–Mar)</option>
+          <option value="Q2">Q2 (Abr–Jun)</option>
+          <option value="Q3">Q3 (Jul–Sep)</option>
+          <option value="Q4">Q4 (Oct–Dic)</option>
+        </select>
+      </div>
+      <div class="form-row"><label>Desde</label><input type="date" name="desde" ngModel required /></div>
+      <div class="form-row"><label>Hasta</label><input type="date" name="hasta" ngModel required /></div>
+    </ng-container>
+
+    <!-- f) Por Sector -->
+    <ng-container *ngSwitchCase="'reporte_registros_sector'">
+      <div class="form-row">
+        <label>Sector</label>
+        <select name="sector" ngModel required>
+          <option value="">Todos</option>
+          <option>Primario</option><option>Secundario</option><option>Terciario</option>
+        </select>
+      </div>
+      <div class="form-row"><label>Institución</label><input type="text" name="institucion" ngModel required /></div>
+      <div class="form-row"><label>Desde</label><input type="date" name="desde" ngModel required /></div>
+      <div class="form-row"><label>Hasta</label><input type="date" name="hasta" ngModel required /></div>
+    </ng-container>
+
+    <!-- g) Por Estatus -->
+    <ng-container *ngSwitchCase="'reporte_registros_estatus'">
+      <div class="form-row">
+        <label>Estatus</label>
+        <select name="estatus" ngModel required>
+          <option value="en_revision">En revisión</option>
+          <option value="concedida">Concedida</option>
+          <option value="rechazada">Rechazada</option>
+          <option value="mantenimiento">En mantenimiento</option>
+        </select>
+      </div>
+      <div class="form-row"><label>Institución</label><input type="text" name="institucion" ngModel required /></div>
+      <div class="form-row"><label>Desde</label><input type="date" name="desde" ngModel required /></div>
+      <div class="form-row"><label>Hasta</label><input type="date" name="hasta" ngModel required /></div>
+    </ng-container>
+
+    <!-- h) General -->
+    <ng-container *ngSwitchCase="'reporte_solicitudes_general'">
+      <div class="form-row"><label>Desde</label><input type="date" name="desde" ngModel required /></div>
+      <div class="form-row"><label>Hasta</label><input type="date" name="hasta" ngModel required /></div>
+      <div class="form-row"><label>Institución</label><input type="text" name="institucion" ngModel required /></div>
+      <div class="form-row">
+        <label>Sector</label>
+        <select name="sector" ngModel required>
+          <option value="">Todos</option>
+          <option>Primario</option><option>Secundario</option><option>Terciario</option>
+        </select>
+      </div>
+    </ng-container>
+
+    <!-- i) Por Institución -->
+    <ng-container *ngSwitchCase="'reporte_por_institucion'">
+      <div class="form-row"><label>Institución</label><input type="text" name="institucion" ngModel /></div>
+      <div class="form-row">
+        <label>Sector</label>
+        <select name="sector" ngModel required>
+          <option value="">Todos</option>
+          <option>Primario</option><option>Secundario</option><option>Terciario</option>
+        </select>
+      </div>
+      <div class="form-row"><label>Desde</label><input type="date" name="desde" ngModel required /></div>
+      <div class="form-row"><label>Hasta</label><input type="date" name="hasta" ngModel required /></div>
+    </ng-container>
+
+    <!-- j) Por Sexo -->
+    <ng-container *ngSwitchCase="'reporte_registros_sexo'">
+      <div class="form-row">
+        <label>Sexo</label>
+        <select name="sexo" ngModel required>
+          <option value="H">Hombre</option>
+          <option value="M">Mujer</option>
+        </select>
+      </div>
+      <div class="form-row"><label>Institución</label><input type="text" name="institucion" ngModel required /></div>
+      <div class="form-row">
+        <label>Categoría</label>
+        <select name="categoria" ngModel required>
+          <option value="">Todas</option>
+          <option>Docente</option><option>Administrativo</option><option>Alumno</option>
+        </select>
+      </div>
+    </ng-container>
+
+    <!-- k) Por Categoría -->
+    <ng-container *ngSwitchCase="'reporte_registros_categoria'">
+      <div class="form-row">
+        <label>Categoría</label>
+        <select name="categoria" ngModel required>
+          <option>Docente</option><option>Administrativo</option><option>Alumno</option>
+        </select>
+      </div>
+      <div class="form-row"><label>Institución</label><input type="text" name="institucion" ngModel required /></div>
+    </ng-container>
+
+    <!-- default: solo fecha -->
+    <ng-container *ngSwitchDefault>
+      <div class="form-row">
+        <label>Fecha de creación</label>
+        <input type="date" name="fecha" ngModel required />
+      </div>
+    </ng-container>
+
+  </ng-container>
+
+  <footer class="modal__footer">
+    <button type="button" class="btn btn--secondary" (click)="closeModal()">Cancelar</button>
+    <button type="submit" class="btn btn--primary" [disabled]="f.invalid || isLoading">
+      {{ 'REPORTS.BUTTON' | translate }} <span class="material-icons">picture_as_pdf</span>
+    </button>
+  </footer>
+</form>
+    <p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
+  </div>
 
   <div *ngIf="isLoading" class="custom-loading-overlay">
     <div class="custom-loading-box">

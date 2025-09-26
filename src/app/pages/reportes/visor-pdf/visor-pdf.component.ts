@@ -1,36 +1,46 @@
-import {Component} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
-import {Location} from '@angular/common'
+// visor-pdf.component.ts
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-visor-pdf',
   templateUrl: './visor-pdf.component.html',
   styleUrls: ['./visor-pdf.component.scss']
 })
-export class VisorPdfComponent {
-  archivo: string = '';
-  archivoNombre: string = '';
-  archivoTitulo: string = '';
+export class VisorPdfComponent implements OnInit, OnDestroy {
+  pdfUrl?: SafeResourceUrl;
+  rawUrl?: string;       // para revokeObjectURL
+  filename?: string;
+  tipo?: string;
+  errorMsg = '';
 
-  constructor(
-    private route: ActivatedRoute,
-    private location: Location
-  ) {
-    const archivoParam = this.route.snapshot.paramMap.get('archivo');
-    const tipoParam = this.route.snapshot.paramMap.get('tipo');
+  constructor(private router: Router, private sanitizer: DomSanitizer) {}
 
-    if (archivoParam && tipoParam) {
-      this.archivoNombre = archivoParam;
-      this.archivo = 'assets/reportes/' + tipoParam + '/' + archivoParam;
-      console.log('Archivo cargado:', this.archivo);
+  /* Cuando llegamos al visor PDF, obtenemos la URL y el nombre del archivo. En este caso podemos ver que,
+  podemos utilizar la url para mostrar el PDF regresado por el API para reportes ó archivos locales para fines de visualización */
+  ngOnInit(): void {
+    const { url, filename, tipo } = history.state || {};
+    if (!url) {
+      this.errorMsg = 'No se pudo cargar el reporte. Regrese e inténtelo de nuevo.';
+      return;
+    }
 
-      const baseName = archivoParam.replace('.pdf', '').replace(/-/g, ' ');
-      this.archivoTitulo = baseName.charAt(0).toUpperCase() + baseName.slice(1);
+    //this.rawUrl = url as string; // Usa  la URL del API generada
+    this.rawUrl = 'assets/reportes/admin/' + (filename as string); // Usa archivos locales para pruebas
+    this.filename = filename as string;
+    this.tipo = tipo as string;
+    this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.rawUrl);
+  }
+
+  ngOnDestroy(): void {
+    // Revocar el blob URL para liberar memoria
+    if (this.rawUrl) {
+      URL.revokeObjectURL(this.rawUrl);
     }
   }
 
-  protected goBack() {
-    // Regresar la navegación una pagina atrás
-    this.location.back();
+  back(): void {
+    history.length > 1 ? history.back() : this.router.navigate(['/']);
   }
 }
