@@ -219,17 +219,27 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
       })),
       columns: [
         {
-          title: 'Número de expediente',
+          title: 'No. de expediente',
           data: 'numeroExpediente',
           render: (data) => {
-            return `<span class="fw-semibold text-gray-600">${data || ''}</span>`;
+            let shortCert = '';
+            if (data && data.startsWith('IND-EXP-')) {
+              shortCert = data.substring(8);
+            }
+
+            return `<span class="fw-semibold text-gray-600" style="display: inline-block; max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">IND-EXP-<br>${shortCert || ''}</span>`;
           },
         },
         {
-          title: 'Número de certificado',
+          title: 'No. de certificado',
           data: 'numeroCertificado',
           render: (data) => {
-            return `<span class="fw-semibold text-gray-600">${data || ''}</span>`;
+            let shortCert = '';
+            if (data && data.startsWith('IND-CERT-')) {
+              shortCert = data.substring(9);
+            }
+
+            return `<span class="fw-semibold text-gray-600" style="display: inline-block; max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">IND-CERT-<br>${shortCert || ''}</span>`;
           },
         },
         {

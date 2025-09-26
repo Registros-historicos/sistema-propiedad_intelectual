@@ -1,16 +1,16 @@
-import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { DataTablesResponse } from '../../../administrador/shared-services';
-import { Config } from 'datatables.net';
-import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
-import { SweetAlertOptions } from 'sweetalert2';
+import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {DataTablesResponse} from '../../../administrador/shared-services';
+import {Config} from 'datatables.net';
+import {SwalComponent} from '@sweetalert2/ngx-sweetalert2';
+import {SweetAlertOptions} from 'sweetalert2';
 import moment from 'moment/moment';
-import { PatentsService } from '../../../../api/services/patents.service';
-import { TranslateService } from '@ngx-translate/core';
-import { Observable } from 'rxjs';
-import { IPatentModel } from 'src/app/api/models/patent.model';
-import { FederalEntity } from 'src/app/api/models/entity.model';
-import { ENTIDADES_FEDERATIVAS_DATA } from 'src/app/api/data/entity.data';
-import { ENTIDADES_FEDERATIVAS_MAP } from 'src/app/api/data/entity-institucion.data';
+import {PatentsService} from '../../../../api/services/patents.service';
+import {TranslateService} from '@ngx-translate/core';
+import {Observable} from 'rxjs';
+import {IPatentModel} from 'src/app/api/models/patent.model';
+import {FederalEntity} from 'src/app/api/models/entity.model';
+import {ENTIDADES_FEDERATIVAS_DATA} from 'src/app/api/data/entity.data';
+import {ENTIDADES_FEDERATIVAS_MAP} from 'src/app/api/data/entity-institucion.data';
 import {ImpiRegistriesService} from '../../../../api/services/impi.service';
 
 type EstatusPatente = 'Registrada' | 'En trámite' | 'Trámite con observaciones' | 'Aprobada' | 'Concluida';
@@ -127,7 +127,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     sector: "",
     subsector: "",
     fechaExpedicion: "",
-  archivo: "",
+    archivo: "",
     observaciones: "",
     inventores: [
       {
@@ -170,59 +170,239 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Datos locales de maquetado para IMPI en este componente (independiente de otros)
   private readonly FAKE_IMPI_DATA_LOCAL: ImpiLocalItem[] = [
-  { id: 1, rama: 'Invención', titulo: 'Sistema Cuántico de Encriptación de Datos', institucion: 'TecNM / Instituto Tecnológico de Ensenada', fechaSolicitud: '2025-09-08', numeroExpediente: 'EXP-0001', numeroCertificado: 'CERT-0001', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [
-      {
-        curp: 'PEAJ900101HDFRRN01',
-        nombreCompleto: 'Pedro Álvarez Juárez',
-        sexo: 'M',
-        tipoInvestigador: 'Profesor-Investigador',
-    institucion: 'TecNM / Instituto Tecnológico de Ensenada',
-        programaEducativo: 'Ingeniería en Sistemas',
-        cuerpoAcademico: 'Cómputo Aplicado',
-        departamento: 'Sistemas y Computación',
-        fechaAfiliacion: '2020-03-15',
-        fechaFin: ''
-      }
-    ] },
-  { id: 2, rama: 'Modelo de Utilidad', titulo: 'Dispositivo Portátil para Purificación de Agua', institucion: 'TecNM / Instituto Tecnológico de La Paz', fechaSolicitud: '2025-09-05', numeroExpediente: 'EXP-0002', numeroCertificado: 'CERT-0002', estatus: 'Registrada', descripcion: '', observaciones: '', inventores: [
-      {
-        curp: 'LOPR920202MDFRRS02',
-        nombreCompleto: 'Lourdes Pérez Ríos',
-        sexo: 'F',
-        tipoInvestigador: 'Estudiante',
-    institucion: 'TecNM / Instituto Tecnológico de La Paz',
-        programaEducativo: 'Química',
-        cuerpoAcademico: 'Procesos Químicos',
-        departamento: 'Química',
-        fechaAfiliacion: '2023-01-10',
-        fechaFin: ''
-      },
-      {
-        curp: 'HOGM850606HDFTRN03',
-        nombreCompleto: 'Hugo Gómez Martínez',
-        sexo: 'M',
-        tipoInvestigador: 'Técnico Académico',
-    institucion: 'TecNM / Instituto Tecnológico de La Paz',
-        programaEducativo: 'Ingeniería Química',
-        cuerpoAcademico: 'Procesos Químicos',
-        departamento: 'Ingeniería',
-        fechaAfiliacion: '2021-09-01',
-        fechaFin: ''
-      }
-    ] },
-  { id: 3, rama: 'Diseño Industrial', titulo: 'Silla Ergonómica con Materiales Reciclados', institucion: 'TecNM / Instituto Tecnológico de Campeche', fechaSolicitud: '2025-09-01', numeroExpediente: 'EXP-0003', numeroCertificado: 'CERT-0003', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
-  { id: 4, rama: 'Invención', titulo: 'Algoritmo de IA para Detección Temprana de Cáncer', institucion: 'TecNM / Instituto Tecnológico Superior de Calkiní', fechaSolicitud: '2025-08-28', numeroExpediente: 'EXP-0004', numeroCertificado: 'CERT-0004', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
-  { id: 5, rama: 'Modelo de Utilidad', titulo: 'Mecanismo de Cierre Automático para Contenedores', institucion: 'TecNM / Instituto Tecnológico de la Selva', fechaSolicitud: '2025-08-25', numeroExpediente: 'EXP-0005', numeroCertificado: 'CERT-0005', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
-  { id: 6, rama: 'Invención', titulo: 'Dron Autónomo para Monitoreo Agrícola', institucion: 'TecNM / Instituto Tecnológico de Tapachula', fechaSolicitud: '2025-08-22', numeroExpediente: 'EXP-0006', numeroCertificado: 'CERT-0006', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
-  { id: 7, rama: 'Diseño Industrial', titulo: 'Lámpara LED de Bajo Consumo con Forma Orgánica', institucion: 'TecNM / Instituto Tecnológico de Tuxtla Gutiérrez', fechaSolicitud: '2025-08-19', numeroExpediente: 'EXP-0007', numeroCertificado: 'CERT-0007', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
-  { id: 8, rama: 'Modelo de Utilidad', titulo: 'Filtro de Aire Mejorado para Automóviles', institucion: 'TecNM / Instituto Tecnológico Superior de Cintalapa', fechaSolicitud: '2025-08-15', numeroExpediente: 'EXP-0008', numeroCertificado: 'CERT-0008', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
-  { id: 9, rama: 'Invención', titulo: 'Batería de Grafeno de Carga Ultra Rápida', institucion: 'TecNM / Instituto Tecnológico Superior de Comitán', fechaSolicitud: '2025-08-11', numeroExpediente: 'EXP-0009', numeroCertificado: 'CERT-0009', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
-  { id: 10, rama: 'Diseño Industrial', titulo: 'Mobiliario Urbano Inteligente con Paneles Solares', institucion: 'TecNM / Instituto Tecnológico de Gustavo A. Madero', fechaSolicitud: '2025-08-07', numeroExpediente: 'EXP-0010', numeroCertificado: 'CERT-0010', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
-  { id: 11, rama: 'Invención', titulo: 'Software de Simulación de Reacciones Químicas', institucion: 'TecNM / Instituto Tecnológico de Gustavo A. Madero II', fechaSolicitud: '2025-08-04', numeroExpediente: 'EXP-0011', numeroCertificado: 'CERT-0011', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
-  { id: 12, rama: 'Modelo de Utilidad', titulo: 'Sistema de Riego por Goteo de Alta Eficiencia', institucion: 'TecNM / Instituto Tecnológico José Mario Molina Pasquel y Henríquez', fechaSolicitud: '2025-08-01', numeroExpediente: 'EXP-0012', numeroCertificado: 'CERT-0012', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
-  { id: 13, rama: 'Invención', titulo: 'Prótesis Robótica Controlada por Señales Neuronales', institucion: 'TecNM / Instituto Tecnológico de Celaya', fechaSolicitud: '2025-07-29', numeroExpediente: 'EXP-0013', numeroCertificado: 'CERT-0013', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
-  { id: 14, rama: 'Diseño Industrial', titulo: 'Empaque Ecológico para Alimentos a Base de Algas', institucion: 'TecNM / Instituto Tecnológico de León', fechaSolicitud: '2025-07-25', numeroExpediente: 'EXP-0014', numeroCertificado: 'CERT-0014', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] },
-  { id: 15, rama: 'Modelo de Utilidad', titulo: 'Herramienta Multifuncional para Ciclismo Urbano', institucion: 'TecNM / Instituto Tecnológico de Irapuato', fechaSolicitud: '2025-07-21', numeroExpediente: 'EXP-0015', numeroCertificado: 'CERT-0015', estatus: 'En trámite', descripcion: '', observaciones: '', inventores: [] }
+    {
+      id: 1,
+      rama: 'Invención',
+      titulo: 'Sistema Cuántico de Encriptación de Datos',
+      institucion: 'TecNM / Instituto Tecnológico de Ensenada',
+      fechaSolicitud: '2025-09-08',
+      numeroExpediente: 'EXP-0001',
+      numeroCertificado: 'CERT-0001',
+      estatus: 'En trámite',
+      descripcion: '',
+      observaciones: '',
+      inventores: [
+        {
+          curp: 'PEAJ900101HDFRRN01',
+          nombreCompleto: 'Pedro Álvarez Juárez',
+          sexo: 'M',
+          tipoInvestigador: 'Profesor-Investigador',
+          institucion: 'TecNM / Instituto Tecnológico de Ensenada',
+          programaEducativo: 'Ingeniería en Sistemas',
+          cuerpoAcademico: 'Cómputo Aplicado',
+          departamento: 'Sistemas y Computación',
+          fechaAfiliacion: '2020-03-15',
+          fechaFin: ''
+        }
+      ]
+    },
+    {
+      id: 2,
+      rama: 'Modelo de Utilidad',
+      titulo: 'Dispositivo Portátil para Purificación de Agua',
+      institucion: 'TecNM / Instituto Tecnológico de La Paz',
+      fechaSolicitud: '2025-09-05',
+      numeroExpediente: 'EXP-0002',
+      numeroCertificado: 'CERT-0002',
+      estatus: 'Registrada',
+      descripcion: '',
+      observaciones: '',
+      inventores: [
+        {
+          curp: 'LOPR920202MDFRRS02',
+          nombreCompleto: 'Lourdes Pérez Ríos',
+          sexo: 'F',
+          tipoInvestigador: 'Estudiante',
+          institucion: 'TecNM / Instituto Tecnológico de La Paz',
+          programaEducativo: 'Química',
+          cuerpoAcademico: 'Procesos Químicos',
+          departamento: 'Química',
+          fechaAfiliacion: '2023-01-10',
+          fechaFin: ''
+        },
+        {
+          curp: 'HOGM850606HDFTRN03',
+          nombreCompleto: 'Hugo Gómez Martínez',
+          sexo: 'M',
+          tipoInvestigador: 'Técnico Académico',
+          institucion: 'TecNM / Instituto Tecnológico de La Paz',
+          programaEducativo: 'Ingeniería Química',
+          cuerpoAcademico: 'Procesos Químicos',
+          departamento: 'Ingeniería',
+          fechaAfiliacion: '2021-09-01',
+          fechaFin: ''
+        }
+      ]
+    },
+    {
+      id: 3,
+      rama: 'Diseño Industrial',
+      titulo: 'Silla Ergonómica con Materiales Reciclados',
+      institucion: 'TecNM / Instituto Tecnológico de Campeche',
+      fechaSolicitud: '2025-09-01',
+      numeroExpediente: 'EXP-0003',
+      numeroCertificado: 'CERT-0003',
+      estatus: 'En trámite',
+      descripcion: '',
+      observaciones: '',
+      inventores: []
+    },
+    {
+      id: 4,
+      rama: 'Invención',
+      titulo: 'Algoritmo de IA para Detección Temprana de Cáncer',
+      institucion: 'TecNM / Instituto Tecnológico Superior de Calkiní',
+      fechaSolicitud: '2025-08-28',
+      numeroExpediente: 'EXP-0004',
+      numeroCertificado: 'CERT-0004',
+      estatus: 'En trámite',
+      descripcion: '',
+      observaciones: '',
+      inventores: []
+    },
+    {
+      id: 5,
+      rama: 'Modelo de Utilidad',
+      titulo: 'Mecanismo de Cierre Automático para Contenedores',
+      institucion: 'TecNM / Instituto Tecnológico de la Selva',
+      fechaSolicitud: '2025-08-25',
+      numeroExpediente: 'EXP-0005',
+      numeroCertificado: 'CERT-0005',
+      estatus: 'En trámite',
+      descripcion: '',
+      observaciones: '',
+      inventores: []
+    },
+    {
+      id: 6,
+      rama: 'Invención',
+      titulo: 'Dron Autónomo para Monitoreo Agrícola',
+      institucion: 'TecNM / Instituto Tecnológico de Tapachula',
+      fechaSolicitud: '2025-08-22',
+      numeroExpediente: 'EXP-0006',
+      numeroCertificado: 'CERT-0006',
+      estatus: 'En trámite',
+      descripcion: '',
+      observaciones: '',
+      inventores: []
+    },
+    {
+      id: 7,
+      rama: 'Diseño Industrial',
+      titulo: 'Lámpara LED de Bajo Consumo con Forma Orgánica',
+      institucion: 'TecNM / Instituto Tecnológico de Tuxtla Gutiérrez',
+      fechaSolicitud: '2025-08-19',
+      numeroExpediente: 'EXP-0007',
+      numeroCertificado: 'CERT-0007',
+      estatus: 'En trámite',
+      descripcion: '',
+      observaciones: '',
+      inventores: []
+    },
+    {
+      id: 8,
+      rama: 'Modelo de Utilidad',
+      titulo: 'Filtro de Aire Mejorado para Automóviles',
+      institucion: 'TecNM / Instituto Tecnológico Superior de Cintalapa',
+      fechaSolicitud: '2025-08-15',
+      numeroExpediente: 'EXP-0008',
+      numeroCertificado: 'CERT-0008',
+      estatus: 'En trámite',
+      descripcion: '',
+      observaciones: '',
+      inventores: []
+    },
+    {
+      id: 9,
+      rama: 'Invención',
+      titulo: 'Batería de Grafeno de Carga Ultra Rápida',
+      institucion: 'TecNM / Instituto Tecnológico Superior de Comitán',
+      fechaSolicitud: '2025-08-11',
+      numeroExpediente: 'EXP-0009',
+      numeroCertificado: 'CERT-0009',
+      estatus: 'En trámite',
+      descripcion: '',
+      observaciones: '',
+      inventores: []
+    },
+    {
+      id: 10,
+      rama: 'Diseño Industrial',
+      titulo: 'Mobiliario Urbano Inteligente con Paneles Solares',
+      institucion: 'TecNM / Instituto Tecnológico de Gustavo A. Madero',
+      fechaSolicitud: '2025-08-07',
+      numeroExpediente: 'EXP-0010',
+      numeroCertificado: 'CERT-0010',
+      estatus: 'En trámite',
+      descripcion: '',
+      observaciones: '',
+      inventores: []
+    },
+    {
+      id: 11,
+      rama: 'Invención',
+      titulo: 'Software de Simulación de Reacciones Químicas',
+      institucion: 'TecNM / Instituto Tecnológico de Gustavo A. Madero II',
+      fechaSolicitud: '2025-08-04',
+      numeroExpediente: 'EXP-0011',
+      numeroCertificado: 'CERT-0011',
+      estatus: 'En trámite',
+      descripcion: '',
+      observaciones: '',
+      inventores: []
+    },
+    {
+      id: 12,
+      rama: 'Modelo de Utilidad',
+      titulo: 'Sistema de Riego por Goteo de Alta Eficiencia',
+      institucion: 'TecNM / Instituto Tecnológico José Mario Molina Pasquel y Henríquez',
+      fechaSolicitud: '2025-08-01',
+      numeroExpediente: 'EXP-0012',
+      numeroCertificado: 'CERT-0012',
+      estatus: 'En trámite',
+      descripcion: '',
+      observaciones: '',
+      inventores: []
+    },
+    {
+      id: 13,
+      rama: 'Invención',
+      titulo: 'Prótesis Robótica Controlada por Señales Neuronales',
+      institucion: 'TecNM / Instituto Tecnológico de Celaya',
+      fechaSolicitud: '2025-07-29',
+      numeroExpediente: 'EXP-0013',
+      numeroCertificado: 'CERT-0013',
+      estatus: 'En trámite',
+      descripcion: '',
+      observaciones: '',
+      inventores: []
+    },
+    {
+      id: 14,
+      rama: 'Diseño Industrial',
+      titulo: 'Empaque Ecológico para Alimentos a Base de Algas',
+      institucion: 'TecNM / Instituto Tecnológico de León',
+      fechaSolicitud: '2025-07-25',
+      numeroExpediente: 'EXP-0014',
+      numeroCertificado: 'CERT-0014',
+      estatus: 'En trámite',
+      descripcion: '',
+      observaciones: '',
+      inventores: []
+    },
+    {
+      id: 15,
+      rama: 'Modelo de Utilidad',
+      titulo: 'Herramienta Multifuncional para Ciclismo Urbano',
+      institucion: 'TecNM / Instituto Tecnológico de Irapuato',
+      fechaSolicitud: '2025-07-21',
+      numeroExpediente: 'EXP-0015',
+      numeroCertificado: 'CERT-0015',
+      estatus: 'En trámite',
+      descripcion: '',
+      observaciones: '',
+      inventores: []
+    }
   ];
 
   tranlatesPlaceholders: any = {};
@@ -300,7 +480,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         zeroRecords: this.translate.instant('TABLE.ZERO_RECORDS'),
       },
       paging: true,
-  ...(this.useLocalFakeData ? {
+      ...(this.useLocalFakeData ? {
         data: this.FAKE_IMPI_DATA_LOCAL.map(item => ({
           id: item.id,
           rama: item.rama,
@@ -346,17 +526,28 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       }),
       columns: [
         {
-          title: 'Número de expediente', // Nueva columna
+          title: 'No. de expediente', // Nueva columna
           data: 'numeroExpediente',
           render: (data) => {
-            return `<span class="fw-semibold text-gray-600">${data || ''}</span>`;
+            let shortExp = '';
+            if (data && data.startsWith('EXP-')) {
+              shortExp = data.substring(4); // "EXP-0001" tiene 8 caracteres
+            }
+
+            return `<span class="fw-semibold text-gray-600" style="display: inline-block; max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">>EXP-<br>${shortExp || ''}</span>`;
           },
         },
         {
-          title: 'Número de título', // Nueva columna
+          title: 'No. de título', // Nueva columna
           data: 'numeroTitulo',
           render: (data) => {
-            return `<span class="fw-semibold text-gray-600">${data || ''}</span>`;
+            let shortCert = '';
+            if (data && data.startsWith('CERT-')) {
+              shortCert = data.substring(5); // "CERT-0001" tiene 9 caracteres
+            }
+
+            // Asegurar que el span abarque el 100% de ancho y si el texto es muy largo, se muetsre la ellipsis
+            return `<span class="fw-semibold text-gray-600" style="display: inline-block; max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">CERT-<br>${shortCert || ''}</span>`;
           },
         },
         {
@@ -428,7 +619,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         $row.addClass('cursor-pointer');
       },
       initComplete: (settings, json) => {
-  this.dtInstance = settings.oInstance.api()
+        this.dtInstance = settings.oInstance.api()
         console.log('DataTables initialized:', this.dtInstance);
         console.log('Page info():', this.dtInstance.page.info());
         this.selectedPage = this.dtInstance.page.info().page;
@@ -485,7 +676,9 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   private inicializarSeleccionesDesdePatente(): void {
     if (this.patenteModel.institucion) {
       for (const [estadoId, instituciones] of Object.entries(ENTIDADES_FEDERATIVAS_MAP)) {
-        const institucionEncontrada = instituciones.find((inst: { nombre: string; }) => inst.nombre === this.patenteModel.institucion);
+        const institucionEncontrada = instituciones.find((inst: {
+          nombre: string;
+        }) => inst.nombre === this.patenteModel.institucion);
         if (institucionEncontrada) {
           this.estadoSeleccionado = Number(estadoId);
           this.institucionesFiltradas = instituciones;
@@ -572,7 +765,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cdr.detectChanges();
 
     this.service.getPatent(id).subscribe((patente: IPatentModel) => {
-      this.patenteModel = { ...patente };
+      this.patenteModel = {...patente};
       this.observacionesChanged = false;
       this.resetEditMode();
     });
@@ -615,7 +808,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       this.service.getPatent(id).subscribe((patente: IPatentModel) => {
         // Mezclar para no perder campos de UI
-        this.patenteModel = { ...this.patenteModel, ...patente };
+        this.patenteModel = {...this.patenteModel, ...patente};
         // Derivar denominación si viene vacío
         if (!this.patenteModel.denominacion) {
           this.patenteModel.denominacion = this.patenteModel.nombrePatente;
@@ -668,7 +861,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         }
       }
-      this.showAlert({ icon: 'success', title: 'Actualizado', text: 'El registro fue actualizado correctamente.' });
+      this.showAlert({icon: 'success', title: 'Actualizado', text: 'El registro fue actualizado correctamente.'});
       this.isViewMode = true;
       modal.dismiss('saved');
       return;
@@ -724,26 +917,26 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   getValidStatusOptions(): { value: EstatusPatente, label: string }[] {
     const currentStatus = this.patenteModel.estatus;
 
-    switch(currentStatus) {
+    switch (currentStatus) {
       case 'Registrada':
         return [
-          { value: 'En trámite', label: 'En trámite' },
-          { value: 'Trámite con observaciones', label: 'Trámite con observaciones' }
+          {value: 'En trámite', label: 'En trámite'},
+          {value: 'Trámite con observaciones', label: 'Trámite con observaciones'}
         ];
 
       case 'Trámite con observaciones':
         return [
-          { value: 'En trámite', label: 'En trámite' }
+          {value: 'En trámite', label: 'En trámite'}
         ];
 
       case 'En trámite':
         return [
-          { value: 'Aprobada', label: 'Aprobada' }
+          {value: 'Aprobada', label: 'Aprobada'}
         ];
 
       case 'Aprobada':
         return [
-          { value: 'Concluida', label: 'Concluida' }
+          {value: 'Concluida', label: 'Concluida'}
         ];
 
       case 'Concluida':
