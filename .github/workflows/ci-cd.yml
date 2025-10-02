@@ -105,7 +105,7 @@ jobs:
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.VM_SSH_KEY }}
           source: ".env"
-          target: "~/frontend/"
+          target: "~/frontend"
 
 
       - name: Deploy over SSH
