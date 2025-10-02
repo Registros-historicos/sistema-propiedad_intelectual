@@ -93,6 +93,11 @@ jobs:
           source: "deploy/**"
           target: "~/frontend"
 
+      - name: Set .env file
+        run: |
+          echo "FRONT_PORT=${{ env.FRONT_PORT }}" >> .env
+          echo "API_URL=${{ env.API_URL }}" >> .env
+
       - name: Copy .env to VM
         uses: appleboy/scp-action@v0.1.7
         with:
