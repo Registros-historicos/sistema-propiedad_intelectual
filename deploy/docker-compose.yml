@@ -5,7 +5,7 @@ services:
     container_name: sistema-frontend
     restart: unless-stopped
     ports:
-      - "${FRONT_PORT}:80"
+      - "${FRONT_PORT}:${FRONT_PORT}"
     env_file:
       - ../.env
     pull_policy: always
