@@ -11,7 +11,7 @@ server {
 
     # Proxy para la API
     location /api/ {
-        proxy_pass ${api_url}/;
+        proxy_pass ${API_URL};
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
     }
