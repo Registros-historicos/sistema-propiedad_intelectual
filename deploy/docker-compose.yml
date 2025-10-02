@@ -1,11 +1,12 @@
 version: "3.9"
+name: frontend
 services:
   frontend:
     image: docker.io/${DOCKERHUB_USERNAME}/sistema-propiedad_intelectual:${APP_TAG:-latest}
     container_name: sistema-frontend
     restart: unless-stopped
     ports:
-      - "${env.FRONT_PORT}:80"
+      - "4200:80"
     env_file:
       - ../.env
     pull_policy: always

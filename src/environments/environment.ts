@@ -3,6 +3,8 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
+  REPORTS_API_KEY: 'secret-key',
+  REPORTS_API_URL: 'http://20.14.208.230:8000/',
   production: false,
   appVersion: 'v8.2.4',
   USERDATA_KEY: 'authf649fc9a5f55',
