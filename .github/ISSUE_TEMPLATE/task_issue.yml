@@ -1,0 +1,111 @@
+name: 📌 Dev Task
+description: "Plantilla para asignación de tareas de desarrollo"
+title: "[TASK]: <Título breve de la tarea>"
+labels: ["Task", "needs-triage"]
+assignees: [""] 
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🧩 Task de Desarrollo
+        Se debe llenar esta plantilla para asignar la tarea a un desarrollador.
+        > Usa formato **TAREA / EVIDENCIA / PRUEBAS** y agrega toda la información necesaria para que el dev pueda comenzar sin bloqueos.
+
+  - id: resumen
+    type: input
+    attributes:
+      label: Resumen breve
+      description: Título corto y claro
+      placeholder: "Ej.: Crear componente de tabla con paginación en Angular"
+    validations:
+      required: true
+
+  - id: tarea
+    type: textarea
+    attributes:
+      label: 📝 TAREA
+      description: Explica qué se debe realizar
+      placeholder: |
+        Implementar servicio Angular `nomina.service.ts` para consumir API de nómina.
+        Consideraciones: usar HttpClient, manejo de errores con interceptores, unit tests con Jasmine/Karma.
+    validations:
+      required: true
+
+  - id: tablas_previstas
+    type: textarea
+    attributes:
+      label: Tablas o componentes implicados
+      description: Si aplica (por ejemplo en DB o microservicio)
+      placeholder: |
+        - estibadores-grid.component.ts
+        - nomina.service.ts
+        - tableros.module.ts
+        - shared/pipes/format-currency.pipe.ts
+
+  - id: criterios
+    type: textarea
+    attributes:
+      label: ✅ Criterios de aceptación (Definition of Done)
+      description: Qué condiciones deben cumplirse para cerrar la tarea
+      placeholder: |
+        - El servicio retorna datos correctos desde la API.
+        - El componente muestra la información en la tabla con paginación.
+        - Formularios reactivos validan campos obligatorios.
+        - Código pasa `ng lint` y `ng test` sin errores.
+    validations:
+      required: true
+
+  - id: evidencia
+    type: textarea
+    attributes:
+      label: 📎 EVIDENCIA
+      description: Qué debe adjuntar el dev al cerrar el issue
+      placeholder: "Captura de la tabla renderizada, consola mostrando requests exitosos, enlace a PR."
+
+  - id: pruebas
+    type: textarea
+    attributes:
+      label: 🧪 PRUEBAS
+      description: Cómo validar la implementación
+      placeholder: |
+        - Abrir la vista y validar carga de más de 50 registros en la tabla.
+        - Validar mensajes de error en formularios reactivos.
+        - Ejecutar pruebas unitarias con `ng test` y flujos end-to-end con `ng e2e`.
+
+  - id: prioridad
+    type: dropdown
+    attributes:
+      label: Prioridad
+      options:
+        - P0 (Crítica)
+        - P1 (Alta)
+        - P2 (Media)
+        - P3 (Baja)
+      default: 2
+    validations:
+      required: true
+
+  - id: status
+    type: dropdown
+    attributes:
+      label: Estado inicial
+      options:
+        - Todo
+        - Doing
+        - Blocked
+        - Done
+      default: 0
+    validations:
+      required: true
+
+  - id: checklist
+    type: checkboxes
+    attributes:
+      label: Checklist operativo
+      options:
+        - label: Crear rama siguiendo convención `<tipo-tarea>/<slug-tarea>`
+        - label: Subir cambios y abrir PR vinculado a este issue
+        - label: Actualizar status en el Project
+        - label: Adjuntar evidencia en este issue antes de cerrar
+        - label: Mover este issue a Done al cerrar
