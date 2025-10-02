@@ -95,8 +95,8 @@ jobs:
 
       - name: Set .env file
         run: |
-          echo "FRONT_PORT=${{ env.FRONT_PORT }}" >> .env
-          echo "API_URL=${{ env.API_URL }}" >> .env
+          echo "front_port=${{ env.front_port }}" >> .env
+          echo "api_url=${{ env.api_url }}" >> .env
 
       - name: Copy .env to VM
         uses: appleboy/scp-action@v0.1.7
