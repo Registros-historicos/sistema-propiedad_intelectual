@@ -3,8 +3,6 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  REPORTS_API_KEY: 'secret-key',
-  REPORTS_API_URL: 'http://20.14.208.230:8000/',
   production: false,
   appVersion: 'v8.2.4',
   USERDATA_KEY: 'authf649fc9a5f55',
@@ -162,8 +160,8 @@ export const environment = {
     },
   },
   /* API Endpoints y la Key, en su momento deberá ser almacenada en un entorno seguro, dejo esta tarea a los backend */
-  REPORTS_API_URL: 'https://api-reportes-1087492711571.us-central1.run.app/v1/reports',
-  REPORTS_API_KEY: 'qwWGOsxxxxGxK7J78vzaep4qE/16JUP8lQoNGY8/Q0w='
+  REPORTS_API_KEY: 'secret-key',
+  REPORTS_API_URL: 'http://20.14.208.230:8000/',
 };
 
 /*

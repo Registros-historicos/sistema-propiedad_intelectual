@@ -2,9 +2,9 @@ name: CI/CD Frontend Angular
 
 on:
   push:
-    branches: [ master, release, develop ]
+    branches: [ master, release ]
   pull_request:
-    branches: [ master, release, develop ]
+    branches: [ master, release ]
 
 permissions:
   contents: read
@@ -79,7 +79,7 @@ jobs:
   deploy_vm:
     runs-on: ubuntu-latest
     needs: build_and_push
-    #if: github.event_name == 'push' && (github.ref == 'refs/heads/release' || github.ref == 'refs/heads/master')
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/release' || github.ref == 'refs/heads/master')
     steps:
       - uses: actions/checkout@v4
 
