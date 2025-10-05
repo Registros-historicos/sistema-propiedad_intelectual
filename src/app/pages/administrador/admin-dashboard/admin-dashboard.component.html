@@ -1,11 +1,5 @@
-<div class="row g-5 g-xl-8">
+<div class="row g-5 g-xl-8"> 
   <div class="col-xl-6">
-    <!-- <app-tablero-instituciones-federales
-      [cardTitleTranslate]="'GRAPHICS.TITLES.FEDERAL_INSTITUTIONS'"
-      [cardSubtitleTranslate]="'GRAPHICS.TITLES.REQUEST'"
-      [items]="federalInstitutions"
-    >
-    </app-tablero-instituciones-federales> -->
     <app-tablero-institutos-general
       titulo="Institutos Tecnológicos Federales"
       [data]="institutosFederales"
@@ -22,9 +16,7 @@
 
 <div class="row g-5 g-xl-8">
   <div class="col-xl-6">
-    <app-tablero-instituciones
-      [topFiveFederalInstitutions]="instituciones"
-    ></app-tablero-instituciones>
+<app-tablero-instituciones></app-tablero-instituciones>
   </div>
 
   <div class="col-xl-6">
@@ -65,6 +57,11 @@
       <!-- end::Header -->
       <!-- begin::Body -->
       <div class="card-body py-3">
+        <!-- DEBUG TEMPORAL 
+        <div class="alert alert-success mb-3" *ngIf="topFiveEntities.length > 0">
+          <strong></strong> {{ topFiveEntities.length }} entidades federativas
+        </div>-->
+        
         <!-- begin::Table container -->
         <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
           <!-- begin::Table -->
@@ -72,65 +69,39 @@
             <!-- begin::Table head -->
             <thead>
               <tr>
-                <th class="p-0 min-w-150px"></th>
-                <th class="p-0 min-w-200px"></th>
-                <th class="p-0 min-w-125px"></th>
+                <th class="text-muted mt-1 fw-bold fs-7">Entidad</th>
+                <th class="text-muted mt-1 fw-bold fs-7 text-center">Total</th>
               </tr>
             </thead>
             <!-- end::Table head -->
             <!-- begin::Table body -->
             <tbody>
-              @for (entity of topFiveEntities; track $index) {
-              <tr>
+              <tr *ngFor="let entity of topFiveEntities; let i = index">
                 <td>
                   <div class="d-flex align-items-center">
                     <div class="symbol symbol-45px me-5 d-flex justify-content-center align-items-center px-2">
-                      <mat-icon
-                        style="
-                          font-size: 25px;
-                          height: 25px;
-                          width: 40px;
-                          color: rgb(1, 8, 49);
-                        "
-                        >place</mat-icon>
+                      <mat-icon style="font-size: 25px; height: 25px; width: 40px; color: rgb(1, 8, 49);">place</mat-icon>
                     </div>
                     <div class="d-flex justify-content-start flex-column">
-                      <span class="text-gray-900 fw-bolder fs-6"
-                        >{{ $index + 1 }} . {{ entity.name | titlecase }}</span
-                      >
+                      <span class="text-gray-900 fw-bolder fs-6">
+                        {{ i + 1 }} . {{ entity.entidad_nombre | titlecase }}
+                      </span>
                     </div>
                   </div>
                 </td>
                 <td class="text-end">
-                  @for (tag of entity.tags; track $index) {
-                  <span
-                    class="badge fw-bold me-1"
-                    [ngClass]="{
-                      'badge-light-danger': tag === 'PATENTS',
-                      'badge-light-info': tag === 'MA',
-                      'badge-light-warning': tag === 'MU',
-                      'badge-light-success': tag === 'DA',
-                      'badge-light-primary': tag === 'DI'
-                    }"
-                  >
-                    {{ tag }}
+                    <span class="bg-light-primary rounded py-1 px-2 fw-bold text-primary text">
+                    {{ entity.total }}
+                    <span translate="GRAPHICS.TITLES.REQUEST"></span>
                   </span>
-                  }
-                </td>
-                <td class="text-center">
-                  <span class="text-muted fw-bold"
-                    >{{ entity.value }}
-                    <span translate="GRAPHICS.TITLES.REQUEST"></span
-                  ></span>
                 </td>
               </tr>
-              } @empty {
-              <tr>
+
+              <tr *ngIf="topFiveEntities.length === 0">
                 <td colspan="2" class="text-center text-muted">
                   <span translate="GRAPHICS.LEGENDS.NO_FEDERAL_ENTITIES"></span>
                 </td>
               </tr>
-              }
             </tbody>
             <!-- end::Table body -->
           </table>
@@ -150,93 +121,15 @@
 <div class="row g-5 g-xl-8">
   <div class="col-xl-6">
     <app-grafica-solicitudes></app-grafica-solicitudes>
-    <!-- <div class="card card-xl-stretch mb-xl-8">
-      <div class="card-header border-0 pt-5">
-        <h3 class="card-title align-items-start flex-column">
-          <span
-            class="card-label fw-bolder fs-3 mb-1"
-            translate="GRAPHICS.TITLES.HISTORICAL_REGISTERS_IMPI"
-          ></span>
-        </h3>
-        <div class="card-toolbar">
-          <div
-            class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary tooltip-css"
-          >
-            <mat-icon style="color: #1d6f42">description</mat-icon>
-            <span class="tooltip-text" translate="BUTTON.EXPORT_EXCEL"></span>
-          </div>
-        </div>
-      </div>
-      <div class="card-body p-5">
-        <div class="table-responsive">
-          <apx-chart
-            [series]="chartOptions.series"
-            [chart]="chartOptions.chart"
-            [xaxis]="chartOptions.xaxis"
-            [dataLabels]="chartOptions.dataLabels"
-            [stroke]="chartOptions.stroke"
-            [legend]="chartOptions.legend"
-            [fill]="chartOptions.fill"
-            [tooltip]="chartOptions.tooltip"
-            [colors]="chartOptions.colors"
-            [plotOptions]="chartOptions.plotOptions"
-          ></apx-chart>
-        </div>
-      </div>
-    </div> -->
   </div>
 
   <div class="col-xl-6">
     <app-grafica-solicitudes-in></app-grafica-solicitudes-in>
-    <!-- <div class="card card-xl-stretch mb-xl-8">
-      <div class="card-header border-0 pt-5">
-        <h3 class="card-title align-items-start flex-column">
-          <span
-            class="card-label fw-bolder fs-3 mb-1"
-            translate="GRAPHICS.TITLES.HISTORICAL_REGISTERS_INDAUTOR"
-          ></span>
-        </h3>
-        <div class="card-toolbar">
-          <div
-            class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary tooltip-css"
-          >
-            <mat-icon style="color: #1d6f42">description</mat-icon>
-            <span class="tooltip-text" translate="BUTTON.EXPORT_EXCEL"></span>
-          </div>
-        </div>
-      </div>
-      <div class="card-body p-5">
-        <div class="table-responsive">
-          <apx-chart
-            [series]="chartOptionsGraph2.series"
-            [chart]="chartOptionsGraph2.chart"
-            [xaxis]="chartOptionsGraph2.xaxis"
-            [dataLabels]="chartOptionsGraph2.dataLabels"
-            [stroke]="chartOptionsGraph2.stroke"
-            [legend]="chartOptionsGraph2.legend"
-            [fill]="chartOptionsGraph2.fill"
-            [tooltip]="chartOptionsGraph2.tooltip"
-            [colors]="chartOptionsGraph2.colors"
-            [plotOptions]="chartOptionsGraph2.plotOptions"
-          ></apx-chart>
-        </div>
-      </div>
-    </div> -->
-    <!-- <app-tablero-registro-categoria
-      [data]="categorias"
-      titulo="GRAPHICS.TITLES.REGISTERS_BY_CATEGORY"
-      [height]="400"
-    ></app-tablero-registro-categoria> -->
   </div>
 </div>
 
 <div class="row g-5 g-xl-8">
   <div class="col-xl-6">
-    <!-- <app-tablero-registro-categoria
-      [data]="solicitudes"
-      titulo="Solicitudes generales"
-      [height]="400"
-    ></app-tablero-registro-categoria> -->
     <app-tablero-registro-categoria
       [data]="categorias"
       titulo="GRAPHICS.TITLES.REGISTERS_BY_CATEGORY"
