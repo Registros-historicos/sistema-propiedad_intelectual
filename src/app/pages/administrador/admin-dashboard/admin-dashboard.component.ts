@@ -1,15 +1,18 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; 
 import { getCSSVariableValue } from 'src/app/template/kt/_utils';
 import { forkJoin } from 'rxjs';
 import { ImpiRegistriesService } from 'src/app/api/services/impi.service';
 import { IndautorRegistriesService } from 'src/app/api/services/indautor.service';
 import { CardItem } from 'src/app/template/layout/components/tablero-instituciones-federales/tablero-instituciones-federales.component';
+import { TablerosService } from 'src/app/api/services/tableros.service';
 
-export interface Top5 {
+
+interface TopEntity {
   city_name: string;
   total_registries: number;
-  tags?: any[];
+  tags?: string[];
 }
+
 @Component({
   selector: 'app-admin-dashboard',
   templateUrl: './admin-dashboard.component.html',
@@ -19,58 +22,7 @@ export class AdminDashboardComponent implements OnInit {
   chartOptions: any;
   chartOptionsGraph2: any;
 
-  protected readonly topFiveEntities = [
-    {
-      name: 'Veracruz',
-      value: 800,
-      tags: ['PA', 'DA', 'MU', 'DI', 'MA'],
-    },
-    {
-      name: 'Puebla',
-      value: 700,
-      tags: ['PA', 'MU', 'MA'],
-    },
-    {
-      name: 'Oaxaca',
-      value: 600,
-      tags: ['PA', 'DA', 'DI', 'MA'],
-    },
-    {
-      name: 'Chiapas',
-      value: 500,
-      tags: ['DA', 'MU', 'DI'],
-    },
-    {
-      name: 'Tabasco',
-      value: 400,
-      tags: ['PA', 'MU', 'MA'],
-    },
-    {
-      name: 'Yucatán',
-      value: 350,
-      tags: ['PA', 'DA', 'DI'],
-    },
-    {
-      name: 'Guerrero',
-      value: 300,
-      tags: ['MU', 'DI', 'MA'],
-    },
-    {
-      name: 'Hidalgo',
-      value: 250,
-      tags: ['PA', 'DA', 'MU'],
-    },
-    {
-      name: 'Campeche',
-      value: 200,
-      tags: ['DA', 'DI', 'MA'],
-    },
-    {
-      name: 'Quintana Roo',
-      value: 150,
-      tags: ['PA', 'MU', 'MA'],
-    },
-  ];
+ topFiveEntities: any[] = [];
 
   protected readonly topFiveFederalInstitutions = [
     {
@@ -163,59 +115,6 @@ export class AdminDashboardComponent implements OnInit {
       titleTranslate: 'Diseños Industriales',
       count: 300,
       routerLink: '/administrador/propiedades/patente',
-    },
-  ];
-
-  protected readonly instituciones = [
-    {
-      name: 'Instituto Tecnológico de Tuxtla Gutierrez',
-      value: 800,
-      tags: ['PA', 'DA', 'MU', 'DI', 'MA'],
-    },
-    {
-      name: 'Instituto Tecnológico de Durango',
-      value: 700,
-      tags: ['PA', 'MU', 'MA'],
-    },
-    {
-      name: 'Instituto Tecnológico de Orizaba',
-      value: 600,
-      tags: ['PA', 'DA', 'DI', 'MA'],
-    },
-    {
-      name: 'Instituto Tecnológico de Celaya',
-      value: 500,
-      tags: ['DA', 'MU', 'DI'],
-    },
-    {
-      name: 'Instituto Tecnológico de Acapulco',
-      value: 400,
-      tags: ['PA', 'MU', 'MA'],
-    },
-    {
-      name: 'Instituto Tecnológico de Mérida',
-      value: 350,
-      tags: ['PA', 'DA', 'DI'],
-    },
-    {
-      name: 'Instituto Tecnológico de Chihuahua',
-      value: 300,
-      tags: ['MU', 'DI', 'MA'],
-    },
-    {
-      name: 'Instituto Tecnológico de Tijuana',
-      value: 250,
-      tags: ['PA', 'DA', 'MU'],
-    },
-    {
-      name: 'Instituto Tecnológico de León',
-      value: 200,
-      tags: ['DA', 'DI', 'MA'],
-    },
-    {
-      name: 'Instituto Tecnológico de Cancún',
-      value: 150,
-      tags: ['PA', 'MU', 'MA'],
     },
   ];
 
@@ -880,10 +779,34 @@ export class AdminDashboardComponent implements OnInit {
     },
   ];
 
-  constructor() {}
+  constructor(
+    private tablerosService: TablerosService,
+    private cdRef: ChangeDetectorRef // <-- AGREGAR ESTO
+  ) {}
 
-  ngOnInit(): void {
-    this.initGraphs();
+ngOnInit(): void {
+  this.loadTopEntities();  // <-- SOLO ESTA LÍNEA
+  this.initGraphs();
+}
+
+trackByEntidad(index: number, item: any): number {
+  return item.ent_federativa_param;
+}
+  private loadTopEntities(): void {
+    this.tablerosService.getTopEntities().subscribe({
+      next: (data) => {
+        console.log('✅ DATOS RECIBIDOS:', data);
+        this.topFiveEntities = data;
+        console.log('🔍 topFiveEntities asignado:', this.topFiveEntities);
+        
+        // FORZAR DETECCIÓN DE CAMBIOS
+        this.cdRef.detectChanges();
+        console.log('🔄 Change Detection forzado');
+      },
+      error: (error) => {
+        console.error('❌ ERROR:', error);
+      }
+    });
   }
 
   private initGraphs(): void {
@@ -1014,12 +937,12 @@ export class AdminDashboardComponent implements OnInit {
     ];
   }
 
-  normalizeResponse(resp: any): Top5[] {
+  normalizeResponse(resp: any): TopEntity[] {
     if(!resp) return [];
-    if(Array.isArray(resp)) return resp as Top5[];
-    if(Array.isArray(resp.data)) return resp.data as Top5[];
-    if(Array.isArray(resp.result)) return resp.result as Top5[];
-    if(Array.isArray(resp.items)) return resp.items as Top5[];
+    if(Array.isArray(resp)) return resp as TopEntity[];
+    if(Array.isArray(resp.data)) return resp.data as TopEntity[];
+    if(Array.isArray(resp.result)) return resp.result as TopEntity[];
+    if(Array.isArray(resp.items)) return resp.items as TopEntity[];
 
     try {
 
@@ -1027,7 +950,7 @@ export class AdminDashboardComponent implements OnInit {
       if(!arrays.length) return [];
 
       const values = arrays.reduce((acc: any[], cur: any[]) => acc.concat(cur), []);
-      if(values && values.length) return values as Top5[];
+      if(values && values.length) return values as TopEntity[];
       
     } catch (error) {
       
@@ -1035,8 +958,8 @@ export class AdminDashboardComponent implements OnInit {
     return [];
   }
 
-  aggregateAndSort(arr: Top5[], order: 'desc'|'asc' = 'desc'): Top5[] {
-    const map = new Map<string, Top5>()
+  aggregateAndSort(arr: TopEntity[], order: 'desc'|'asc' = 'desc'): TopEntity[] {
+    const map = new Map<string, TopEntity>()
     for (const item of arr) {
 
       const key = (item.city_name || '').trim();
