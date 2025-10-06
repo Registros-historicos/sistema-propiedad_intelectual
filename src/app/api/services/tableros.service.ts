@@ -25,8 +25,9 @@ export class TablerosService {
   // NUEVO MÉTODO PARA CATEGORÍAS DE INVESTIGADORES
   getCategoriasInvestigadores(): Observable<CategoriaInvestigador[]> {
     return this.http.get<CategoriaInvestigador[]>('/api/tableros/investigadores/categorias/');
-   //Método para Registro por Estatus
-  getRegisterStatus(): Observable<any[]> {
+  }
+  
+   getRegisterStatus(): Observable<any[]> {
     return this.http.get<any[]>('/api/tableros/registros/estatus');
   }
 }
