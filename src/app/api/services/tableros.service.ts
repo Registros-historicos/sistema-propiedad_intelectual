@@ -15,4 +15,9 @@ export class TablerosService {
   getTopInstitutions(): Observable<any[]> {
     return this.http.get<any[]>('/api/tableros/instituciones/top10');
   }
+
+   //Método para Registro por Estatus
+  getRegisterStatus(): Observable<any[]> {
+    return this.http.get<any[]>('/api/tableros/registros/estatus');
+  }
 }
