@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { getCSSVariableValue } from 'src/app/template/kt/_utils';
 
 @Component({
@@ -6,7 +6,7 @@ import { getCSSVariableValue } from 'src/app/template/kt/_utils';
   templateUrl: './tablero-registro-categoria.component.html',
   styleUrl: './tablero-registro-categoria.component.scss',
 })
-export class TableroCategoriasComponent implements OnInit {
+export class TableroCategoriasComponent implements OnInit, OnChanges {
   @Input() data: { categoria: string; value: number }[] = [];
   @Input() titulo: string = '';
   @Input() subtitulo: string = '';
@@ -16,6 +16,12 @@ export class TableroCategoriasComponent implements OnInit {
 
   ngOnInit(): void {
     this.chartOptions = this.createCategoryChartOptions(this.height, this.data);
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['data']) {
+      this.chartOptions = this.createCategoryChartOptions(this.height, this.data);
+    }
   }
 
   private createCategoryChartOptions(height: number, data: any[]): any {
