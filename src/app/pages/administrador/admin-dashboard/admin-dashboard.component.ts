@@ -4,7 +4,7 @@ import { forkJoin } from 'rxjs';
 import { ImpiRegistriesService } from 'src/app/api/services/impi.service';
 import { IndautorRegistriesService } from 'src/app/api/services/indautor.service';
 import { CardItem } from 'src/app/template/layout/components/tablero-instituciones-federales/tablero-instituciones-federales.component';
-import { TablerosService } from 'src/app/api/services/tableros.service';
+import { TablerosService, CategoriaInvestigador } from 'src/app/api/services/tableros.service';
 
 
 interface TopEntity {
@@ -118,11 +118,7 @@ export class AdminDashboardComponent implements OnInit {
     },
   ];
 
-  protected readonly categorias = [
-    { categoria: 'Docentes', value: 500 },
-    { categoria: 'Administrativos', value: 250 },
-    { categoria: 'Alumnos', value: 180 },
-  ];
+  categorias: { categoria: string; value: number }[] = [];
 
   protected readonly solicitudes = [
     { categoria: 'Marcas', value: 712 },
@@ -784,8 +780,21 @@ export class AdminDashboardComponent implements OnInit {
     private cdRef: ChangeDetectorRef // <-- AGREGAR ESTO
   ) {}
 
+
 ngOnInit(): void {
-  this.loadTopEntities();  // <-- SOLO ESTA LÍNEA
+  this.loadTopEntities();
+  // Cargar categorias de investigadores desde el endpoint real
+  this.tablerosService.getCategoriasInvestigadores().subscribe({
+    next: (resp: CategoriaInvestigador[]) => {
+      this.categorias = (resp || []).map(it => ({
+        categoria: it.categoria,
+        value: Number(it.total)
+      }));
+    },
+    error: (err) => {
+      console.error('Error cargando categorias de investigadores desde backend', err);
+    }
+  });
   this.initGraphs();
 }
 

@@ -1,4 +1,5 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { TablerosService, CategoriaInvestigador } from 'src/app/api/services/tableros.service';
 import { getCSSVariableValue } from '../../../template/kt/_utils';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -6,7 +7,7 @@ import { TranslateService } from '@ngx-translate/core';
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html'
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   chartOptions: any = {};
   chartOptionsRound: any = {};
   selectedFilter: string = '1';
@@ -16,15 +17,9 @@ export class DashboardComponent {
   @Input() chartLine: number = 11;
   @Input() chartRotate?: number = 145;
 
-  constructor(private translate: TranslateService) { }
 
-  ngOnInit(): void {
-    this.chartOptions = this.getChartOptions(350);
 
-    setTimeout(() => {
-      initChart(this.chartSize, this.chartLine, this.chartRotate);
-    }, 10);
-  }
+
 
   onFilterChange(): void {
     this.chartOptions = this.getChartOptions(350);
@@ -306,11 +301,32 @@ export class DashboardComponent {
     { category: "Diciembre", series1: 60, series2: 105 },
   ];
 
-  protected readonly categorias = [
-    { categoria: 'Docentes', value: 500 },
-    { categoria: 'Administrativos', value: 250 },
-    { categoria: 'Alumnos', value: 180 },
-  ];
+  categorias: { categoria: string; value: number }[] = [];
+
+  constructor(private translate: TranslateService, private tablerosService: TablerosService) { }
+
+  ngOnInit(): void {
+    // Lógica original
+    this.chartOptions = this.getChartOptions(350);
+    setTimeout(() => {
+      initChart(this.chartSize, this.chartLine, this.chartRotate);
+    }, 10);
+
+    // Cargar categorias de investigadores desde el endpoint real
+    this.tablerosService.getCategoriasInvestigadores().subscribe({
+      next: (resp: CategoriaInvestigador[]) => {
+        console.log('[DEBUG] Respuesta categorias investigadores:', resp);
+        this.categorias = (resp || []).map(it => ({
+          categoria: it.categoria,
+          value: Number(it.total)
+        }));
+        console.log('[DEBUG] Categorias mapeadas:', this.categorias);
+      },
+      error: (err) => {
+        console.error('[DEBUG] Error cargando categorias de investigadores desde backend', err);
+      }
+    });
+  }
 
 }
 
