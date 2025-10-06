@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgApexchartsModule } from 'ng-apexcharts';
 import { InlineSVGModule } from 'ng-inline-svg-2';
 import { RouterModule, Routes } from '@angular/router';
 import {
@@ -38,6 +39,7 @@ import { ClassicComponent } from './components/toolbar/classic/classic.component
 import { ExtendedComponent } from './components/toolbar/extended/extended.component';
 import { ReportsComponent } from './components/toolbar/reports/reports.component';
 import { SaasComponent } from './components/toolbar/saas/saas.component';
+import { TableroCategoriasSimpleComponent } from './components/tablero-categorias-simple/tablero-categorias-simple.component';
 import {SharedModule} from "../shared/shared.module";
 import {MatIcon} from '@angular/material/icon';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
@@ -71,7 +73,8 @@ const routes: Routes = [
     ClassicComponent,
     ExtendedComponent,
     ReportsComponent,
-    SaasComponent,
+  SaasComponent,
+  TableroCategoriasSimpleComponent,
   ],
   imports: [
     CommonModule,
@@ -87,7 +90,8 @@ const routes: Routes = [
     DropdownMenusModule,
     NgbTooltipModule,
     TranslateModule,
-    ThemeModeModule,
+  ThemeModeModule,
+  NgApexchartsModule,
     SharedModule,
     MatIcon,
     SweetAlert2Module.forRoot()
