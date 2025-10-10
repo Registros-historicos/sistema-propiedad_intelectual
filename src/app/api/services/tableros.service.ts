@@ -30,4 +30,9 @@ export class TablerosService {
    getRegisterStatus(): Observable<any[]> {
     return this.http.get<any[]>('/api/tableros/registros/estatus');
   }
+
+   //Método para Registro por Sectores
+  getRegisterSector(): Observable<any[]> {
+    return this.http.get<any[]>('/api/tableros/sectores/actividad');
+  }
 }
