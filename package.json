@@ -5,6 +5,7 @@
     "ng": "ng",
   "start": "ng serve --proxy-config proxy.conf.json",
   "check-backend": "node ./scripts/check-backend.js",
+    "start": "ng serve --proxy-config proxy.conf.json",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "rtl": "webpack --config=rtl.config.js",
