@@ -39,7 +39,8 @@
         <thead>
           <tr>
             <th class="text-muted mt-1 fw-bold fs-7">Institución</th> <!-- Aumentado el ancho para las instituciones -->
-            <th class="text-muted mt-1 fw-bold fs-7 text-center">Total</th> <!-- Reducido el ancho para el total -->
+            <th class="text-muted mt-1 fw-bold fs-7 text-center">Total 
+        <span class="font-weight-bold">{{ totalRegistros | number }}</span></th> <!-- Reducido el ancho para el total -->
           </tr>
         </thead>
         <!-- end::Table head -->
@@ -68,7 +69,7 @@
             </td>
             <td class="text-end" style="min-width: 120px;">
             <span class="bg-light-primary rounded py-1 px-2 fw-bold text-primary">
-              {{ institution.total }} <span translate="GRAPHICS.TITLES.REQUEST"></span>
+              {{ totalRegistros }} <span translate="GRAPHICS.TITLES.REQUEST"></span>
             </span>
             </td>
           </tr>
