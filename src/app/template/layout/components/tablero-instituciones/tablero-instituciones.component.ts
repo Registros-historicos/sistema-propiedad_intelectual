@@ -49,13 +49,4 @@ export class TableroInstitucionesComponent implements OnInit {
   }
 
 
-    private calculateTotals(): void {
-    this.totalRegistros = this.instituciones.reduce((sum, current) => {
-      const registros = current.total || 0;
-      return sum + registros;
-    }, 0);
-
-   }
-
-
 }
