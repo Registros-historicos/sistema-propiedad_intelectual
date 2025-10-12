@@ -1,3 +1,4 @@
+
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
@@ -17,6 +18,11 @@ export interface Instituto {
   total?: number;
   registros?: number;
   count?: number;
+}
+
+export interface CategoriaInvestigador {
+  categoria: string;
+  total: number;
 }
 
 @Injectable({
@@ -62,7 +68,7 @@ export class TablerosService {
   }
 
   getRegisterSector(): Observable<any[]> {
-    return this.http.get<any[]>('/api/tableros/sectores/actividad').pipe(
+    return this.http.get<any[]>('/api/tableros/sectores/actividad/all').pipe(
       catchError(error => {
         console.error('Error en getRegisterSector:', error);
         return of([]);
@@ -154,4 +160,5 @@ export class TablerosService {
       default: return 'Sin tipo';
     }
   }
+
 }
