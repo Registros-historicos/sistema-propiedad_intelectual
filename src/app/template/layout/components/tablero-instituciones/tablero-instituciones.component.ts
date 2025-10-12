@@ -9,6 +9,7 @@ import { TablerosService } from 'src/app/api/services/tableros.service';
 export class TableroInstitucionesComponent implements OnInit {
   
   instituciones: any[] = [];
+  totalRegistros: number = 0;
 
   constructor(
     private tablerosService: TablerosService,
@@ -32,6 +33,7 @@ export class TableroInstitucionesComponent implements OnInit {
         }
         
         this.cdRef.detectChanges();
+        this.calculateTotals();
         console.log('🔄 Change Detection forzado en instituciones');
       },
       error: (error) => {
