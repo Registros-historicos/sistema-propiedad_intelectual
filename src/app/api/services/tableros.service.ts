@@ -165,4 +165,20 @@ export class TablerosService {
     }
   }
 
+  getTotalIMPIApplications(): Observable<any[]> {
+    return this.http.get<any[]>('/api/tableros/solicitudes/impi/').pipe(
+      catchError(error => {
+        return of([]);
+      })
+    );
+  }
+
+  getTotalINDAUTORApplications(): Observable<any[]> {
+    return this.http.get<any[]>('/api/tableros/solicitudes/indautor/').pipe(
+      catchError(error => {
+        return of([]);
+      })
+    );
+  }
+
 }
