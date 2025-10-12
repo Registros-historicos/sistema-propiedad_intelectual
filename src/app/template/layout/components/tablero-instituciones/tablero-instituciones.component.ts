@@ -33,7 +33,6 @@ export class TableroInstitucionesComponent implements OnInit {
         }
         
         this.cdRef.detectChanges();
-        this.calculateTotals();
         console.log('🔄 Change Detection forzado en instituciones');
       },
       error: (error) => {
