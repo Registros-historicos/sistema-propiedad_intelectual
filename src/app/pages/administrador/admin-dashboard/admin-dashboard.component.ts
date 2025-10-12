@@ -32,99 +32,11 @@ export class AdminDashboardComponent implements OnInit {
   // TOP 10 ENTIDADES FEDERATIVAS (original)
   topFiveEntities: any[] = [];
 
-  protected readonly topFiveFederalInstitutions = [
-    {
-      name: 'Instituto Tecnológico de Tuxtla Gutierrez',
-      value: 800,
-      tags: ['PA', 'DA', 'MU', 'DI', 'MA'],
-    },
-    {
-      name: 'Instituto Tecnológico de Durango',
-      value: 700,
-      tags: ['PA', 'MU', 'MA'],
-    },
-    {
-      name: 'Instituto Tecnológico de Orizaba',
-      value: 600,
-      tags: ['PA', 'DA', 'DI', 'MA'],
-    },
-    {
-      name: 'Instituto Tecnológico de Celaya',
-      value: 500,
-      tags: ['DA', 'MU', 'DI'],
-    },
-    {
-      name: 'Instituto Tecnológico de Acapulco',
-      value: 400,
-      tags: ['PA', 'MU', 'MA'],
-    },
-  ];
+  protected readonly topFiveFederalInstitutions = [];
 
-  protected readonly topFiveCentralizedInstitutions = [
-    {
-      name: 'Instituto Tecnológico Superior de Zongolica',
-      value: 400,
-      tags: ['PA', 'DA', 'MU', 'DI', 'MA'],
-    },
-    {
-      name: 'Instituto Tecnológico Superior de Palenque',
-      value: 350,
-      tags: ['PA', 'DA', 'DI', 'MA'],
-    },
-    {
-      name: 'Instituto Tecnológico Superior de Irapuato',
-      value: 300,
-      tags: ['PA', 'MU', 'MA'],
-    },
-    {
-      name: 'Instituto Tecnológico Superior de Cintapala',
-      value: 250,
-      tags: ['DA', 'MU', 'DI'],
-    },
-    {
-      name: 'Instituto Tecnológico Superior de Comitán',
-      value: 200,
-      tags: ['PA', 'DA', 'DI'],
-    },
-  ];
+  protected readonly topFiveCentralizedInstitutions = [];
 
-  protected readonly federalInstitutions: CardItem[] = [
-    {
-      icon: 'emoji_objects',
-      iconColor: 'text-danger',
-      titleTranslate: 'Patentes',
-      count: 800,
-      routerLink: '/administrador/propiedades/patente',
-    },
-    {
-      icon: 'branding_watermark',
-      iconColor: 'text-info',
-      titleTranslate: 'Marcas',
-      count: 300,
-      routerLink: '/administrador/propiedades/patente',
-    },
-    {
-      icon: 'construction',
-      iconColor: 'text-warning',
-      titleTranslate: 'Modelos de Utilidad',
-      count: 400,
-      routerLink: '/administrador/propiedades/patente',
-    },
-    {
-      icon: 'copyright',
-      iconColor: 'text-success',
-      titleTranslate: 'Derechos de Autor',
-      count: 200,
-      routerLink: '/administrador/propiedades/patente',
-    },
-    {
-      icon: 'architecture',
-      iconColor: 'text-primary',
-      titleTranslate: 'Diseños Industriales',
-      count: 300,
-      routerLink: '/administrador/propiedades/patente',
-    },
-  ];
+  protected readonly federalInstitutions: CardItem[] = [];
 
   categorias: { categoria: string; value: number }[] = [];
 
@@ -162,24 +74,7 @@ export class AdminDashboardComponent implements OnInit {
     { category: "Diciembre", series1: 60, series2: 105 },
   ];
 
-  protected readonly status = [
-    {
-      label: "En revisión",
-      serie: 47
-    },
-    {
-      label: "Concedida",
-      serie: 55
-    },
-    {
-      label: "Rechazada",
-      serie: 13
-    },
-    {
-      label: "En mantenimiento",
-      serie: 43
-    }
-  ]
+  protected readonly status = []
 
   constructor(
     private tablerosService: TablerosService,
