@@ -1,73 +1,79 @@
 <div class="card card-xl-stretch mb-xl-8">
   <div class="card-header border-0 pt-5">
     <h3 class="card-title align-items-start flex-column">
-      <span
-        class="card-label fw-bolder fs-3 mb-1"
-        [translate]="cardTitleTranslate"
-      ></span>
-      <span
-        class="text-muted mt-1 fw-bold fs-7"
-        [translate]="cardSubtitleTranslate"
-      ></span>
+      <span class="card-label fw-bolder fs-3 mb-1">
+        Top 10 Instituciones
+      </span>
+      <span class="text-muted mt-1 fw-bold fs-7">
+        Instituciones con más registros
+      </span>
     </h3>
-    <div class="card-toolbar">
-      <!-- begin::Button-->
-      <div
-        class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary tooltip-css"
-      >
-        <mat-icon style="color: #1d6f42">description</mat-icon>
-        <span class="tooltip-text" translate="BUTTON.EXPORT_EXCEL"></span>
-      </div>
-      <!-- end::Button-->
-    </div>
   </div>
 
   <div class="card-body py-3">
-    <div class="table-responsive">
+    <!-- DEBUG TEMPORAL -->
+    <div class="alert alert-info mb-3">
+      <strong>DEBUG:</strong> 
+      Loading: {{loading}} | 
+      Error: {{error}} | 
+      Instituciones: {{instituciones.length}}
+    </div>
+    
+    <!-- Loading State -->
+    <div *ngIf="loading" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <p class="text-muted mt-2">Cargando instituciones...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error && !loading" class="text-center py-5">
+      <div class="alert alert-danger">
+        <p>{{ errorMessage }}</p>
+        <button class="btn btn-sm btn-primary" (click)="retryLoad()">
+          Reintentar
+        </button>
+      </div>
+    </div>
+
+    <!-- Data Table -->
+    <div *ngIf="!loading && !error" class="table-responsive" style="max-height: 400px; overflow-y: auto">
       <table class="table align-middle gs-0 gy-5">
         <thead>
           <tr>
-            <th class="p-0 w-50px"></th>
-            <th class="p-0 min-w-200px"></th>
-            <th class="p-0 min-w-100px"></th>
-            <th class="p-0 min-w-40px"></th>
+            <th class="text-muted mt-1 fw-bold fs-7">Institución</th>
+            <th class="text-muted mt-1 fw-bold fs-7 text-center">Total Registros</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of items">
-            <th>
-              <div class="symbol symbol-50px me-2">
-                <span class="symbol-label">
-                  <mat-icon
-                    [fontIcon]="item.icon"
-                    [ngClass]="item.iconColor"
-                  ></mat-icon>
-                </span>
-              </div>
-            </th>
+          <tr *ngFor="let institute of instituciones; let i = index">
             <td>
-              <span
-                class="text-gray-900 fw-bolder mb-1 fs-6"
-                [translate]="item.titleTranslate"
-              ></span>
-            </td>
-            <td>
-              <div class="d-flex flex-column w-100 me-2">
-                <div class="d-flex flex-stack mb-2">
-                  <span class="me-2 fs-6 fw-bold text-primary">
-                    {{ item.count }}
-                    <span translate="GRAPHICS.TITLES.REQUEST"></span>
+              <div class="d-flex align-items-center">
+                <div class="symbol symbol-45px me-5 d-flex justify-content-center align-items-center px-2">
+                  <mat-icon style="font-size: 25px; height: 25px; width: 40px; color: rgb(1, 8, 49);">business</mat-icon>
+                </div>
+                <div class="d-flex justify-content-start flex-column">
+                  <span class="text-gray-900 fw-bolder fs-6">
+                    {{ i + 1 }}. {{ institute.nombre_institucion | titlecase }}
+                  </span>
+                  <span class="text-muted fw-bold fs-7">
+                    {{ institute.nombre_tipo_institucion }}
                   </span>
                 </div>
               </div>
             </td>
             <td class="text-end">
-              <a
-                [routerLink]="item.routerLink"
-                class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary"
-              >
-                <app-keenicon name="arrow-right" class="fs-2"></app-keenicon>
-              </a>
+              <span class="bg-light-primary rounded py-1 px-2 fw-bold text-primary">
+                {{ institute.total_registros }}
+                <span translate="GRAPHICS.TITLES.REQUEST"></span>
+              </span>
+            </td>
+          </tr>
+
+          <tr *ngIf="instituciones.length === 0 && !loading && !error">
+            <td colspan="2" class="text-center text-muted">
+              No se encontraron instituciones
             </td>
           </tr>
         </tbody>
