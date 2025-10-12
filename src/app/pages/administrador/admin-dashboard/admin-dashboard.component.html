@@ -1,33 +1,38 @@
 <div class="row g-5 g-xl-8"> 
+  <!-- Institutos Federales -->
   <div class="col-xl-6">
     <app-tablero-institutos-general
       titulo="Institutos Tecnológicos Federales"
-      [data]="institutosFederales"
+      [tipoInstitucion]="123"
     ></app-tablero-institutos-general>
   </div>
 
+  <!-- Institutos Descentralizados -->
   <div class="col-xl-6">
     <app-tablero-institutos-general
       titulo="Institutos Descentralizados"
-      [data]="institutosDescentralizados"
+      [tipoInstitucion]="122"
     ></app-tablero-institutos-general>
   </div>
 </div>
 
 <div class="row g-5 g-xl-8">
+  <!-- Tablero top 10 institutos -->
   <div class="col-xl-6">
-<app-tablero-instituciones></app-tablero-instituciones>
+      
+    <app-tablero-instituciones></app-tablero-instituciones>
+  
   </div>
 
+  <!-- Todas las Instituciones -->
   <div class="col-xl-6">
     <app-tablero-institutos-general
-      titulo="Registros por institución"
-      [data]="institutosData"
+      titulo="Todas las Instituciones"
     ></app-tablero-institutos-general>
   </div>
 </div>
 
-<!-- dashboard.component.html -->
+<!-- TOP 10 DE ENTIDADES FEDERATIVAS -->
 <div class="row g-5 g-xl-8">
   <div class="col-xl-6">
     <div class="card card-xl-stretch mb-xl-8">
@@ -118,11 +123,11 @@
   </div>
 </div>
 
+<!-- Resto del dashboard -->
 <div class="row g-5 g-xl-8">
   <div class="col-xl-6">
     <app-grafica-solicitudes></app-grafica-solicitudes>
   </div>
-
   <div class="col-xl-6">
     <app-grafica-solicitudes-in></app-grafica-solicitudes-in>
   </div>
@@ -136,7 +141,6 @@
       [height]="400"
     ></app-tablero-registro-categoria>
   </div>
-
   <div class="col-xl-6">
     <app-registros-sexo [data]="gender" class="card card-xl-stretch mb-xl-8"></app-registros-sexo>
   </div>
@@ -146,7 +150,6 @@
   <div class="col-xl-6">
     <app-registros-anio [anios]="anios" class="card card-xl-stretch mb-xl-8"></app-registros-anio>
   </div>
-
   <div class="col-xl-6">
     <app-registro-estatus class="card card-xl-stretch mb-xl-8"></app-registro-estatus>
   </div>
