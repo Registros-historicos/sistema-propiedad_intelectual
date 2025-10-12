@@ -31,7 +31,6 @@ export class TableroInstitucionesComponent implements OnInit {
           console.log('🔍 PROPIEDADES DISPONIBLES:', Object.keys(this.instituciones[0]));
         }
         
-        // FORZAR DETECCIÓN DE CAMBIOS
         this.cdRef.detectChanges();
         console.log('🔄 Change Detection forzado en instituciones');
       },
