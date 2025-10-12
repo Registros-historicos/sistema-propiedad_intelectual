@@ -19,9 +19,16 @@
         <!-- begin::PieCharts -->
         <div #chartRef id="kt_charts_widget_1_chart"
             style="max-height:350px;">
-            <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [labels]="chartOptions.labels"
-                [responsive]="chartOptions.responsive" [legend]="chartOptions.legend" [plotOptions]="chartOptions.plotOptions"
-                [dataLabels]="chartOptions.dataLabels" [stroke]="chartOptions.stroke"></apx-chart>
+            <apx-chart 
+                [series]="chartOptions?.series || []" 
+                [chart]="chartOptions?.chart || { type: 'donut', height: 350 }" 
+                [labels]="chartOptions?.labels || []"
+                [responsive]="chartOptions?.responsive" 
+                [legend]="chartOptions?.legend" 
+                [plotOptions]="chartOptions?.plotOptions"
+                [dataLabels]="chartOptions?.dataLabels" 
+                [stroke]="chartOptions?.stroke">
+            </apx-chart>
         </div>
         <!-- end::PieCharts -->
     </div>

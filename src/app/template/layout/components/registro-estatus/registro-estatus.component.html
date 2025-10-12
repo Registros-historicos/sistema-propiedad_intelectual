@@ -19,9 +19,16 @@
         <!-- begin::PieCharts -->
         <div #chartRef id="kt_charts_widget_1_chart"
             class="flex-grow-1 w-100 d-flex justify-content-center align-items-center" style="min-height:350px;">
-            <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [labels]="chartOptions.labels" [colors]="chartOptions.colors"
-                [responsive]="chartOptions.responsive" [legend]="chartOptions.legend" [plotOptions]="chartOptions.plotOptions"
-                [dataLabels]="chartOptions.dataLabels"></apx-chart>
+            <apx-chart 
+                [series]="chartOptions?.series || []" 
+                [chart]="chartOptions?.chart || { type: 'pie', width: 650, height: 650 }" 
+                [labels]="chartOptions?.labels || []" 
+                [colors]="chartOptions?.colors" 
+                [responsive]="chartOptions?.responsive" 
+                [legend]="chartOptions?.legend" 
+                [plotOptions]="chartOptions?.plotOptions"
+                [dataLabels]="chartOptions?.dataLabels">
+            </apx-chart>
         </div>
         <!-- end::PieCharts -->
     </div>

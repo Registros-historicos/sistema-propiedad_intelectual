@@ -24,7 +24,7 @@ export class TablerosService {
 
   // NUEVO MÉTODO PARA CATEGORÍAS DE INVESTIGADORES
   getCategoriasInvestigadores(): Observable<CategoriaInvestigador[]> {
-    return this.http.get<CategoriaInvestigador[]>('/api/tableros/investigadores/categorias/');
+    return this.http.get<CategoriaInvestigador[]>('/api/tableros/investigadores/categorias');
   }
   
    getRegisterStatus(): Observable<any[]> {
@@ -35,4 +35,9 @@ export class TablerosService {
   getRegisterSector(): Observable<any[]> {
     return this.http.get<any[]>('/api/tableros/sectores/actividad');
   }
+  //Metodo para obtener registros por sexo
+  getRegistrosPorSexo(): Observable<any[]> {
+    return this.http.get<any[]>('/api/tableros/investigadores/sexo');
+  }
+
 }
