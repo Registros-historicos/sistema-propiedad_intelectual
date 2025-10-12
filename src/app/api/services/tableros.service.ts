@@ -86,6 +86,10 @@ export class TablerosService {
       })
     );
   }
+  //Metodo para obtener registros por sexo
+  getRegistrosPorSexo(): Observable<any[]> {
+    return this.http.get<any[]>('/api/tableros/investigadores/sexo');
+  }
 
   getInstitucionesFiltradas(tipoInstitucion: number): Observable<Instituto[]> {
     let params = new HttpParams();
