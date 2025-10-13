@@ -2,14 +2,7 @@
     <div class="card-header border-0 pt-5">
         <h3 class="card-title align-items-start flex-column">
             <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.RECORDS_YEAR"></span>
-            <div class="btn-group mt-1 position-relative" [class.compact]="compactYearButton">
-                <button class="btn btn-sm btn-outline-secondary" type="button" (click)="toggleYearMenu()">
-                    {{ year || '2025' }}
-                </button>
-                <div class="dropdown-menu show" *ngIf="showYearMenu" style="position: absolute; transform: translateY(6px); z-index: 1050;">
-                    <button class="dropdown-item" *ngFor="let y of yearOptions" [class.active]="y === year" (click)="selectYear(y, $event)">{{ y }}</button>
-                </div>
-            </div>
+            <span class="text-muted mt-1 fw-bold fs-7">2025</span>
         </h3>
         <div class="card-toolbar">
             <button type="button" class="btn btn-sm btn-icon btn-bg-light btn-active-light-primary me-5"
@@ -61,7 +54,6 @@
         </div>
     </div>
     <div class="card-body p-5">
-        <!-- Debug eliminado: lastResponseRows ya no se muestra en la UI -->
         <div class="table-responsive" style="min-height:400px;">
             <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [xaxis]="chartOptions.xaxis"
                 [dataLabels]="chartOptions.dataLabels" [stroke]="chartOptions.stroke" [legend]="chartOptions.legend"

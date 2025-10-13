@@ -87,7 +87,6 @@ export class RegistrosSexoComponent implements OnInit {
   ngOnInit(): void {
     this.tablerosService.getRegistrosPorSexo().subscribe({
       next: (data) => {
-        console.debug('[DEBUG] Respuesta registros por sexo:', data);
         console.log('Datos recibidos:', data);
         const labels = data.map(item => item.sexo);   // ['Femenino', 'Masculino']
         const series = data.map(item => item.total);  // [99, 99]

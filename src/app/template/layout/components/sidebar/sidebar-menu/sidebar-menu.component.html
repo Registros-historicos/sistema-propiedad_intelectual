@@ -2,7 +2,7 @@
 <div id="kt_app_sidebar_menu_scroll" class="scroll-y my-5 mx-3" data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-height="auto" data-kt-scroll-dependencies="#kt_app_sidebar_logo, #kt_app_sidebar_footer" data-kt-scroll-wrappers="#kt_app_sidebar_menu" data-kt-scroll-offset="5px" data-kt-scroll-save-state="true">
   <!--begin::Menu-->
   <div class="menu menu-column menu-rounded menu-sub-indention fw-semibold fs-6" id="#kt_app_sidebar_menu" data-kt-menu="true" data-kt-menu-expand="false">
-  @for (item of menuItems; track trackByMenu($index, item)) {
+    @for (item of menuItems; track item.name) {
       <!-- Simple link -->
       @if (item.type === 'link') {
       <div class="menu-item">
@@ -36,7 +36,7 @@
         <div class="menu-sub menu-sub-accordion" routerLinkActive="menu-active-bg">
           <!-- Dropdown items -->
           @if (Array.isArray(item.children)) {
-            @for (subItem of item.children; track trackByMenu($index, subItem)) {
+            @for (subItem of item.children; track subItem.name) {
               <div class="menu-item">
                 <a class="menu-link without-sub" [routerLink]="subItem.link" routerLinkActive="active">
                 <span class="menu-icon">
