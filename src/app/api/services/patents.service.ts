@@ -194,7 +194,7 @@ export class PatentsService {
       tipo_ingreso_param: '2',
       id_usuario: 1,
       rama_param: this.mapRamaToBackend(patent.rama || 'Invención'),
-      medio_ingreso_param: this.mapMedioIngresoToBackend(patent.medioIngreso || 'VENTANILLA'),
+      medio_ingreso_param: this.mapMedioIngresoToBackend(patent.medioIngreso || 'Ventanilla'),
       tipo_sector_param: this.mapSectorToBackend(patent.tipoSector || 'Quinario'),
       tipo_registro_param: this.TIPO_PATENTE,
       estatus_param: this.mapEstatusToBackend(patent.estatus || 'En trámite'),
