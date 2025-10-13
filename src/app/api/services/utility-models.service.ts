@@ -1,311 +1,239 @@
+// src/app/api/services/utility-models.service.ts
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map, switchMap, throwError } from 'rxjs';
 import { IModUtilModel } from '../models/mod-util.model';
-import { modUtilData } from '../data/mod-util.data';
+import { ApiCrudService } from '../ApiCrud.service';
 
-@Injectable({
-  providedIn: 'root'
-})
+// ===== Tipos de la API (listado/detalle) =====
+export type ApiItem = {
+  id_registro: number;
+  no_expediente: number | string;
+  titulo: string;
+
+  // Pueden venir como number o string
+  tipo_ingreso_param?: number | string;
+  rama_param?: number | string;
+  estatus_param?: number | string;
+  medio_ingreso_param?: number | string;
+  tipo_registro_param?: number | string;
+  tipo_sector_param?: number | string;
+
+  // Campos alternativos / amigables que a veces manda el backend
+  rama?: number | string;
+
+  id_usuario?: number;
+  fec_expedicion?: string | null;
+  observaciones?: string | null;
+  archivo?: string | null;
+  fec_solicitud?: string | null;
+  descripcion?: string | null;
+
+  // Institución puede venir ya en el payload de algunos endpoints
+  institucion?: string;
+};
+
+type ApiListResponse = {
+  total: number | string;   // puede venir como "(...,63)"
+  page: number;
+  limit: number;
+  results: ApiItem[];
+};
+
+// DTO EXACTO que pide tu backend en PUT /api/registros/{id}
+export interface UpdateRegistroDto {
+  no_expediente: string;
+  titulo: string;
+  tipo_ingreso_param: string;
+  id_usuario: number;
+  rama_param: string;
+  fec_expedicion: string | null;
+  observaciones: string | null;
+  archivo: string | null;
+  estatus_param: string;
+  medio_ingreso_param: string;
+  tipo_registro_param: string;
+  fec_solicitud: string | null;
+  descripcion: string | null;
+  tipo_sector_param: string;
+}
+
+@Injectable({ providedIn: 'root' })
 export class UtilityModelsService {
-  private modUtiles: IModUtilModel[] = [...modUtilData];
+  private readonly listBase = '/api/registros/';
+  private readonly searchBase = '/api/registros/search/';
+  private readonly tipoIndautor = 44; // INDAUTOR
 
-  constructor() { }
+  constructor(private api: ApiCrudService) {}
 
-  private convertDateFormat(dateStr: string): string {
-    const converted = dateStr.split('-').reverse().join('-');
-    return converted;
+  // ===== Helpers =====
+  /** Traduce params de DataTables → { page, limit, search } */
+  private dtToQuery(tableParams: any): { page: number; limit: number; search?: string } {
+    const start = tableParams?.start ?? 0;
+    const limit = tableParams?.length ?? 10;
+    const page = Math.floor(start / limit) + 1;
+    const search = tableParams?.search?.value?.trim();
+    return { page, limit, search };
   }
 
+  /** Extrae entero de un total que puede venir como número o string "(...,63)" */
+  private parseTotal(raw: number | string): number {
+    if (typeof raw === 'number') return raw;
+    const m = String(raw).match(/(\d+)\)?\s*$/);
+    return m ? Number(m[1]) : 0;
+  }
+
+  /** Mapea el item de API → modelo que usa la UI */
+  private mapToIModUtilModel(it: ApiItem): IModUtilModel {
+    return {
+      id: it.id_registro,
+      solicitudId: String(it.no_expediente ?? ''),
+      nombreModUtil: it.titulo ?? '',
+      solicitante: '', // no viene en payload
+      fechaSolicitud: it.fec_solicitud ?? '',
+      estatus: 'En trámite', // si en el futuro se mapea desde estatus_param, se ajusta aquí
+      descripcion: it.descripcion ?? '',
+      institucion: it.institucion ?? '',   // úsala si viene
+      correo: '',
+      documentos: it.archivo ? [it.archivo] : [],
+      observaciones: it.observaciones ?? ''
+    };
+  }
+
+  /** Convierte registro de API → DTO PUT, preservando valores (para update seguro) */
+  private buildUpdateDtoFromApi(record: ApiItem, overrides?: Partial<UpdateRegistroDto>): UpdateRegistroDto {
+    return {
+      no_expediente: String(record.no_expediente ?? ''),
+      titulo: String(record.titulo ?? ''),
+      tipo_ingreso_param: String(record.tipo_ingreso_param ?? '45'),
+      id_usuario: Number(record.id_usuario ?? 0),
+      rama_param: String(record.rama_param ?? record.rama ?? ''),
+      fec_expedicion: record.fec_expedicion ?? null,
+      observaciones: record.observaciones ?? null,
+      archivo: record.archivo ?? null,
+      estatus_param: String(overrides?.estatus_param ?? record.estatus_param ?? ''),
+      medio_ingreso_param: String(record.medio_ingreso_param ?? ''),
+      tipo_registro_param: String(record.tipo_registro_param ?? this.tipoIndautor),
+      fec_solicitud: record.fec_solicitud ?? null,
+      descripcion: record.descripcion ?? null,
+      tipo_sector_param: String(record.tipo_sector_param ?? ''),
+      ...(overrides ?? {})
+    };
+  }
+
+  // ===== Listado / Búsqueda (DataTables server-side) =====
   public getModUtiles(tableParams: any): Observable<any> {
-    const start = tableParams.start || 0;
-    const length = tableParams.length || 10;
-    const searchValue = tableParams.search?.value || '';
+    const { page, limit, search } = this.dtToQuery(tableParams);
+    let url: string;
 
-    const orderColumn = tableParams.order?.[0]?.column || 0;
-    const orderDir = tableParams.order?.[0]?.dir || 'asc';
-    const columnName = tableParams.columns?.[orderColumn]?.data || 'id';
-
-    let filteredModUtiles = this.modUtiles;
-
-    if (searchValue) {
-      filteredModUtiles = this.modUtiles.filter(modUtil => {
-        const convertedDate = this.convertDateFormat(modUtil.fechaSolicitud);
-
-        return modUtil.nombreModUtil.toLowerCase().includes(searchValue.toLowerCase()) ||
-          modUtil.solicitante.toLowerCase().includes(searchValue.toLowerCase()) ||
-          modUtil.correo.toLowerCase().includes(searchValue.toLowerCase()) ||
-          modUtil.institucion.toLowerCase().includes(searchValue.toLowerCase()) ||
-          modUtil.solicitudId.toLowerCase().includes(searchValue.toLowerCase()) ||
-          modUtil.estatus.toLowerCase().includes(searchValue.toLowerCase()) ||
-          convertedDate.includes(searchValue);
-      });
+    if (search) {
+      const q = encodeURIComponent(search);
+      url = `${this.searchBase}?limit=${encodeURIComponent(limit)}&page=${encodeURIComponent(page)}&q=${q}&tipo=${this.tipoIndautor}`;
+    } else {
+      url = `${this.listBase}?limit=${encodeURIComponent(limit)}&page=${encodeURIComponent(page)}&tipo=${this.tipoIndautor}`;
     }
 
-    const getUtilityModelValue = (utilityModel: IModUtilModel, column: string): string | number => {
-      switch (column) {
-        case 'solicitante':
-          return utilityModel.solicitante || '';
-        case 'nombreModUtil':
-          return utilityModel.nombreModUtil || '';
-        case 'institucion':
-          return utilityModel.institucion || '';
-        case 'fechaSolicitud':
-          return new Date(utilityModel.fechaSolicitud).getTime();
-        default:
-          return utilityModel.id;
-      }
-    };
-
-    filteredModUtiles.sort((a, b) => {
-      const valueA = getUtilityModelValue(a, columnName);
-      const valueB = getUtilityModelValue(b, columnName);
-
-      if (orderDir === 'asc') {
-        return valueA > valueB ? 1 : -1;
-      } else {
-        return valueA < valueB ? 1 : -1;
-      }
-    });
-
-    const total = filteredModUtiles.length;
-    const paginatedModUtiles = filteredModUtiles.slice(start, start + length);
-
-    return new Observable(observer => {
-      setTimeout(() => {
-        observer.next({
-          draw: tableParams.draw,
-          recordsTotal: this.modUtiles.length,
+    return this.api.get<ApiListResponse>(url).pipe(
+      map((res) => {
+        const total = this.parseTotal(res?.total ?? 0);
+        const data = Array.isArray(res?.results)
+          ? res.results.map((r) => {
+            const base = this.mapToIModUtilModel(r);
+            return {
+              ...base,
+              // Mostrar el NÚMERO de la rama tal como viene del backend
+              ramaLabel: String(r.rama_param ?? r.rama ?? ''),
+            } as any;
+          })
+          : [];
+        return {
+          draw: tableParams?.draw,
+          recordsTotal: total,
           recordsFiltered: total,
-          data: paginatedModUtiles
-        });
-        observer.complete();
-      }, 500); // Simular delay de red
-    });
+          data
+        };
+      })
+    );
   }
 
-  /**
-   * Obtener un modelo de utilidad por ID
-   * @param id ID del modelo de utilidad
-   */
+  // ===== GET por ID (detalle) =====
+  /** JSON crudo del backend */
+  public getRegistroRaw(id: number): Observable<ApiItem> {
+    const url = `/api/registros/${encodeURIComponent(id)}/`; // slash final según swagger
+    return this.api.get<ApiItem>(url);
+  }
+
+  /** Detalle mapeado a IModUtilModel + ramaLabel como número */
   public getModUtil(id: number): Observable<IModUtilModel> {
-    return new Observable(observer => {
-      const fixId = Number(id);
-      const modUtil = this.modUtiles.find(p => p.id === fixId);
-
-      setTimeout(() => {
-        if (modUtil) {
-          observer.next(modUtil);
-        } else {
-          // Devolver objeto vacío si no se encuentra
-          observer.next({
-            id: 0,
-            solicitudId: "",
-            nombreModUtil: "",
-            solicitante: "",
-            fechaSolicitud: "",
-            estatus: "En trámite",
-            descripcion: "",
-            institucion: "",
-            correo: "",
-            documentos: [],
-            observaciones: ""
-          });
-        }
-        observer.complete();
-      }, 500);
-    });
+    const url = `/api/registros/${encodeURIComponent(id)}/`;
+    return this.api.get<ApiItem>(url).pipe(
+      map((res) => {
+        const base = this.mapToIModUtilModel(res);
+        return {
+          ...base,
+          ramaLabel: String(res.rama_param ?? res.rama ?? ''),
+          institucion: res.institucion ?? base.institucion
+        } as any;
+      })
+    );
   }
 
-  /**
-   * Crear nuevo modelo de utilidad
-   * @param modUtil Datos del modelo de utilidad
-   */
-  public createModUtil(modUtil: IModUtilModel): Observable<IModUtilModel> {
-    return new Observable(observer => {
-      // Generar nuevo ID
-      modUtil.id = this.modUtiles.length > 0
-        ? Math.max(...this.modUtiles.map(p => p.id)) + 1
-        : 1;
-
-      // Agregar al array local
-      this.modUtiles.push(modUtil);
-
-      setTimeout(() => {
-        observer.next(modUtil);
-        observer.complete();
-      }, 500);
-    });
-  }
-
-  /**
-   * Actualizar un modelo de utilidad completo
-   * @param id ID del modelo de utilidad
-   * @param modUtil Datos actualizados
-   */
-  public updateModUtil(id: number, modUtil: IModUtilModel): Observable<IModUtilModel> {
-    return new Observable(observer => {
-      const index = this.modUtiles.findIndex(p => p.id === id);
-
-      if (index !== -1) {
-        this.modUtiles[index] = { ...modUtil, id: id };
-      }
-
-      setTimeout(() => {
-        observer.next(modUtil);
-        observer.complete();
-      }, 500);
-    });
-  }
-
-  /**
-   * Eliminar un modelo de utilidad
-   * @param id ID del modelo de utilidad
-   */
+  // ===== PATCH: deshabilitar / habilitar =====
+  /** Baja lógica (deshabilitar) — estilo compatible con tu mock (Observable<void>) */
   public deleteModUtil(id: number): Observable<void> {
-    return new Observable(observer => {
-      const fixId = Number(id);
-      const index = this.modUtiles.findIndex(p => p.id === fixId);
-
-      if (index !== -1) {
-        this.modUtiles.splice(index, 1);
-      }
-
-      setTimeout(() => {
-        observer.next();
-        observer.complete();
-      }, 500);
+    return new Observable<void>((observer) => {
+      const url = `/api/registros/${encodeURIComponent(id)}/disable`;
+      this.api.patch<unknown>(url, {}).subscribe({
+        next: () => { observer.next(); observer.complete(); },
+        error: (err) => observer.error(err)
+      });
     });
   }
 
-  // 🆕 MÉTODOS ESPECÍFICOS PARA ESTATUS Y OBSERVACIONES
-
-  /**
-   * Actualizar el estatus de un modelo de utilidad
-   * @param modUtilId ID del modelo de utilidad
-   * @param newStatus Nuevo estatus
-   */
-  public updateModUtilStatus(modUtilId: number, newStatus: IModUtilModel['estatus']): Observable<any> {
-    return new Observable(observer => {
-      const modUtil = this.modUtiles.find(p => p.id === modUtilId);
-
-      if (modUtil) {
-        modUtil.estatus = newStatus;
-      }
-
-      setTimeout(() => {
-        observer.next({
-          success: true,
-          message: 'Estatus actualizado correctamente',
-          modUtil: modUtil
-        });
-        observer.complete();
-      }, 500);
+  /** Habilitar — estilo compatible con tu mock (Observable<void>) */
+  public enableModUtil(id: number): Observable<void> {
+    return new Observable<void>((observer) => {
+      const url = `/api/registros/${encodeURIComponent(id)}/enable`;
+      this.api.patch<unknown>(url, {}).subscribe({
+        next: () => { observer.next(); observer.complete(); },
+        error: (err) => observer.error(err)
+      });
     });
   }
 
-  /**
-   * Actualizar las observaciones de un modelo de utilidad
-   * @param modUtilId ID del modelo de utilidad
-   * @param observations Observaciones del coordinador
-   */
-  public updateModUtilObservations(modUtilId: number, observations: string): Observable<any> {
-    return new Observable(observer => {
-      const modUtil = this.modUtiles.find(p => p.id === modUtilId);
-
-      if (modUtil) {
-        modUtil.observaciones = observations;
-      }
-
-      setTimeout(() => {
-        observer.next({
-          success: true,
-          message: 'Observaciones actualizadas correctamente',
-          modUtil: modUtil
-        });
-        observer.complete();
-      }, 500);
-    });
+  // ===== PUT: actualizar general (payload completo) =====
+  public updateRegistro(id: number, payload: UpdateRegistroDto): Observable<void> {
+    const url = `/api/registros/${encodeURIComponent(id)}`;
+    return this.api.put(url, payload).pipe(map(() => { /* void */ }));
   }
 
-  /**
-   * Actualizar tanto estatus como observaciones en una sola operación
-   * @param modUtilId ID del modelo de utilidad
-   * @param data Objeto con estatus y observaciones
-   */
-  public updateModUtilStatusAndObservations(modUtilId: number, data: {
-    estatus?: IModUtilModel['estatus'],
-    observaciones?: string
-  }): Observable<any> {
-    return new Observable(observer => {
-      const modUtil = this.modUtiles.find(p => p.id === modUtilId);
-
-      if (modUtil) {
-        if (data.estatus) {
-          modUtil.estatus = data.estatus;
-        }
-        if (data.observaciones !== undefined) {
-          modUtil.observaciones = data.observaciones;
-        }
-      }
-
-      setTimeout(() => {
-        observer.next({
-          success: true,
-          message: 'Modelo de utilidad actualizado correctamente',
-          modUtil: modUtil
-        });
-        observer.complete();
-      }, 500);
-    });
+  // ===== PUT: actualizar solo estatus (preserva el resto de campos) =====
+  public updateModUtilStatus(modUtilId: number, newStatus: string): Observable<void> {
+    return this.getRegistroRaw(modUtilId).pipe(
+      map((record) => this.buildUpdateDtoFromApi(record, { estatus_param: String(newStatus) })),
+      switchMap((dto) => this.updateRegistro(modUtilId, dto))
+    );
   }
 
-  // 📊 MÉTODOS ADICIONALES DE UTILIDAD
-
-  /**
-   * Obtener todos los modelos de utilidad (sin paginación)
-   */
-  public getAllModUtiles(): Observable<IModUtilModel[]> {
-    return new Observable(observer => {
-      setTimeout(() => {
-        observer.next([...this.modUtiles]);
-        observer.complete();
-      }, 300);
-    });
+  // ===== No simulamos métodos locales =====
+  public createModUtil(_: IModUtilModel) {
+    return throwError(() => new Error('Crear no disponible: falta endpoint de backend.'));
   }
-
-  /**
-   * Filtrar modelos de utilidad por estatus
-   * @param status Estatus a filtrar
-   */
-  public getModUtilesByStatus(status: IModUtilModel['estatus']): Observable<IModUtilModel[]> {
-    return new Observable(observer => {
-      const filtered = this.modUtiles.filter(p => p.estatus === status);
-
-      setTimeout(() => {
-        observer.next(filtered);
-        observer.complete();
-      }, 300);
-    });
+  public updateModUtil(_: number, __: IModUtilModel) {
+    return throwError(() => new Error('Actualizar no disponible: usa updateRegistro().'));
   }
-
-  /**
-   * Obtener estadísticas de modelos de utilidad
-   */
-  public getModUtilesStats(): Observable<any> {
-    return new Observable(observer => {
-      const stats = {
-        total: this.modUtiles.length,
-        enTramite: this.modUtiles.filter(p => p.estatus === 'En trámite').length,
-        aprobadas: this.modUtiles.filter(p => p.estatus === 'Aprobada').length,
-        registradas: this.modUtiles.filter(p => p.estatus === 'Registrada').length,
-        concluidas: this.modUtiles.filter(p => p.estatus === 'Concluida').length,
-        conObservaciones: this.modUtiles.filter(p => p.estatus === 'Trámite con observaciones').length
-      };
-
-      setTimeout(() => {
-        observer.next(stats);
-        observer.complete();
-      }, 300);
-    });
+  public updateModUtilObservations(_: number, __: string) {
+    return throwError(() => new Error('Actualizar observaciones no disponible: falta endpoint de backend.'));
+  }
+  public updateModUtilStatusAndObservations(_: number, __: { estatus?: IModUtilModel['estatus']; observaciones?: string }) {
+    return throwError(() => new Error('Actualizar estatus/observaciones no disponible: falta endpoint de backend.'));
+  }
+  public getAllModUtiles() {
+    return throwError(() => new Error('Listado sin paginar no disponible: falta endpoint de backend.'));
+  }
+  public getModUtilesByStatus(_: IModUtilModel['estatus']) {
+    return throwError(() => new Error('Filtro por estatus no disponible: falta endpoint de backend.'));
+  }
+  public getModUtilesStats() {
+    return throwError(() => new Error('Estadísticas no disponibles: falta endpoint de backend.'));
   }
 }
