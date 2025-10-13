@@ -114,12 +114,12 @@ export class TablerosService {
     return this.http.get<{ mes: number; total: number }[]>(url);
   }
 
-// Método para obtener registros por periodo (trimestre o rango de fechas)
-// Nota: el backend espera primero el parámetro "fin" y luego "inicio" en la query
-getRegistrosPorPeriodo(start: string, end: string): Observable<{ mes: number; total: number }[]> {
-  const url = `/api/tableros/registros/periodo/?fin=${end}&inicio=${start}`;
-  return this.http.get<{ mes: number; total: number }[]>(url);
-}
+  // Método para obtener registros por periodo (trimestre o rango de fechas)
+  // Nota: el backend espera primero el parámetro "fin" y luego "inicio" en la query
+  getRegistrosPorPeriodo(start: string, end: string): Observable<{ mes: number; total: number }[]> {
+    const url = `/api/tableros/registros/periodo/?fin=${end}&inicio=${start}`;
+    return this.http.get<{ mes: number; total: number }[]>(url);
+  }
 
 
 
