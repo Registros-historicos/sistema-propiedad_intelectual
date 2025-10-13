@@ -47,19 +47,17 @@ interface IndInventor {
 type IndautorUIModel = {
   id: number;
   titulo: string;
-  // 🔹 Estos tres campos ahora son TEXTO legible para el modal
   rama: string;
-  medioIngreso: string;
-  tipoSector: string;
-
   institucion: string;
   fechaSolicitud: string;
   numeroExpediente: string;
   numeroCertificado: string;
   estatus: EstatusModUtil | '';
+  medioIngreso: string;
   tecnologicoOrigen: string;
   cePat: string;
   anioRenovacion: string;
+  tipoSector: string;
   sector: string;
   subsector: string;
   fechaExpedicion: string;
@@ -110,28 +108,21 @@ export class ModeloUtilidadComponent
     documentos: [''],
   };
 
-  // ====== NUEVO: guardo los IDs crudos para el PUT ======
-  private rawIdsForSave = {
-    ramaId: '' as string | number | null,
-    medioIngresoId: '' as string | number | null,
-    tipoSectorId: '' as string | number | null,
-  };
-
-  // Modelo para el modal "Ver/Editar" (los campos mostrados son TEXTO)
+  // Modelo para el modal "Ver/Editar"
   indautorModel: IndautorUIModel = {
     id: 0,
     titulo: '',
-    rama: '',            // texto legible
-    medioIngreso: '',    // texto legible
-    tipoSector: '',      // texto legible
+    rama: '',
     institucion: '',
     fechaSolicitud: '',
     numeroExpediente: '',
     numeroCertificado: '',
     estatus: 'En trámite',
+    medioIngreso: '',
     tecnologicoOrigen: '',
     cePat: '',
     anioRenovacion: '',
+    tipoSector: '',
     sector: '',
     subsector: '',
     fechaExpedicion: '',
@@ -184,15 +175,21 @@ export class ModeloUtilidadComponent
     this.placeholder = this.translate.instant('TABLE.PLACEHOLDER_SEARCH');
 
     this.datatableConfig = {
+      // === TODO local en cliente ===
       serverSide: false,
       processing: true,
       searching: true,
       deferRender: true,
+
+      // === Orden local (dos clics asc/desc; multi columna) ===
       ordering: true,
       orderMulti: true,
       order: [[0, 'asc']],
       rowId: 'id',
+
+      // Si tu template tiene una columna Acciones al final, la desactivamos:
       columnDefs: [{ targets: -1, orderable: false }],
+
       lengthMenu: this.lengthMenu,
       pageLength: this.pageLength,
       language: {
@@ -203,10 +200,23 @@ export class ModeloUtilidadComponent
         infoEmpty: this.translate.instant('TABLE.PAG_INFO_EMPTY'),
         zeroRecords: this.translate.instant('TABLE.ZERO_RECORDS'),
       },
+
+      // ⬇⬇⬇ clave: arrancar sin ajax, con data vacía
       data: [],
+
       columns: [
-        { title: 'ID', data: 'id', className: 'text-gray-700 fw-semibold',
-          render: (d:any,t:string)=> t!=='display'? d ?? '' : `<span class="fw-semibold">${d ?? ''}</span>` },
+        // ===== ID =====
+        {
+          title: 'ID',
+          data: 'id',
+          className: 'text-gray-700 fw-semibold',
+          render: (data: any, type: string) => {
+            if (type !== 'display') return data ?? '';
+            return `<span class="fw-semibold">${data ?? ''}</span>`;
+          },
+        },
+
+        // ===== No. expediente =====
         {
           title: 'N.º DE EXPEDIENTE',
           data: 'solicitudId',
@@ -220,6 +230,8 @@ export class ModeloUtilidadComponent
               </span>`;
           },
         },
+
+        // ===== RAMA =====
         {
           title: this.translate.instant('TABLE.BRANCH') || 'RAMA',
           data: 'ramaLabel',
@@ -228,9 +240,10 @@ export class ModeloUtilidadComponent
             if (type !== 'display') return label;
 
             const id = full?.id ?? '';
-            const initials = label && label.length > 1
-              ? (label[0] + (label[1] || '')).toUpperCase()
-              : 'IN';
+            const initials =
+              label && label.length > 1
+                ? (label[0] + (label[1] || '')).toUpperCase()
+                : 'IN';
             const colorClasses = ['success', 'info', 'warning', 'danger'];
             const randomColorClass =
               colorClasses[Math.floor(Math.random() * colorClasses.length)];
@@ -254,50 +267,73 @@ export class ModeloUtilidadComponent
               </div>`;
           },
         },
+
+        // ===== TÍTULO =====
         {
           title: this.translate.instant('TABLE.WORK_TITLE') || 'TÍTULO',
           data: 'nombreModUtil',
-          render: (data: string, type: string) =>
-            type!=='display' ? (data || '') : `<span class="fw-bold fs-6 text-gray-800">${data || ''}</span>`,
+          render: (data: string, type: string) => {
+            if (type !== 'display') return data || '';
+            return `<span class="fw-bold fs-6 text-gray-800">${data || ''}</span>`;
+          },
         },
+
+        // ===== INSTITUCIÓN =====
         {
           title: this.translate.instant('TABLE.INSTITUTION') || 'INSTITUCIÓN',
           data: 'institucion',
-          render: (data: string, type: string) =>
-            type!=='display' ? (data || '') : `<span class="fw-semibold text-gray-600">${data || '—'}</span>`,
+          render: (data: string, type: string) => {
+            if (type !== 'display') return data || '';
+            return `<span class="fw-semibold text-gray-600">${data || '—'}</span>`;
+          },
         },
+
+        // ===== FECHA SOLICITUD (ordenable por ISO) =====
         {
           title: this.translate.instant('TABLE.DATE') || 'FECHA DE SOLICITUD',
           data: 'fechaSolicitud',
-          render: (data: string, type: string) =>
-            type!=='display' ? (data || '') : `<span class="fw-semibold text-gray-600">${data ? moment(data).format('DD-MM-YYYY') : ''}</span>`,
+          render: (data: string, type: string) => {
+            if (type !== 'display') return data || '';
+            return `<span class="fw-semibold text-gray-600">${
+              data ? moment(data).format('DD-MM-YYYY') : ''
+            }</span>`;
+          },
         },
+
+        // (Acciones en tu template: última columna; queda deshabilitada por columnDefs)
       ],
+
       createdRow: (row: any, data: any) => {
         const $row = $(row);
         $row.attr('data-action', 'view');
         $row.attr('data-id', data?.id ?? 0);
         $row.addClass('cursor-pointer');
       },
+
       initComplete: (settings: any) => {
         this.dtInstance = settings.oInstance.api();
+
+        // Cargar TODOS los datos y llenar la tabla (sin ajax de DataTables)
         this.refreshTableData();
+
         this.cdr.detectChanges();
       },
     } as Config;
   }
 
-  /** Trae TODO, cachea y pinta */
+  /** Trae TODO del backend, actualiza cache local y pinta en la tabla sin parpadeos */
   private refreshTableData(): void {
+    // pide un lote grande para “global”
     this.service.getModUtiles({ start: 0, length: 100000 }).subscribe({
       next: (res) => {
         const rows = (res?.data || []).map((r: any) => ({
+          // normaliza los campos que usas en columns
           id: r.id,
           solicitudId: r.solicitudId,
           ramaLabel: r.ramaLabel ?? r.rama ?? '',
           nombreModUtil: r.nombreModUtil,
           institucion: r.institucion,
-          fechaSolicitud: r.fechaSolicitud,
+          fechaSolicitud: r.fechaSolicitud, // ISO
         }));
 
         this.tableData = rows;
@@ -307,10 +343,12 @@ export class ModeloUtilidadComponent
           this.dtInstance.rows.add(this.tableData);
           this.dtInstance.draw(false);
         } else {
+          // fallback si aún no hay instancia (no debería pasar)
           this.datatableConfig.data = this.tableData;
         }
       },
       error: () => {
+        // en error deja la tabla vacía (pero no se queda “cargando”)
         this.tableData = [];
         if (this.dtInstance) {
           this.dtInstance.clear().draw(false);
@@ -424,22 +462,7 @@ export class ModeloUtilidadComponent
     });
   }
 
-  // ===== Helpers de extracción (ID / nombre) =====
-  private asId(v: any): string | number | null {
-    if (v === null || v === undefined) return null;
-    if (typeof v === 'object') {
-      if ('id_param' in v) return (v.id_param as number) ?? null;
-      if ('id' in v) return (v.id as number) ?? null;
-      return null;
-    }
-    return v as string | number;
-  }
-  private asName(v: any, alt?: string, fallback: string = ''): string {
-    if (v && typeof v === 'object' && 'nombre' in v) return v.nombre as string;
-    return (alt ?? fallback) || '';
-  }
-
-  // === Ver (modo lectura) — usa NOMBRES legibles y guarda IDs crudos para PUT
+  // === Ver (modo lectura)
   view(id: number): void {
     this.isViewMode = true;
     this.isEditingForm = false;
@@ -449,32 +472,20 @@ export class ModeloUtilidadComponent
       next: (modUtil: IModUtilModel) => {
         const extra: any = modUtil as any;
 
-        // Texto legible (labels) que ya armó el service
-        const ramaTxt = (modUtil as any).rama ?? this.asName(extra.ramaRaw);
-        const medioTxt = (modUtil as any).medioIngreso ?? this.asName(extra.medioIngresoRaw);
-        const sectorTxt = (modUtil as any).tipoSector ?? this.asName(extra.tipoSectorRaw);
-
-        // IDs crudos para guardar
-        this.rawIdsForSave = {
-          ramaId: this.asId(extra.ramaRaw),
-          medioIngresoId: this.asId(extra.medioIngresoRaw),
-          tipoSectorId: this.asId(extra.tipoSectorRaw),
-        };
-
         this.indautorModel = {
           id: modUtil.id,
           titulo: modUtil.nombreModUtil || '',
-          rama: ramaTxt,                        // TEXTO
-          medioIngreso: medioTxt,               // TEXTO
-          tipoSector: sectorTxt,                // TEXTO
+          rama: String(extra.ramaRaw ?? ''),
           institucion: modUtil.institucion || '',
           fechaSolicitud: modUtil.fechaSolicitud || '',
           numeroExpediente: modUtil.solicitudId || '',
           numeroCertificado: '',
           estatus: (modUtil.estatus as EstatusModUtil) || 'En trámite',
+          medioIngreso: String(extra.medioIngresoRaw ?? ''),
           tecnologicoOrigen: modUtil.institucion || '',
           cePat: '',
           anioRenovacion: '',
+          tipoSector: String(extra.tipoSectorRaw ?? ''),
           sector: '',
           subsector: '',
           fechaExpedicion: extra.fechaExpedicion || '',
@@ -494,40 +505,30 @@ export class ModeloUtilidadComponent
     });
   }
 
-  // === Editar (modo edición con lápiz) — igual que view, pero habilita inputs
+  // === Editar (modo edición con lápiz)
   edit(id: number): void {
     this.isViewMode = false;
-    this.isEditingForm = true;
+    this.isEditingForm = true; // activa inputs en el modal
     this.cdr.detectChanges();
 
     this.service.getModUtil(id).subscribe({
       next: (modUtil: IModUtilModel) => {
         const extra: any = modUtil as any;
 
-        const ramaTxt = (modUtil as any).rama ?? this.asName(extra.ramaRaw);
-        const medioTxt = (modUtil as any).medioIngreso ?? this.asName(extra.medioIngresoRaw);
-        const sectorTxt = (modUtil as any).tipoSector ?? this.asName(extra.tipoSectorRaw);
-
-        this.rawIdsForSave = {
-          ramaId: this.asId(extra.ramaRaw),
-          medioIngresoId: this.asId(extra.medioIngresoRaw),
-          tipoSectorId: this.asId(extra.tipoSectorRaw),
-        };
-
         this.indautorModel = {
           id: modUtil.id,
           titulo: modUtil.nombreModUtil || '',
-          rama: ramaTxt,                      // TEXTO para mostrar/editar
-          medioIngreso: medioTxt,
-          tipoSector: sectorTxt,
+          rama: String(extra.ramaRaw ?? ''),
           institucion: modUtil.institucion || '',
           fechaSolicitud: modUtil.fechaSolicitud || '',
           numeroExpediente: modUtil.solicitudId || '',
           numeroCertificado: '',
           estatus: (modUtil.estatus as EstatusModUtil) || 'En trámite',
+          medioIngreso: String(extra.medioIngresoRaw ?? ''),
           tecnologicoOrigen: modUtil.institucion || '',
           cePat: '',
           anioRenovacion: '',
+          tipoSector: String(extra.tipoSectorRaw ?? ''),
           sector: '',
           subsector: '',
           fechaExpedicion: extra.fechaExpedicion || '',
@@ -547,7 +548,7 @@ export class ModeloUtilidadComponent
     });
   }
 
-  // === Guardar (usa IDs crudos que cacheamos al abrir el modal)
+  // === Guardar (edición del formulario del modal)
   saveEdit(modal: any): void {
     if (!this.indautorModel.titulo?.trim()) {
       this.showAlert({
@@ -566,22 +567,20 @@ export class ModeloUtilidadComponent
     this.service.getRegistroRaw(id).pipe(
       switchMap((raw) => {
         const dto = {
-          no_expediente:       s(this.indautorModel.numeroExpediente ?? raw.no_expediente),
-          titulo:              s(this.indautorModel.titulo ?? raw.titulo),
-
-          // 🔸 si tenemos el ID crudo lo usamos; si no, caemos al raw del GET
-          tipo_ingreso_param:  s(this.rawIdsForSave.medioIngresoId ?? raw.tipo_ingreso_param ?? '45'),
-          id_usuario:          Number(raw.id_usuario ?? 0),
-          rama_param:          s(this.rawIdsForSave.ramaId ?? raw.rama_param),
-          fec_expedicion:      s(raw.fec_expedicion),
-          observaciones:       s(this.indautorModel.observaciones ?? raw.observaciones),
-          archivo:             s(this.indautorModel.archivo ?? raw.archivo),
-          estatus_param:       s(raw.estatus_param),
-          medio_ingreso_param: s(this.rawIdsForSave.medioIngresoId ?? raw.medio_ingreso_param),
-          tipo_registro_param: s(raw.tipo_registro_param ?? '45'),
-          fec_solicitud:       s(this.indautorModel.fechaSolicitud ?? raw.fec_solicitud),
-          descripcion:         s(this.indautorModel.descripcion ?? raw.descripcion),
-          tipo_sector_param:   s(this.rawIdsForSave.tipoSectorId ?? raw.tipo_sector_param),
+          no_expediente:      s(this.indautorModel.numeroExpediente ?? raw.no_expediente),
+          titulo:             s(this.indautorModel.titulo ?? raw.titulo),
+          tipo_ingreso_param: s(raw.tipo_ingreso_param ?? '45'),
+          id_usuario:         Number(raw.id_usuario ?? 0),
+          rama_param:         s(this.indautorModel.rama ?? raw.rama_param),
+          fec_expedicion:     s(raw.fec_expedicion),
+          observaciones:      s(this.indautorModel.observaciones ?? raw.observaciones),
+          archivo:            s(this.indautorModel.archivo ?? raw.archivo),
+          estatus_param:      s(raw.estatus_param),
+          medio_ingreso_param:s(this.indautorModel.medioIngreso ?? raw.medio_ingreso_param),
+          tipo_registro_param:s(raw.tipo_registro_param ?? '45'),
+          fec_solicitud:      s(this.indautorModel.fechaSolicitud ?? raw.fec_solicitud),
+          descripcion:        s(this.indautorModel.descripcion ?? raw.descripcion),
+          tipo_sector_param:  s(this.indautorModel.tipoSector ?? raw.tipo_sector_param),
         };
 
         return this.service.updateRegistro(id, dto as any);
@@ -598,7 +597,6 @@ export class ModeloUtilidadComponent
           nombreModUtil: this.indautorModel.titulo,
           institucion:   this.indautorModel.institucion,
           fechaSolicitud:this.indautorModel.fechaSolicitud,
-          // la tabla muestra ramaLabel; no la rompas si no cambió
           ramaLabel:     this.indautorModel.rama || undefined,
         });
 
@@ -610,7 +608,7 @@ export class ModeloUtilidadComponent
           showConfirmButton: false,
         });
 
-        // Refresca todo (sin parpadeo)
+        // Y refresca cache completo por si hay dependencias (sin parpadeo)
         this.refreshTableData();
 
         modal?.dismiss?.('saved');
@@ -870,21 +868,20 @@ export class ModeloUtilidadComponent
     this.isViewMode = true;
     this.isEditingForm = false;
 
-    // resetea modelo de UI
     this.indautorModel = {
       id: 0,
       titulo: '',
       rama: '',
-      medioIngreso: '',
-      tipoSector: '',
       institucion: '',
       fechaSolicitud: '',
       numeroExpediente: '',
       numeroCertificado: '',
       estatus: 'En trámite',
+      medioIngreso: '',
       tecnologicoOrigen: '',
       cePat: '',
       anioRenovacion: '',
+      tipoSector: '',
       sector: '',
       subsector: '',
       fechaExpedicion: '',
@@ -893,9 +890,6 @@ export class ModeloUtilidadComponent
       descripcion: '',
       inventores: [],
     };
-
-    // resetea IDs crudos
-    this.rawIdsForSave = { ramaId: null, medioIngresoId: null, tipoSectorId: null };
   }
 
   getStatusOrder(status: string): number {
@@ -979,9 +973,11 @@ export class ModeloUtilidadComponent
   private patchRowInTable(id: number, patch: Partial<any>): void {
     if (!this.dtInstance) return;
 
+    // actualiza cache local
     const i = this.tableData.findIndex(x => Number(x.id) === Number(id));
     if (i > -1) this.tableData[i] = { ...this.tableData[i], ...patch };
 
+    // actualiza fila visible
     let row = this.dtInstance.row(`#${id}`);
     if (!row || !row.data || !row.data()) {
       row = this.dtInstance.row((idx: number, data: any) => Number(data?.id) === Number(id));
@@ -999,8 +995,10 @@ export class ModeloUtilidadComponent
   private removeRowFromTable(id: number): void {
     if (!this.dtInstance) return;
 
+    // quita de cache
     this.tableData = this.tableData.filter(x => Number(x.id) !== Number(id));
 
+    // quita de tabla
     let row = this.dtInstance.row(`#${id}`);
     if (!row || !row.data || !row.data()) {
       row = this.dtInstance.row((idx: number, data: any) => Number(data?.id) === Number(id));
