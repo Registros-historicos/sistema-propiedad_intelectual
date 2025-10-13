@@ -1,4 +1,4 @@
-import { IPatentModel } from "../models/patent.model";
+/* import { IPatentModel } from "../models/patent.model";
 
 export const PATENT_DATA: IPatentModel[] = [
     {
@@ -1802,3 +1802,4 @@ export const PATENT_DATA: IPatentModel[] = [
         documentos: ["solicitud.pdf", "especificaciones_tecnicas.pdf", "memoria_descriptiva.pdf"]
     }
 ];
+ */

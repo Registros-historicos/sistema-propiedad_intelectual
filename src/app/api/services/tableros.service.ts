@@ -114,10 +114,12 @@ export class TablerosService {
     return this.http.get<{ mes: number; total: number }[]>(url);
   }
 
-// Método para obtener registros por periodo (trimestre o rango de fechas)
-getRegistrosPorPeriodo(start: string, end: string): Observable<{ mes: number; total: number }[]> {
-  return this.http.get<{ mes: number; total: number }[]>(`/api/tableros/registros/periodo/?start=${start}&end=${end}`);
-}
+  // Método para obtener registros por periodo (trimestre o rango de fechas)
+  // Nota: el backend espera primero el parámetro "fin" y luego "inicio" en la query
+  getRegistrosPorPeriodo(start: string, end: string): Observable<{ mes: number; total: number }[]> {
+    const url = `/api/tableros/registros/periodo/?fin=${end}&inicio=${start}`;
+    return this.http.get<{ mes: number; total: number }[]>(url);
+  }
 
 
 
@@ -196,5 +198,10 @@ getRegistrosPorPeriodo(start: string, end: string): Observable<{ mes: number; to
       })
     );
   }
+
+  getRegistrosPorPeriodoFiltro(inicio: string, fin: string): Observable<{ mes: number; total: number }[]> {
+  const url = `/api/tableros/registros/periodo/?inicio=${inicio}&fin=${fin}`;
+  return this.http.get<{ mes: number; total: number }[]>(url);
+}
 
 }

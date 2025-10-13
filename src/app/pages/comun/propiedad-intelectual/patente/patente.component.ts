@@ -85,7 +85,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   dtInstance: any;
   selectedPage: number = 0;
   // Flag para trabajar con el arreglo local de la tabla
-  useLocalFakeData: boolean = true;
+  useLocalFakeData: boolean = false;
 
   lengthMenu: number[] = [5, 10, 15, 20];
 
@@ -491,105 +491,98 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
           numeroTitulo: item.numeroCertificado
         }))
       } : {
-        ajax: (dataTablesParameters: any, callback) => {
-          this.impiService.listImpiRegistries(this.selectedPage, dataTablesParameters.length, dataTablesParameters.search.value || null).subscribe({
-            next: (resp) => {
-              callback({
-                draw: dataTablesParameters.draw,
-                recordsTotal: resp.totalElements,
-                recordsFiltered: resp.totalElements,
-                data: resp.content.map((item: any) => ({
-                  id: item.id,
-                  solicitudId: item.record,
-                  nombrePatente: item.denomination,
-                  rama: item.branch || 'No disponible',
-                  fechaSolicitud: item.issue_date ? moment(item.issue_date).format('YYYY-MM-DD') : '',
-                  institucion: item.origin_city || 'No disponible',
-                  estatus: 'No disponible',
-                  descripcion: item.notes || '',
-                  documentos: [],
-                  numeroExpediente: item.numero_expediente || '',
-                  numeroTitulo: item.numero_titulo || ''
-                }))
-              })
-            },
-            error: (error) => {
-              callback({
-                draw: dataTablesParameters.draw,
-                recordsTotal: 0,
-                recordsFiltered: 0,
-                data: []
-              });
-            }
-          });
-        }
+       ajax: (dataTablesParameters: any, callback) => {
+  this.service.getPatents(dataTablesParameters).subscribe({
+    next: (resp: any) => {
+      callback(resp);
+    },
+    error: (error: any) => {
+      console.error('❌ Error al cargar patentes:', error);
+      callback({
+        draw: dataTablesParameters.draw,
+        recordsTotal: 0,
+        recordsFiltered: 0,
+        data: []
+      });
+    }
+  });
+}
       }),
       columns: [
+     {
+  title: 'No. de expediente',
+  data: 'numeroExpediente',
+  render: (data) => {
+    // Convertimos a string por seguridad, aunque sea numérico
+    const strData = data ? String(data) : '—';
+
+    return `
+      <span class="fw-semibold text-gray-600"
+        style="display: inline-block; max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+        EXP-<br>${strData}
+      </span>
+    `;
+  },
+},
         {
-          title: 'No. de expediente', // Nueva columna
-          data: 'numeroExpediente',
-          render: (data) => {
-            let shortExp = '';
-            if (data && data.startsWith('EXP-')) {
-              shortExp = data.substring(4); // "EXP-0001" tiene 8 caracteres
-            }
+  title: 'No. de título',
+  data: 'numeroTitulo',
+  render: (data) => {
+    const strData = data ? String(data) : '—';
 
-            return `<span class="fw-semibold text-gray-600" style="display: inline-block; max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">>EXP-<br>${shortExp || ''}</span>`;
-          },
-        },
-        {
-          title: 'No. de título', // Nueva columna
-          data: 'numeroTitulo',
-          render: (data) => {
-            let shortCert = '';
-            if (data && data.startsWith('CERT-')) {
-              shortCert = data.substring(5); // "CERT-0001" tiene 9 caracteres
-            }
+    return `
+      <span class="fw-semibold text-gray-600"
+        style="display: inline-block; max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+        CERT-<br>${strData}
+      </span>
+    `;
+  },
+},
+    {
+  title: this.translate.instant('TABLE.BRANCH'),
+  data: 'rama',
+  render: (data, type, full) => {
+    // Asegurar que sea string
+    const safeData = (data !== undefined && data !== null) ? String(data) : 'Invención';
 
-            // Asegurar que el span abarque el 100% de ancho y si el texto es muy largo, se muetsre la ellipsis
-            return `<span class="fw-semibold text-gray-600" style="display: inline-block; max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">CERT-<br>${shortCert || ''}</span>`;
-          },
-        },
-        {
-          title: this.translate.instant('TABLE.BRANCH'),
-          data: 'rama',
-          render: (data, type, full) => {
-            const colorClasses = ['success', 'info', 'warning', 'danger'];
-            const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
+    const colorClasses = ['success', 'info', 'warning', 'danger'];
+    const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
 
-            const nameParts = data.split(' ').filter((part: string) => part.length > 0 && !part.endsWith('.'));
+    const nameParts = safeData.split(' ').filter((part: string) => part.length > 0 && !part.endsWith('.'));
 
-            let initials = '';
-            if (nameParts.length >= 2) {
-              initials = (nameParts[0][0] + nameParts[1][0]).toUpperCase();
-            } else if (nameParts.length === 1) {
-              initials = (nameParts[0][0] + nameParts[0][1]).toUpperCase();
-            }
+    let initials = '';
+    if (nameParts.length >= 2) {
+      initials = (nameParts[0][0] + nameParts[1][0]).toUpperCase();
+    } else if (nameParts.length === 1 && nameParts[0].length >= 2) {
+      initials = (nameParts[0][0] + nameParts[0][1]).toUpperCase();
+    } else {
+      initials = 'IN';
+    }
 
-            const symbolLabel = `
-              <div class="symbol-label fs-3 bg-light-${randomColorClass} text-${randomColorClass}">
-                ${initials}
-              </div>
-            `;
+    const symbolLabel = `
+      <div class="symbol-label fs-3 bg-light-${randomColorClass} text-${randomColorClass}">
+        ${initials}
+      </div>
+    `;
 
-            const nameAndEmail = `
-              <div class="d-flex flex-column" data-action="view" data-id="${full.id}">
-                <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${data}</a>
-              </div>
-            `;
+    const nameAndEmail = `
+      <div class="d-flex flex-column" data-action="view" data-id="${full.id}">
+        <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${safeData}</a>
+      </div>
+    `;
 
-            return `
-              <div class="d-flex align-items-center">
-                <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" data-action="view" data-id="${full.id}">
-                  <a href="javascript:;">
-                    ${symbolLabel}
-                  </a>
-                </div>
-                ${nameAndEmail}
-              </div>
-            `;
-          },
-        },
+    return `
+      <div class="d-flex align-items-center">
+        <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" data-action="view" data-id="${full.id}">
+          <a href="javascript:;">
+            ${symbolLabel}
+          </a>
+        </div>
+        ${nameAndEmail}
+      </div>
+    `;
+  }
+},
         {
           title: this.translate.instant('TABLE.WORK_TITLE'),
           data: 'nombrePatente',
@@ -696,23 +689,33 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     this.patenteModel.institucion = '';
   }
 
-  delete(id: number) {
-    if (this.useLocalFakeData) {
-      const numericId = Number(id);
-      const idx = this.FAKE_IMPI_DATA_LOCAL.findIndex(x => x.id === numericId);
-      if (idx > -1) {
-        this.FAKE_IMPI_DATA_LOCAL.splice(idx, 1);
-        if (this.dtInstance) {
-          this.dtInstance.rows((i: number, rowData: any) => rowData.id === numericId).remove().draw(false);
-        }
-      }
-      return;
-    } else {
-      this.service.deletePatent(id).subscribe(() => {
+delete(id: number) {
+  if (this.useLocalFakeData) {
+    // ... código para datos fake
+  } else {
+    this.service.deletePatent(id).subscribe({
+      next: () => {
+        console.log('✅ Registro deshabilitado correctamente');
         this.reloadEvent.emit(true);
-      });
-    }
+        
+        // Opcional: Mostrar alerta de éxito
+        this.showAlert({
+          icon: 'success',
+          title: 'Eliminado',
+          text: 'El registro fue deshabilitado correctamente.'
+        });
+      },
+      error: (error) => {
+        console.error('❌ Error al deshabilitar:', error);
+        this.showAlert({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo deshabilitar el registro.'
+        });
+      }
+    });
   }
+}
 
   view(id: number) {
     this.isViewMode = true;
@@ -892,6 +895,10 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
           modal.dismiss('saved');
         },
         error: (err) => {
+            console.error('❌ Error completo al actualizar patente:', err);
+      console.error('❌ Error details:', err.error);
+      console.error('❌ Error status:', err.status);
+      console.error('❌ Error message:', err.message);
           console.error('Error al actualizar patente', err);
           this.showAlert({
             icon: 'error',
@@ -1042,7 +1049,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     };
 
     this.service.updatePatentStatusAndObservations(this.patenteModel.id, updateData).subscribe({
-      next: (response) => {
+      next: (response : any) => {
         this.isSaving = false;
         this.patenteModel.estatus = updateData.estatus;
         this.patenteModel.observaciones = updateData.observaciones;
@@ -1061,7 +1068,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         this.showAlert(alertaExito);
         this.reloadEvent.emit(true);
       },
-      error: (error) => {
+      error: (error: any) => {
         this.isSaving = false;
         console.error('Error al guardar:', error);
 
@@ -1284,4 +1291,8 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.reloadEvent.unsubscribe();
   }
+
+  
 }
+
+
