@@ -1291,6 +1291,8 @@ delete(id: number) {
   ngOnDestroy(): void {
     this.reloadEvent.unsubscribe();
   }
+
+  
 }
 
 

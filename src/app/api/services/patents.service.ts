@@ -1,9 +1,9 @@
-
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { IPatentModel } from '../models/patent.model';
+import { Catalogos, ParametrizacionesService } from './parametrizaciones.service';
 
 export interface IPaginatedPatentsResponse {
   total: number;
@@ -17,119 +17,81 @@ export interface IPaginatedPatentsResponse {
 })
 export class PatentsService {
   private apiUrl = '/api/registros';
-  private readonly TIPO_PATENTE = '44'; // IMPI
+  private readonly TIPO_PATENTE = '44';
+  private catalogos?: Catalogos;
 
-  constructor(private http: HttpClient) { 
-    console.log('✅ PatentsService inicializado - CONECTADO AL BACKEND REAL');
+  constructor(
+    private http: HttpClient,
+    private paramService: ParametrizacionesService
+  ) {
+    this.cargarCatalogos();
   }
 
-  /**
-   * 🔥 NUEVO: Obtener patentes con paginación desde el backend
-   */
+  private cargarCatalogos(): void {
+    this.paramService.getAll().subscribe({
+      next: (cats) => {
+        this.catalogos = cats;
+      },
+      error: (err) => console.error('Error cargando parametrizaciones:', err),
+    });
+  }
+
   public getPatents(tableParams: any): Observable<any> {
-    console.log('🔵 getPatents llamado con parámetros:', tableParams);
-    
     const page = Math.floor((tableParams.start || 0) / (tableParams.length || 10)) + 1;
     const limit = tableParams.length || 10;
     const searchValue = tableParams.search?.value || '';
 
-    // Si hay búsqueda, usar endpoint de búsqueda
     if (searchValue && searchValue.trim() !== '') {
-      console.log('🔍 Buscando:', searchValue);
       return this.searchPatents(searchValue, page, limit).pipe(
         map(response => this.formatForDataTables(response, tableParams.draw))
       );
     }
 
-    // Listar normal
-    console.log('📋 Listando página:', page, 'límite:', limit);
     return this.listPatents(page, limit).pipe(
       map(response => this.formatForDataTables(response, tableParams.draw))
     );
   }
 
-  /**
-   * 🔥 Listar patentes
-   */
-/**
- * 🔥 Listar patentes
- */
-private listPatents(page: number = 1, limit: number = 10): Observable<IPaginatedPatentsResponse> {
-  const params = new HttpParams()
-    .set('tipo', this.TIPO_PATENTE)
-    .set('page', page.toString())
-    .set('limit', limit.toString());
+  private listPatents(page: number = 1, limit: number = 10): Observable<IPaginatedPatentsResponse> {
+    const params = new HttpParams()
+      .set('tipo', this.TIPO_PATENTE)
+      .set('page', page.toString())
+      .set('limit', limit.toString());
 
-  const url = `${this.apiUrl}/?${params.toString()}`;
-  console.log('🌐 REQUEST:', url);
-
-  return this.http.get<any>(this.apiUrl, { params }).pipe(
-    map(response => {
-      console.log('✅ RESPONSE RAW:', response);
-      
-      let total = 0;
-      let results = [];
-      
-      // 🔥 PARSEAR EL FORMATO EXTRAÑO DEL BACKEND
-      if (response.total !== undefined) {
-        const totalValue = response.total;
+    return this.http.get<any>(this.apiUrl, { params }).pipe(
+      map(response => {
+        let total = 0;
+        let results = [];
         
-        // Si es un string con formato "(44,IMPI,177,Patente,156)"
-        if (typeof totalValue === 'string' && totalValue.includes(',')) {
-          console.log('🔍 Parseando total string:', totalValue);
-          
-          // Extraer el último número del string
-          // "(44,IMPI,177,Patente,156)" → ["44", "IMPI", "177", "Patente", "156"]
-          const parts = totalValue.replace('(', '').replace(')', '').split(',');
-          const lastPart = parts[parts.length - 1].trim();
-          total = parseInt(lastPart, 10);
-          
-          console.log('✅ Total extraído:', total);
-        } 
-        // Si ya es un número
-        else if (typeof totalValue === 'number') {
-          total = totalValue;
-        }
-        // Si es un string numérico simple "156"
-        else if (typeof totalValue === 'string') {
-          total = parseInt(totalValue, 10);
+        if (response.total !== undefined) {
+          const totalValue = response.total;
+          if (typeof totalValue === 'string' && totalValue.includes(',')) {
+            const parts = totalValue.replace('(', '').replace(')', '').split(',');
+            const lastPart = parts[parts.length - 1].trim();
+            total = parseInt(lastPart, 10);
+          } else if (typeof totalValue === 'number') {
+            total = totalValue;
+          } else if (typeof totalValue === 'string') {
+            total = parseInt(totalValue, 10);
+          }
+          results = response.results || [];
+        } else if (response.count !== undefined) {
+          total = response.count;
+          results = response.results || [];
+        } else if (Array.isArray(response)) {
+          total = response.length;
+          results = response;
         }
         
-        results = response.results || [];
-      }
-      // Formato Django Rest Framework
-      else if (response.count !== undefined) {
-        total = response.count;
-        results = response.results || [];
-      }
-      // Array directo
-      else if (Array.isArray(response)) {
-        total = response.length;
-        results = response;
-      }
-      
-      console.log('📊 Total de registros:', total);
-      console.log('📊 Registros en esta página:', results.length);
-      
-      // 🔥 VALIDAR que total sea un número válido
-      if (isNaN(total) || total < 0) {
-        console.error('❌ Total inválido:', total);
-        total = 0;
-      }
-      
-      return {
-        total: total,
-        page: page,
-        limit: limit,
-        results: results
-      };
-    })
-  );
-}
+        if (isNaN(total) || total < 0) {
+          total = 0;
+        }
+        
+        return { total, page, limit, results };
+      })
+    );
+  }
 
-  /**
-   * 🔥 Buscar patentes
-   */
   private searchPatents(query: string, page: number = 1, limit: number = 10): Observable<IPaginatedPatentsResponse> {
     const params = new HttpParams()
       .set('tipo', this.TIPO_PATENTE)
@@ -140,138 +102,59 @@ private listPatents(page: number = 1, limit: number = 10): Observable<IPaginated
     return this.http.get<IPaginatedPatentsResponse>(`${this.apiUrl}/search/`, { params });
   }
 
-  /**
-/**
- * Formatear respuesta para DataTables
- */
-private formatForDataTables(response: IPaginatedPatentsResponse, draw: number): any {
-  console.log('📊 Formateando para DataTables:', response);
-  console.log('📊 Total:', response.total);
-  console.log('📊 Resultados:', response.results?.length);
-  
-  const formattedData = {
-    draw: draw,
-    recordsTotal: response.total || 0,
-    recordsFiltered: response.total || 0,
-    data: (response.results || []).map(patent => this.mapBackendToFrontend(patent))
-  };
-  
-  console.log('✅ Datos formateados:', formattedData);
-  console.log('✅ recordsTotal:', formattedData.recordsTotal);
-  console.log('✅ data length:', formattedData.data.length);
-  
-  return formattedData;
-}
-/**
- * 🔥 Mapear campos del backend al modelo frontend
- * Basado en el JSON real del Swagger
- */
-private mapBackendToFrontend(backendPatent: any): IPatentModel {
-  console.log('🔄 Mapeando registro:', backendPatent.id_registro);
-  
-  return {
-    // ========================================
-    // CAMPOS BÁSICOS DEL MODELO
-    // ========================================
-    id: backendPatent.id_registro || 0,
-    solicitudId: backendPatent.no_expediente?.toString() || 'N/A',
-    nombrePatente: backendPatent.titulo || 'Sin título',
-    solicitante: backendPatent.solicitante || 'TecNM',
-    institucion: backendPatent.institucion || 'N/A',
-    correo: backendPatent.correo || 'N/A',
-    
-    // 🔥 Convertir fecha ISO a formato YYYY-MM-DD
-    fechaSolicitud: backendPatent.fec_solicitud 
-      ? backendPatent.fec_solicitud.split('T')[0]
-      : '',
-    
-    estatus: this.mapEstatus(backendPatent.estatus),
-    descripcion: backendPatent.descripcion || '',
-    documentos: backendPatent.archivo ? [backendPatent.archivo] : [],
-    observaciones: backendPatent.observaciones || '',
-    
-    // ========================================
-    // 🔥 CAMPOS ADICIONALES PARA EL MODAL
-    // ========================================
-    rama: backendPatent.rama || 'Invención',
-    numeroExpediente: backendPatent.no_expediente?.toString() || 'N/A',
-    numeroTitulo: backendPatent.id_registro?.toString() || 'N/A',
-    denominacion: backendPatent.titulo || 'Sin título',
-    
-    // 🔥 NUEVOS CAMPOS MAPEADOS
-    medioIngreso: backendPatent.medio_ingreso || 'N/A',
-    tipoSector: backendPatent.tipo_sector || 'N/A',
-    
-    // Campos que el backend NO envía - valores por defecto
-    tecnologicoOrigen: 'Instituto Tecnológico',
-    cePat: 'N/A',
-    anioRenovacion: 'N/A',
-    sector: 'N/A',
-    subsector: 'N/A',
-    
-    // 🔥 Fecha de expedición (puede ser null en el backend)
-    fechaExpedicion: backendPatent.fec_expedicion 
-      ? backendPatent.fec_expedicion.split('T')[0]
-      : 'Pendiente',
-    
-    archivo: backendPatent.archivo || '',
-    
-    // 🔥 Campos extra del backend que podemos usar
-    tipoIngreso: backendPatent.tipo_ingreso || 'IMPI',
-    tipoRegistro: backendPatent.tipo_registro || 'IMPI',
-    
-  } as any;
-}
-  /**
-   * Mapear estatus
-   */
-/**
- * Mapear estatus del backend al frontend
- */
-private mapEstatus(estatusParam: string): IPatentModel['estatus'] {
-  console.log('🔍 Estatus recibido del backend:', estatusParam);
-  
-  const estatusMap: { [key: string]: IPatentModel['estatus'] } = {
-    'Confirmada': 'Registrada',
-    'Pendiente': 'En trámite',
-    'En revisión': 'Trámite con observaciones',
-    'Aprobada': 'Aprobada',
-    'Concluida': 'Concluida',
-    'En espera de validación': 'En trámite',
-    'Cancelada': 'En trámite'
+  private formatForDataTables(response: IPaginatedPatentsResponse, draw: number): any {
+    const formattedData = {
+      draw,
+      recordsTotal: response.total || 0,
+      recordsFiltered: response.total || 0,
+      data: (response.results || []).map(patent => this.mapBackendToFrontend(patent))
+    };
+    return formattedData;
+  }
 
-  };
-  
-  // Si no está en el mapa, usar el valor original o 'En trámite' por defecto
-  const mapped = estatusMap[estatusParam] || estatusParam || 'En trámite';
-  
-  console.log('✅ Estatus mapeado:', mapped);
-  
-  return mapped;
-}
+  private mapBackendToFrontend(backendPatent: any): IPatentModel {
+    if (this.catalogos) {
+      backendPatent = this.paramService.convertirRegistroConObjetos(backendPatent, this.catalogos);
+    }
 
-  /**
-   * 🔥 Obtener una patente por ID
-   */
-/**
- * 🔥 Obtener una patente por ID
- */
-public getPatent(id: number): Observable<IPatentModel> {
-  console.log('🔍 Obteniendo patente ID:', id);
-  
-  return this.http.get<any>(`${this.apiUrl}/${id}/`).pipe(
-    map(patent => {
-      console.log('✅ Patente obtenida del backend:', patent);
-      const mapped = this.mapBackendToFrontend(patent);
-      console.log('✅ Patente mapeada:', mapped);
-      return mapped;
-    })
-  );
-}
+    return {
+      id: backendPatent.id_registro || 0,
+      solicitudId: backendPatent.no_expediente?.toString() || 'N/A',
+      nombrePatente: backendPatent.titulo || 'Sin título',
+      solicitante: backendPatent.solicitante || 'TecNM',
+      institucion: backendPatent.institucion?.nombre || backendPatent.institucion || 'N/A',
+      correo: backendPatent.correo || 'N/A',
+      fechaSolicitud: backendPatent.fec_solicitud ? backendPatent.fec_solicitud.split('T')[0] : '',
+      estatus: backendPatent.estatus_param?.nombre || backendPatent.estatus || 'En trámite',
+      descripcion: backendPatent.descripcion || '',
+      documentos: backendPatent.archivo ? [backendPatent.archivo] : [],
+      observaciones: backendPatent.observaciones || '',
+      rama: backendPatent.rama_param?.nombre || backendPatent.rama || 'Invención',
+      numeroExpediente: backendPatent.no_expediente?.toString() || 'N/A',
+      numeroTitulo: backendPatent.id_registro?.toString() || 'N/A',
+      denominacion: backendPatent.titulo || 'Sin título',
+      medioIngreso: backendPatent.medio_ingreso_param?.nombre || backendPatent.medio_ingreso || 'N/A',
+      tipoSector: backendPatent.tipo_sector_param?.nombre || backendPatent.tipo_sector || 'N/A',
+      tecnologicoOrigen: 'Instituto Tecnológico',
+      cePat: 'N/A',
+      anioRenovacion: 'N/A',
+      sector: 'N/A',
+      subsector: 'N/A',
+      fechaExpedicion: backendPatent.fec_expedicion 
+        ? backendPatent.fec_expedicion.split('T')[0]
+        : 'Pendiente',
+      archivo: backendPatent.archivo || '',
+      tipoIngreso: backendPatent.tipo_ingreso_param?.nombre || backendPatent.tipo_ingreso || 'IMPI',
+      tipoRegistro: backendPatent.tipo_registro_param?.nombre || backendPatent.tipo_registro || 'IMPI',
+    } as any;
+  }
 
-  /**
-   * 🔥 Crear nueva patente
-   */
+  public getPatent(id: number): Observable<IPatentModel> {
+    return this.http.get<any>(`${this.apiUrl}/${id}/`).pipe(
+      map(patent => this.mapBackendToFrontend(patent))
+    );
+  }
+
   public createPatent(patent: IPatentModel): Observable<IPatentModel> {
     const backendData = this.mapFrontendToBackend(patent);
     return this.http.post<any>(this.apiUrl, backendData).pipe(
@@ -279,109 +162,95 @@ public getPatent(id: number): Observable<IPatentModel> {
     );
   }
 
-  /**
-   * 🔥 Actualizar patente
-   */
-/**
- * 🔥 Actualizar patente - CORREGIDO
- */
-public updatePatent(id: number, patent: IPatentModel): Observable<IPatentModel> {
-  console.log('🔄 Actualizando patente ID:', id);
-  
-  const backendData = this.mapFrontendToBackend(patent);
-  
-  return this.http.put<any>(`${this.apiUrl}/${id}/`, backendData).pipe(
-    map(response => {
-      console.log('✅ Respuesta de actualización:', response);
-      return this.mapBackendToFrontend(response);
-    })
-  );
-}
+  public updatePatent(id: number, patent: IPatentModel): Observable<IPatentModel> {
+    const backendData = this.mapFrontendToBackend(patent);
+    return this.http.put<any>(`${this.apiUrl}/${id}/`, backendData).pipe(
+      map(response => this.mapBackendToFrontend(response))
+    );
+  }
 
-  /**
-   * 🔥 Eliminar (deshabilitar) patente
-   */
   public deletePatent(id: number): Observable<void> {
     return this.http.patch<void>(`${this.apiUrl}/${id}/disable`, {});
   }
 
-  /**
-   * Mapear del frontend al backend
-   */
-  private mapFrontendToBackend(patent: IPatentModel): any {
-  console.log('🔄 Mapeando frontend->backend:', patent);
-  
-  // 🔥 MAPEO CORREGIDO DE ESTATUS
-  const estatusMapInverso: { [key: string]: string } = {
-    'Registrada': 'Femenino',      // ← El backend espera "Femenino" para "Registrada"
-    'En trámite': 'Masculino',     // ← El backend espera "Masculino" para "En trámite"  
-    'Trámite con observaciones': 'En revisión',
-    'Aprobada': 'Aprobada',
-    'Concluida': 'Concluida'
-  };
+  private mapFrontendToBackend(patent: any): any {
+    const formatDate = (date: string | null | undefined): string => {
+      if (!date || date === 'Pendiente') {
+        return new Date().toISOString().split('T')[0];
+      }
+      if (date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        return date;
+      }
+      if (date.includes('T')) {
+        return date.split('T')[0];
+      }
+      return date;
+    };
 
-  const payload = {
-    no_expediente: patent.solicitudId || patent.no_expediente,
-    titulo: patent.nombrePatente || patent.titulo,
-    tipo_ingreso_param: '2', // IMPI
-    id_usuario: 1, // Esto debería venir del usuario autenticado
-    rama_param: this.mapRamaToBackend(patent.rama_param || 'Invención'),
-    fec_expedicion: patent.fec_expedicion || new Date().toISOString().split('T')[0],
-    observaciones: patent.observaciones || '',
-    archivo: patent.archivo || (patent.documentos?.[0] || ''),
-    estatus_param: estatusMapInverso[patent.estatus] || patent.estatus,
-    medio_ingreso_param: this.mapMedioIngresoToBackend(patent.medio_ingreso_param || 'VENTANILLA'),
-    tipo_registro_param: this.TIPO_PATENTE,
-    fec_solicitud: patent.fechaSolicitud,
-    descripcion: patent.descripcion || '',
-    tipo_sector_param: this.mapSectorToBackend(patent.tipo_registro_param || 'Quinario'),
-    institucion: patent.institucion || ''
-  };
+    return {
+      no_expediente: patent.solicitudId || patent.numeroExpediente || '',
+      titulo: patent.nombrePatente || patent.denominacion || '',
+      descripcion: patent.descripcion || '',
+      tipo_ingreso_param: '2',
+      id_usuario: 1,
+      rama_param: this.mapRamaToBackend(patent.rama || 'Invención'),
+      medio_ingreso_param: this.mapMedioIngresoToBackend(patent.medioIngreso || 'VENTANILLA'),
+      tipo_sector_param: this.mapSectorToBackend(patent.tipoSector || 'Quinario'),
+      tipo_registro_param: this.TIPO_PATENTE,
+      estatus_param: this.mapEstatusToBackend(patent.estatus || 'En trámite'),
+      fec_solicitud: formatDate(patent.fechaSolicitud),
+      fec_expedicion: formatDate(patent.fechaExpedicion),
+      archivo: patent.archivo || (patent.documentos?.[0]) || '',
+      observaciones: patent.observaciones || 'Sin observaciones',
+    };
+  }
 
-  console.log('📤 Payload para backend:', payload);
-  return payload;
-}
+  private mapRamaToBackend(rama: string): string {
+    const ramaMap: { [key: string]: string } = {
+      'Invención': '1',
+      'Modelo de utilidad': '2', 
+      'Diseño Industrial': '3',
+      'Diseño industrial': '3',
+      'Marca': '4'
+    };
+    return ramaMap[rama] || '1';
+  }
 
-/**
- * Mapear rama al formato del backend
- */
-private mapRamaToBackend(rama: string): string {
-  const ramaMap: { [key: string]: string } = {
-    'Invención': '1',
-    'Modelo de utilidad': '2', 
-    'Diseño industrial': '3',
-    'Marca': '4'
-  };
-  return ramaMap[rama] || '1';
-}
+  private mapMedioIngresoToBackend(medioIngreso: string): string {
+    const medioMap: { [key: string]: string } = {
+      'VENTANILLA': '1',
+      'Indautor': '2',
+      'Cuenta Pase IMPI': '3',
+      'EN LÍNEA': '2',
+      'N/A': '1'
+    };
+    return medioMap[medioIngreso] || '1';
+  }
 
-/**
- * Mapear medio de ingreso al formato del backend
- */
-private mapMedioIngresoToBackend(medioIngreso: string): string {
-  const medioMap: { [key: string]: string } = {
-    'VENTANILLA': '1',
-    'Indautor': '2',
-    'Cuenta Pase IMPI': '3'
-  };
-  return medioMap[medioIngreso] || '1';
-}
+  private mapSectorToBackend(tipoSector: string): string {
+    const sectorMap: { [key: string]: string } = {
+      'Primario': '1',
+      'Secundario': '2',
+      'Terciario': '3',
+      'Cuaternario': '4',
+      'Quinario': '5',
+      'N/A': '5'
+    };
+    return sectorMap[tipoSector] || '5';
+  }
 
-/**
- * Mapear tipo de sector al formato del backend  
- */
-private mapSectorToBackend(tipoSector: string): string {
-  const sectorMap: { [key: string]: string } = {
-    'Primario': '1',
-    'Secundario': '2',
-    'Terciario': '3',
-    'Cuaternario': '4',
-    'Quinario': '5'
-  };
-  return sectorMap[tipoSector] || '5';
-}
+  private mapEstatusToBackend(estatus: string): string {
+    const estatusMap: { [key: string]: string } = {
+      'Registrada': '1',
+      'En trámite': '2',
+      'Trámite con observaciones': '3',
+      'Aprobada': '4',
+      'Concluida': '5',
+      'En espera de validación': '2'
+    };
+    return estatusMap[estatus] || '2';
+  }
 
-  // MÉTODOS ADICIONALES
   public updatePatentStatus(patentId: number, newStatus: IPatentModel['estatus']): Observable<any> {
     return this.updatePatent(patentId, { estatus: newStatus } as IPatentModel);
   }
@@ -432,6 +301,4 @@ private mapSectorToBackend(tipoSector: string): string {
       }))
     );
   }
-
-  
 }
