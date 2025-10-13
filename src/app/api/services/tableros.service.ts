@@ -57,7 +57,7 @@ export class TablerosService {
       })
     );
   }
-  
+
   getRegisterStatus(): Observable<any[]> {
     return this.http.get<any[]>('/api/tableros/registros/estatus').pipe(
       catchError(error => {
@@ -125,15 +125,15 @@ export class TablerosService {
 
   private normalizeInstitutoData(data: any[], tipoFiltro?: number): Instituto[] {
     if (!Array.isArray(data)) return [];
-    
+
     console.log(`🎯 Normalizando ${data.length} items con tipoFiltro: ${tipoFiltro}`);
-    
+
     return data.map((item, index) => {
       // Si hay un filtro específico, forzar ese tipo
       if (tipoFiltro === 122 || tipoFiltro === 123) {
         const tipoForzado = this.getTipoInstitucion(tipoFiltro);
         console.log(`🎯 FORZANDO tipo: ${tipoForzado} para filtro ${tipoFiltro}`);
-        
+
         return {
           tipo_institucion_param: tipoFiltro,
           nombre_tipo_institucion: tipoForzado,
@@ -141,13 +141,13 @@ export class TablerosService {
           total_registros: item.total_registros || item.total || item.registros || item.count || 0
         };
       }
-      
+
       // Para "Todas las Instituciones", determinar el tipo basado en el ID
       const tipoInstitucion = this.getTipoByInstitucionId(item.id_institucion);
       const nombreTipo = this.getTipoInstitucion(tipoInstitucion);
-      
+
       console.log(`📋 Item ${index} - ID: ${item.id_institucion}, Tipo detectado: ${tipoInstitucion} (${nombreTipo})`);
-      
+
       return {
         tipo_institucion_param: tipoInstitucion,
         nombre_tipo_institucion: nombreTipo,
@@ -161,10 +161,10 @@ export class TablerosService {
   private getTipoByInstitucionId(idInstitucion: number): number {
     // Instituciones Federales (123) - basado en los logs
     const institucionesFederales = [212, 209, 218, 211, 214, 207];
-    
+
     // Instituciones Descentralizadas (122) - basado en los logs
     const institucionesDescentralizadas = [205, 216, 203, 210, 202, 204, 215, 206, 217, 213, 208, 201];
-    
+
     if (institucionesFederales.includes(idInstitucion)) {
       return 123;
     } else if (institucionesDescentralizadas.includes(idInstitucion)) {

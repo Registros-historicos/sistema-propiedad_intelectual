@@ -61,10 +61,7 @@
         </div>
     </div>
     <div class="card-body p-5">
-        <!-- Indicador de carga para peticiones por periodo -->
-        <div *ngIf="loadingPeriod" class="mb-3">
-            <span class="badge bg-info">Cargando datos del periodo...</span>
-        </div>
+        <!-- Debug eliminado: lastResponseRows ya no se muestra en la UI -->
         <div class="table-responsive" style="min-height:400px;">
             <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [xaxis]="chartOptions.xaxis"
                 [dataLabels]="chartOptions.dataLabels" [stroke]="chartOptions.stroke" [legend]="chartOptions.legend"
