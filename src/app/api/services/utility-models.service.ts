@@ -1,4 +1,3 @@
-// src/app/api/services/utility-models.service.ts
 import { Injectable } from '@angular/core';
 import { Observable, map, switchMap, throwError } from 'rxjs';
 import { IModUtilModel } from '../models/mod-util.model';
@@ -39,21 +38,22 @@ type ApiListResponse = {
   results: ApiItem[];
 };
 
-// DTO EXACTO que pide tu backend en PUT /api/registros/{id}
+// DTO EXACTO que pide tu backend en PUT /api/registros/{id}/
+// (según el cURL: todo string salvo id_usuario)
 export interface UpdateRegistroDto {
   no_expediente: string;
   titulo: string;
   tipo_ingreso_param: string;
-  id_usuario: number;
+  id_usuario: number;           // el backend acepta número aquí
   rama_param: string;
-  fec_expedicion: string | null;
-  observaciones: string | null;
-  archivo: string | null;
+  fec_expedicion: string;
+  observaciones: string;
+  archivo: string;
   estatus_param: string;
   medio_ingreso_param: string;
   tipo_registro_param: string;
-  fec_solicitud: string | null;
-  descripcion: string | null;
+  fec_solicitud: string;
+  descripcion: string;
   tipo_sector_param: string;
 }
 
@@ -61,7 +61,7 @@ export interface UpdateRegistroDto {
 export class UtilityModelsService {
   private readonly listBase = '/api/registros/';
   private readonly searchBase = '/api/registros/search/';
-  private readonly tipoIndautor = 44; // INDAUTOR
+  private readonly tipoIndautor = 45; // INDAUTOR
 
   constructor(private api: ApiCrudService) {}
 
@@ -82,8 +82,17 @@ export class UtilityModelsService {
     return m ? Number(m[1]) : 0;
   }
 
+  /** Coerce a string sin nulls */
+  private s(v: any): string {
+    return v === undefined || v === null ? '' : String(v);
+  }
+
   /** Mapea el item de API → modelo que usa la UI */
   private mapToIModUtilModel(it: ApiItem): IModUtilModel {
+    // normaliza institución: '-' => ''
+    const inst = (it.institucion ?? '').trim();
+    const institucionNorm = inst === '-' ? '' : inst;
+
     return {
       id: it.id_registro,
       solicitudId: String(it.no_expediente ?? ''),
@@ -92,31 +101,30 @@ export class UtilityModelsService {
       fechaSolicitud: it.fec_solicitud ?? '',
       estatus: 'En trámite', // si en el futuro se mapea desde estatus_param, se ajusta aquí
       descripcion: it.descripcion ?? '',
-      institucion: it.institucion ?? '',   // úsala si viene
+      institucion: institucionNorm,
       correo: '',
       documentos: it.archivo ? [it.archivo] : [],
       observaciones: it.observaciones ?? ''
     };
   }
 
-  /** Convierte registro de API → DTO PUT, preservando valores (para update seguro) */
+  /** Convierte registro de API → DTO PUT, preservando valores (para update seguro), forzando strings */
   private buildUpdateDtoFromApi(record: ApiItem, overrides?: Partial<UpdateRegistroDto>): UpdateRegistroDto {
     return {
-      no_expediente: String(record.no_expediente ?? ''),
-      titulo: String(record.titulo ?? ''),
-      tipo_ingreso_param: String(record.tipo_ingreso_param ?? '45'),
-      id_usuario: Number(record.id_usuario ?? 0),
-      rama_param: String(record.rama_param ?? record.rama ?? ''),
-      fec_expedicion: record.fec_expedicion ?? null,
-      observaciones: record.observaciones ?? null,
-      archivo: record.archivo ?? null,
-      estatus_param: String(overrides?.estatus_param ?? record.estatus_param ?? ''),
-      medio_ingreso_param: String(record.medio_ingreso_param ?? ''),
-      tipo_registro_param: String(record.tipo_registro_param ?? this.tipoIndautor),
-      fec_solicitud: record.fec_solicitud ?? null,
-      descripcion: record.descripcion ?? null,
-      tipo_sector_param: String(record.tipo_sector_param ?? ''),
-      ...(overrides ?? {})
+      no_expediente: this.s(overrides?.no_expediente ?? record.no_expediente),
+      titulo: this.s(overrides?.titulo ?? record.titulo),
+      tipo_ingreso_param: this.s(overrides?.tipo_ingreso_param ?? record.tipo_ingreso_param ?? '45'),
+      id_usuario: Number(overrides?.id_usuario ?? record.id_usuario ?? 0),
+      rama_param: this.s(overrides?.rama_param ?? record.rama_param ?? record.rama ?? ''),
+      fec_expedicion: this.s(overrides?.fec_expedicion ?? record.fec_expedicion),
+      observaciones: this.s(overrides?.observaciones ?? record.observaciones),
+      archivo: this.s(overrides?.archivo ?? record.archivo),
+      estatus_param: this.s(overrides?.estatus_param ?? record.estatus_param),
+      medio_ingreso_param: this.s(overrides?.medio_ingreso_param ?? record.medio_ingreso_param),
+      tipo_registro_param: this.s(overrides?.tipo_registro_param ?? record.tipo_registro_param ?? this.tipoIndautor),
+      fec_solicitud: this.s(overrides?.fec_solicitud ?? record.fec_solicitud),
+      descripcion: this.s(overrides?.descripcion ?? record.descripcion),
+      tipo_sector_param: this.s(overrides?.tipo_sector_param ?? record.tipo_sector_param),
     };
   }
 
@@ -142,6 +150,11 @@ export class UtilityModelsService {
               ...base,
               // Mostrar el NÚMERO de la rama tal como viene del backend
               ramaLabel: String(r.rama_param ?? r.rama ?? ''),
+              // Extras crudos por si los necesitas en lista más adelante
+              ramaRaw: r.rama_param ?? (r as any).rama ?? '',
+              medioIngresoRaw: r.medio_ingreso_param ?? '',
+              tipoSectorRaw: r.tipo_sector_param ?? '',
+              fechaExpedicion: r.fec_expedicion ?? '',
             } as any;
           })
           : [];
@@ -162,23 +175,36 @@ export class UtilityModelsService {
     return this.api.get<ApiItem>(url);
   }
 
-  /** Detalle mapeado a IModUtilModel + ramaLabel como número */
+  /** Detalle mapeado a IModUtilModel + extras crudos para el modal */
   public getModUtil(id: number): Observable<IModUtilModel> {
     const url = `/api/registros/${encodeURIComponent(id)}/`;
     return this.api.get<ApiItem>(url).pipe(
       map((res) => {
-        const base = this.mapToIModUtilModel(res);
+        // normaliza institución '-' → ''
+        const inst = (res.institucion ?? '').trim();
+        const institucionNorm = inst === '-' ? '' : inst;
+
+        const base = this.mapToIModUtilModel({
+          ...res,
+          institucion: institucionNorm,
+        });
+
         return {
           ...base,
-          ramaLabel: String(res.rama_param ?? res.rama ?? ''),
-          institucion: res.institucion ?? base.institucion
+          // etiqueta numérica (como string) para la tabla
+          ramaLabel: String(res.rama_param ?? (res as any).rama ?? ''),
+          // valores crudos para el modal (IDs tal cual)
+          ramaRaw: res.rama_param ?? (res as any).rama ?? '',
+          medioIngresoRaw: res.medio_ingreso_param ?? '',
+          tipoSectorRaw: res.tipo_sector_param ?? '',
+          fechaExpedicion: res.fec_expedicion ?? '',
+          institucion: institucionNorm,
         } as any;
       })
     );
   }
 
   // ===== PATCH: deshabilitar / habilitar =====
-  /** Baja lógica (deshabilitar) — estilo compatible con tu mock (Observable<void>) */
   public deleteModUtil(id: number): Observable<void> {
     return new Observable<void>((observer) => {
       const url = `/api/registros/${encodeURIComponent(id)}/disable`;
@@ -189,7 +215,6 @@ export class UtilityModelsService {
     });
   }
 
-  /** Habilitar — estilo compatible con tu mock (Observable<void>) */
   public enableModUtil(id: number): Observable<void> {
     return new Observable<void>((observer) => {
       const url = `/api/registros/${encodeURIComponent(id)}/enable`;
@@ -200,9 +225,9 @@ export class UtilityModelsService {
     });
   }
 
-  // ===== PUT: actualizar general (payload completo) =====
+  // ===== PUT: actualizar general (payload completo, con SLASH FINAL) =====
   public updateRegistro(id: number, payload: UpdateRegistroDto): Observable<void> {
-    const url = `/api/registros/${encodeURIComponent(id)}`;
+    const url = `/api/registros/${encodeURIComponent(id)}/`; // <-- SLASH FINAL
     return this.api.put(url, payload).pipe(map(() => { /* void */ }));
   }
 
@@ -214,7 +239,7 @@ export class UtilityModelsService {
     );
   }
 
-  // ===== No simulamos métodos locales =====
+  // ===== Métodos no disponibles =====
   public createModUtil(_: IModUtilModel) {
     return throwError(() => new Error('Crear no disponible: falta endpoint de backend.'));
   }

@@ -1,4 +1,3 @@
-// src/app/pages/comun/propiedad-intelectual/modelo-utilidad/modelo-utilidad.component.ts
 import {
   AfterViewInit,
   ChangeDetectorRef,
@@ -18,7 +17,7 @@ import { Config } from 'datatables.net';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { UtilityModelsService } from '../../../../api/services/utility-models.service';
 import moment from 'moment';
-import { Observable } from 'rxjs';
+import { Observable, switchMap } from 'rxjs';
 import { IModUtilModel } from 'src/app/api/models/mod-util.model';
 import { FederalEntity } from 'src/app/api/models/entity.model';
 import { TranslateService } from '@ngx-translate/core';
@@ -109,7 +108,7 @@ export class ModeloUtilidadComponent
     documentos: [''],
   };
 
-  // Modelo para el modal "Ver/Editar" (lo usa la plantilla)
+  // Modelo para el modal "Ver/Editar"
   indautorModel: IndautorUIModel = {
     id: 0,
     titulo: '',
@@ -139,9 +138,14 @@ export class ModeloUtilidadComponent
   institucionSeleccionada: number | null = null;
 
   selectedFile: File | null = null;
-  isViewMode = true;
-  isEditingStatus = false;
+
+  // Flags de UI
+  isViewMode = true;         // modal lectura
+  isEditingStatus = false;   // edición estatus
+  isEditingForm = false;     // edición formulario (lápiz)
   isSaving = false;
+
+  // Estado edición estatus
   statusError = false;
   editedStatus = '';
   editedObservations = '';
@@ -156,6 +160,9 @@ export class ModeloUtilidadComponent
     'Trámite con observaciones': 'En trámite',
   };
 
+  // cache local para la tabla
+  private tableData: any[] = [];
+
   constructor(
     private service: UtilityModelsService,
     private cdr: ChangeDetectorRef,
@@ -168,10 +175,21 @@ export class ModeloUtilidadComponent
     this.placeholder = this.translate.instant('TABLE.PLACEHOLDER_SEARCH');
 
     this.datatableConfig = {
-      serverSide: true,
+      // === TODO local en cliente ===
+      serverSide: false,
       processing: true,
       searching: true,
-      ordering: false,
+      deferRender: true,
+
+      // === Orden local (dos clics asc/desc; multi columna) ===
+      ordering: true,
+      orderMulti: true,
+      order: [[0, 'asc']],
+      rowId: 'id',
+
+      // Si tu template tiene una columna Acciones al final, la desactivamos:
+      columnDefs: [{ targets: -1, orderable: false }],
+
       lengthMenu: this.lengthMenu,
       pageLength: this.pageLength,
       language: {
@@ -183,34 +201,27 @@ export class ModeloUtilidadComponent
         zeroRecords: this.translate.instant('TABLE.ZERO_RECORDS'),
       },
 
-      ajax: (dataTablesParams: any, callback: any) => {
-        this.service.getModUtiles(dataTablesParams).subscribe({
-          next: (res) => {
-            callback({
-              draw: res.draw,
-              recordsTotal: res.recordsTotal,
-              recordsFiltered: res.recordsFiltered,
-              data: res.data,
-            });
-          },
-          error: () => {
-            callback({
-              draw: dataTablesParams.draw,
-              recordsTotal: 0,
-              recordsFiltered: 0,
-              data: [],
-            });
-          },
-        });
-      },
+      // ⬇⬇⬇ clave: arrancar sin ajax, con data vacía
+      data: [],
 
-      // ====== COLUMNAS REQUERIDAS ======
       columns: [
-        // N.º DE EXPEDIENTE
+        // ===== ID =====
+        {
+          title: 'ID',
+          data: 'id',
+          className: 'text-gray-700 fw-semibold',
+          render: (data: any, type: string) => {
+            if (type !== 'display') return data ?? '';
+            return `<span class="fw-semibold">${data ?? ''}</span>`;
+          },
+        },
+
+        // ===== No. expediente =====
         {
           title: 'N.º DE EXPEDIENTE',
           data: 'solicitudId',
-          render: (data: any) => {
+          render: (data: any, type: string) => {
+            if (type !== 'display') return data ?? '';
             const val = (data ?? '') !== '' ? String(data) : '—';
             return `
               <span class="fw-semibold text-gray-600"
@@ -220,34 +231,14 @@ export class ModeloUtilidadComponent
           },
         },
 
-        // N.º DE CERTIFICADO (acepta number|string; fallback a varias claves)
-        {
-          title: 'N.º DE CERTIFICADO',
-          data: 'numeroCertificado', // el service lo normaliza si existe
-          render: (data: any, _t: any, full: any) => {
-            const raw =
-              data ??
-              full?.noCertificado ??
-              full?.certificado ??
-              full?.numCertificado ??
-              '';
-            const show =
-              raw === 0 || raw === '0' || (raw ?? '') !== '' ? String(raw) : '—';
-
-            return `
-              <span class="fw-semibold text-gray-600"
-                    style="display:inline-block;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                ${show}
-              </span>`;
-          },
-        },
-
-        // RAMA (usa ramaLabel; si viene número, el service lo expone como string)
+        // ===== RAMA =====
         {
           title: this.translate.instant('TABLE.BRANCH') || 'RAMA',
           data: 'ramaLabel',
-          render: (data: any, _t: any, full: any) => {
+          render: (data: any, type: string, full: any) => {
             const label = (data ?? full?.rama ?? '—').toString();
+            if (type !== 'display') return label;
+
             const id = full?.id ?? '';
             const initials =
               label && label.length > 1
@@ -277,31 +268,39 @@ export class ModeloUtilidadComponent
           },
         },
 
-        // TÍTULO
+        // ===== TÍTULO =====
         {
           title: this.translate.instant('TABLE.WORK_TITLE') || 'TÍTULO',
           data: 'nombreModUtil',
-          render: (data: string) =>
-            `<span class="fw-bold fs-6 text-gray-800">${data || ''}</span>`,
+          render: (data: string, type: string) => {
+            if (type !== 'display') return data || '';
+            return `<span class="fw-bold fs-6 text-gray-800">${data || ''}</span>`;
+          },
         },
 
-        // INSTITUCIÓN
+        // ===== INSTITUCIÓN =====
         {
           title: this.translate.instant('TABLE.INSTITUTION') || 'INSTITUCIÓN',
           data: 'institucion',
-          render: (data: string) =>
-            `<span class="fw-semibold text-gray-600">${data || '—'}</span>`,
+          render: (data: string, type: string) => {
+            if (type !== 'display') return data || '';
+            return `<span class="fw-semibold text-gray-600">${data || '—'}</span>`;
+          },
         },
 
-        // FECHA DE SOLICITUD
+        // ===== FECHA SOLICITUD (ordenable por ISO) =====
         {
           title: this.translate.instant('TABLE.DATE') || 'FECHA DE SOLICITUD',
           data: 'fechaSolicitud',
-          render: (data: string) =>
-            `<span class="fw-semibold text-gray-600">${
+          render: (data: string, type: string) => {
+            if (type !== 'display') return data || '';
+            return `<span class="fw-semibold text-gray-600">${
               data ? moment(data).format('DD-MM-YYYY') : ''
-            }</span>`,
+            }</span>`;
+          },
         },
+
+        // (Acciones en tu template: última columna; queda deshabilitada por columnDefs)
       ],
 
       createdRow: (row: any, data: any) => {
@@ -313,9 +312,51 @@ export class ModeloUtilidadComponent
 
       initComplete: (settings: any) => {
         this.dtInstance = settings.oInstance.api();
+
+        // Cargar TODOS los datos y llenar la tabla (sin ajax de DataTables)
+        this.refreshTableData();
+
         this.cdr.detectChanges();
       },
     } as Config;
+  }
+
+  /** Trae TODO del backend, actualiza cache local y pinta en la tabla sin parpadeos */
+  private refreshTableData(): void {
+    // pide un lote grande para “global”
+    this.service.getModUtiles({ start: 0, length: 100000 }).subscribe({
+      next: (res) => {
+        const rows = (res?.data || []).map((r: any) => ({
+          // normaliza los campos que usas en columns
+          id: r.id,
+          solicitudId: r.solicitudId,
+          ramaLabel: r.ramaLabel ?? r.rama ?? '',
+          nombreModUtil: r.nombreModUtil,
+          institucion: r.institucion,
+          fechaSolicitud: r.fechaSolicitud, // ISO
+        }));
+
+        this.tableData = rows;
+
+        if (this.dtInstance) {
+          this.dtInstance.clear();
+          this.dtInstance.rows.add(this.tableData);
+          this.dtInstance.draw(false);
+        } else {
+          // fallback si aún no hay instancia (no debería pasar)
+          this.datatableConfig.data = this.tableData;
+        }
+      },
+      error: () => {
+        // en error deja la tabla vacía (pero no se queda “cargando”)
+        this.tableData = [];
+        if (this.dtInstance) {
+          this.dtInstance.clear().draw(false);
+        } else {
+          this.datatableConfig.data = [];
+        }
+      },
+    });
   }
 
   onPageLengthChange(event: any): void {
@@ -385,7 +426,7 @@ export class ModeloUtilidadComponent
   delete(id: number): void {
     this.service.deleteModUtil(id).subscribe({
       next: () => {
-        if (this.dtInstance) this.dtInstance.ajax.reload(null, false);
+        this.removeRowFromTable(id);
         this.showAlert({
           icon: 'success',
           title: 'Deshabilitado',
@@ -405,7 +446,6 @@ export class ModeloUtilidadComponent
   enable(id: number): void {
     this.service.enableModUtil(id).subscribe({
       next: () => {
-        if (this.dtInstance) this.dtInstance.ajax.reload(null, false);
         this.showAlert({
           icon: 'success',
           title: 'Habilitado',
@@ -422,15 +462,10 @@ export class ModeloUtilidadComponent
     });
   }
 
-  // === Botones que usa tu template ===
-  edit(id: number): void {
-    this.isViewMode = false;
-    this.cdr.detectChanges();
-    this.view(id);
-  }
-
+  // === Ver (modo lectura)
   view(id: number): void {
     this.isViewMode = true;
+    this.isEditingForm = false;
     this.cdr.detectChanges();
 
     this.service.getModUtil(id).subscribe({
@@ -440,22 +475,17 @@ export class ModeloUtilidadComponent
         this.indautorModel = {
           id: modUtil.id,
           titulo: modUtil.nombreModUtil || '',
-          rama: extra.ramaLabel || 'INDAUTOR',
+          rama: String(extra.ramaRaw ?? ''),
           institucion: modUtil.institucion || '',
           fechaSolicitud: modUtil.fechaSolicitud || '',
           numeroExpediente: modUtil.solicitudId || '',
-          numeroCertificado:
-            extra.numeroCertificado ??
-            extra.noCertificado ??
-            extra.certificado ??
-            extra.numCertificado ??
-            '',
+          numeroCertificado: '',
           estatus: (modUtil.estatus as EstatusModUtil) || 'En trámite',
-          medioIngreso: extra.medioIngresoLabel || '',
-          tecnologicoOrigen: '',
+          medioIngreso: String(extra.medioIngresoRaw ?? ''),
+          tecnologicoOrigen: modUtil.institucion || '',
           cePat: '',
           anioRenovacion: '',
-          tipoSector: extra.tipoSectorLabel || '',
+          tipoSector: String(extra.tipoSectorRaw ?? ''),
           sector: '',
           subsector: '',
           fechaExpedicion: extra.fechaExpedicion || '',
@@ -475,16 +505,127 @@ export class ModeloUtilidadComponent
     });
   }
 
-  saveEdit(modal: any): void {
-    this.showAlert({
-      icon: 'info',
-      title: 'Edición no disponible',
-      text: 'El guardado completo no está implementado todavía.',
+  // === Editar (modo edición con lápiz)
+  edit(id: number): void {
+    this.isViewMode = false;
+    this.isEditingForm = true; // activa inputs en el modal
+    this.cdr.detectChanges();
+
+    this.service.getModUtil(id).subscribe({
+      next: (modUtil: IModUtilModel) => {
+        const extra: any = modUtil as any;
+
+        this.indautorModel = {
+          id: modUtil.id,
+          titulo: modUtil.nombreModUtil || '',
+          rama: String(extra.ramaRaw ?? ''),
+          institucion: modUtil.institucion || '',
+          fechaSolicitud: modUtil.fechaSolicitud || '',
+          numeroExpediente: modUtil.solicitudId || '',
+          numeroCertificado: '',
+          estatus: (modUtil.estatus as EstatusModUtil) || 'En trámite',
+          medioIngreso: String(extra.medioIngresoRaw ?? ''),
+          tecnologicoOrigen: modUtil.institucion || '',
+          cePat: '',
+          anioRenovacion: '',
+          tipoSector: String(extra.tipoSectorRaw ?? ''),
+          sector: '',
+          subsector: '',
+          fechaExpedicion: extra.fechaExpedicion || '',
+          archivo: (modUtil.documentos && modUtil.documentos[0]) || '',
+          observaciones: modUtil.observaciones || '',
+          descripcion: modUtil.descripcion || '',
+          inventores: [],
+        };
+      },
+      error: () => {
+        this.showAlert({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo cargar el detalle para edición.',
+        });
+      },
     });
-    this.isViewMode = true;
-    modal?.dismiss?.('saved');
   }
 
+  // === Guardar (edición del formulario del modal)
+  saveEdit(modal: any): void {
+    if (!this.indautorModel.titulo?.trim()) {
+      this.showAlert({
+        icon: 'error',
+        title: 'Validación',
+        text: 'El título es obligatorio.',
+      });
+      return;
+    }
+
+    const id = this.indautorModel.id;
+    this.isSaving = true;
+
+    const s = (v: any) => (v === undefined || v === null ? '' : String(v));
+
+    this.service.getRegistroRaw(id).pipe(
+      switchMap((raw) => {
+        const dto = {
+          no_expediente:      s(this.indautorModel.numeroExpediente ?? raw.no_expediente),
+          titulo:             s(this.indautorModel.titulo ?? raw.titulo),
+          tipo_ingreso_param: s(raw.tipo_ingreso_param ?? '45'),
+          id_usuario:         Number(raw.id_usuario ?? 0),
+          rama_param:         s(this.indautorModel.rama ?? raw.rama_param),
+          fec_expedicion:     s(raw.fec_expedicion),
+          observaciones:      s(this.indautorModel.observaciones ?? raw.observaciones),
+          archivo:            s(this.indautorModel.archivo ?? raw.archivo),
+          estatus_param:      s(raw.estatus_param),
+          medio_ingreso_param:s(this.indautorModel.medioIngreso ?? raw.medio_ingreso_param),
+          tipo_registro_param:s(raw.tipo_registro_param ?? '45'),
+          fec_solicitud:      s(this.indautorModel.fechaSolicitud ?? raw.fec_solicitud),
+          descripcion:        s(this.indautorModel.descripcion ?? raw.descripcion),
+          tipo_sector_param:  s(this.indautorModel.tipoSector ?? raw.tipo_sector_param),
+        };
+
+        return this.service.updateRegistro(id, dto as any);
+      })
+    ).subscribe({
+      next: () => {
+        this.isSaving = false;
+        this.isViewMode = true;
+        this.isEditingForm = false;
+
+        // Parchea fila local
+        this.patchRowInTable(id, {
+          solicitudId:   this.indautorModel.numeroExpediente,
+          nombreModUtil: this.indautorModel.titulo,
+          institucion:   this.indautorModel.institucion,
+          fechaSolicitud:this.indautorModel.fechaSolicitud,
+          ramaLabel:     this.indautorModel.rama || undefined,
+        });
+
+        this.showAlert({
+          icon: 'success',
+          title: '¡Guardado!',
+          text: 'Los cambios se guardaron correctamente.',
+          timer: 1800,
+          showConfirmButton: false,
+        });
+
+        // Y refresca cache completo por si hay dependencias (sin parpadeo)
+        this.refreshTableData();
+
+        modal?.dismiss?.('saved');
+      },
+      error: (err) => {
+        this.isSaving = false;
+        this.showAlert({
+          icon: 'error',
+          title: 'Error al guardar',
+          text: 'Ocurrió un error al intentar guardar los cambios.',
+        });
+        console.error('PUT /api/registros/{id}/ error:', err);
+      }
+    });
+  }
+
+  // === Edición de estatus (flujo existente)
   getStatusBadgeClass(status: string): string {
     const statusClasses: { [key: string]: string } = {
       'En trámite': 'badge-light-info',
@@ -503,10 +644,7 @@ export class ModeloUtilidadComponent
       case 'Registrada':
         return [
           { value: 'En trámite', label: 'En trámite' },
-          {
-            value: 'Trámite con observaciones',
-            label: 'Trámite con observaciones',
-          },
+          { value: 'Trámite con observaciones', label: 'Trámite con observaciones' },
         ];
       case 'Trámite con observaciones':
         return [{ value: 'En trámite', label: 'En trámite' }];
@@ -540,7 +678,7 @@ export class ModeloUtilidadComponent
     }, 10);
   }
 
-  private validateForm(): boolean {
+  private validateFormStatus(): boolean {
     this.statusError = false;
     if (!this.editedStatus || this.editedStatus.trim() === '') {
       this.statusError = true;
@@ -550,7 +688,7 @@ export class ModeloUtilidadComponent
   }
 
   saveChanges(): void {
-    if (!this.validateForm()) {
+    if (!this.validateFormStatus()) {
       this.showAlert({
         icon: 'error',
         title: 'Error de validación',
@@ -582,13 +720,13 @@ export class ModeloUtilidadComponent
     import('sweetalert2').then((Swal) => {
       Swal.default.fire(alertaConfirmacion).then((result) => {
         if (result.isConfirmed) {
-          this.performSave();
+          this.performSaveStatus();
         }
       });
     });
   }
 
-  private performSave(): void {
+  private performSaveStatus(): void {
     this.isSaving = true;
     const nuevoEstatus = this.editedStatus as EstatusModUtil;
 
@@ -608,9 +746,6 @@ export class ModeloUtilidadComponent
             timer: 2000,
             showConfirmButton: false,
           });
-
-          this.reloadEvent.emit(true);
-          if (this.dtInstance) this.dtInstance.ajax.reload(null, false);
         },
         error: () => {
           this.isSaving = false;
@@ -667,8 +802,6 @@ export class ModeloUtilidadComponent
             title: '¡Actualizado!',
             text: `El estatus ha sido actualizado a "${nuevoEstatus}"`,
           });
-          this.reloadEvent.emit(true);
-          if (this.dtInstance) this.dtInstance.ajax.reload(null, false);
         },
         error: () => {
           this.showAlert({
@@ -732,6 +865,9 @@ export class ModeloUtilidadComponent
 
   closeForm(modal: any): void {
     modal.dismiss('cancel');
+    this.isViewMode = true;
+    this.isEditingForm = false;
+
     this.indautorModel = {
       id: 0,
       titulo: '',
@@ -802,7 +938,7 @@ export class ModeloUtilidadComponent
     this.reloadEvent.unsubscribe();
   }
 
-  /* ===== Helpers UI para inventores (la plantilla los usa) ===== */
+  /* ===== Helpers UI inventores ===== */
   addInventor(): void {
     if (!this.indautorModel.inventores) this.indautorModel.inventores = [];
     this.indautorModel.inventores.push({
@@ -831,5 +967,44 @@ export class ModeloUtilidadComponent
     return invs.filter(
       (i) => !!(i && (i.curp || i.nombreCompleto || i.institucion))
     );
+  }
+
+  // ===== Helpers DataTable (parche/remo sin recargar) =====
+  private patchRowInTable(id: number, patch: Partial<any>): void {
+    if (!this.dtInstance) return;
+
+    // actualiza cache local
+    const i = this.tableData.findIndex(x => Number(x.id) === Number(id));
+    if (i > -1) this.tableData[i] = { ...this.tableData[i], ...patch };
+
+    // actualiza fila visible
+    let row = this.dtInstance.row(`#${id}`);
+    if (!row || !row.data || !row.data()) {
+      row = this.dtInstance.row((idx: number, data: any) => Number(data?.id) === Number(id));
+    }
+    if (row && row.data) {
+      const current = row.data();
+      const merged = { ...current, ...patch };
+      if (patch.ramaLabel === undefined && current?.ramaLabel) {
+        merged.ramaLabel = current.ramaLabel;
+      }
+      row.data(merged).draw(false);
+    }
+  }
+
+  private removeRowFromTable(id: number): void {
+    if (!this.dtInstance) return;
+
+    // quita de cache
+    this.tableData = this.tableData.filter(x => Number(x.id) !== Number(id));
+
+    // quita de tabla
+    let row = this.dtInstance.row(`#${id}`);
+    if (!row || !row.data || !row.data()) {
+      row = this.dtInstance.row((idx: number, data: any) => Number(data?.id) === Number(id));
+    }
+    if (row && row.remove) {
+      row.remove().draw(false);
+    }
   }
 }
