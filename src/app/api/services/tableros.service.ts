@@ -104,10 +104,6 @@ export class TablerosService {
       })
     );
   }
-  //Metodo para obtener registros por sexo
-  getRegistrosPorSexo(): Observable<any[]> {
-    return this.http.get<any[]>('/api/tableros/investigadores/sexo');
-  }
 
   // Método para obtener registros por mes (tablero de registros por año)
   // Se acepta un parámetro year opcional para filtrar por año en el backend
