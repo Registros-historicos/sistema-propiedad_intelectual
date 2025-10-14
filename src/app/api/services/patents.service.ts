@@ -35,22 +35,31 @@ export class PatentsService {
       error: (err) => console.error('Error cargando parametrizaciones:', err),
     });
   }
+public getPatents(tableParams: any): Observable<any> {
+  const page = Math.floor((tableParams.start || 0) / (tableParams.length || 10)) + 1;
+  const limit = tableParams.length || 10;
+  const searchValue = tableParams.search?.value || '';
 
-  public getPatents(tableParams: any): Observable<any> {
-    const page = Math.floor((tableParams.start || 0) / (tableParams.length || 10)) + 1;
-    const limit = tableParams.length || 10;
-    const searchValue = tableParams.search?.value || '';
+  // 🔹 Esperar a que los catálogos estén cargados antes de formatear las patentes
+  return this.paramService.getAll().pipe(
+    switchMap((cats) => {
+      this.catalogos = cats;
 
-    if (searchValue && searchValue.trim() !== '') {
-      return this.searchPatents(searchValue, page, limit).pipe(
-        map(response => this.formatForDataTables(response, tableParams.draw))
-      );
-    }
+      // 🔹 Elegir entre búsqueda o listado normal
+      if (searchValue && searchValue.trim() !== '') {
+        return this.searchPatents(searchValue, page, limit);
+      }
+      return this.listPatents(page, limit);
+    }),
+    map((response) => {
+      // 🔹 Ahora sí formatear con los catálogos ya cargados
+      const formatted = this.formatForDataTables(response, tableParams.draw);
+      console.log('✅ Catálogos aplicados, ejemplo de estatus:', formatted.data[0]?.estatus);
+      return formatted;
+    })
+  );
+}
 
-    return this.listPatents(page, limit).pipe(
-      map(response => this.formatForDataTables(response, tableParams.draw))
-    );
-  }
 
   private listPatents(page: number = 1, limit: number = 10): Observable<IPaginatedPatentsResponse> {
     const params = new HttpParams()
@@ -114,6 +123,7 @@ export class PatentsService {
 
   private mapBackendToFrontend(backendPatent: any): IPatentModel {
     if (this.catalogos) {
+      console.log('Estatus convertido:', backendPatent.estatus_param);
       backendPatent = this.paramService.convertirRegistroConObjetos(backendPatent, this.catalogos);
     }
 
@@ -125,8 +135,10 @@ export class PatentsService {
       institucion: backendPatent.institucion?.nombre || backendPatent.institucion || 'N/A',
       correo: backendPatent.correo || 'N/A',
       fechaSolicitud: backendPatent.fec_solicitud ? backendPatent.fec_solicitud.split('T')[0] : '',
-      estatus: backendPatent.estatus_param?.nombre || backendPatent.estatus || 'En trámite',
-      descripcion: backendPatent.descripcion || '',
+estatus:
+  typeof backendPatent.estatus_param === 'object'
+    ? backendPatent.estatus_param?.nombre
+    : backendPatent.estatus || 'N/A',      descripcion: backendPatent.descripcion || '',
       documentos: backendPatent.archivo ? [backendPatent.archivo] : [],
       observaciones: backendPatent.observaciones || '',
       rama: backendPatent.rama_param?.nombre || backendPatent.rama || 'Invención',
@@ -135,7 +147,7 @@ export class PatentsService {
       denominacion: backendPatent.titulo || 'Sin título',
       medioIngreso: backendPatent.medio_ingreso_param?.nombre || backendPatent.medio_ingreso || 'N/A',
       tipoSector: backendPatent.tipo_sector_param?.nombre || backendPatent.tipo_sector || 'N/A',
-      tecnologicoOrigen: 'Instituto Tecnológico',
+    tecnologicoOrigen: backendPatent.institucion?.nombre || backendPatent.institucion || 'N/A',
       cePat: 'N/A',
       anioRenovacion: 'N/A',
       sector: 'N/A',
@@ -147,6 +159,7 @@ export class PatentsService {
       tipoIngreso: backendPatent.tipo_ingreso_param?.nombre || backendPatent.tipo_ingreso || 'IMPI',
       tipoRegistro: backendPatent.tipo_registro_param?.nombre || backendPatent.tipo_registro || 'IMPI',
     } as any;
+
   }
 
   public getPatent(id: number): Observable<IPatentModel> {

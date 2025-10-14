@@ -12,10 +12,10 @@ import {FederalEntity} from 'src/app/api/models/entity.model';
 import {ENTIDADES_FEDERATIVAS_DATA} from 'src/app/api/data/entity.data';
 import {ENTIDADES_FEDERATIVAS_MAP} from 'src/app/api/data/entity-institucion.data';
 import {ImpiRegistriesService} from '../../../../api/services/impi.service';
+import { ParametrizacionesService, Catalogos, Parametrizacion, } from '../../../../api/services/parametrizaciones.service';
 
 type EstatusPatente = 'Registrada' | 'En trámite' | 'Trámite con observaciones' | 'Aprobada' | 'Concluida';
 
-// Nuevos tipos para el formulario extendido
 interface Inventor {
   curp: string;
   nombreCompleto: string;
@@ -72,6 +72,11 @@ type PatenteUIModel = IPatentModel & {
   inventores?: Inventor[];
 };
 
+interface ParametroItem {
+  id: number;
+  nombre: string;
+}
+
 @Component({
   selector: 'app-patente',
   templateUrl: './patente.component.html',
@@ -80,7 +85,10 @@ type PatenteUIModel = IPatentModel & {
 export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   isCollapsed1 = false;
   isCollapsed2 = true;
-
+  ramasCatalogo: ParametroItem[] = [];
+  mediosIngresoCatalogo: ParametroItem[] = [];
+  tiposSectorCatalogo: ParametroItem[] = [];
+  estatusCatalogo: ParametroItem[] = [];
   pageLength: number = 10;
   dtInstance: any;
   selectedPage: number = 0;
@@ -411,7 +419,9 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     private service: PatentsService,
     private cdr: ChangeDetectorRef,
     private translate: TranslateService,
-    private impiService: ImpiRegistriesService
+    private impiService: ImpiRegistriesService,
+    private parametrizacionesServices: ParametrizacionesService // ← AGREGAR ESTO
+
   ) {
     this.tranlatesPlaceholders = {
       METHOD_SUBMISSION: this.translate.instant('FORMS.PLACEHOLDERS.METHOD_SUBMISSION'),
@@ -464,6 +474,14 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.placeholder = this.translate.instant('TABLE.PLACEHOLDER_SEARCH')
+    this.cargarCatalogos();
+    setTimeout(() => {
+    console.log('📚 Ramas disponibles:', this.ramasCatalogo);
+    console.log('📚 Estatus disponibles:', this.estatusCatalogo);
+    console.log('📚 Medios ingreso disponibles:', this.mediosIngresoCatalogo);
+    console.log('📚 Sectores disponibles:', this.tiposSectorCatalogo);
+  }, 2000);
+
 
     // Para mostrar el mismo arreglo y columnas que en INDAUTOR/local, usa el dataset local propio de este componente
 
@@ -758,6 +776,10 @@ delete(id: number) {
           ...patente,
           denominacion: patente.nombrePatente || this.patenteModel.denominacion,
         };
+        console.log('📊 Datos de la patente recibidos:', patente);
+      console.log('🔢 Valor de rama:', this.patenteModel.rama);
+      console.log('🔢 Tipo de rama:', typeof this.patenteModel.rama);
+      console.log('✅ Resultado de getRamaNombre:', this.getRamaNombre(this.patenteModel.rama));
         this.inicializarSeleccionesDesdePatente();
       });
     }
@@ -774,11 +796,9 @@ delete(id: number) {
     });
   }
 
-  // Segundo botón: Editar
   edit(id: number) {
     this.isViewMode = false;
     this.cdr.detectChanges();
-
     if (this.useLocalFakeData) {
       const numericId = Number(id);
       const item = this.FAKE_IMPI_DATA_LOCAL.find(x => x.id === numericId);
@@ -810,9 +830,8 @@ delete(id: number) {
       }
     } else {
       this.service.getPatent(id).subscribe((patente: IPatentModel) => {
-        // Mezclar para no perder campos de UI
         this.patenteModel = {...this.patenteModel, ...patente};
-        // Derivar denominación si viene vacío
+          this.convertirNombresAIdsParaEdicion();
         if (!this.patenteModel.denominacion) {
           this.patenteModel.denominacion = this.patenteModel.nombrePatente;
         }
@@ -875,12 +894,13 @@ delete(id: number) {
         nombrePatente: this.patenteModel.denominacion || this.patenteModel.nombrePatente,
         solicitante: this.patenteModel.solicitante,
         fechaSolicitud: this.patenteModel.fechaSolicitud,
+        rama_param: (this.patenteModel as any).ramaIdTemp as any,
         estatus: this.patenteModel.estatus as IPatentModel['estatus'],
         descripcion: this.patenteModel.descripcion || '',
         institucion: this.patenteModel.institucion || '',
         correo: this.patenteModel.correo || '',
         documentos: this.patenteModel.documentos || [],
-        observaciones: this.patenteModel.observaciones || ''
+        observaciones: this.patenteModel.observaciones || '',
       };
 
       this.service.updatePatent(this.patenteModel.id, payload).subscribe({
@@ -909,6 +929,22 @@ delete(id: number) {
       });
     }
   }
+
+ 
+private convertirNombresAIdsParaEdicion(): void {
+  if (this.patenteModel.rama && typeof this.patenteModel.rama === 'string') {
+    const ramaEncontrada = this.ramasCatalogo.find(r => 
+      r.nombre.toLowerCase().trim() === (this.patenteModel.rama as string).toLowerCase().trim()
+    );
+    if (ramaEncontrada) {
+      // Guardar el ID en una propiedad temporal para el select
+      (this.patenteModel as any).ramaIdTemp = ramaEncontrada.id;
+      console.log(`✅ Rama convertida: "${this.patenteModel.rama}" → ID ${ramaEncontrada.id}`);
+    } else {
+      console.warn(`⚠️ No se encontró rama con nombre: "${this.patenteModel.rama}"`);
+    }
+  }
+}
 
   getStatusBadgeClass(status: string): string {
     const statusClasses: { [key: string]: string } = {
@@ -1287,6 +1323,80 @@ delete(id: number) {
 
     return statusIcons[status] || 'document';
   }
+
+  private cargarCatalogos(): void {
+  this.parametrizacionesServices.getAll().subscribe({
+    next: (catalogos: Catalogos) => {
+      console.log('✅ Catálogos completos cargados:', catalogos);
+
+      // 🔹 Cargar Ramas (id_tema = 3)
+      if (catalogos[3]?.lista) {
+        this.ramasCatalogo = catalogos[3].lista.map((r: Parametrizacion) => ({
+          id: r.id_param,
+          nombre: r.nombre
+        }));
+        console.log('✅ Ramas cargadas:', this.ramasCatalogo);
+      }
+
+      // 🔹 Cargar Medios de Ingreso (id_tema = 8)
+      if (catalogos[8]?.lista) {
+        this.mediosIngresoCatalogo = catalogos[8].lista.map((m: Parametrizacion) => ({
+          id: m.id_param,
+          nombre: m.nombre
+        }));
+        console.log('✅ Medios de ingreso cargados:', this.mediosIngresoCatalogo);
+      }
+
+      // 🔹 Cargar Tipos de Sector (id_tema = 2)
+      if (catalogos[2]?.lista) {
+        this.tiposSectorCatalogo = catalogos[2].lista.map((s: Parametrizacion) => ({
+          id: s.id_param,
+          nombre: s.nombre
+        }));
+        console.log('✅ Tipos de sector cargados:', this.tiposSectorCatalogo);
+      }
+
+      // 🔹 Cargar Estatus (id_tema = 5)
+      if (catalogos[5]?.lista) {
+        this.estatusCatalogo = catalogos[5].lista.map((e: Parametrizacion) => ({
+          id: e.id_param,
+          nombre: e.nombre
+        }));
+        console.log('✅ Estatus cargados:', this.estatusCatalogo);
+      }
+    },
+    error: (err) => console.error('❌ Error al cargar catálogos:', err)
+  });
+}
+  
+
+getRamaNombre(ramaId: string | number | undefined): string {
+  if (!ramaId) return 'N/A';
+  const id = typeof ramaId === 'string' ? parseInt(ramaId) : ramaId;
+  const rama = this.ramasCatalogo.find(r => r.id === id);
+  return rama ? rama.nombre : 'N/A';
+}
+
+getMedioIngresoNombre(medioId: string | number | undefined): string {
+  if (!medioId) return 'N/A';
+  const id = typeof medioId === 'string' ? parseInt(medioId) : medioId;
+  const medio = this.mediosIngresoCatalogo.find(m => m.id === id);
+  return medio ? medio.nombre : 'N/A';
+}
+
+getTipoSectorNombre(sectorId: string | number | undefined): string {
+  if (!sectorId) return 'N/A';
+  const id = typeof sectorId === 'string' ? parseInt(sectorId) : sectorId;
+  const sector = this.tiposSectorCatalogo.find(s => s.id === id);
+  return sector ? sector.nombre : 'N/A';
+}
+
+getEstatusNombre(estatusId: string | number | undefined): string {
+  if (!estatusId) return 'N/A';
+  const id = typeof estatusId === 'string' ? parseInt(estatusId) : estatusId;
+  const estatus = this.estatusCatalogo.find(e => e.id === id);
+  return estatus ? estatus.nombre : 'N/A';
+}
 
   ngOnDestroy(): void {
     this.reloadEvent.unsubscribe();
