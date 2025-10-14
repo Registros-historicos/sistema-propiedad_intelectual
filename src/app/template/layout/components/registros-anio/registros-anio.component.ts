@@ -1,5 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, HostListener, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { getCSSVariableValue } from 'src/app/template/kt/_utils';
+import { TablerosService } from 'src/app/api/services/tableros.service';
 
 interface Data {
   category: string;
@@ -12,8 +13,10 @@ interface Data {
   templateUrl: './registros-anio.component.html',
   styleUrl: './registros-anio.component.scss'
 })
-export class RegistrosAnioComponent {
+export class RegistrosAnioComponent implements OnChanges {
   @Input() anios: Data[] = [];
+  // Opcional: año para filtrar desde el backend
+  @Input() year?: number | null;
 
   chartOptions: any;
   today: any;
@@ -21,12 +24,95 @@ export class RegistrosAnioComponent {
   selectedQuarter: string | null = null;
   startDate: string | null = null;
   endDate: string | null = null;
+  loadingPeriod: boolean = false;
+
+  constructor(private tablerosService: TablerosService, private elRef: ElementRef, private cd: ChangeDetectorRef) {}
+
+  // Control del dropdown sin depender de Bootstrap JS
+  showYearMenu = false;
+  // Mostrar versión compacta del control cuando se haga scroll
+  compactYearButton = false;
+
+  toggleYearMenu() {
+    this.showYearMenu = !this.showYearMenu;
+    console.debug('[RegistrosAnio] toggleYearMenu ->', this.showYearMenu);
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (!this.elRef.nativeElement.contains(target)) {
+      this.showYearMenu = false;
+    }
+  }
+
+  // Opciones de años para el dropdown
+  yearOptions: number[] = [];
+  // Última respuesta cruda del backend (para debug en UI)
+  lastResponseRows: any[] = [];
+
+  private buildYearOptions() {
+    const current = new Date().getFullYear();
+    const start = 2020; // año inicial razonable
+    const end = current + 1;
+    this.yearOptions = [];
+    for (let y = end; y >= start; y--) {
+      this.yearOptions.push(y);
+    }
+    // Si no hay year seleccionado, establecer por defecto al actual
+    if (this.year === undefined || this.year === null) {
+      this.year = current;
+    }
+    console.debug('[RegistrosAnio] buildYearOptions -> yearOptions:', this.yearOptions, 'selected year:', this.year);
+  }
+
+  selectYear(y: number, event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    console.debug('[RegistrosAnio] selectYear ->', y);
+    this.year = y;
+    this.showYearMenu = false; // cerrar el menú al seleccionar
+    this.loadRegistrosByMonth();
+  }
+
+  @HostListener('window:scroll', [])
+  onWindowScroll() {
+    const y = window.scrollY || window.pageYOffset;
+    const shouldCompact = y > 80;
+    if (shouldCompact !== this.compactYearButton) {
+      this.compactYearButton = shouldCompact;
+      // opcional: debug
+      console.debug('[RegistrosAnio] onWindowScroll -> compactYearButton =', this.compactYearButton);
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    // Si cambian 'year' o 'anios', recargar la data
+    if (changes['year']) {
+      this.loadRegistrosByMonth();
+    }
+    if (changes['anios'] && (!this.anios || this.anios.length === 0)) {
+      // si el input anios llega vacío, intentamos cargar desde backend
+      this.loadRegistrosByMonth();
+    }
+  }
 
   ngOnInit() {
-    this.initializeChart();
-
     const d = new Date();
     this.today = d.toISOString().split('T')[0];
+
+    // Construir opciones de año para el dropdown
+    this.buildYearOptions();
+
+    // Inicializar chart (se actualizará cuando lleguen datos)
+    this.initializeChart();
+
+    // Intentamos cargar datos desde backend si no hay datos iniciales
+    if (!this.anios || this.anios.length === 0) {
+      this.loadRegistrosByMonth();
+    }
   }
 
   initializeChart() {
@@ -37,11 +123,11 @@ export class RegistrosAnioComponent {
     this.chartOptions = {
       series: [
         {
-          name: 'Registros Tipo A',
+          name: 'IMPI',
           data: series1Data,
         },
         {
-          name: 'Registros Tipo B',
+          name: 'INDAUTOR',
           data: series2Data,
         },
       ],
@@ -115,6 +201,8 @@ export class RegistrosAnioComponent {
         yaxis: { lines: { show: true } },
       },
     }
+    // Forzar actualización visual del chart
+    try { this.cd.detectChanges(); } catch (e) { /* ignore */ }
   }
 
   applyQuarterFilter(event: any) {
@@ -127,13 +215,25 @@ export class RegistrosAnioComponent {
   }
 
   applyDateRange(startEvent: any, endEvent: any) {
-    const start = startEvent.target ? startEvent.target.value : startEvent;
-    const end = endEvent.target ? endEvent.target.value : endEvent;
+    const start = startEvent && startEvent.target ? startEvent.target.value : (startEvent || this.startDate);
+    const end = endEvent && endEvent.target ? endEvent.target.value : (endEvent || this.endDate);
 
-    this.startDate = start;
-    this.endDate = end;
+    this.startDate = start as string | null;
+    this.endDate = end as string | null;
     this.selectedQuarter = null;
-    this.updateChartData();
+    // Si hay rango completo, solicitar datos al endpoint por periodo
+    if (this.startDate && this.endDate) {
+      // Asegurar formato YYYY-MM-DD
+      const inicio = this.startDate;
+      const fin = this.endDate;
+      // Limpiar datos actuales para que el gráfico muestre un estado intermedio
+      this.anios = [];
+      this.loadingPeriod = true;
+      try { this.cd.detectChanges(); } catch (e) { /* ignore */ }
+      this.loadRegistrosByPeriodo(inicio, fin);
+    } else {
+      this.updateChartData();
+    }
   }
 
   resetFilters() {
@@ -175,11 +275,11 @@ export class RegistrosAnioComponent {
       series: [
         {
           name: 'IMPI',
-          data: filteredData.map(s => s.series1),
+          data: filteredData.map(s => s.series1 || 0),
         },
         {
           name: 'INDAUTOR',
-          data: filteredData.map(s => s.series2),
+          data: filteredData.map(s => s.series2 || 0),
         },
       ],
       xaxis: {
@@ -187,5 +287,181 @@ export class RegistrosAnioComponent {
         categories: filteredData.map(s => s.category),
       },
     };
+  }
+
+  // Carga desde el endpoint que devuelve [{mes, total}]
+  loadRegistrosByMonth() {
+    // Si ya tenemos datos locales y no se especificó year, no hacemos petición
+    if (this.anios && this.anios.length === 12 && (this.year === undefined || this.year === null)) {
+      this.initializeChart();
+      return;
+    }
+    const requestedYear = this.year ?? 2025;
+    console.debug('[RegistrosAnio] loadRegistrosByMonth -> requesting year:', requestedYear, 'expected URL: /api/tableros/registros/mes/?anio=' + requestedYear);
+
+    this.tablerosService.getRegistrosPorMes(this.year ?? undefined).subscribe({
+      next: (rows) => {
+        console.debug('[RegistrosAnio] loadRegistrosByMonth -> response rows:', rows);
+        this.lastResponseRows = rows || [];
+        // rows: [{mes: number (1-12?), total: number}]
+        // Normalizar a 12 meses
+        const months: Data[] = [];
+        const monthNames = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+        for (let m = 1; m <= 12; m++) {
+          months.push({ category: monthNames[m - 1], series1: 0, series2: 0 });
+        }
+
+        // Si backend devuelve multiples registros por mes, los asignamos a series1 y series2
+        // Regla: el primer registro de cada mes va a series1; el segundo (y el resto) se suman en series2.
+        const grouped: Record<number, number[]> = {};
+        rows.forEach(r => {
+          const mes = r.mes || 1;
+          if (!grouped[mes]) grouped[mes] = [];
+          grouped[mes].push(r.total);
+        });
+
+        for (let m = 1; m <= 12; m++) {
+          const vals = grouped[m] || [];
+          months[m - 1].series1 = vals.length > 0 ? vals[0] : 0;
+          if (vals.length > 1) {
+            months[m - 1].series2 = vals.slice(1).reduce((a, b) => a + b, 0);
+          } else {
+            months[m - 1].series2 = 0;
+          }
+        }
+
+        console.debug('[RegistrosAnio] loadRegistrosByMonth -> mapped months:', months);
+
+        this.anios = months;
+        this.initializeChart();
+      },
+      error: (err) => {
+        console.error('Error cargando registros por mes', err);
+        this.lastResponseRows = [];
+        // Mantener chart con datos vacíos
+        this.anios = this.anios && this.anios.length ? this.anios : Array.from({ length: 12 }, (_, i) => ({ category: String(i + 1), series1: 0, series2: 0 }));
+        this.initializeChart();
+      }
+    });
+  }
+
+  // Cargar registros desde el endpoint por periodo: devuelve objetos con anio, mes, tipo_registro_param, total
+  loadRegistrosByPeriodo(inicio: string, fin: string) {
+    console.debug('[RegistrosAnio] loadRegistrosByPeriodo -> inicio:', inicio, 'fin:', fin);
+    this.tablerosService.getRegistrosPorPeriodo(inicio, fin).subscribe({
+      next: (rows: any[]) => {
+        console.debug('[RegistrosAnio] loadRegistrosByPeriodo -> response rows:', rows);
+        this.lastResponseRows = rows || [];
+
+  // Normalizar a 12 meses del año (usamos el año de inicio si todos son del mismo año)
+  const monthNames = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+        const months: Data[] = [];
+        for (let m = 1; m <= 12; m++) {
+          months.push({ category: monthNames[m - 1], series1: 0, series2: 0 });
+        }
+
+        // Agrupar por mes y por tipo_registro_param
+        // tipo_registro_param 44 -> series1 (IMPI), 45 -> series2 (INDAUTOR)
+        const grouped: Record<number, { s1: number; s2: number }> = {};
+        rows.forEach(r => {
+          const mes = Number(r.mes) || 1;
+          const tipo = Number(r.tipo_registro_param);
+          const total = Number(r.total) || 0;
+          if (!grouped[mes]) grouped[mes] = { s1: 0, s2: 0 };
+          if (tipo === 44) grouped[mes].s1 += total;
+          else if (tipo === 45) grouped[mes].s2 += total;
+          else {
+            // si hay otros tipos, repartirlos en series2 por seguridad
+            grouped[mes].s2 += total;
+          }
+        });
+
+        for (let m = 1; m <= 12; m++) {
+          const vals = grouped[m];
+          if (vals) {
+            months[m - 1].series1 = vals.s1 || 0;
+            months[m - 1].series2 = vals.s2 || 0;
+          }
+        }
+
+        // Recortar los meses al rango solicitado para mostrar solo el intervalo
+        try {
+          const inicioMes = new Date(inicio).getMonth(); // 0-11
+          const finMes = new Date(fin).getMonth(); // 0-11
+          let sliced: Data[] = [];
+          if (!isNaN(inicioMes) && !isNaN(finMes)) {
+            if (inicioMes <= finMes) {
+              sliced = months.slice(inicioMes, finMes + 1);
+            } else {
+              // Si el rango cruza año (ej. nov - feb), mostrar desde inicio hasta fin del siguiente año
+              sliced = months.slice(inicioMes).concat(months.slice(0, finMes + 1));
+            }
+          } else {
+            sliced = months;
+          }
+        this.anios = sliced;
+        this.initializeChart();
+        try { this.cd.detectChanges(); } catch (e) { /* ignore */ }
+        } catch (e) {
+          // En caso de fallo en el recorte, usar todos los meses
+          this.anios = months;
+          this.initializeChart();
+        }
+  // Construir un rango cronológico de meses entre inicio y fin (incluyendo año)
+        const inicioDate = new Date(inicio);
+        const finDate = new Date(fin);
+
+        // Generar array de { year, month } entre inicioDate y finDate inclusive
+        const monthsRange: { year: number; month: number; label: string }[] = [];
+        try {
+          const cur = new Date(inicioDate.getFullYear(), inicioDate.getMonth(), 1);
+          const end = new Date(finDate.getFullYear(), finDate.getMonth(), 1);
+          while (cur <= end) {
+            const y = cur.getFullYear();
+            const m = cur.getMonth() + 1; // 1-12
+            monthsRange.push({ year: y, month: m, label: `${monthNames[cur.getMonth()]} ${y}` });
+            cur.setMonth(cur.getMonth() + 1);
+          }
+        } catch (e) {
+          // Fallback: si hay error, mostrar meses genéricos
+          for (let m = 1; m <= 12; m++) monthsRange.push({ year: inicioDate.getFullYear(), month: m, label: monthNames[m - 1] + ' ' + inicioDate.getFullYear() });
+        }
+
+        // Agrupar por clave año-mes y sumar por tipo
+        const groupedByYearMonth: Record<string, { s1: number; s2: number }> = {};
+        rows.forEach(r => {
+          const y = Number(r.anio) || new Date(inicio).getFullYear();
+          const mes = Number(r.mes) || 1;
+          const tipo = Number(r.tipo_registro_param);
+          const total = Number(r.total) || 0;
+          const key = `${y}-${mes}`;
+          if (!groupedByYearMonth[key]) groupedByYearMonth[key] = { s1: 0, s2: 0 };
+          if (tipo === 44) groupedByYearMonth[key].s1 += total;
+          else if (tipo === 45) groupedByYearMonth[key].s2 += total;
+          else groupedByYearMonth[key].s2 += total;
+        });
+
+        // Mapear monthsRange al formato requerido por el chart, en orden cronológico
+        const mapped = monthsRange.map(m => {
+          const key = `${m.year}-${m.month}`;
+          const vals = groupedByYearMonth[key] || { s1: 0, s2: 0 };
+          return { category: m.label, series1: vals.s1 || 0, series2: vals.s2 || 0 } as Data;
+        });
+
+        this.anios = mapped;
+        this.initializeChart();
+        try { this.cd.detectChanges(); } catch (e) { /* ignore */ }
+        this.loadingPeriod = false;
+      },
+      error: (err: any) => {
+        console.error('Error cargando registros por periodo', err);
+        this.lastResponseRows = [];
+        // Mantener chart con datos vacíos
+        this.anios = this.anios && this.anios.length ? this.anios : Array.from({ length: 12 }, (_, i) => ({ category: String(i + 1), series1: 0, series2: 0 }));
+        this.initializeChart();
+        this.loadingPeriod = false;
+        try { this.cd.detectChanges(); } catch (e) { /* ignore */ }
+      }
+    });
   }
 }

@@ -54,4 +54,12 @@ export class SidebarMenuComponent implements OnInit {
   }
 
   protected readonly Array = Array;
+
+  // trackBy para evitar claves duplicadas en ngFor
+  trackByMenu(index: number, item: any): any {
+    // Preferir un campo único como link; si no existe, combinar name+index
+    if (item && item.link) return item.link;
+    if (item && item.name) return `${item.name}_${index}`;
+    return index;
+  }
 }

@@ -1,5 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { TablerosService } from 'src/app/api/services/tableros.service';
 import { getCSSVariableValue } from 'src/app/template/kt/_utils';
+
+interface Solicitudes {
+  tipo_registro: string;
+  rama: string;
+  total: number;
+}
 
 @Component({
   selector: 'app-grafica-solicitudes-in',
@@ -8,24 +15,18 @@ import { getCSSVariableValue } from 'src/app/template/kt/_utils';
 })
 export class GraficaSolicitudesInComponent implements OnInit {
 
-  tiposSolicitudes = [
-    { nombre: 'Programa de Computación', total: 130, icono: 'emoji_objects' },
-    { nombre: 'Literaria', total: 100, icono: 'credit_card' },
-    { nombre: 'Reserva de Derechos', total: 40, icono: 'build' },
-    { nombre: 'Artística', total: 60, icono: 'copyright' },
-    { nombre: 'Compilación de Datos', total: 70, icono: 'architecture' },
-  ];
+  tiposSolicitudes: Solicitudes[] = [];
 
   chartOptions: any;
   totalSolicitudes: number = 0;
 
-  ngOnInit(): void {
-    this.totalSolicitudes = this.tiposSolicitudes.reduce(
-      (acc, item) => acc + item.total,
-      0
-    );
+  constructor(
+    private tablerosService: TablerosService,
+    private cdRef: ChangeDetectorRef
+  ) {}
 
-    this.chartOptions = this.getChartOptions(350);
+  ngOnInit(): void {
+    this.loadTotalINDAUTORApplications()
   }
 
   getChartOptions(height: number) {
@@ -39,7 +40,7 @@ export class GraficaSolicitudesInComponent implements OnInit {
     ];
 
     const pieData = this.tiposSolicitudes.map(item => item.total);
-    const pieLabels = this.tiposSolicitudes.map(item => item.nombre);
+    const pieLabels = this.tiposSolicitudes.map(item => item.rama);
 
     return {
       series: pieData,
@@ -67,7 +68,7 @@ export class GraficaSolicitudesInComponent implements OnInit {
           useSeriesColors: false
         },
         formatter: (seriesName: string, opts: any) => {
-          return this.tiposSolicitudes[opts.seriesIndex].nombre;
+          return this.tiposSolicitudes[opts.seriesIndex].rama;
         },
         itemMargin: { horizontal: 10, vertical: 5 }
       },
@@ -118,7 +119,7 @@ export class GraficaSolicitudesInComponent implements OnInit {
           formatter: (val: number) => `${val} solicitudes`,
           title: {
             formatter: (seriesName: any, { seriesIndex }: any) => {
-              return this.tiposSolicitudes[seriesIndex].nombre;
+              return this.tiposSolicitudes[seriesIndex].rama;
             }
           }
         }
@@ -129,5 +130,20 @@ export class GraficaSolicitudesInComponent implements OnInit {
         }
       }
     };
+  }
+
+  private loadTotalINDAUTORApplications(): void {
+    this.tablerosService.getTotalINDAUTORApplications().subscribe({
+      next: (data) => {
+        this.tiposSolicitudes = data;
+        this.totalSolicitudes = this.tiposSolicitudes
+          .reduce((acc, item) => acc + (item.total ?? 0), 0);
+        this.chartOptions = this.getChartOptions(350);
+        this.cdRef.detectChanges();
+      },
+      error: (error: any) => {
+        console.error('ERROR:', error);
+      }
+    });
   }
 }
