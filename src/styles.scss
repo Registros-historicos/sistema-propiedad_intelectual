@@ -10,3 +10,14 @@
 @import "./assets/plugins/keenicons/duotone/style.css";
 @import "./assets/plugins/keenicons/outline/style.css";
 @import "./assets/plugins/keenicons/solid/style.css";
+
+/* Material Symbols Outlined global helper */
+.material-symbols-outlined {
+	font-family: 'Material Symbols Outlined';
+	font-variation-settings:
+		'FILL' 0,
+		'wght' 400,
+		'GRAD' 0,
+		'opsz' 24;
+	font-size: 24px;
+}
