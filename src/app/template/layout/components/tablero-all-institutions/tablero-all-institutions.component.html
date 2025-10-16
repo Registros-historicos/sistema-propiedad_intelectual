@@ -9,14 +9,10 @@
       </span>
     </h3>
     <div class="card-toolbar">
-      <span class="px-2 text-muted fw-bold fs-7">
-        Total:
-        <span class="font-weight-bold">{{ totalRegistros | number }}</span>
-      </span>
-
       <!-- begin::Button-->
       <div
-        class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary tooltip-css">
+        class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary tooltip-css"
+      >
         <mat-icon style="color: #1d6f42">description</mat-icon>
         <span class="tooltip-text" translate="BUTTON.EXPORT_EXCEL"></span>
       </div>
@@ -43,20 +39,20 @@
     </div>
 
     <!-- Data Table -->
-    <div *ngIf="!loading && !error" class="table-responsive" style="max-height: 400px; overflow-y: auto">
+    <div
+      *ngIf="!loading && !error"
+      class="table-responsive"
+      style="max-height: 400px; overflow-y: auto"
+    >
       <table class="table align-middle gs-0 gy-5">
-        <thead>
-          <tr>
-            <!--<th class="p-0 min-w-300px">Institución</th>-->
-            <!--<th class="p-0 min-w-150px text-end">Registros</th>-->
-          </tr>
-        </thead>
+        <thead></thead>
         <tbody>
-          <tr *ngFor="let d of data">
+          <tr *ngFor="let institute of data; trackBy: trackByInstitutionId">
             <td>
               <div class="d-flex align-items-center">
                 <div
-                  class="symbol symbol-45px me-5 d-flex justify-content-center align-items-center px-2">
+                  class="symbol symbol-45px me-5 d-flex justify-content-center align-items-center px-2"
+                >
                   <mat-icon
                     style="
                       font-size: 25px;
@@ -64,29 +60,33 @@
                       width: 40px;
                       color: rgb(1, 8, 49);
                     "
-                    >business</mat-icon>
+                    >business</mat-icon
+                  >
                 </div>
                 <div class="d-flex justify-content-start flex-column">
                   <h4 class="text-gray-900 fw-bolder fs-6 mb-1">
-                    {{ d.institucion_nombre }}
+                    {{ institute.institucion_nombre }}
                   </h4>
                   <span class="text-muted fw-bold fs-7">
-                    {{ tipoInstitucion === 122 ? 'Descentralizado' : tipoInstitucion === 123 ? 'Federal' : 'Sin Tipo' }}
+                    {{ institute.tipo_institucion }}
                   </span>
                 </div>
               </div>
             </td>
             <td class="text-end">
               <span class="badge badge-light-primary fw-bold fs-7">
-                {{ d.total }} registros
+                {{ institute.total }} registros
               </span>
             </td>
           </tr>
         </tbody>
       </table>
-      
+
       <!-- Empty State -->
-      <div *ngIf="data.length === 0 && !loading && !error" class="text-center py-5">
+      <div
+        *ngIf="data.length === 0 && !loading && !error"
+        class="text-center py-5"
+      >
         <p class="text-muted">No se encontraron instituciones</p>
       </div>
     </div>

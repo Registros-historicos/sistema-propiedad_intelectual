@@ -25,6 +25,19 @@ export interface CategoriaInvestigador {
   total: number;
 }
 
+export interface Institutions {
+  id_institucion: number
+  institucion_nombre: string
+  total: number
+  tipo_institucion: string
+}
+
+interface Institute {
+  id_institucion: number;
+  institucion_nombre: string;
+  total: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -76,6 +89,35 @@ export class TablerosService {
     );
   }
 
+  //Get all institutions
+   getAllInstitutions(): Observable<Institutions[]> {
+    return this.http.get<any[]>('/api/tableros/instituciones/all/').pipe(
+      map(data => this.normalizeInstitutionsData(data)),
+      catchError(error => {
+        console.error('Error in getAllInstitutions:', error);
+        return of([]);
+      })
+    );
+  }
+
+  private normalizeInstitutionsData(data: Institutions[]): Institutions[] {
+    if (!Array.isArray(data)) return [];
+    return data.map(item => ({
+      id_institucion: item.id_institucion,
+      institucion_nombre: item.institucion_nombre || 'Sin nombre',
+      total: item.total || 0,
+      tipo_institucion: this.getTypeInstitutions(item.tipo_institucion) || 'Sin tipo'
+    }));
+  }
+
+  private getTypeInstitutions(type: string): string {
+    switch(type) {
+      case "INSTITUTO TECNOLOGICO DESCENTRALIZADO": return 'Descentralizado';
+      case "INSTITUTO TECNOLOGICO FEDERAL": return 'Federal';
+      default: return 'Sin tipo';
+    }
+  }
+
   // NUEVOS MÉTODOS PARA INSTITUCIONES
   getInstitucionesAll(): Observable<Instituto[]> {
     return this.http.get<any[]>('/api/tableros/instituciones/all/').pipe(
@@ -103,6 +145,20 @@ export class TablerosService {
         return of([]);
       })
     );
+  }
+
+  getNewInstitucionesFiltradas(tipoInstitucion: number): Observable<Institute[]> {
+    if (tipoInstitucion !== 122 && tipoInstitucion !== 123) {
+      return of<Institute[]>([]);
+    }
+
+    const params = new HttpParams().set('tipo_institucion', String(tipoInstitucion));
+
+    return this.http.get<any[]>('/api/tableros/instituciones/filtradas', { params }).pipe(
+      catchError(error => {
+        return of<Institute[]>([]);
+      })
+    )
   }
 
   // Método para obtener registros por mes (tablero de registros por año)
