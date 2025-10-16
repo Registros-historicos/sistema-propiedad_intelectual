@@ -15,34 +15,12 @@
     </div>
     <!-- end::Header -->
     <!-- begin::Body -->
-    <div class="card-body h-100">
-                <!-- NUEVO: Estado de carga -->
-        <div *ngIf="isLoading" class="text-center py-5">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Cargando...</span>
-            </div>
-            <p class="text-muted mt-2">Cargando datos de género...</p>
-        </div>
-
-        <!-- NUEVO: Estado de error -->
-        <div *ngIf="hasError && !isLoading" class="text-center py-5">
-            <div class="alert alert-danger d-inline-block">
-                <p>Error al cargar los datos</p>
-                <button class="btn btn-sm btn-primary mt-2" (click)="retryLoad()">
-                    Reintentar
-                </button>
-            </div>
-        </div>
-                <!-- NUEVO: Estado sin datos -->
-        <div *ngIf="!isLoading && !hasError && (!isChartReady || !chartOptions?.series?.length)" class="text-center py-5">
-            <p class="text-muted">No hay datos disponibles</p>
-        </div>
+    <div class="card-body h-100 p-0"> <!-- Se agregó p0 -->
         <!-- begin::PieCharts -->
         <!-- <div #chartRef id="kt_charts_widget_1_chart"
             style="max-height:350px;">-->
-            <!-- MODIFICADO: Gráfico con condiciones de visibilidad -->
-             <div *ngIf="isChartReady && chartOptions?.series?.length && !isLoading && !hasError" 
-             #chartRef id="kt_charts_widget_1_chart" style="max-height:350px;">
+        <div class="chart-responsive-container" 
+             style="width: 100%; height: 100%; min-height: 350px; padding: 1rem;">
             <apx-chart 
                 [series]="chartOptions?.series || []" 
                 [chart]="chartOptions?.chart || { type: 'donut', height: 350 }" 
