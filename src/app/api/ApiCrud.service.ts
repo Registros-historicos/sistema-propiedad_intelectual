@@ -128,6 +128,7 @@ export class ApiCrudService {
     return this.http.put(url,body, reqOpts);
   }
 
+
   /**
    * Allows user to perform DELETE request using HttpClient, you can add custom request options if it's necessary
    * @param {string} url
@@ -156,4 +157,24 @@ export class ApiCrudService {
 
     return this.http.delete(url, reqOpts);
   }
+
+  patch<T>(url: string, body?: any, params?: any, reqOpts?: any) {
+    !reqOpts ? reqOpts = {} : null;
+
+    if (params) {
+      reqOpts.params = new HttpParams();
+      for (const item of params) {
+        for (const k in item) {
+          reqOpts.params = reqOpts.params.append(k, item[k]);
+        }
+      }
+    }
+
+    if (reqOpts && !reqOpts.headers) {
+      reqOpts.headers = this.requiredOptions().headers;
+    }
+
+    return this.http.patch<T>(url, body ?? {}, reqOpts);
+  }
+
 }
