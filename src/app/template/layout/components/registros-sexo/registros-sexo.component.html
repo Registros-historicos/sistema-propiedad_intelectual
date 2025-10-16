@@ -15,10 +15,12 @@
     </div>
     <!-- end::Header -->
     <!-- begin::Body -->
-    <div class="card-body h-100">
+    <div class="card-body h-100 p-0"> <!-- Se agregó p0 -->
         <!-- begin::PieCharts -->
-        <div #chartRef id="kt_charts_widget_1_chart"
-            style="max-height:350px;">
+        <!-- <div #chartRef id="kt_charts_widget_1_chart"
+            style="max-height:350px;">-->
+        <div class="chart-responsive-container" 
+             style="width: 100%; height: 100%; min-height: 350px; padding: 1rem;">
             <apx-chart 
                 [series]="chartOptions?.series || []" 
                 [chart]="chartOptions?.chart || { type: 'donut', height: 350 }" 
