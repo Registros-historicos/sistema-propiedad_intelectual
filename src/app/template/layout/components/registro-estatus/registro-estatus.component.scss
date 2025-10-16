@@ -1,37 +1,56 @@
+/* ===== Tooltip ===== */
 .tooltip-css {
   position: relative;
-  display: inline-block;
-}
-.tooltip-css .tooltip-text {
-  visibility: hidden;
-  opacity: 0;
-  transition: opacity .15s ease, transform .15s ease;
-  position: absolute;
-  bottom: 125%;
-  left: 50%;
-  transform: translateX(-50%) translateY(6px);
-  padding: 6px 10px;
-  white-space: nowrap;
-  border-radius: 4px;
-  background: #212121;
-  color: #fff;
-  font-size: 12px;
-  z-index: 1000;
-}
-.tooltip-css:hover .tooltip-text,
-.tooltip-css:focus .tooltip-text {
-  visibility: visible;
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .tooltip-text {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity .15s ease, transform .15s ease;
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%) translateY(6px);
+    padding: 6px 10px;
+    white-space: nowrap;
+    border-radius: 4px;
+    background: #212121;
+    color: #fff;
+    font-size: 12px;
+    z-index: 1000;
+  }
+
+  &:hover .tooltip-text,
+  &:focus .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
-/* IMPORTANTÍSIMO: no estrangular el canvas de Apex */
-#records_status_chart .apexcharts-canvas {
-  width: 100%;
-  max-width: none;
+/* ===== Contenedor del chart =====
+   - Altura mínima clara para que Apex pueda calcular el canvas
+   - Flex centrado
+*/
+.chart-container {
+  min-height: 420px;         /* 👈 coherente con chart.height */
 }
 
-/* (Opcional) si el card puede ser estrecho, permite que el donut respire */
-#records_status_chart {
-  min-height: 350px;
+/* NO limites el canvas a 480px: permite ocupar el ancho disponible */
+#kt_charts_widget_1_chart .apexcharts-canvas {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Si la leyenda derecha crece mucho, dale scroll (sin empujar el pie) */
+.apexcharts-legend {
+  max-height: 360px;         /* ajusta a tu card */
+  overflow: auto;
+}
+
+/* Ajustes visuales suaves */
+.apexcharts-legend-text {
+  line-height: 1.2;
 }

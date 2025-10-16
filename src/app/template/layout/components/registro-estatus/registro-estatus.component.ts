@@ -1,8 +1,8 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ViewChild } from '@angular/core';
+import { ChartComponent } from 'ng-apexcharts';
 import { TablerosService } from 'src/app/api/services/tableros.service';
-import { getCSSVariableValue } from 'src/app/template/kt/_utils';
 
-interface RegistroEstatusRow {
+interface IRegisterStatus {
   estatus: string;
   total: number;
 }
@@ -10,133 +10,111 @@ interface RegistroEstatusRow {
 @Component({
   selector: 'app-registro-estatus',
   templateUrl: './registro-estatus.component.html',
-  styleUrls: ['./registro-estatus.component.scss']
+  styleUrls: ['./registro-estatus.component.scss'] // 👈 plural para que cargue el SCSS
 })
-export class RegistroEstatusComponent implements OnInit {
+export class RegistroEstatusComponent implements AfterViewInit {
+  @ViewChild('chart') chart?: ChartComponent;
 
-  data: RegistroEstatusRow[] = [];
-  chartOptions: any;
-  totalRegistros = 0;
+  data: IRegisterStatus[] = [];
+  chartOptions: any = {};
+  isLoaded = false;
+
+  private readonly colors = [
+    '#008FFB','#00E396','#FEB019','#FF4560',
+    '#775DD0','#3F51B5','#546E7A','#D4526E','#8D5B4C'
+  ];
 
   constructor(
     private tablerosService: TablerosService,
     private cdRef: ChangeDetectorRef
   ) {}
 
-  ngOnInit(): void {
-    this.loadRegisterStatus();
-  }
-
-  private getChartOptions(height: number) {
-    const labelColor = getCSSVariableValue('--bs-gray-500');
-    const seriesColors = [
-      getCSSVariableValue('--bs-primary'),
-      getCSSVariableValue('--bs-success'),
-      getCSSVariableValue('--bs-warning'),
-      getCSSVariableValue('--bs-danger'),
-      getCSSVariableValue('--bs-info'),
-      getCSSVariableValue('--bs-dark'),
-      getCSSVariableValue('--bs-purple'),
-      getCSSVariableValue('--bs-teal'),
-      getCSSVariableValue('--bs-pink'),
-    ];
-
-    const series = this.data.map(d => Number(d.total) || 0);
-    const labels = this.data.map(d => d.estatus ?? '');
-
-    return {
-      series,
-      chart: {
-        type: 'donut',          // donut como el ejemplo que sí funciona
-        height: height,
-        toolbar: { show: false }
-      },
-      labels,
-      colors: seriesColors,
-      dataLabels: {
-        enabled: true,
-        style: {
-          fontSize: '12px',
-          fontWeight: 'bold',
-        },
-        dropShadow: { enabled: false }
-      },
-      legend: {
-        position: 'bottom',
-        horizontalAlign: 'center',
-        fontSize: '12px',
-        labels: {
-          colors: labelColor,
-          useSeriesColors: false
-        },
-        itemMargin: { horizontal: 10, vertical: 5 }
-      },
-      stroke: {
-        show: true,
-        width: 2,
-        colors: ['transparent']
-      },
-      plotOptions: {
-        pie: {
-          donut: {
-            labels: {
-              show: true,
-              name: {
-                show: true,
-                fontSize: '16px',
-                fontWeight: 'bold',
-                color: labelColor,
-                formatter: () => 'Total'
-              },
-              value: {
-                show: true,
-                fontSize: '24px',
-                fontWeight: 'bold',
-                color: labelColor,
-                formatter: () => this.totalRegistros.toString()
-              },
-              total: {
-                show: true,
-                showAlways: true,
-                label: 'Total',
-                color: labelColor,
-                formatter: () => this.totalRegistros.toString()
-              }
-            }
-          }
-        }
-      },
-      tooltip: {
-        style: { fontSize: '12px' },
-        y: {
-          formatter: (val: number) => `${val} registros`,
-          title: {
-            formatter: (seriesName: any, { seriesIndex }: any) => labels[seriesIndex] ?? ''
-          }
-        }
-      },
-      states: {
-        hover: { filter: { type: 'darken', value: 0.1 } }
-      }
-    };
+  // 👇 Esperamos a que exista el DOM con tamaño real
+  ngAfterViewInit(): void {
+    setTimeout(() => this.loadRegisterStatus(), 0);
   }
 
   private loadRegisterStatus(): void {
     this.tablerosService.getRegisterStatus().subscribe({
       next: (data) => {
-        // normaliza datos
-        this.data = Array.isArray(data)
-          ? data.map(d => ({ estatus: d.estatus, total: Number(d.total) || 0 }))
-          : [];
-
-        this.totalRegistros = this.data.reduce((a, b) => a + b.total, 0);
-
-        // mismo patrón que tu ejemplo: altura por contenedor
-        this.chartOptions = this.getChartOptions(350);
-
+        this.data = (data || []).filter(x => x && x.estatus != null);
+        this.buildChart();
+        this.isLoaded = true;
         this.cdRef.detectChanges();
       },
       error: (err) => console.error('ERROR:', err)
     });
+  }
+
+  private buildChart(): void {
+    const labels = this.data.map(s => s.estatus);
+    const series = this.data.map(s => Number(s.total) || 0);
+
+    this.chartOptions = {
+      series,
+      labels,
+      colors: this.colors,
+      chart: {
+        id: 'registro-estatus',
+        type: 'pie',
+        height: 420,                 // 👈 alto suficiente y estable
+        toolbar: { show: false },
+        animations: {
+          enabled: true,
+          speed: 500,
+          dynamicAnimation: { enabled: false } // 👈 evita recalculados pesados
+        },
+        foreColor: '#3f4254'
+      },
+      legend: {
+        show: true,
+        position: 'right',           // 👈 a la derecha por defecto
+        horizontalAlign: 'left',
+        fontSize: '13px',
+        markers: { width: 10, height: 10, radius: 12 },
+        itemMargin: { vertical: 4, horizontal: 8 }
+      },
+      dataLabels: {
+        enabled: true,
+        style: { fontSize: '13px', fontWeight: 'bold' }
+      },
+      states: {                       // 👈 hover visible sin “parpadeo”
+        hover: { filter: { type: 'lighten', value: 0.08 } },
+        active: { filter: { type: 'none' } }
+      },
+      stroke: { show: false },
+      plotOptions: {
+        pie: {
+          expandOnClick: true,        // hover/click nativo
+          dataLabels: { offset: 0 },
+          customScale: 0.96            // un poco más grande sin chocar con la leyenda
+        }
+      },
+      tooltip: { enabled: true },
+      responsive: [
+        {
+          // 👇 en < 1400px baja la leyenda para no romper el layout
+          breakpoint: 1400,
+          options: {
+            legend: {
+              position: 'bottom',
+              horizontalAlign: 'center',
+              fontSize: '12px'
+            },
+            chart: { height: 380 },
+            dataLabels: { style: { fontSize: '12px' } },
+            plotOptions: { pie: { customScale: 0.98 } }
+          }
+        },
+        {
+          breakpoint: 992,
+          options: {
+            chart: { height: 340 },
+            dataLabels: { style: { fontSize: '11px' } },
+            plotOptions: { pie: { customScale: 1.0 } }
+          }
+        }
+      ]
+    };
   }
 }
