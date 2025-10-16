@@ -26,31 +26,72 @@ export class ParametrizacionesService {
 
   constructor(private http: HttpClient) {}
 
+    private readonly ESTATUS_FALLBACK: { [id: number]: string } = {
+    1: 'Registrada',
+    2: 'En trámite',
+    3: 'Trámite con observaciones',
+    4: 'Aprobada',
+    5: 'Concluida',
+    26: 'Confirmada',
+    27: 'Pendiente',
+    28: 'Con Observaciones',
+    29: 'Rechazada',
+    30: 'Finalizada',
+    31: 'Cancelada',
+    32: 'En pausa',
+    33: 'En espera de validación',
+    34: 'Notificada al Tecnológico'
+  };
+
+
   /**
    * 🔹 Obtiene y agrupa todas las parametrizaciones en memoria.
    * Solo se ejecuta una vez y se cachea en memoria.
    * Ejemplo:
    * this.paramService.getAll().subscribe(cats => this.catalogos = cats);
    */
+
   getAll(): Observable<Catalogos> {
     if (!this.cache$) {
       this.cache$ = this.http.get<Parametrizacion[]>(this.apiUrl).pipe(
         map((rows) => {
+          console.log('📥 Parametrizaciones recibidas:', rows.length);
+          
           const grouped: Catalogos = {};
+
           for (const r of rows) {
-            if (!grouped[r.id_tema]) {
-              grouped[r.id_tema] = { lista: [], mapa: {} };
+            let tema = r.id_tema;
+
+            // 🔥 Asignar tema 7 a todos los estatus que vienen con id_tema null
+            if (!tema) {
+              const nombresEstatus = [
+                'Cancelada', 'Confirmada', 'Con Observaciones', 'En espera de validación',
+                'En pausa', 'Finalizada', 'Notificada al Tecnológico', 'Pendiente', 'Rechazada'
+              ];
+              if (nombresEstatus.includes(r.nombre)) {
+                tema = 7;
+              }
             }
-            grouped[r.id_tema].lista.push(r);
-            grouped[r.id_tema].mapa[r.id_param] = r;
+
+            if (tema && !grouped[tema]) {
+              grouped[tema] = { lista: [], mapa: {} };
+            }
+
+            if (tema) {
+              grouped[tema].lista.push(r);
+              grouped[tema].mapa[r.id_param] = r;
+            }
           }
+
+          console.log('📋 Catálogo tema 7 (estatus):', grouped[7]?.lista);
           return grouped;
         }),
-        shareReplay(1) // cachea resultado para no volver a llamar al backend
+        shareReplay(1)
       );
     }
     return this.cache$;
   }
+
 
   /** 🔹 Devuelve el objeto completo del catálogo por su id y tema */
   getObjeto(catalogos: Catalogos, idTema: number, idParam: number): Parametrizacion | null {
@@ -62,22 +103,44 @@ export class ParametrizacionesService {
     return catalogos[idTema]?.mapa[idParam]?.nombre ?? '';
   }
 
-  /** 🔹 Convierte los campos *_param de un registro a objetos del catálogo */
-  convertirRegistroConObjetos(registro: any, catalogos: Catalogos): any {
+convertirRegistroConObjetos(registro: any, catalogos: Catalogos): any {
     const result = { ...registro };
+
     Object.keys(result).forEach((key) => {
       if (key.endsWith('_param') || key === 'institucion') {
         const id = result[key];
         const tema = this.getTemaPorCampo(key);
-        if (tema && id) {
-          result[key] = this.getObjeto(catalogos, tema, id);
+
+        if (tema && id && !isNaN(Number(id))) {
+          const idNum = Number(id);
+          const objeto = this.getObjeto(catalogos, tema, idNum);
+
+          if (objeto) {
+            result[key] = objeto;
+            console.log('✅ Convertido:', key, '→', objeto.nombre);
+          } else {
+            // 🔥 USAR FALLBACK SI NO SE ENCUENTRA EN CATÁLOGOS
+            if (key === 'estatus_param' && this.ESTATUS_FALLBACK[idNum]) {
+              result[key] = {
+                id_param: idNum,
+                nombre: this.ESTATUS_FALLBACK[idNum],
+                id_tema: tema,
+                id_param_padre: null
+              };
+              console.warn('⚠️ Usando fallback para estatus:', this.ESTATUS_FALLBACK[idNum]);
+            } else {
+              console.warn('❌ No encontrado:', key, 'id:', idNum, 'tema:', tema);
+            }
+          }
         }
       }
     });
+
     return result;
   }
 
-  /** 🔹 Convierte los objetos *_param en IDs antes de hacer PUT o POST */
+
+
   prepararPayload(data: any): any {
     const result: any = {};
     Object.entries(data).forEach(([key, value]) => {
@@ -95,7 +158,7 @@ export class ParametrizacionesService {
     const mapa: Record<string, number> = {
       tipo_ingreso_param: 9,
       rama_param: 3,
-      estatus_param: 5,
+      estatus_param: 7,
       medio_ingreso_param: 8,
       tipo_registro_param: 3,
       tipo_sector_param: 2,
