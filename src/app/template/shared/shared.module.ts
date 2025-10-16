@@ -30,6 +30,7 @@ import { GraficaSolicitudesInComponent } from '../layout/components/grafica-soli
 import { DepartamentosComponent } from '../layout/components/departamentos/departamentos.component';
 import { InvestigadoresComponent } from '../layout/components/investigadores/investigadores.component';
 import { ProgramasEducativosComponent } from '../layout/components/programas-educativos/programas-educativos.component';
+import { TableroAllInstitutionsComponent } from '../layout/components/tablero-all-institutions/tablero-all-institutions.component';
 
 @NgModule({
   declarations: [
@@ -51,7 +52,8 @@ import { ProgramasEducativosComponent } from '../layout/components/programas-edu
     GraficaSolicitudesInComponent,
     DepartamentosComponent,
     InvestigadoresComponent,
-    ProgramasEducativosComponent
+    ProgramasEducativosComponent,
+    TableroAllInstitutionsComponent
     ],
   imports: [
     CommonModule,
@@ -87,7 +89,8 @@ import { ProgramasEducativosComponent } from '../layout/components/programas-edu
     GraficaSolicitudesInComponent,
     DepartamentosComponent,
     InvestigadoresComponent,
-    ProgramasEducativosComponent
+    ProgramasEducativosComponent,
+    TableroAllInstitutionsComponent
   ]
 })
 export class SharedModule {

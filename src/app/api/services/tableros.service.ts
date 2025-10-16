@@ -25,6 +25,13 @@ export interface CategoriaInvestigador {
   total: number;
 }
 
+export interface Institutions {
+  id_institucion: number
+  institucion_nombre: string
+  total: number
+  tipo_institucion: string
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -74,6 +81,35 @@ export class TablerosService {
         return of([]);
       })
     );
+  }
+
+  //Get all institutions
+   getAllInstitutions(): Observable<Institutions[]> {
+    return this.http.get<any[]>('/api/tableros/instituciones/all/').pipe(
+      map(data => this.normalizeInstitutionsData(data)),
+      catchError(error => {
+        console.error('Error in getAllInstitutions:', error);
+        return of([]);
+      })
+    );
+  }
+
+  private normalizeInstitutionsData(data: Institutions[]): Institutions[] {
+    if (!Array.isArray(data)) return [];
+    return data.map(item => ({
+      id_institucion: item.id_institucion,
+      institucion_nombre: item.institucion_nombre || 'Sin nombre',
+      total: item.total || 0,
+      tipo_institucion: this.getTypeInstitutions(item.tipo_institucion) || 'Sin tipo'
+    }));
+  }
+
+  private getTypeInstitutions(type: string): string {
+    switch(type) {
+      case "INSTITUTO TECNOLOGICO DESCENTRALIZADO": return 'Descentralizado';
+      case "INSTITUTO TECNOLOGICO FEDERAL": return 'Federal';
+      default: return 'Sin tipo';
+    }
   }
 
   // NUEVOS MÉTODOS PARA INSTITUCIONES
