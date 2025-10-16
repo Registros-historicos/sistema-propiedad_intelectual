@@ -1,10 +1,7 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; 
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { of } from 'rxjs';
 import { getCSSVariableValue } from 'src/app/template/kt/_utils';
-import { forkJoin, of } from 'rxjs';
-import { ImpiRegistriesService } from 'src/app/api/services/impi.service';
-import { IndautorRegistriesService } from 'src/app/api/services/indautor.service';
-//import { CardItem } from 'src/app/template/layout/components/tablero-instituciones-federales/tablero-instituciones-federales.component';
-import { TablerosService, CategoriaInvestigador } from 'src/app/api/services/tableros.service';
+import { CategoriaInvestigador, TablerosService, Top10Instituciones } from 'src/app/api/services/tableros.service';
 
 // INTERFAZ
 export interface CardItem {
@@ -34,6 +31,7 @@ interface Instituto {
 export class AdminDashboardComponent implements OnInit {
   dataFederalInstitutes: Instituto[] = []
   dataDecentralizedInstitutes: Instituto[] = []
+  dataTop10Institutions: Top10Instituciones[] = [];
 
   chartOptions: any;
   chartOptionsGraph2: any;
@@ -49,41 +47,6 @@ export class AdminDashboardComponent implements OnInit {
 
   categorias: { categoria: string; value: number }[] = [];
 
-  protected readonly solicitudes = [
-    { categoria: 'Marcas', value: 712 },
-    { categoria: 'Modelo de Utilidad', value: 250 },
-    { categoria: 'Patente', value: 630 },
-    { categoria: 'Programas de Computación', value: 300 },
-    { categoria: 'Literaria', value: 280 },
-  ];
-
-  protected readonly gender = [
-    {
-      label: "Hombre",
-      serie: 47
-    },
-    {
-      label: "Mujer",
-      serie: 55
-    },
-  ]
-
-  protected readonly anios = [
-    { category: "Enero", series1: 120, series2: 80 },
-    { category: "Febrero", series1: 90, series2: 110 },
-    { category: "Marzo", series1: 60, series2: 95 },
-    { category: "Abril", series1: 120, series2: 75 },
-    { category: "Mayo", series1: 90, series2: 130 },
-    { category: "Junio", series1: 60, series2: 85 },
-    { category: "Julio", series1: 120, series2: 100 },
-    { category: "Agosto", series1: 90, series2: 115 },
-    { category: "Septiembre", series1: 60, series2: 70 },
-    { category: "Octubre", series1: 120, series2: 140 },
-    { category: "Noviembre", series1: 90, series2: 95 },
-    { category: "Diciembre", series1: 60, series2: 105 },
-  ];
-
-  protected readonly status = []
 
   constructor(
     private tablerosService: TablerosService,
@@ -92,6 +55,7 @@ export class AdminDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadTopEntities();
+    this.loadTop10Institutions();
     this.tablerosService.getCategoriasInvestigadores().subscribe({
       next: (resp: CategoriaInvestigador[]) => {
         this.categorias = (resp || []).map(it => ({
@@ -111,6 +75,7 @@ export class AdminDashboardComponent implements OnInit {
     
     this.loadRegisterInstitutes(123)
     this.loadRegisterInstitutes(122)
+
 
   }
 
@@ -132,6 +97,18 @@ private loadTopEntities(): void {
     }
   });
 }
+  private loadTop10Institutions(): void {
+  this.tablerosService.getTopInstitutions().subscribe({
+    next: (data) => {
+      this.dataTop10Institutions = data;
+      this.cdRef.detectChanges();
+    },
+    error: (error) => {
+      console.error('ERROR cargando top instituciones:', error);
+    },
+  });
+}
+
 
   private initGraphs(): void {
     const solicitudesData = this.getSimulatedData();
