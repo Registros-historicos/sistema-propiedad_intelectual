@@ -1,11 +1,36 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { TablerosService, Top10Instituciones } from 'src/app/api/services/tableros.service';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit{
+
+  dataTop10Institutions: Top10Instituciones[] = [];
+
+  constructor(
+      private tablerosService: TablerosService,
+      private cdRef: ChangeDetectorRef
+    ) {}
+
+  ngOnInit(): void {
+    this.loadTop10Institutions();
+  }
+
+  private loadTop10Institutions(): void {
+  this.tablerosService.getTopInstitutions().subscribe({
+    next: (data) => {
+      this.dataTop10Institutions = data;
+      this.cdRef.detectChanges();
+    },
+    error: (error) => {
+      console.error('ERROR cargando top instituciones:', error);
+    },
+   });
+  }
+
   protected readonly institutosFederales = [
     {
       tipo_institucion_param: 4,

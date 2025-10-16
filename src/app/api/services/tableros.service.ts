@@ -37,6 +37,11 @@ interface Institute {
   institucion_nombre: string;
   total: number;
 }
+export interface Top10Instituciones {
+  id_institucion: number
+  institucion_nombre: string
+  total: number
+}
 
 @Injectable({
   providedIn: 'root'
@@ -44,10 +49,9 @@ interface Institute {
 export class TablerosService {
   constructor(private http: HttpClient) {}
 
-  getTopEntities(): Observable<any[]> {
-    return this.http.get<any[]>('/api/tableros/entidades/top10').pipe(
+  getTopEntities(): Observable<Top10Instituciones[]> {
+    return this.http.get<Top10Instituciones[]>('/api/tableros/entidades/top10').pipe(
       catchError(error => {
-        console.error('Error en getTopEntities:', error);
         return of([]);
       })
     );

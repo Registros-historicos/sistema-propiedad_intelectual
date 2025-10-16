@@ -3,14 +3,12 @@
   <!-- Tablero de Institutos Tecnológicos Federales -->
   <div class="col-xl-6">
     <!-- Componente de Tabla o Gráfico -->
-<app-tablero-instituciones-federales></app-tablero-instituciones-federales>
+    <app-tablero-top10-instituciones [instituciones]="dataTop10Institutions"></app-tablero-top10-instituciones> 
   </div>
 
   <!-- Tablero de Institutos Tecnológicos Descentralizados -->
   <div class="col-xl-6">
-    <!-- Componente de Tabla o Gráfico -->
-<app-tecnologicos-descentralizados></app-tecnologicos-descentralizados>
-    <!-- end::Table -->
+    <app-tablero-all-institutions titulo="Todas las Instituciones"></app-tablero-all-institutions>
   </div>
 </div>
 
