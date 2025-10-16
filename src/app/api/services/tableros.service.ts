@@ -32,6 +32,12 @@ export interface Institutions {
   tipo_institucion: string
 }
 
+interface Institute {
+  id_institucion: number;
+  institucion_nombre: string;
+  total: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -139,6 +145,20 @@ export class TablerosService {
         return of([]);
       })
     );
+  }
+
+  getNewInstitucionesFiltradas(tipoInstitucion: number): Observable<Institute[]> {
+    if (tipoInstitucion !== 122 && tipoInstitucion !== 123) {
+      return of<Institute[]>([]);
+    }
+
+    const params = new HttpParams().set('tipo_institucion', String(tipoInstitucion));
+
+    return this.http.get<any[]>('/api/tableros/instituciones/filtradas', { params }).pipe(
+      catchError(error => {
+        return of<Institute[]>([]);
+      })
+    )
   }
 
   // Método para obtener registros por mes (tablero de registros por año)
