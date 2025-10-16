@@ -1,35 +1,44 @@
-<div>
-    <div class="card-header border-0 pt-5">
-        <h3 class="card-title align-items-start flex-column">
-            <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.RECORDS_STATUS"></span>
-        </h3>
+<div class="card card-xl-stretch mb-xl-8">
+  <div class="card-header border-0 pt-5">
+    <h3 class="card-title align-items-start flex-column">
+      <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.RECORDS_STATUS"></span>
+      <span class="text-muted fw-bold fs-7" translate="GRAPHICS.TITLES.TYPE"></span>
+    </h3>
 
-        <div class="card-toolbar">
-            <!-- begin::Button-->
-            <div class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary tooltip-css">
-                <mat-icon style="color: #1D6F42;">description</mat-icon>
-                <span class="tooltip-text" translate="BUTTON.EXPORT_EXCEL"></span>
-            </div>
-            <!-- end::Button-->
-        </div>
+    <div class="card-toolbar">
+      <button
+        type="button"
+        class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary"
+        data-kt-menu-trigger="click"
+        data-kt-menu-placement="bottom-end"
+        data-kt-menu-flip="top-end"
+      >
+        <span class="fs-2">
+          <div class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary tooltip-css">
+            <mat-icon style="color: #1D6F42;">description</mat-icon>
+            <span class="tooltip-text" translate="BUTTON.EXPORT_EXCEL"></span>
+          </div>
+        </span>
+      </button>
     </div>
-    <!-- end::Header -->
-    <!-- begin::Body -->
-    <div class="card-body h-100">
-        <!-- begin::PieCharts -->
-        <div #chartRef id="kt_charts_widget_1_chart"
-            class="flex-grow-1 w-100 d-flex justify-content-center align-items-center" style="min-height:350px;">
-            <apx-chart 
-                [series]="chartOptions?.series || []" 
-                [chart]="chartOptions?.chart || { type: 'pie', width: 650, height: 650 }" 
-                [labels]="chartOptions?.labels || []" 
-                [colors]="chartOptions?.colors" 
-                [responsive]="chartOptions?.responsive" 
-                [legend]="chartOptions?.legend" 
-                [plotOptions]="chartOptions?.plotOptions"
-                [dataLabels]="chartOptions?.dataLabels">
-            </apx-chart>
-        </div>
-        <!-- end::PieCharts -->
+  </div>
+
+  <div class="card-body">
+    <!-- Igual que el ejemplo: alto por estilo inline del contenedor -->
+    <div #chartRef id="records_status_chart" [style.height]="'350px'">
+      <apx-chart
+        *ngIf="chartOptions?.series?.length"
+        [series]="chartOptions.series"
+        [chart]="chartOptions.chart"
+        [labels]="chartOptions.labels"
+        [dataLabels]="chartOptions.dataLabels"
+        [legend]="chartOptions.legend"
+        [stroke]="chartOptions.stroke"
+        [plotOptions]="chartOptions.plotOptions"
+        [tooltip]="chartOptions.tooltip"
+        [states]="chartOptions.states"
+        [colors]="chartOptions.colors"
+      ></apx-chart>
     </div>
+  </div>
 </div>
