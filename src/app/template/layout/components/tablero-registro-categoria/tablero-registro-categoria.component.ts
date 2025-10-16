@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, ChangeDetectorRef} from '@angular/core';
 import { getCSSVariableValue } from 'src/app/template/kt/_utils';
 
 @Component({
@@ -13,15 +13,38 @@ export class TableroCategoriasComponent implements OnInit, OnChanges {
   @Input() height: number = 350;
 
   chartOptions: any;
+  // NUEVA
+  isChartReady = false;
+
+    // NUEVO CONSTRUCTOR AGREGADO
+  constructor(private cdRef: ChangeDetectorRef) {}
 
   ngOnInit(): void {
-    this.chartOptions = this.createCategoryChartOptions(this.height, this.data);
+    //this.chartOptions = this.createCategoryChartOptions(this.height, this.data);
+    // SE CAMBIÓ por esta línea
+    this.updateChart();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['data']) {
-      this.chartOptions = this.createCategoryChartOptions(this.height, this.data);
+      //this.chartOptions = this.createCategoryChartOptions(this.height, this.data);
+      // SE CAMBIÓ por esta línea
+      this.updateChart();
     }
+  }
+    // NUEVO MÉTODO 
+  private updateChart(): void {
+    if (!this.data || this.data.length === 0) {
+      this.isChartReady = false;
+      return;
+    }
+
+    // NUEVO SETTIMEOUT
+    setTimeout(() => {
+      this.chartOptions = this.createCategoryChartOptions(this.height, this.data);
+      this.isChartReady = true;
+      this.cdRef.detectChanges();
+    }, 100);
   }
 
   private createCategoryChartOptions(height: number, data: any[]): any {
@@ -43,6 +66,23 @@ export class TableroCategoriasComponent implements OnInit, OnChanges {
         type: 'bar',
         height: height,
         toolbar: { show: false },
+        // AGREGADO desde aquí
+        animations: {
+          enabled: true,
+          easing: 'easeinout',
+          speed: 800,
+          animateGradually: {
+            enabled: true,
+            delay: 150
+          },
+          dynamicAnimation: {
+            enabled: true,
+            speed: 350
+          }
+        },
+        redrawOnParentResize: true, // 🔥 NUEVA PROPIEDAD
+        redrawOnWindowResize: true  // 🔥 NUEVA PROPIEDAD
+        // HASTA aquí
       },
       plotOptions: {
         bar: {
@@ -68,6 +108,8 @@ export class TableroCategoriasComponent implements OnInit, OnChanges {
             colors: labelColor,
             fontSize: '12px',
           },
+          // LINEA AGREGADA
+          rotate: -45,
         },
       },
       yaxis: {

@@ -8,14 +8,10 @@ import { CuerposAcademicosComponent } from '../layout/components/cuerpos-academi
 import { RegistrosCategoriaComponent } from '../layout/components/registros-categoria/registros-categoria.component';
 import { RegistrosSexoComponent } from '../layout/components/registros-sexo/registros-sexo.component';
 import { RegistrosAnioComponent } from '../layout/components/registros-anio/registros-anio.component';
-import { TableroInstitucionesComponent } from '../layout/components/tablero-instituciones/tablero-instituciones.component';
 import { TableroCategoriasComponent } from '../layout/components/tablero-registro-categoria/tablero-registro-categoria.component';
 import { TableroInstitucionesFederalesComponent } from '../layout/components/tablero-instituciones-federales/tablero-instituciones-federales.component';
 import { TableroSolicitudesComponent } from '../layout/components/tablero-solicitudes/tablero-solicitudes.component';
 import { ChartComponent } from 'ng-apexcharts';
-import { Routes } from '@angular/router';
-import { Routing } from '../../pages/routing';
-import { LayoutComponent } from '../layout/layout.component';
 import { TableroInstitutosGeneralComponent } from '../layout/components/tablero-institutos-general/tablero-institutos-general.component';
 import { GraficaSectorComponent } from '../layout/components/grafica-sector/grafica-sector.component';
 import { GraficoInstitucionComponent } from '../layout/components/grafico-institucion/grafico-institucion.component';
@@ -31,6 +27,7 @@ import { DepartamentosComponent } from '../layout/components/departamentos/depar
 import { InvestigadoresComponent } from '../layout/components/investigadores/investigadores.component';
 import { ProgramasEducativosComponent } from '../layout/components/programas-educativos/programas-educativos.component';
 import { TableroAllInstitutionsComponent } from '../layout/components/tablero-all-institutions/tablero-all-institutions.component';
+import { TableroTop10InstitucionesComponent } from '../layout/components/tablero-top10-instituciones/tablero-top10-instituciones.component';
 
 @NgModule({
   declarations: [
@@ -47,13 +44,13 @@ import { TableroAllInstitutionsComponent } from '../layout/components/tablero-al
     TableroInstitucionesFederalesComponent,
     TableroSolicitudesComponent,
     TableroInstitutosGeneralComponent,
-    TableroInstitucionesComponent,
     GraficaSolicitudesComponent,
     GraficaSolicitudesInComponent,
     DepartamentosComponent,
     InvestigadoresComponent,
     ProgramasEducativosComponent,
-    TableroAllInstitutionsComponent
+    TableroAllInstitutionsComponent,
+    TableroTop10InstitucionesComponent
     ],
   imports: [
     CommonModule,
@@ -80,7 +77,6 @@ import { TableroAllInstitutionsComponent } from '../layout/components/tablero-al
     RegistrosCategoriaComponent,
     RegistrosSexoComponent,
     RegistrosAnioComponent,
-    TableroInstitucionesComponent,
     TableroCategoriasComponent,
     TableroInstitucionesFederalesComponent,
     TableroSolicitudesComponent,
@@ -90,7 +86,8 @@ import { TableroAllInstitutionsComponent } from '../layout/components/tablero-al
     DepartamentosComponent,
     InvestigadoresComponent,
     ProgramasEducativosComponent,
-    TableroAllInstitutionsComponent
+    TableroAllInstitutionsComponent,
+    TableroTop10InstitucionesComponent
   ]
 })
 export class SharedModule {

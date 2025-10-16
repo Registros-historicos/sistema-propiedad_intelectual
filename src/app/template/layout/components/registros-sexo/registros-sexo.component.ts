@@ -10,11 +10,27 @@ import { TablerosService } from 'src/app/api/services/tableros.service';
 export class RegistrosSexoComponent implements OnInit {
   @ViewChild('chart') chart: ChartComponent;
 
+  // NUEVA: Propiedades para manejar estados
+  isChartReady = false;
+  isLoading = true;
+  hasError = false;
+  
+  // NUEVA: Input para datos externos 
+  @Input() externalData: any[] = [];
+
   chartOptions: any = {
     series: [],
     chart: {
       type: 'donut',
       height: 350,
+            // NUEVO: Configuraciones para renderizado
+      animations: {
+        enabled: true,
+        easing: 'easeinout',
+        speed: 800
+      },
+      redrawOnParentResize: true,    // NUEVO IMPORTANTE para zoom
+      redrawOnWindowResize: true,    // NUEVO IMPORTANTE para zoom
     },
     labels: [],
     dataLabels: {
@@ -43,6 +59,7 @@ export class RegistrosSexoComponent implements OnInit {
     plotOptions: {
       pie: {
         donut: {
+          size: '65%', //SE AGREGÓ PARA VLA RESPONSIVIDAD
           labels: {
             show: true,
             name: {
@@ -68,14 +85,70 @@ export class RegistrosSexoComponent implements OnInit {
         }
       }
     },
+    // NUEVO: Colores para los 3 géneros
+    colors: [
+      getCSSVariableValue('--bs-primary'),    // Masculino
+      getCSSVariableValue('--bs-success'),    // Femenino  
+      getCSSVariableValue('--bs-warning')     // Otro
+    ],
     responsive: [
       {
         breakpoint: 480,
-        options: {
-          chart: { width: 300 },
-          legend: { position: 'bottom' }
+        options: { //SE AGREGÓ DE AQUÍ
+        chart: {
+          height: 300,
+          width: '100%'
+        },
+        legend: {
+          position: 'bottom',
+          horizontalAlign: 'center',
+          fontSize: '10px', // Texto más pequeño en móviles
+          itemMargin: {
+            horizontal: 5,
+            vertical: 2
+          }
+        },
+        plotOptions: {
+          pie: {
+            donut: {
+              size: '60%', // Donut más pequeño en móviles
+              labels: {
+                name: {
+                  fontSize: '14px'
+                },
+                value: {
+                  fontSize: '20px'
+                }
+              }
+            }
+          }
+        },
+        dataLabels: {
+          style: {
+            fontSize: '10px'
+          }
         }
       }
+    },
+    {
+      breakpoint: 768, // Tablets
+      options: {
+        chart: {
+          height: 320
+        },
+        legend: {
+          fontSize: '11px'
+        }
+      }
+    },
+    {
+      breakpoint: 1024, // Pantallas grandes
+      options: {
+        chart: {
+          height: 350
+        }
+      }
+    }//HASTA AQUÍ
     ]
   };
 
@@ -89,23 +162,96 @@ export class RegistrosSexoComponent implements OnInit {
       next: (data) => {
         console.debug('[DEBUG] Respuesta registros por sexo:', data);
         console.log('Datos recibidos:', data);
-        const labels = data.map(item => item.sexo);   // ['Femenino', 'Masculino']
-        const series = data.map(item => item.total);  // [99, 99]
+
+        //const labels = data.map(item => item.sexo);   // ['Femenino', 'Masculino']
+        //const series = data.map(item => item.total);  // [99, 99]
+        
+        // NUEVO: Normalizar datos para incluir "otro"
+        const normalizedData = this.normalizeGenderData(data);
+        const labels = normalizedData.map(item => item.label);   // ['Femenino', 'Masculino', 'Otro']
+        const series = normalizedData.map(item => item.value);   // [99, 99, 0]
 
         // Reasignar el objeto para que Angular detecte el cambio y ApexCharts se actualice
-        this.chartOptions = {
+        /**this.chartOptions = {
           ...this.chartOptions,
           labels,
           series
-        };
+        };**/
+        // MODIFICADO: Usar timeout para mejor renderizado
+        setTimeout(() => {
+          this.chartOptions = {
+            ...this.chartOptions,
+            labels,
+            series
+          };
+
+          // NUEVO: Actualizar estados
+          this.isChartReady = true;
+          this.isLoading = false;
 
         // Forzar detección de cambios por si hace falta
         this.cdRef.detectChanges();
-      },
+      },100);//AGREGADO 100);
+      },//AGREGADA
       error: (err) => {
         console.error('Error al obtener registros por sexo:', err);
+        // NUEVO: Actualizar estados de error
+        this.isLoading = false;
+        this.hasError = true;
+        this.cdRef.detectChanges();
       }
     });
+  }
+   // NUEVO: Normalizar datos de género
+  private normalizeGenderData(data: any[]): { label: string, value: number }[] {
+    const genderMap: { [key: string]: string } = {
+      'masculino': 'Masculino',
+      'femenino': 'Femenino', 
+      'hombre': 'Masculino',
+      'mujer': 'Femenino',
+      'otro': 'Otro',
+      'otros': 'Otro',
+      'other': 'Otro'
+    };
+
+    const result: { [key: string]: number } = {};
+
+    data.forEach(item => {
+      const rawGender = (item.sexo || item.gender || '').toString().toLowerCase().trim();
+      const normalizedGender = genderMap[rawGender] || this.capitalizeFirst(rawGender) || 'Otro';
+      
+      const value = Number(item.total || item.value || item.count || 0);
+      
+      if (result[normalizedGender]) {
+        result[normalizedGender] += value;
+      } else {
+        result[normalizedGender] = value;
+      }
+    });
+
+    // Asegurar categorías principales
+    const defaultGenders = ['Masculino', 'Femenino', 'Otro'];
+    defaultGenders.forEach(gender => {
+      if (!result[gender]) {
+        result[gender] = 0;
+      }
+    });
+
+    return Object.keys(result)
+      .map(key => ({ label: key, value: result[key] }))
+      .sort((a, b) => b.value - a.value);
+  }
+
+  // NUEVO: Helper para capitalizar
+  private capitalizeFirst(str: string): string {
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  }
+
+  // NUEVO: Método para reintentar
+  retryLoad(): void {
+    this.isLoading = true;
+    this.hasError = false;
+    this.ngOnInit(); // Recargar los datos
   }
 }
 
