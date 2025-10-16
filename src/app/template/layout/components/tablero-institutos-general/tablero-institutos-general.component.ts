@@ -1,5 +1,11 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { TablerosService, Instituto } from 'src/app/api/services/tableros.service';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
+import { TablerosService } from 'src/app/api/services/tableros.service';
+
+interface Instituto {
+  id_institucion: number;
+  institucion_nombre: string;
+  total: number;
+}
 
 @Component({
   selector: 'app-tablero-institutos-general',
@@ -9,21 +15,44 @@ import { TablerosService, Instituto } from 'src/app/api/services/tableros.servic
 export class TableroInstitutosGeneralComponent implements OnInit {
   @Input() titulo: string = '';
   @Input() tipoInstitucion?: number; // 122 Descentralizado, 123 Federal
+  @Input() data:Instituto[] = [];
 
-  data: Instituto[] = [];
+  @Output() retry = new EventEmitter<void>();
+
   loading: boolean = true;
   error: boolean = false;
   errorMessage: string = '';
   totalInstitutes: number = 0;
   totalRegistros: number = 0;
 
-  constructor(private tablerosService: TablerosService) {}
+  constructor() {}
 
   ngOnInit(): void {
-    this.loadData();
+    this.getTotals();
   }
 
-  private loadData(): void {
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['data']) {
+      this.getTotals();
+      this.loading = false
+    }
+  }
+
+  retryLoad(): void {
+    this.retry.emit();
+  }
+
+  getTotals() {
+    if (this.data && this.data.length > 0) {
+      this.totalInstitutes = this.data.length;
+      this.totalRegistros = this.data.reduce((sum, item) => sum + item.total, 0);
+    } else {
+      this.totalInstitutes = 0;
+      this.totalRegistros = 0;
+    }
+  }
+
+  /* private loadData(): void {
     this.loading = true;
     this.error = false;
     this.errorMessage = '';
@@ -74,5 +103,5 @@ export class TableroInstitutosGeneralComponent implements OnInit {
   // Método para obtener el número de registros de una institución
   getRegistros(institute: Instituto): number {
     return institute.total_registros || 0;
-  }
+  } */
 }

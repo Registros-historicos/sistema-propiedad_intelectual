@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; 
 import { getCSSVariableValue } from 'src/app/template/kt/_utils';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
 import { ImpiRegistriesService } from 'src/app/api/services/impi.service';
 import { IndautorRegistriesService } from 'src/app/api/services/indautor.service';
 //import { CardItem } from 'src/app/template/layout/components/tablero-instituciones-federales/tablero-instituciones-federales.component';
@@ -20,12 +20,21 @@ interface TopEntity {
   tags?: string[];
 }
 
+interface Instituto {
+  id_institucion: number;
+  institucion_nombre: string;
+  total: number;
+}
+
 @Component({
   selector: 'app-admin-dashboard',
   templateUrl: './admin-dashboard.component.html',
   styleUrl: './admin-dashboard.component.scss',
 })
 export class AdminDashboardComponent implements OnInit {
+  dataFederalInstitutes: Instituto[] = []
+  dataDecentralizedInstitutes: Instituto[] = []
+
   chartOptions: any;
   chartOptionsGraph2: any;
 
@@ -95,6 +104,10 @@ export class AdminDashboardComponent implements OnInit {
       }
     });
     this.initGraphs();
+    
+    this.loadRegisterInstitutes(123)
+    this.loadRegisterInstitutes(122)
+
   }
 
   trackByEntidad(index: number, item: any): number {
@@ -290,5 +303,22 @@ private loadTopEntities(): void {
       return a.city_name.localeCompare(b.city_name, 'es', {sensitivity: 'base'});
     });
     return aggregate;
+  }
+
+  loadRegisterInstitutes(tipoInstitucion: number) {
+    this.tablerosService.getNewInstitucionesFiltradas(tipoInstitucion ?? 0).subscribe({
+      next: (data) => {
+        if (tipoInstitucion === 122) {
+          this.dataDecentralizedInstitutes = [...data];
+        } else {
+          this.dataFederalInstitutes = [...data];
+        }
+        this.cdRef.detectChanges();
+      },
+      error: (error: any) => {
+        console.error('ERROR:', error);
+        return of<Instituto[]>([]);
+      }
+    });
   }
 }

@@ -52,7 +52,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let institute of data; let i = index">
+          <tr *ngFor="let d of data">
             <td>
               <div class="d-flex align-items-center">
                 <div
@@ -68,17 +68,17 @@
                 </div>
                 <div class="d-flex justify-content-start flex-column">
                   <h4 class="text-gray-900 fw-bolder fs-6 mb-1">
-                    {{ institute.nombre_institucion }}
+                    {{ d.institucion_nombre }}
                   </h4>
                   <span class="text-muted fw-bold fs-7">
-                    {{ institute.nombre_tipo_institucion }}
+                    {{ tipoInstitucion === 122 ? 'Descentralizado' : tipoInstitucion === 123 ? 'Federal' : 'Sin Tipo' }}
                   </span>
                 </div>
               </div>
             </td>
             <td class="text-end">
               <span class="badge badge-light-primary fw-bold fs-7">
-                {{ getRegistros(institute) }} registros
+                {{ d.total }} registros
               </span>
             </td>
           </tr>
