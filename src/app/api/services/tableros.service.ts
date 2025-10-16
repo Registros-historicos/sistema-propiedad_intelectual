@@ -149,7 +149,6 @@ export class TablerosService {
 
   getNewInstitucionesFiltradas(tipoInstitucion: number): Observable<Institute[]> {
     if (tipoInstitucion !== 122 && tipoInstitucion !== 123) {
-      console.warn(`getInstitucionesFiltradas: tipo inválido ${tipoInstitucion}. Sólo 122 o 123 permitidos.`);
       return of<Institute[]>([]);
     }
 
@@ -157,7 +156,6 @@ export class TablerosService {
 
     return this.http.get<any[]>('/api/tableros/instituciones/filtradas', { params }).pipe(
       catchError(error => {
-        console.error('Error en getInstitucionesfiltradas:', error);
         return of<Institute[]>([]);
       })
     )
