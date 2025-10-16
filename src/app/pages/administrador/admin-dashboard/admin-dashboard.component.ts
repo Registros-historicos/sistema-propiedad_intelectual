@@ -6,7 +6,7 @@ import { IndautorRegistriesService } from 'src/app/api/services/indautor.service
 //import { CardItem } from 'src/app/template/layout/components/tablero-instituciones-federales/tablero-instituciones-federales.component';
 import { TablerosService, CategoriaInvestigador } from 'src/app/api/services/tableros.service';
 
-// AGREGA ESTA INTERFAZ AQUÍ:
+// INTERFAZ
 export interface CardItem {
   icon: string;
   iconColor: string;
@@ -89,9 +89,13 @@ export class AdminDashboardComponent implements OnInit {
           categoria: it.categoria,
           value: Number(it.total)
         }));
+        // NUEVA LÍNEA PARA GRAFICA POR CATEGORIAS
+        this.cdRef.detectChanges();
       },
       error: (err) => {
         console.error('Error cargando categorias de investigadores desde backend', err);
+        // NUEVA LÍNEA PARA GRAFICA POR CATEGORIAS     
+        this.cdRef.detectChanges();
       }
     });
     this.initGraphs();
