@@ -1,8 +1,8 @@
-import { ChangeDetectorRef, Component, Input, ViewChild } from '@angular/core';
-import { ChartComponent } from 'ng-apexcharts';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { TablerosService } from 'src/app/api/services/tableros.service';
+import { getCSSVariableValue } from 'src/app/template/kt/_utils';
 
-interface ChartOptions {
+interface RegistroEstatusRow {
   estatus: string;
   total: number;
 }
@@ -10,109 +10,133 @@ interface ChartOptions {
 @Component({
   selector: 'app-registro-estatus',
   templateUrl: './registro-estatus.component.html',
-  styleUrl: './registro-estatus.component.scss'
+  styleUrls: ['./registro-estatus.component.scss']
 })
-export class RegistroEstatusComponent {
-  @ViewChild("chart") chart: ChartComponent;
+export class RegistroEstatusComponent implements OnInit {
 
-  data: ChartOptions[];
-  
-  chartOptions: any = {};
+  data: RegistroEstatusRow[] = [];
+  chartOptions: any;
+  totalRegistros = 0;
 
   constructor(
     private tablerosService: TablerosService,
-    private cdRef: ChangeDetectorRef 
+    private cdRef: ChangeDetectorRef
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadRegisterStatus();
+  }
+
+  private getChartOptions(height: number) {
+    const labelColor = getCSSVariableValue('--bs-gray-500');
+    const seriesColors = [
+      getCSSVariableValue('--bs-primary'),
+      getCSSVariableValue('--bs-success'),
+      getCSSVariableValue('--bs-warning'),
+      getCSSVariableValue('--bs-danger'),
+      getCSSVariableValue('--bs-info'),
+      getCSSVariableValue('--bs-dark'),
+      getCSSVariableValue('--bs-purple'),
+      getCSSVariableValue('--bs-teal'),
+      getCSSVariableValue('--bs-pink'),
+    ];
+
+    const series = this.data.map(d => Number(d.total) || 0);
+    const labels = this.data.map(d => d.estatus ?? '');
+
+    return {
+      series,
+      chart: {
+        type: 'donut',          // donut como el ejemplo que sí funciona
+        height: height,
+        toolbar: { show: false }
+      },
+      labels,
+      colors: seriesColors,
+      dataLabels: {
+        enabled: true,
+        style: {
+          fontSize: '12px',
+          fontWeight: 'bold',
+        },
+        dropShadow: { enabled: false }
+      },
+      legend: {
+        position: 'bottom',
+        horizontalAlign: 'center',
+        fontSize: '12px',
+        labels: {
+          colors: labelColor,
+          useSeriesColors: false
+        },
+        itemMargin: { horizontal: 10, vertical: 5 }
+      },
+      stroke: {
+        show: true,
+        width: 2,
+        colors: ['transparent']
+      },
+      plotOptions: {
+        pie: {
+          donut: {
+            labels: {
+              show: true,
+              name: {
+                show: true,
+                fontSize: '16px',
+                fontWeight: 'bold',
+                color: labelColor,
+                formatter: () => 'Total'
+              },
+              value: {
+                show: true,
+                fontSize: '24px',
+                fontWeight: 'bold',
+                color: labelColor,
+                formatter: () => this.totalRegistros.toString()
+              },
+              total: {
+                show: true,
+                showAlways: true,
+                label: 'Total',
+                color: labelColor,
+                formatter: () => this.totalRegistros.toString()
+              }
+            }
+          }
+        }
+      },
+      tooltip: {
+        style: { fontSize: '12px' },
+        y: {
+          formatter: (val: number) => `${val} registros`,
+          title: {
+            formatter: (seriesName: any, { seriesIndex }: any) => labels[seriesIndex] ?? ''
+          }
+        }
+      },
+      states: {
+        hover: { filter: { type: 'darken', value: 0.1 } }
+      }
+    };
   }
 
   private loadRegisterStatus(): void {
     this.tablerosService.getRegisterStatus().subscribe({
       next: (data) => {
-        this.data = data;
-        this.loadChart();
+        // normaliza datos
+        this.data = Array.isArray(data)
+          ? data.map(d => ({ estatus: d.estatus, total: Number(d.total) || 0 }))
+          : [];
+
+        this.totalRegistros = this.data.reduce((a, b) => a + b.total, 0);
+
+        // mismo patrón que tu ejemplo: altura por contenedor
+        this.chartOptions = this.getChartOptions(350);
+
         this.cdRef.detectChanges();
       },
-      error: (error: any) => {
-        console.error('ERROR:', error);
-      }
+      error: (err) => console.error('ERROR:', err)
     });
   }
-
-  loadChart() {
-    const labels = this.data.map(s => s.estatus );
-    const series = this.data.map(s => s.total );
-    const colors = [
-      '#008FFB',
-      '#00E396',
-      '#FEB019',
-      '#FF4560',
-      '#775DD0',
-      '#3F51B5',
-      '#546E7A',
-      '#D4526E',
-      '#8D5B4C'
-    ];
-
-    this.chartOptions = {
-      series,
-      chart: {
-        width: 650,
-        height: 650,
-        offsetY: -30,
-        type: "pie",
-      },
-      labels,
-      colors,
-      dataLabels: {
-        enabled: true,
-        style: {
-          fontSize: "16px",  
-          fontWeight: 'bold',
-          colors: ['#fff']  
-        },
-      },
-      legend: {
-        position: 'right',
-        horizontalAlign: 'left',
-        fontSize: '16px',
-        offsetY: 75,
-        offsetX: 20,
-        height: 350,
-      },
-      plotOptions: {
-        pie: {
-          customScale: 0.8,
-          dataLabels: {
-            offset: 0,
-          }
-        }
-      },
-      responsive: [
-        {
-          breakpoint: 480,
-          options: {
-            chart: {
-              width: 450,
-              height: 450,
-            },
-            legend: {
-              position: 'bottom',
-              fontSize: '30px'
-            },
-            dataLabels: {
-              style: { 
-                fontSize: '16px'
-              }
-            }
-          }
-        }
-      ]
-    };
-  }
-
 }
-
-
