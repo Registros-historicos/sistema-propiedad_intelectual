@@ -20,7 +20,17 @@
     </div>
   </div>
   <div class="card-body p-5">
-    <div class="table-responsive">
+    <!-- AGREGADO desde aquí - Estado de carga -->
+    <div *ngIf="!isChartReady || !data?.length" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <!--<p class="text-muted mt-2" translate="COMMON.LOADING"></p>-->
+      <p class="text-muted mt-2">Cargando...</p>
+    </div>
+    <!-- SE MODIFICO esta línea -->
+    <div class="table-responsive" *ngIf="isChartReady && data?.length">
+    <!--<div class="table-responsive">-->
   <apx-chart
         [series]="chartOptions.series"
         [chart]="chartOptions.chart"
@@ -34,5 +44,11 @@
         [plotOptions]="chartOptions.plotOptions"
       ></apx-chart>
     </div>
+    <!-- SE AGREGÓ desde aquí - Estado vacío -->
+    <div *ngIf="isChartReady && (!data || data.length === 0)" class="text-center py-5">
+      <!-- <p class="text-muted" translate="COMMON.NO_DATA"></p>-->
+      <p class="text-muted">No hay datos disponibles</p>
+    </div>
+    <!-- HASTA aquí -->
   </div>
 </div>
