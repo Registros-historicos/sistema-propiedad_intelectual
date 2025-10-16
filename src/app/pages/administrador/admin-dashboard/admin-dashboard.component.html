@@ -4,6 +4,8 @@
     <app-tablero-institutos-general
       titulo="Institutos Tecnológicos Federales"
       [tipoInstitucion]="123"
+      [data]="dataFederalInstitutes"
+      (retry)="loadRegisterInstitutes(123)"
     ></app-tablero-institutos-general>
   </div>
 
@@ -12,6 +14,8 @@
     <app-tablero-institutos-general
       titulo="Institutos Descentralizados"
       [tipoInstitucion]="122"
+      [data]="dataDecentralizedInstitutes"
+      (retry)="loadRegisterInstitutes(122)"
     ></app-tablero-institutos-general>
   </div>
 </div>
