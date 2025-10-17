@@ -29,7 +29,17 @@ type EstatusModUtil =
   | 'En trámite'
   | 'Trámite con observaciones'
   | 'Aprobada'
-  | 'Concluida';
+  | 'Concluida'
+  | 'Confirmada'
+  | 'Pendiente'
+  | 'Con Observaciones'
+  | 'Rechazada'
+  | 'Finalizada'
+  | 'Cancelada'
+  | 'En pausa'
+  | 'En espera de validación'
+  | 'Notificada al Tecnológico'
+  | '';
 
 interface IndInventor {
   curp: string;
@@ -56,7 +66,7 @@ type IndautorUIModel = {
   fechaSolicitud: string;
   numeroExpediente: string;
 
-  estatus: EstatusModUtil | '';
+  estatus: EstatusModUtil;
   fechaExpedicion: string;
   archivo: string;
   observaciones: string;
@@ -91,23 +101,19 @@ export class ModeloUtilidadComponent
   ramasCatalogo: Parametrizacion[] = [];          // tema 3
   mediosIngresoCatalogo: Parametrizacion[] = [];  // tema 8
   tiposSectorCatalogo: Parametrizacion[] = [];    // tema 2
-  estatusOptions: EstatusModUtil[] = [
-    'Registrada',
-    'En trámite',
-    'Trámite con observaciones',
-    'Aprobada',
-    'Concluida',
-  ];
+  estatusCatalogo: Parametrizacion[] = [];        // tema 7 (con fallback del servicio)
 
-  // Selects
+  // Selects (guardamos IDs)
   selectedRamaId: number | null = null;
   selectedMedioIngresoId: number | null = null;
   selectedTipoSectorId: number | null = null;
+  selectedEstatusId: number | null = null;
 
   private rawIdsForSave = {
     ramaId: '' as string | number | null,
     medioIngresoId: '' as string | number | null,
     tipoSectorId: '' as string | number | null,
+    estatusId: '' as string | number | null,
   };
 
   // Modelo de modal
@@ -273,6 +279,7 @@ export class ModeloUtilidadComponent
         this.ramasCatalogo = (cats[3]?.lista || []) as Parametrizacion[];
         this.mediosIngresoCatalogo = (cats[8]?.lista || []) as Parametrizacion[];
         this.tiposSectorCatalogo = (cats[2]?.lista || []) as Parametrizacion[];
+        this.estatusCatalogo = (cats[7]?.lista || []) as Parametrizacion[]; // 👈 tema 7 con fallback
       },
       error: (e) => console.error('❌ Error cargando catálogos', e),
     });
@@ -340,6 +347,34 @@ export class ModeloUtilidadComponent
     return found?.id_param ?? null;
   }
 
+  // ========= Badge class para TODOS los estatus conocidos (tema 7 + fallback)
+  getStatusBadgeClass(status: string): string {
+    const s = (status || '').toLowerCase();
+    if (!s) return 'badge-light-secondary';
+
+    const map: Record<string, string> = {
+      // clásicos
+      'registrada': 'badge-light-primary',
+      'en trámite': 'badge-light-info',
+      'trámite con observaciones': 'badge-light-warning',
+      'aprobada': 'badge-light-success',
+      'concluida': 'badge-light-secondary',
+      // nuevos/fallback tema 7
+      'confirmada': 'badge-light-success',
+      'pendiente': 'badge-light-warning',
+      'con observaciones': 'badge-light-warning',
+      'rechazada': 'badge-light-danger',
+      'finalizada': 'badge-light-secondary',
+      'cancelada': 'badge-light-dark',
+      'en pausa': 'badge-light',
+      'en espera de validación': 'badge-light-info',
+      'notificada al tecnológico': 'badge-light-primary',
+    };
+
+    return map[s] || 'badge-light-secondary';
+  }
+
+  // ====== Ver
   view(id: number): void {
     this.isViewMode = true;
     this.cdr.detectChanges();
@@ -351,19 +386,24 @@ export class ModeloUtilidadComponent
         const ramaTxt   = (modUtil as any).rama ?? this.asName(extra.rama_param) ?? '';
         const medioTxt  = (modUtil as any).medioIngreso ?? this.asName(extra.medio_ingreso_param) ?? '';
         const sectorTxt = (modUtil as any).tipoSector ?? this.asName(extra.tipo_sector_param) ?? '';
+        const estatusTxt= (modUtil as any).estatus ?? this.asName(extra.estatus_param) ?? '';
 
         this.rawIdsForSave = {
           ramaId: this.asId(extra.rama_param),
           medioIngresoId: this.asId(extra.medio_ingreso_param),
           tipoSectorId: this.asId(extra.tipo_sector_param),
+          estatusId: this.asId(extra.estatus_param),
         };
 
+        // preparar selects por si alternas a editar sin re-cargar
         this.selectedRamaId =
           (this.rawIdsForSave.ramaId as number) ?? this.findIdByName(this.ramasCatalogo, ramaTxt);
         this.selectedMedioIngresoId =
           (this.rawIdsForSave.medioIngresoId as number) ?? this.findIdByName(this.mediosIngresoCatalogo, medioTxt);
         this.selectedTipoSectorId =
           (this.rawIdsForSave.tipoSectorId as number) ?? this.findIdByName(this.tiposSectorCatalogo, sectorTxt);
+        this.selectedEstatusId =
+          (this.rawIdsForSave.estatusId as number) ?? this.findIdByName(this.estatusCatalogo, estatusTxt);
 
         this.indautorModel = {
           id: modUtil.id,
@@ -374,7 +414,7 @@ export class ModeloUtilidadComponent
           institucion: modUtil.institucion || '',
           fechaSolicitud: (modUtil as any).fechaSolicitud || '',
           numeroExpediente: (modUtil as any).solicitudId || '',
-          estatus: (modUtil.estatus as EstatusModUtil) || 'En trámite',
+          estatus: (estatusTxt as EstatusModUtil) || 'En trámite',
           fechaExpedicion: (extra?.fechaExpedicion as string) || '',
           archivo:
             (Array.isArray(modUtil.documentos) && modUtil.documentos[0]) || '',
@@ -389,6 +429,7 @@ export class ModeloUtilidadComponent
     });
   }
 
+  // ====== Editar
   edit(id: number): void {
     this.isViewMode = false;
     this.cdr.detectChanges();
@@ -400,20 +441,26 @@ export class ModeloUtilidadComponent
         const ramaTxt   = (modUtil as any).rama ?? this.asName(extra.rama_param) ?? '';
         const medioTxt  = (modUtil as any).medioIngreso ?? this.asName(extra.medio_ingreso_param) ?? '';
         const sectorTxt = (modUtil as any).tipoSector ?? this.asName(extra.tipo_sector_param) ?? '';
+        const estatusTxt= (modUtil as any).estatus ?? this.asName(extra.estatus_param) ?? '';
 
         this.rawIdsForSave = {
           ramaId: this.asId(extra.rama_param),
           medioIngresoId: this.asId(extra.medio_ingreso_param),
           tipoSectorId: this.asId(extra.tipo_sector_param),
+          estatusId: this.asId(extra.estatus_param),
         };
 
+        // set de selects (IDs)
         this.selectedRamaId =
           (this.rawIdsForSave.ramaId as number) ?? this.findIdByName(this.ramasCatalogo, ramaTxt);
         this.selectedMedioIngresoId =
           (this.rawIdsForSave.medioIngresoId as number) ?? this.findIdByName(this.mediosIngresoCatalogo, medioTxt);
         this.selectedTipoSectorId =
           (this.rawIdsForSave.tipoSectorId as number) ?? this.findIdByName(this.tiposSectorCatalogo, sectorTxt);
+        this.selectedEstatusId =
+          (this.rawIdsForSave.estatusId as number) ?? this.findIdByName(this.estatusCatalogo, estatusTxt);
 
+        // modelo (texto legible)
         this.indautorModel = {
           id: modUtil.id,
           titulo: (modUtil as any).nombreModUtil || '',
@@ -423,7 +470,7 @@ export class ModeloUtilidadComponent
           institucion: modUtil.institucion || '',
           fechaSolicitud: (modUtil as any).fechaSolicitud || '',
           numeroExpediente: (modUtil as any).solicitudId || '',
-          estatus: (modUtil.estatus as EstatusModUtil) || 'En trámite',
+          estatus: (estatusTxt as EstatusModUtil) || 'En trámite',
           fechaExpedicion: (extra?.fechaExpedicion as string) || '',
           archivo:
             (Array.isArray(modUtil.documentos) && modUtil.documentos[0]) || '',
@@ -447,9 +494,10 @@ export class ModeloUtilidadComponent
     const id = this.indautorModel.id;
     this.isSaving = true;
 
-    const ramaId  = this.selectedRamaId ?? this.rawIdsForSave.ramaId;
-    const medioId = this.selectedMedioIngresoId ?? this.rawIdsForSave.medioIngresoId;
-    const sectorId= this.selectedTipoSectorId ?? this.rawIdsForSave.tipoSectorId;
+    const ramaId   = this.selectedRamaId ?? this.rawIdsForSave.ramaId;
+    const medioId  = this.selectedMedioIngresoId ?? this.rawIdsForSave.medioIngresoId;
+    const sectorId = this.selectedTipoSectorId ?? this.rawIdsForSave.tipoSectorId;
+    const estatusId= this.selectedEstatusId ?? this.rawIdsForSave.estatusId;
 
     const s = (v: any) => (v === undefined || v === null ? '' : String(v));
 
@@ -463,10 +511,10 @@ export class ModeloUtilidadComponent
             tipo_ingreso_param:  s(medioId || raw.tipo_ingreso_param || '45'),
             id_usuario:          Number((raw as any).id_usuario ?? 0),
             rama_param:          s(ramaId || raw.rama_param),
-            fec_expedicion:      s((raw as any).fec_expedicion ?? ''),
+            fec_expedicion:      s(this.indautorModel.fechaExpedicion || (raw as any).fec_expedicion || ''),
             observaciones:       s(this.indautorModel.observaciones ?? raw.observaciones),
             archivo:             s(this.indautorModel.archivo ?? raw.archivo),
-            estatus_param:       s(this.indautorModel.estatus || raw.estatus_param),
+            estatus_param:       s(estatusId || raw.estatus_param), // 👈 guardar ID de estatus
             medio_ingreso_param: s(medioId || raw.medio_ingreso_param),
             tipo_registro_param: s(raw.tipo_registro_param ?? '45'),
             fec_solicitud:       s(this.indautorModel.fechaSolicitud ?? raw.fec_solicitud),
@@ -598,10 +646,11 @@ export class ModeloUtilidadComponent
       inventores: [],
     };
 
-    this.rawIdsForSave = { ramaId: null, medioIngresoId: null, tipoSectorId: null };
+    this.rawIdsForSave = { ramaId: null, medioIngresoId: null, tipoSectorId: null, estatusId: null };
     this.selectedRamaId = null;
     this.selectedMedioIngresoId = null;
     this.selectedTipoSectorId = null;
+    this.selectedEstatusId = null;
   }
 
   showAlert(swalOptions: SweetAlertOptions): void {

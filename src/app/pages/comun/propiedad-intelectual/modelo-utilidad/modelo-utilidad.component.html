@@ -87,15 +87,7 @@
         <div class="fv-row col-md-6">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">Estatus</label>
           <div class="form-control form-control-solid d-flex align-items-center bg-light">
-            <span class="badge"
-                  [ngClass]="{
-                    'badge-light-success': indautorModel.estatus === 'Aprobada',
-                    'badge-light-primary': indautorModel.estatus === 'Registrada',
-                    'badge-light-warning': indautorModel.estatus === 'Trámite con observaciones',
-                    'badge-light-info': indautorModel.estatus === 'En trámite',
-                    'badge-light-secondary': indautorModel.estatus === 'Concluida'
-                  }"
-                  class="fs-7 fw-bold">
+            <span class="badge {{ getStatusBadgeClass(indautorModel.estatus) }} fs-7 fw-bold">
               {{ indautorModel.estatus }}
             </span>
           </div>
@@ -224,9 +216,9 @@
       <div class="row g-9 mb-7">
         <div class="fv-row col-md-6">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">Estatus</label>
-          <select class="form-select" [(ngModel)]="indautorModel.estatus">
-            <option value="">Seleccione...</option>
-            <option *ngFor="let e of estatusOptions" [value]="e">{{ e }}</option>
+          <select class="form-select" [(ngModel)]="selectedEstatusId">
+            <option [ngValue]="null">Seleccione...</option>
+            <option *ngFor="let e of estatusCatalogo" [ngValue]="e.id_param">{{ e.nombre }}</option>
           </select>
         </div>
         <div class="fv-row col-md-6">
