@@ -37,6 +37,11 @@ export class GraficaSolicitudesInComponent implements OnInit {
       getCSSVariableValue('--bs-warning'),
       getCSSVariableValue('--bs-danger'),
       getCSSVariableValue('--bs-info'),
+      getCSSVariableValue('--bs-teal'),
+      getCSSVariableValue('--bs-green'),
+      getCSSVariableValue('--bs-pink'),
+      getCSSVariableValue('--bs-cyan'),
+      getCSSVariableValue('--bs-orange'), 
     ];
 
     const pieData = this.tiposSolicitudes.map(item => item.total);
