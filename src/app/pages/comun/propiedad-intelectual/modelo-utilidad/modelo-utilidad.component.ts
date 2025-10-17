@@ -8,12 +8,11 @@ import {
   ViewChild,
 } from '@angular/core';
 import { SweetAlertOptions } from 'sweetalert2';
-import { DataTablesResponse } from '../../../administrador/shared-services';
 import { Config } from 'datatables.net';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { UtilityModelsService } from '../../../../api/services/utility-models.service';
 import moment from 'moment';
-import { Observable, switchMap } from 'rxjs';
+import { switchMap } from 'rxjs';
 import { IModUtilModel } from 'src/app/api/models/mod-util.model';
 import { TranslateService } from '@ngx-translate/core';
 import {
@@ -24,22 +23,8 @@ import {
 
 declare const $: any;
 
-type EstatusModUtil =
-  | 'Registrada'
-  | 'En trámite'
-  | 'Trámite con observaciones'
-  | 'Aprobada'
-  | 'Concluida'
-  | 'Confirmada'
-  | 'Pendiente'
-  | 'Con Observaciones'
-  | 'Rechazada'
-  | 'Finalizada'
-  | 'Cancelada'
-  | 'En pausa'
-  | 'En espera de validación'
-  | 'Notificada al Tecnológico'
-  | '';
+// 👉 Lo flexibilizamos a string para no perder selección si el catálogo no trae el nombre exacto
+type EstatusModUtil = string;
 
 interface IndInventor {
   curp: string;
@@ -66,7 +51,7 @@ type IndautorUIModel = {
   fechaSolicitud: string;
   numeroExpediente: string;
 
-  estatus: EstatusModUtil;
+  estatus: EstatusModUtil | '';
   fechaExpedicion: string;
   archivo: string;
   observaciones: string;
@@ -82,7 +67,6 @@ type IndautorUIModel = {
 export class ModeloUtilidadComponent
   implements OnInit, AfterViewInit, OnDestroy
 {
-  // ====== UI base ======
   pageLength = 10;
   dtInstance: any;
   lengthMenu: number[] = [5, 10, 15, 20];
@@ -101,13 +85,20 @@ export class ModeloUtilidadComponent
   ramasCatalogo: Parametrizacion[] = [];          // tema 3
   mediosIngresoCatalogo: Parametrizacion[] = [];  // tema 8
   tiposSectorCatalogo: Parametrizacion[] = [];    // tema 2
-  estatusCatalogo: Parametrizacion[] = [];        // tema 7 (con fallback del servicio)
+  estatusCatalogo: Parametrizacion[] = [];        // tema 7
 
-  // Selects (guardamos IDs)
+  // Base de opciones visibles
+  estatusOptions: EstatusModUtil[] = [
+    'Registrada',
+    'En trámite',
+    'Trámite con observaciones',
+    'Aprobada',
+    'Concluida',
+  ];
+
   selectedRamaId: number | null = null;
   selectedMedioIngresoId: number | null = null;
   selectedTipoSectorId: number | null = null;
-  selectedEstatusId: number | null = null;
 
   private rawIdsForSave = {
     ramaId: '' as string | number | null,
@@ -116,7 +107,6 @@ export class ModeloUtilidadComponent
     estatusId: '' as string | number | null,
   };
 
-  // Modelo de modal
   indautorModel: IndautorUIModel = {
     id: 0,
     titulo: '',
@@ -134,7 +124,7 @@ export class ModeloUtilidadComponent
     inventores: [],
   };
 
-  isViewMode = true;     // alterna entre modal ver / editar
+  isViewMode = true;
   isSaving = false;
 
   private tableData: any[] = [];
@@ -152,7 +142,6 @@ export class ModeloUtilidadComponent
     this.placeholder = this.translate.instant('TABLE.PLACEHOLDER_SEARCH');
     this.cargarCatalogos();
 
-    // Config DataTable
     this.datatableConfig = {
       serverSide: false,
       processing: true,
@@ -175,45 +164,29 @@ export class ModeloUtilidadComponent
       },
       data: [],
       columns: [
-        // ✅ ID visible
-        {
-          title: 'ID',
-          data: 'id',
-          className: 'text-gray-700 fw-semibold',
-          render: (d: any, t: string) =>
-            t !== 'display' ? d ?? '' : `<span class="fw-semibold">${d ?? ''}</span>`,
-        },
-        // Expediente
+        { title: 'ID', data: 'id', className: 'text-gray-700 fw-semibold',
+          render: (d: any, t: string) => t !== 'display' ? d ?? '' : `<span class="fw-semibold">${d ?? ''}</span>` },
         {
           title: 'N.º DE EXPEDIENTE',
           data: 'solicitudId',
           render: (data: any, type: string) => {
             if (type !== 'display') return data ?? '';
             const val = (data ?? '') !== '' ? String(data) : '—';
-            return `
-              <span class="fw-semibold text-gray-600"
+            return `<span class="fw-semibold text-gray-600"
                     style="display:inline-block;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                ${val}
-              </span>`;
+                    ${val}</span>`;
           },
         },
-        // Rama
         {
           title: this.translate.instant('TABLE.BRANCH') || 'RAMA',
           data: 'ramaLabel',
           render: (data: any, type: string, full: any) => {
             const label = (data ?? full?.rama ?? '—').toString();
             if (type !== 'display') return label;
-
             const id = full?.id ?? '';
-            const initials =
-              label && label.length > 1
-                ? (label[0] + (label[1] || '')).toUpperCase()
-                : 'IN';
+            const initials = label && label.length > 1 ? (label[0] + (label[1] || '')).toUpperCase() : 'IN';
             const colorClasses = ['success', 'info', 'warning', 'danger'];
-            const randomColorClass =
-              colorClasses[Math.floor(Math.random() * colorClasses.length)];
-
+            const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
             return `
               <div class="d-flex align-items-center">
                 <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" data-action="view" data-id="${id}">
@@ -229,34 +202,23 @@ export class ModeloUtilidadComponent
               </div>`;
           },
         },
-        // Título
         {
           title: this.translate.instant('TABLE.WORK_TITLE') || 'TÍTULO',
           data: 'nombreModUtil',
           render: (data: string, type: string) =>
-            type !== 'display'
-              ? data || ''
-              : `<span class="fw-bold fs-6 text-gray-800">${data || ''}</span>`,
+            type !== 'display' ? data || '' : `<span class="fw-bold fs-6 text-gray-800">${data || ''}</span>`,
         },
-        // Institución
         {
           title: this.translate.instant('TABLE.INSTITUTION') || 'INSTITUCIÓN',
           data: 'institucion',
           render: (data: string, type: string) =>
-            type !== 'display'
-              ? data || ''
-              : `<span class="fw-semibold text-gray-600">${data || '—'}</span>`,
+            type !== 'display' ? data || '' : `<span class="fw-semibold text-gray-600">${data || '—'}</span>`,
         },
-        // Fecha
         {
           title: this.translate.instant('TABLE.DATE') || 'FECHA DE SOLICITUD',
           data: 'fechaSolicitud',
           render: (data: string, type: string) =>
-            type !== 'display'
-              ? data || ''
-              : `<span class="fw-semibold text-gray-600">${
-                data ? moment(data).format('DD-MM-YYYY') : ''
-              }</span>`,
+            type !== 'display' ? data || '' : `<span class="fw-semibold text-gray-600">${data ? moment(data).format('DD-MM-YYYY') : ''}</span>`,
         },
       ],
       createdRow: (row: any, data: any) => {
@@ -279,7 +241,18 @@ export class ModeloUtilidadComponent
         this.ramasCatalogo = (cats[3]?.lista || []) as Parametrizacion[];
         this.mediosIngresoCatalogo = (cats[8]?.lista || []) as Parametrizacion[];
         this.tiposSectorCatalogo = (cats[2]?.lista || []) as Parametrizacion[];
-        this.estatusCatalogo = (cats[7]?.lista || []) as Parametrizacion[]; // 👈 tema 7 con fallback
+        this.estatusCatalogo = (cats[7]?.lista || []) as Parametrizacion[];
+
+        // Si vienen nombres en tema 7, usamos los que coinciden con los 5 principales, manteniendo orden
+        const fromCat = (this.estatusCatalogo || []).map(e => e?.nombre).filter(Boolean) as string[];
+        const orden: EstatusModUtil[] = [
+          'Registrada','En trámite','Trámite con observaciones','Aprobada','Concluida'
+        ];
+        if (fromCat.length) {
+          this.estatusOptions = orden.filter(n => fromCat.includes(n));
+          // Si el catálogo no trae alguno, conserva el resto para no perder selección previa
+          if (!this.estatusOptions.length) this.estatusOptions = orden;
+        }
       },
       error: (e) => console.error('❌ Error cargando catálogos', e),
     });
@@ -325,6 +298,7 @@ export class ModeloUtilidadComponent
     else this.reloadEvent.emit(true);
   }
 
+  // ===== Helpers =====
   private asId(v: any): string | number | null {
     if (v === null || v === undefined) return null;
     if (typeof v === 'object') {
@@ -338,7 +312,6 @@ export class ModeloUtilidadComponent
     if (v && typeof v === 'object' && 'nombre' in v) return v.nombre as string;
     return (alt ?? fallback) || '';
   }
-
   private findIdByName(catalog: Parametrizacion[], nombre: string): number | null {
     if (!nombre) return null;
     const found = catalog.find(
@@ -346,35 +319,43 @@ export class ModeloUtilidadComponent
     );
     return found?.id_param ?? null;
   }
-
-  // ========= Badge class para TODOS los estatus conocidos (tema 7 + fallback)
-  getStatusBadgeClass(status: string): string {
-    const s = (status || '').toLowerCase();
-    if (!s) return 'badge-light-secondary';
-
-    const map: Record<string, string> = {
-      // clásicos
-      'registrada': 'badge-light-primary',
-      'en trámite': 'badge-light-info',
-      'trámite con observaciones': 'badge-light-warning',
-      'aprobada': 'badge-light-success',
-      'concluida': 'badge-light-secondary',
-      // nuevos/fallback tema 7
-      'confirmada': 'badge-light-success',
-      'pendiente': 'badge-light-warning',
-      'con observaciones': 'badge-light-warning',
-      'rechazada': 'badge-light-danger',
-      'finalizada': 'badge-light-secondary',
-      'cancelada': 'badge-light-dark',
-      'en pausa': 'badge-light',
-      'en espera de validación': 'badge-light-info',
-      'notificada al tecnológico': 'badge-light-primary',
-    };
-
-    return map[s] || 'badge-light-secondary';
+  private s(v: any): string {
+    return v === undefined || v === null ? '' : String(v);
+  }
+  private sid(v: any): string {
+    if (v === undefined || v === null || v === '') return '';
+    return String(v);
   }
 
-  // ====== Ver
+  private ensureEstatusOption(name: string) {
+    if (!name) return;
+    if (!this.estatusOptions.includes(name)) {
+      // lo agregamos para que el select quede preseleccionado como antes
+      this.estatusOptions = [...this.estatusOptions, name];
+    }
+  }
+
+  private resolveEstatusNombre(extra: any, current: any): EstatusModUtil | '' {
+    const fromObj =
+      extra?.estatus_param &&
+      typeof extra.estatus_param === 'object' &&
+      'nombre' in extra.estatus_param
+        ? (extra.estatus_param.nombre as string)
+        : '';
+
+    let fromId = '';
+    const maybeId = this.asId(extra?.estatus_param);
+    if (typeof maybeId === 'number') {
+      const match = this.estatusCatalogo.find((x) => x.id_param === maybeId);
+      fromId = match?.nombre || '';
+    }
+
+    const name = (current as string) || fromObj || fromId || '';
+    // No forzamos a los 5; permitimos cualquier string para preservar selección previa
+    return (name || 'En trámite') as EstatusModUtil;
+  }
+
+  // ===== Modales =====
   view(id: number): void {
     this.isViewMode = true;
     this.cdr.detectChanges();
@@ -386,7 +367,10 @@ export class ModeloUtilidadComponent
         const ramaTxt   = (modUtil as any).rama ?? this.asName(extra.rama_param) ?? '';
         const medioTxt  = (modUtil as any).medioIngreso ?? this.asName(extra.medio_ingreso_param) ?? '';
         const sectorTxt = (modUtil as any).tipoSector ?? this.asName(extra.tipo_sector_param) ?? '';
-        const estatusTxt= (modUtil as any).estatus ?? this.asName(extra.estatus_param) ?? '';
+        const estatusNombre = this.resolveEstatusNombre(extra, (modUtil as any).estatus);
+
+        // Asegura que el estatus actual esté en las opciones (preselección igual que antes)
+        this.ensureEstatusOption(estatusNombre);
 
         this.rawIdsForSave = {
           ramaId: this.asId(extra.rama_param),
@@ -395,15 +379,12 @@ export class ModeloUtilidadComponent
           estatusId: this.asId(extra.estatus_param),
         };
 
-        // preparar selects por si alternas a editar sin re-cargar
         this.selectedRamaId =
           (this.rawIdsForSave.ramaId as number) ?? this.findIdByName(this.ramasCatalogo, ramaTxt);
         this.selectedMedioIngresoId =
           (this.rawIdsForSave.medioIngresoId as number) ?? this.findIdByName(this.mediosIngresoCatalogo, medioTxt);
         this.selectedTipoSectorId =
           (this.rawIdsForSave.tipoSectorId as number) ?? this.findIdByName(this.tiposSectorCatalogo, sectorTxt);
-        this.selectedEstatusId =
-          (this.rawIdsForSave.estatusId as number) ?? this.findIdByName(this.estatusCatalogo, estatusTxt);
 
         this.indautorModel = {
           id: modUtil.id,
@@ -414,10 +395,9 @@ export class ModeloUtilidadComponent
           institucion: modUtil.institucion || '',
           fechaSolicitud: (modUtil as any).fechaSolicitud || '',
           numeroExpediente: (modUtil as any).solicitudId || '',
-          estatus: (estatusTxt as EstatusModUtil) || 'En trámite',
+          estatus: estatusNombre,
           fechaExpedicion: (extra?.fechaExpedicion as string) || '',
-          archivo:
-            (Array.isArray(modUtil.documentos) && modUtil.documentos[0]) || '',
+          archivo: (Array.isArray(modUtil.documentos) && modUtil.documentos[0]) || '',
           observaciones: (modUtil as any).observaciones || '',
           descripcion: (modUtil as any).descripcion || '',
           inventores: [],
@@ -429,7 +409,6 @@ export class ModeloUtilidadComponent
     });
   }
 
-  // ====== Editar
   edit(id: number): void {
     this.isViewMode = false;
     this.cdr.detectChanges();
@@ -441,7 +420,10 @@ export class ModeloUtilidadComponent
         const ramaTxt   = (modUtil as any).rama ?? this.asName(extra.rama_param) ?? '';
         const medioTxt  = (modUtil as any).medioIngreso ?? this.asName(extra.medio_ingreso_param) ?? '';
         const sectorTxt = (modUtil as any).tipoSector ?? this.asName(extra.tipo_sector_param) ?? '';
-        const estatusTxt= (modUtil as any).estatus ?? this.asName(extra.estatus_param) ?? '';
+        const estatusNombre = this.resolveEstatusNombre(extra, (modUtil as any).estatus);
+
+        // Asegura que el estatus actual esté en las opciones (preselección igual que antes)
+        this.ensureEstatusOption(estatusNombre);
 
         this.rawIdsForSave = {
           ramaId: this.asId(extra.rama_param),
@@ -450,17 +432,13 @@ export class ModeloUtilidadComponent
           estatusId: this.asId(extra.estatus_param),
         };
 
-        // set de selects (IDs)
         this.selectedRamaId =
           (this.rawIdsForSave.ramaId as number) ?? this.findIdByName(this.ramasCatalogo, ramaTxt);
         this.selectedMedioIngresoId =
           (this.rawIdsForSave.medioIngresoId as number) ?? this.findIdByName(this.mediosIngresoCatalogo, medioTxt);
         this.selectedTipoSectorId =
           (this.rawIdsForSave.tipoSectorId as number) ?? this.findIdByName(this.tiposSectorCatalogo, sectorTxt);
-        this.selectedEstatusId =
-          (this.rawIdsForSave.estatusId as number) ?? this.findIdByName(this.estatusCatalogo, estatusTxt);
 
-        // modelo (texto legible)
         this.indautorModel = {
           id: modUtil.id,
           titulo: (modUtil as any).nombreModUtil || '',
@@ -470,10 +448,9 @@ export class ModeloUtilidadComponent
           institucion: modUtil.institucion || '',
           fechaSolicitud: (modUtil as any).fechaSolicitud || '',
           numeroExpediente: (modUtil as any).solicitudId || '',
-          estatus: (estatusTxt as EstatusModUtil) || 'En trámite',
+          estatus: estatusNombre, // ← sigue preseleccionado
           fechaExpedicion: (extra?.fechaExpedicion as string) || '',
-          archivo:
-            (Array.isArray(modUtil.documentos) && modUtil.documentos[0]) || '',
+          archivo: (Array.isArray(modUtil.documentos) && modUtil.documentos[0]) || '',
           observaciones: (modUtil as any).observaciones || '',
           descripcion: (modUtil as any).descripcion || '',
           inventores: [],
@@ -494,32 +471,49 @@ export class ModeloUtilidadComponent
     const id = this.indautorModel.id;
     this.isSaving = true;
 
-    const ramaId   = this.selectedRamaId ?? this.rawIdsForSave.ramaId;
-    const medioId  = this.selectedMedioIngresoId ?? this.rawIdsForSave.medioIngresoId;
-    const sectorId = this.selectedTipoSectorId ?? this.rawIdsForSave.tipoSectorId;
-    const estatusId= this.selectedEstatusId ?? this.rawIdsForSave.estatusId;
+    const ramaId =
+      this.selectedRamaId ??
+      (typeof this.rawIdsForSave.ramaId === 'number'
+        ? this.rawIdsForSave.ramaId
+        : this.findIdByName(this.ramasCatalogo, this.indautorModel.rama));
 
-    const s = (v: any) => (v === undefined || v === null ? '' : String(v));
+    const medioId =
+      this.selectedMedioIngresoId ??
+      (typeof this.rawIdsForSave.medioIngresoId === 'number'
+        ? this.rawIdsForSave.medioIngresoId
+        : this.findIdByName(this.mediosIngresoCatalogo, this.indautorModel.medioIngreso));
+
+    const sectorId =
+      this.selectedTipoSectorId ??
+      (typeof this.rawIdsForSave.tipoSectorId === 'number'
+        ? this.rawIdsForSave.tipoSectorId
+        : this.findIdByName(this.tiposSectorCatalogo, this.indautorModel.tipoSector));
+
+    // nombre → id (tema 7). Si no existe, cae al id crudo detectado.
+    const estatusIdByName = this.findIdByName(this.estatusCatalogo, this.indautorModel.estatus as string);
+    const estatusId =
+      estatusIdByName ??
+      (typeof this.rawIdsForSave.estatusId === 'number' ? this.rawIdsForSave.estatusId : null);
 
     this.service
       .getRegistroRaw(id)
       .pipe(
         switchMap((raw) => {
           const dto = {
-            no_expediente:       s(this.indautorModel.numeroExpediente || raw.no_expediente),
-            titulo:              s(this.indautorModel.titulo || raw.titulo),
-            tipo_ingreso_param:  s(medioId || raw.tipo_ingreso_param || '45'),
-            id_usuario:          Number((raw as any).id_usuario ?? 0),
-            rama_param:          s(ramaId || raw.rama_param),
-            fec_expedicion:      s(this.indautorModel.fechaExpedicion || (raw as any).fec_expedicion || ''),
-            observaciones:       s(this.indautorModel.observaciones ?? raw.observaciones),
-            archivo:             s(this.indautorModel.archivo ?? raw.archivo),
-            estatus_param:       s(estatusId || raw.estatus_param), // 👈 guardar ID de estatus
-            medio_ingreso_param: s(medioId || raw.medio_ingreso_param),
-            tipo_registro_param: s(raw.tipo_registro_param ?? '45'),
-            fec_solicitud:       s(this.indautorModel.fechaSolicitud ?? raw.fec_solicitud),
-            descripcion:         s(this.indautorModel.descripcion ?? raw.descripcion),
-            tipo_sector_param:   s(sectorId || raw.tipo_sector_param),
+            no_expediente: this.s(this.indautorModel.numeroExpediente || raw.no_expediente),
+            titulo: this.s(this.indautorModel.titulo || raw.titulo),
+            tipo_ingreso_param: this.sid(raw.tipo_ingreso_param ?? '45'),
+            id_usuario: Number((raw as any).id_usuario ?? 0),
+            rama_param: this.sid(ramaId ?? raw.rama_param),
+            fec_expedicion: this.s(this.indautorModel.fechaExpedicion || (raw as any).fec_expedicion || ''),
+            observaciones: this.s(this.indautorModel.observaciones ?? raw.observaciones),
+            archivo: this.s(this.indautorModel.archivo ?? raw.archivo),
+            estatus_param: this.sid(estatusId ?? raw.estatus_param),
+            medio_ingreso_param: this.sid(medioId ?? raw.medio_ingreso_param),
+            tipo_registro_param: this.sid(raw.tipo_registro_param ?? '45'),
+            fec_solicitud: this.s(this.indautorModel.fechaSolicitud ?? raw.fec_solicitud),
+            descripcion: this.s(this.indautorModel.descripcion ?? raw.descripcion),
+            tipo_sector_param: this.sid(sectorId ?? raw.tipo_sector_param),
           };
 
           return this.service.updateRegistro(id, dto as any);
@@ -551,7 +545,11 @@ export class ModeloUtilidadComponent
         },
         error: (err) => {
           this.isSaving = false;
-          this.showAlert({ icon: 'error', title: 'Error al guardar', text: 'Ocurrió un error al intentar guardar los cambios.' });
+          this.showAlert({
+            icon: 'error',
+            title: 'Error al guardar',
+            text: 'Revisa que los *_param se envíen como strings (IDs) y que id_usuario sea numérico.',
+          });
           console.error('PUT /api/registros/{id}/ error:', err);
         },
       });
@@ -650,7 +648,6 @@ export class ModeloUtilidadComponent
     this.selectedRamaId = null;
     this.selectedMedioIngresoId = null;
     this.selectedTipoSectorId = null;
-    this.selectedEstatusId = null;
   }
 
   showAlert(swalOptions: SweetAlertOptions): void {
