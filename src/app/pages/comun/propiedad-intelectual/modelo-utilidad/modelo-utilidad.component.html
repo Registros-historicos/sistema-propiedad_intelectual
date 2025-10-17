@@ -14,7 +14,7 @@
           <label class="form-label text-gray-600 me-3 mb-0 fw-semibold" translate="TABLE.PAGE_LENGTH.LABEL"></label>
           <select class="form-select form-select-sm form-select-solid w-auto" (change)="onPageLengthChange($event)"
                   [(ngModel)]="pageLength">
-            <option *ngFor="let length of lengthMenu" [value]="length">{{length}}</option>
+            <option *ngFor="let length of lengthMenu" [value]="length">{{ length }}</option>
           </select>
           <span class="text-gray-600 ms-2 fw-semibold" translate="TABLE.PAGE_LENGTH.RECORDS"></span>
         </div>
@@ -23,8 +23,13 @@
   </div>
 
   <div class="card-body pt-0">
-    <app-crud [datatableConfig]="datatableConfig" route="/coordinador/propiedades/modelo-utilidad"
-      (deleteEvent)="delete($event)" (editEvent)="edit($event)" (viewEvent)="view($event)" [reload]="reloadEvent"
+    <app-crud
+      [datatableConfig]="datatableConfig"
+      route="/coordinador/propiedades/modelo-utilidad"
+      (deleteEvent)="delete($event)"
+      (editEvent)="edit($event)"
+      (viewEvent)="view($event)"
+      [reload]="reloadEvent"
       [modal]="isViewMode ? formModal : formModalEdit">
     </app-crud>
   </div>
@@ -32,112 +37,114 @@
 
 <swal #noticeSwal [swalOptions]="swalOptions"></swal>
 
-<!-- Modal Ver (solo lectura) INDAUTOR -->
+<!-- ===================== MODAL VER ===================== -->
 <ng-template #formModal let-modal>
   <div class="modal-header">
-    <h3 class="modal-title">REGISTROS INDAUTOR - Ver</h3>
+    <h3 class="modal-title">REGISTROS INDAUTOR</h3>
     <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
   </div>
+
   <div class="modal-body">
     <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-650px">
-      <!-- 1: N. Expediente | N. Certificado -->
+
+      <!-- Aviso -->
+      <div class="notice d-flex bg-light-info rounded border-info border border-dashed mb-7 p-6">
+        <app-keenicon name="information-5" class="fs-2tx text-info me-4"></app-keenicon>
+        <div class="d-flex flex-stack flex-grow-1">
+          <div class="fw-semibold">
+            <h4 class="text-gray-900 fw-bold">Detalle de registro</h4>
+            <div class="fs-6 text-gray-700">Consulta la información registrada en INDAUTOR.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ID + Expediente -->
       <div class="row g-9 mb-7">
-        <div class="fv-row col-md-6">
+        <div class="fv-row col-md-4">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">ID</label>
+          <input class="form-control form-control-solid bg-light" [value]="indautorModel.id" readonly />
+        </div>
+        <div class="fv-row col-md-8">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">N. Expediente</label>
           <input class="form-control form-control-solid bg-light" [value]="indautorModel.numeroExpediente" readonly />
         </div>
-        <div class="fv-row col-md-6">
-          <label class="fw-semibold fs-6 mb-2 text-gray-600">N. Certificado</label>
-          <input class="form-control form-control-solid bg-light" [value]="indautorModel.numeroCertificado" readonly />
-        </div>
       </div>
-      <!-- 2: Título | Rama -->
+
+      <!-- Título | Rama -->
       <div class="row g-9 mb-7">
-        <div class="fv-row col-md-6">
-          <label class="fw-semibold fs-6 mb-2 text-gray-600">Titulo</label>
+        <div class="fv-row col-md-8">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Título</label>
           <input class="form-control form-control-solid bg-light" [value]="indautorModel.titulo" readonly />
         </div>
-        <div class="fv-row col-md-6">
+        <div class="fv-row col-md-4">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">Rama</label>
           <input class="form-control form-control-solid bg-light" [value]="indautorModel.rama" readonly />
         </div>
       </div>
-      <!-- 3: Estatus | Medio de Ingreso -->
+
+      <!-- Estatus | Medio de ingreso -->
       <div class="row g-9 mb-7">
         <div class="fv-row col-md-6">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">Estatus</label>
-          <input class="form-control form-control-solid bg-light" [value]="indautorModel.estatus" readonly />
+          <div class="form-control form-control-solid d-flex align-items-center bg-light">
+            <span class="badge"
+                  [ngClass]="{
+                    'badge-light-success': indautorModel.estatus === 'Aprobada',
+                    'badge-light-primary': indautorModel.estatus === 'Registrada',
+                    'badge-light-warning': indautorModel.estatus === 'Trámite con observaciones',
+                    'badge-light-info': indautorModel.estatus === 'En trámite',
+                    'badge-light-secondary': indautorModel.estatus === 'Concluida'
+                  }"
+                  class="fs-7 fw-bold">
+              {{ indautorModel.estatus }}
+            </span>
+          </div>
         </div>
         <div class="fv-row col-md-6">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">Medio de Ingreso</label>
           <input class="form-control form-control-solid bg-light" [value]="indautorModel.medioIngreso" readonly />
         </div>
       </div>
-      <!-- 4: Tecnológico de Origen | CePat -->
+
+      <!-- Tipo de sector | Fecha de Solicitud -->
       <div class="row g-9 mb-7">
-        <div class="fv-row col-md-6">
-          <label class="fw-semibold fs-6 mb-2 text-gray-600">Tecnológico de Origen</label>
-          <input class="form-control form-control-solid bg-light" [value]="indautorModel.tecnologicoOrigen" readonly />
-        </div>
-        <div class="fv-row col-md-6">
-          <label class="fw-semibold fs-6 mb-2 text-gray-600">CePat</label>
-          <input class="form-control form-control-solid bg-light" [value]="indautorModel.cePat" readonly />
-        </div>
-      </div>
-      <!-- 5: Año Renovación | Tipo de Sector -->
-      <div class="row g-9 mb-7">
-        <div class="fv-row col-md-6">
-          <label class="fw-semibold fs-6 mb-2 text-gray-600">Año Renovación</label>
-          <input class="form-control form-control-solid bg-light" [value]="indautorModel.anioRenovacion" readonly />
-        </div>
         <div class="fv-row col-md-6">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">Tipo de Sector</label>
           <input class="form-control form-control-solid bg-light" [value]="indautorModel.tipoSector" readonly />
         </div>
-      </div>
-      <!-- 6: Sector | Subsector -->
-      <div class="row g-9 mb-7">
-        <div class="fv-row col-md-6">
-          <label class="fw-semibold fs-6 mb-2 text-gray-600">Sector</label>
-          <input class="form-control form-control-solid bg-light" [value]="indautorModel.sector" readonly />
-        </div>
-        <div class="fv-row col-md-6">
-          <label class="fw-semibold fs-6 mb-2 text-gray-600">Subsector</label>
-          <input class="form-control form-control-solid bg-light" [value]="indautorModel.subsector" readonly />
-        </div>
-      </div>
-      <!-- 7: Fecha de Solicitud | Fecha de Expedición -->
-      <div class="row g-9 mb-7">
         <div class="fv-row col-md-6">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">Fecha de Solicitud</label>
           <input class="form-control form-control-solid bg-light" [value]="indautorModel.fechaSolicitud" readonly />
         </div>
+      </div>
+
+      <!-- Fecha de Expedición | Archivo -->
+      <div class="row g-9 mb-7">
         <div class="fv-row col-md-6">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">Fecha de Expedición</label>
           <input class="form-control form-control-solid bg-light" [value]="indautorModel.fechaExpedicion" readonly />
         </div>
-      </div>
-      <!-- 8: Archivo | Observaciones -->
-      <div class="row g-9 mb-7">
         <div class="fv-row col-md-6">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">Archivo</label>
           <input class="form-control form-control-solid bg-light" [value]="indautorModel.archivo" readonly />
         </div>
-        <div class="fv-row col-md-6">
-          <label class="fw-semibold fs-6 mb-2 text-gray-600">Observaciones</label>
-          <textarea class="form-control form-control-solid bg-light" [value]="indautorModel.observaciones" rows="1" readonly></textarea>
-        </div>
       </div>
-      <!-- 9: Descripción -->
+
+      <!-- Observaciones (full) -->
+      <div class="fv-row mb-7">
+        <label class="fw-semibold fs-6 mb-2 text-gray-600">Observaciones</label>
+        <textarea class="form-control form-control-solid bg-light" [value]="indautorModel.observaciones" rows="3" readonly></textarea>
+      </div>
+
+      <!-- Descripción (full) -->
       <div class="fv-row mb-7">
         <label class="fw-semibold fs-6 mb-2 text-gray-600">Descripción</label>
         <textarea class="form-control form-control-solid bg-light" [value]="indautorModel.descripcion" rows="3" readonly></textarea>
       </div>
 
-      <!-- Inventores solo lectura -->
+      <!-- Inventores (si existen) -->
       <div class="separator separator-dashed my-7" *ngIf="inventoresVisibles.length"></div>
       <div class="fw-bold fs-4 mb-4" *ngIf="inventoresVisibles.length">Inventores ({{ inventoresVisibles.length }})</div>
-      <div *ngIf="inventoresVisibles.length === 0" class="text-muted">Sin inventores</div>
       <div *ngFor="let inv of inventoresVisibles; let i = index" class="card card-flush mb-5">
         <div class="card-header py-3">
           <div class="card-title fw-bold">Autor {{ i + 1 }}</div>
@@ -152,226 +159,148 @@
               <label class="form-label text-gray-600">Nombre Completo</label>
               <input class="form-control form-control-solid bg-light" [value]="inv.nombreCompleto" readonly />
             </div>
-            <div class="col-md-4">
-              <label class="form-label text-gray-600">Sexo</label>
-              <input class="form-control form-control-solid bg-light" [value]="inv.sexo" readonly />
-            </div>
-            <div class="col-md-8">
-              <label class="form-label text-gray-600">Tipo de investigador</label>
-              <input class="form-control form-control-solid bg-light" [value]="inv.tipoInvestigador" readonly />
-            </div>
-            <div class="col-md-6">
-              <label class="form-label text-gray-600">Institución</label>
-              <input class="form-control form-control-solid bg-light" [value]="inv.institucion" readonly />
-            </div>
-            <div class="col-md-6">
-              <label class="form-label text-gray-600">Programa Educativo</label>
-              <input class="form-control form-control-solid bg-light" [value]="inv.programaEducativo" readonly />
-            </div>
-            <div class="col-md-6">
-              <label class="form-label text-gray-600">Cuerpo Académico</label>
-              <input class="form-control form-control-solid bg-light" [value]="inv.cuerpoAcademico" readonly />
-            </div>
-            <div class="col-md-6">
-              <label class="form-label text-gray-600">Departamento</label>
-              <input class="form-control form-control-solid bg-light" [value]="inv.departamento" readonly />
-            </div>
-            <div class="col-md-6">
-              <label class="form-label text-gray-600">Fecha de Afiliación</label>
-              <input class="form-control form-control-solid bg-light" [value]="inv.fechaAfiliacion" readonly />
-            </div>
-            <div class="col-md-6">
-              <label class="form-label text-gray-600">Fecha de Fin</label>
-              <input class="form-control form-control-solid bg-light" [value]="inv.fechaFin" readonly />
-            </div>
           </div>
         </div>
       </div>
 
+      <!-- ===== COMENTADO (conservado): Número de Certificado =====
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">N. Certificado</label>
+          <input class="form-control form-control-solid bg-light" [value]="indautorModel.numeroCertificado" readonly />
+        </div>
+      </div>
+      -->
+
     </div>
   </div>
+
   <div class="modal-footer">
-    <button type="button" class="btn btn-light-primary" (click)="closeForm(modal)">
-      <app-keenicon name="cross-circle" class="fs-6 me-2"></app-keenicon>
-      Cerrar
-    </button>
+    <button type="button" class="btn btn-primary" (click)="closeForm(modal)">Cerrar</button>
   </div>
 </ng-template>
 
-<!-- Modal Editar INDAUTOR -->
+<!-- ===================== MODAL EDITAR ===================== -->
 <ng-template #formModalEdit let-modal>
-  <div class="modal-header bg-primary">
-    <h3 class="modal-title text-white">REGISTROS INDAUTOR - Editar</h3>
+  <div class="modal-header bg-warning">
+    <h3 class="modal-title text-white">
+      <app-keenicon name="pencil" class="fs-2 me-2 text-white"></app-keenicon>
+      Editar Registro INDAUTOR
+    </h3>
     <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
   </div>
+
   <div class="modal-body">
     <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-650px">
-      <!-- 1: N. Expediente | N. Certificado -->
+
+      <!-- ID + N. Expediente -->
       <div class="row g-9 mb-7">
-        <div class="fv-row col-md-6">
+        <div class="fv-row col-md-4">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">ID</label>
+          <input class="form-control form-control-solid bg-light" [value]="indautorModel.id" readonly />
+        </div>
+        <div class="fv-row col-md-8">
           <label class="required fw-semibold fs-6 mb-2 text-gray-600">N. Expediente</label>
-          <input class="form-control form-control-solid" [(ngModel)]="indautorModel.numeroExpediente" />
-        </div>
-        <div class="fv-row col-md-6">
-          <label class="fw-semibold fs-6 mb-2 text-gray-600">N. Certificado</label>
-          <input class="form-control form-control-solid" [(ngModel)]="indautorModel.numeroCertificado" />
+          <input class="form-control" [(ngModel)]="indautorModel.numeroExpediente" />
         </div>
       </div>
-      <!-- 2: Título | Rama -->
+
+      <!-- Título | Rama -->
       <div class="row g-9 mb-7">
-        <div class="fv-row col-md-6">
-          <label class="required fw-semibold fs-6 mb-2 text-gray-600">Titulo</label>
-          <input class="form-control form-control-solid" [(ngModel)]="indautorModel.titulo" />
+        <div class="fv-row col-md-8">
+          <label class="required fw-semibold fs-6 mb-2 text-gray-600">Título</label>
+          <input class="form-control" [(ngModel)]="indautorModel.titulo" />
         </div>
-        <div class="fv-row col-md-6">
+        <div class="fv-row col-md-4">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">Rama</label>
-          <input class="form-control form-control-solid" [(ngModel)]="indautorModel.rama" />
+          <select class="form-select" [(ngModel)]="selectedRamaId">
+            <option [ngValue]="null">Seleccione...</option>
+            <option *ngFor="let r of ramasCatalogo" [ngValue]="r.id_param">{{ r.nombre }}</option>
+          </select>
         </div>
       </div>
-      <!-- 3: Estatus | Medio de Ingreso -->
+
+      <!-- Estatus | Medio de Ingreso -->
       <div class="row g-9 mb-7">
         <div class="fv-row col-md-6">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">Estatus</label>
-          <input class="form-control form-control-solid" [(ngModel)]="indautorModel.estatus" />
+          <select class="form-select" [(ngModel)]="indautorModel.estatus">
+            <option value="">Seleccione...</option>
+            <option *ngFor="let e of estatusOptions" [value]="e">{{ e }}</option>
+          </select>
         </div>
         <div class="fv-row col-md-6">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">Medio de Ingreso</label>
-          <input class="form-control form-control-solid" [(ngModel)]="indautorModel.medioIngreso" />
+          <select class="form-select" [(ngModel)]="selectedMedioIngresoId">
+            <option [ngValue]="null">Seleccione...</option>
+            <option *ngFor="let m of mediosIngresoCatalogo" [ngValue]="m.id_param">{{ m.nombre }}</option>
+          </select>
         </div>
       </div>
-      <!-- 4: Tecnológico de Origen | CePat -->
+
+      <!-- Tipo de Sector | Fecha de Solicitud -->
       <div class="row g-9 mb-7">
-        <div class="fv-row col-md-6">
-          <label class="fw-semibold fs-6 mb-2 text-gray-600">Tecnológico de Origen</label>
-          <input class="form-control form-control-solid" [(ngModel)]="indautorModel.tecnologicoOrigen" />
-        </div>
-        <div class="fv-row col-md-6">
-          <label class="fw-semibold fs-6 mb-2 text-gray-600">CePat</label>
-          <input class="form-control form-control-solid" [(ngModel)]="indautorModel.cePat" />
-        </div>
-      </div>
-      <!-- 5: Año Renovación | Tipo de Sector -->
-      <div class="row g-9 mb-7">
-        <div class="fv-row col-md-6">
-          <label class="fw-semibold fs-6 mb-2 text-gray-600">Año Renovación</label>
-          <input class="form-control form-control-solid" [(ngModel)]="indautorModel.anioRenovacion" />
-        </div>
         <div class="fv-row col-md-6">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">Tipo de Sector</label>
-          <input class="form-control form-control-solid" [(ngModel)]="indautorModel.tipoSector" />
+          <select class="form-select" [(ngModel)]="selectedTipoSectorId">
+            <option [ngValue]="null">Seleccione...</option>
+            <option *ngFor="let s of tiposSectorCatalogo" [ngValue]="s.id_param">{{ s.nombre }}</option>
+          </select>
         </div>
-      </div>
-      <!-- 6: Sector | Subsector -->
-      <div class="row g-9 mb-7">
-        <div class="fv-row col-md-6">
-          <label class="fw-semibold fs-6 mb-2 text-gray-600">Sector</label>
-          <input class="form-control form-control-solid" [(ngModel)]="indautorModel.sector" />
-        </div>
-        <div class="fv-row col-md-6">
-          <label class="fw-semibold fs-6 mb-2 text-gray-600">Subsector</label>
-          <input class="form-control form-control-solid" [(ngModel)]="indautorModel.subsector" />
-        </div>
-      </div>
-      <!-- 7: Fecha de Solicitud | Fecha de Expedición -->
-      <div class="row g-9 mb-7">
         <div class="fv-row col-md-6">
           <label class="required fw-semibold fs-6 mb-2 text-gray-600">Fecha de Solicitud</label>
-          <input type="date" class="form-control form-control-solid" [(ngModel)]="indautorModel.fechaSolicitud" />
-        </div>
-        <div class="fv-row col-md-6">
-          <label class="fw-semibold fs-6 mb-2 text-gray-600">Fecha de Expedición</label>
-          <input type="date" class="form-control form-control-solid" [(ngModel)]="indautorModel.fechaExpedicion" />
+          <input type="date" class="form-control" [(ngModel)]="indautorModel.fechaSolicitud" />
         </div>
       </div>
-      <!-- 8: Archivo | Observaciones -->
+
+      <!-- Fecha de Expedición | Archivo -->
       <div class="row g-9 mb-7">
         <div class="fv-row col-md-6">
-          <label class="fw-semibold fs-6 mb-2 text-gray-600">Archivo</label>
-          <input class="form-control form-control-solid" [(ngModel)]="indautorModel.archivo" />
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Fecha de Expedición</label>
+          <input type="date" class="form-control" [(ngModel)]="indautorModel.fechaExpedicion" />
         </div>
         <div class="fv-row col-md-6">
-          <label class="fw-semibold fs-6 mb-2 text-gray-600">Observaciones</label>
-          <textarea class="form-control form-control-solid" [(ngModel)]="indautorModel.observaciones" rows="1"></textarea>
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">Archivo</label>
+          <input class="form-control" [(ngModel)]="indautorModel.archivo" />
         </div>
       </div>
-      <!-- 9: Descripción -->
+
+      <!-- Observaciones (full) -->
+      <div class="fv-row mb-7">
+        <label class="fw-semibold fs-6 mb-2 text-gray-600">Observaciones</label>
+        <textarea class="form-control" rows="3" [(ngModel)]="indautorModel.observaciones"></textarea>
+      </div>
+
+      <!-- Descripción (full) -->
       <div class="fv-row mb-7">
         <label class="fw-semibold fs-6 mb-2 text-gray-600">Descripción</label>
-        <textarea class="form-control form-control-solid" [(ngModel)]="indautorModel.descripcion" rows="3"></textarea>
+        <textarea class="form-control" rows="3" [(ngModel)]="indautorModel.descripcion"></textarea>
       </div>
+
       <!-- Inventores -->
       <div class="separator separator-dashed my-7"></div>
       <div class="d-flex align-items-center justify-content-between mb-4">
-        <div class="fw-bold fs-5 text-gray-800">Inventores <span class="badge badge-light-primary ms-2">{{ indautorModel.inventores.length }}</span></div>
-        <button type="button" class="btn btn-sm btn-light-primary" (click)="addInventor()">
+        <div class="fw-bold fs-4">Inventores</div>
+        <button type="button" class="btn btn-sm btn-primary" (click)="addInventor()">
           <app-keenicon name="plus" class="fs-5 me-1"></app-keenicon>
           Agregar inventor
         </button>
       </div>
-      <div *ngIf="!indautorModel.inventores || indautorModel.inventores.length === 0" class="text-muted">Sin inventores</div>
-      <div *ngFor="let inv of indautorModel.inventores; let i = index" class="border rounded p-4 mb-3">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <div class="fw-semibold">Inventor {{ i + 1 }}</div>
-          <button type="button" class="btn btn-icon btn-sm btn-light-danger" (click)="removeInventor(i)">
-            <i class="ki-duotone ki-trash fs-4"></i>
-          </button>
-        </div>
-        <div class="row g-6">
-          <div class="col-md-6">
-            <label class="fw-semibold fs-7 mb-1">CURP</label>
-            <input class="form-control form-control-solid" [(ngModel)]="inv.curp" />
-          </div>
-          <div class="col-md-6">
-            <label class="fw-semibold fs-7 mb-1">Nombre Completo</label>
-            <input class="form-control form-control-solid" [(ngModel)]="inv.nombreCompleto" />
-          </div>
-          <div class="col-md-4">
-            <label class="fw-semibold fs-7 mb-1">Sexo</label>
-            <select class="form-select form-select-solid" [(ngModel)]="inv.sexo">
-              <option value="">-</option>
-              <option value="M">M</option>
-              <option value="F">F</option>
-            </select>
-          </div>
-          <div class="col-md-8">
-            <label class="fw-semibold fs-7 mb-1">Tipo de investigador</label>
-            <input class="form-control form-control-solid" [(ngModel)]="inv.tipoInvestigador" />
-          </div>
-          <div class="col-md-6">
-            <label class="fw-semibold fs-7 mb-1">Institución</label>
-            <input class="form-control form-control-solid" [(ngModel)]="inv.institucion" />
-          </div>
-          <div class="col-md-6">
-            <label class="fw-semibold fs-7 mb-1">Programa Educativo</label>
-            <input class="form-control form-control-solid" [(ngModel)]="inv.programaEducativo" />
-          </div>
-          <div class="col-md-6">
-            <label class="fw-semibold fs-7 mb-1">Cuerpo Académico</label>
-            <input class="form-control form-control-solid" [(ngModel)]="inv.cuerpoAcademico" />
-          </div>
-          <div class="col-md-6">
-            <label class="fw-semibold fs-7 mb-1">Departamento</label>
-            <input class="form-control form-control-solid" [(ngModel)]="inv.departamento" />
-          </div>
-          <div class="col-md-6">
-            <label class="fw-semibold fs-7 mb-1">Fecha de Afiliación</label>
-            <input type="date" class="form-control form-control-solid" [(ngModel)]="inv.fechaAfiliacion" />
-          </div>
-          <div class="col-md-6">
-            <label class="fw-semibold fs-7 mb-1">Fecha de Fin</label>
-            <input type="date" class="form-control form-control-solid" [(ngModel)]="inv.fechaFin" />
-          </div>
+
+      <!-- ===== COMENTADO (conservado): Número de Certificado =====
+      <div class="row g-9 mb-7">
+        <div class="fv-row col-md-6">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">N. Certificado</label>
+          <input class="form-control" [(ngModel)]="indautorModel.numeroCertificado" />
         </div>
       </div>
+      -->
+
     </div>
   </div>
+
   <div class="modal-footer">
-    <button type="button" class="btn btn-success" (click)="saveEdit(modal)">
-      <app-keenicon name="check" class="fs-6 me-2"></app-keenicon>
-      Guardar
-    </button>
-    <button type="button" class="btn btn-light" (click)="closeForm(modal)">
-      Cancelar
-    </button>
+    <button type="button" class="btn btn-light" (click)="closeForm(modal)">Cancelar</button>
+    <button type="button" class="btn btn-warning" (click)="saveEdit(modal)">Guardar</button>
   </div>
 </ng-template>
