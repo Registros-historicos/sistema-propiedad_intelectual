@@ -20,6 +20,10 @@ export class RegistrosAnioComponent implements OnChanges {
 
   chartOptions: any;
   today: any;
+  // Estados visuales para controlar renderizado
+  isLoading: boolean = false;
+  isChartReady: boolean = false;
+  hasError: boolean = false;
 
   selectedQuarter: string | null = null;
   startDate: string | null = null;
@@ -116,93 +120,76 @@ export class RegistrosAnioComponent implements OnChanges {
   }
 
   initializeChart() {
+    // Evitar renderizado si no hay datos
+    if (!this.anios || this.anios.length === 0) {
+      this.isChartReady = false;
+      // mantener chartOptions en null para que el componente no intente renderizar
+      this.chartOptions = null;
+      try { this.cd.detectChanges(); } catch (e) { /* ignore */ }
+      return;
+    }
+
+    this.isLoading = true;
+    this.hasError = false;
+
     const categories = this.anios.map(s => s.category);
     const series1Data = this.anios.map(s => s.series1);
     const series2Data = this.anios.map(s => s.series2);
 
-    this.chartOptions = {
-      series: [
-        {
-          name: 'IMPI',
-          data: series1Data,
+    // Asignar options dentro de setTimeout para prevenir render prematuro
+    setTimeout(() => {
+      this.chartOptions = {
+        series: [
+          { name: 'IMPI', data: series1Data },
+          { name: 'INDAUTOR', data: series2Data },
+        ],
+        chart: {
+          fontFamily: 'inherit',
+          type: 'bar',
+          height: 400,
+          toolbar: { show: false },
         },
-        {
-          name: 'INDAUTOR',
-          data: series2Data,
+        plotOptions: {
+          bar: { horizontal: false, columnWidth: '30%', borderRadius: 5 },
         },
-      ],
-      chart: {
-        fontFamily: 'inherit',
-        type: 'bar',
-        height: 400,
-        toolbar: { show: false },
-      },
-      plotOptions: {
-        bar: {
-          horizontal: false,
-          columnWidth: '30%',
-          borderRadius: 5,
+        legend: { show: false },
+        dataLabels: { enabled: false },
+        stroke: { show: true, width: 2, colors: ['transparent'] },
+        xaxis: {
+          categories,
+          axisBorder: { show: false },
+          axisTicks: { show: false },
+          labels: { style: { colors: getCSSVariableValue('--bs-gray-500'), fontSize: '12px' } },
         },
-      },
-      legend: { show: false },
-      dataLabels: { enabled: false },
-      stroke: {
-        show: true,
-        width: 2,
-        colors: ['transparent'],
-      },
-      xaxis: {
-        categories,
-        axisBorder: { show: false },
-        axisTicks: { show: false },
-        labels: {
-          style: {
-            colors: getCSSVariableValue('--bs-gray-500'),
-            fontSize: '12px',
+        yaxis: {
+          title: { text: 'Número de Registros', style: { color: getCSSVariableValue('--bs-gray-500'), fontSize: '12px' } },
+          labels: { style: { colors: getCSSVariableValue('--bs-gray-500'), fontSize: '12px' } },
+        },
+        fill: { opacity: 1 },
+        states: { normal: { filter: { type: 'none', value: 0 } }, hover: { filter: { type: 'none', value: 0 } }, active: { allowMultipleDataPointsSelection: false, filter: { type: 'none', value: 0 } } },
+        tooltip: { style: { fontSize: '12px' }, y: { formatter: function (val: number) { return val + ' registros'; } } },
+        colors: [getCSSVariableValue('--bs-primary'), getCSSVariableValue('--bs-success'), getCSSVariableValue('--bs-warning'), getCSSVariableValue('--bs-danger'), getCSSVariableValue('--bs-info')],
+        grid: { borderColor: getCSSVariableValue('--bs-gray-200'), strokeDashArray: 4, yaxis: { lines: { show: true } } },
+        responsive: [
+          {
+            breakpoint: 480,
+            options: {
+              chart: { height: 300 },
+              legend: { fontSize: '10px' },
+              plotOptions: { bar: { columnWidth: '40%' } }
+            }
           },
-        },
-      },
-      yaxis: {
-        title: {
-          text: 'Número de Registros',
-          style: {
-            color: getCSSVariableValue('--bs-gray-500'),
-            fontSize: '12px',
-          },
-        },
-        labels: {
-          style: {
-            colors: getCSSVariableValue('--bs-gray-500'),
-            fontSize: '12px',
-          },
-        },
-      },
-      fill: { opacity: 1 },
-      states: {
-        normal: { filter: { type: 'none', value: 0 } },
-        hover: { filter: { type: 'none', value: 0 } },
-        active: {
-          allowMultipleDataPointsSelection: false,
-          filter: { type: 'none', value: 0 },
-        },
-      },
-      tooltip: {
-        style: { fontSize: '12px' },
-        y: {
-          formatter: function (val: number) {
-            return val + ' registros';
-          },
-        },
-      },
-      colors: [getCSSVariableValue('--bs-primary'), getCSSVariableValue('--bs-success'), getCSSVariableValue('--bs-warning'), getCSSVariableValue('--bs-danger'), getCSSVariableValue('--bs-info')],
-      grid: {
-        borderColor: getCSSVariableValue('--bs-gray-200'),
-        strokeDashArray: 4,
-        yaxis: { lines: { show: true } },
-      },
-    }
-    // Forzar actualización visual del chart
-    try { this.cd.detectChanges(); } catch (e) { /* ignore */ }
+          {
+            breakpoint: 768,
+            options: { chart: { height: 350 } }
+          }
+        ],
+      };
+
+      this.isLoading = false;
+      this.isChartReady = true;
+      try { this.cd.detectChanges(); } catch (e) { /* ignore */ }
+    }, 100);
   }
 
   applyQuarterFilter(event: any) {
