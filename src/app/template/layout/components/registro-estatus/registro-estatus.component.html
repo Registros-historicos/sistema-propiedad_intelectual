@@ -1,35 +1,41 @@
 <div>
-    <div class="card-header border-0 pt-5">
-        <h3 class="card-title align-items-start flex-column">
-            <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.RECORDS_STATUS"></span>
-        </h3>
+  <!-- Header -->
+  <div class="card-header border-0 pt-5">
+    <h3 class="card-title align-items-start flex-column">
+      <span class="card-label fw-bolder fs-3 mb-1" translate="GRAPHICS.TITLES.RECORDS_STATUS"></span>
+    </h3>
 
-        <div class="card-toolbar">
-            <!-- begin::Button-->
-            <div class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary tooltip-css">
-                <mat-icon style="color: #1D6F42;">description</mat-icon>
-                <span class="tooltip-text" translate="BUTTON.EXPORT_EXCEL"></span>
-            </div>
-            <!-- end::Button-->
-        </div>
+    <div class="card-toolbar">
+      <!-- begin::Button-->
+      <div class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary tooltip-css">
+        <mat-icon style="color: #1D6F42;">description</mat-icon>
+        <span class="tooltip-text" translate="BUTTON.EXPORT_EXCEL"></span>
+      </div>
+      <!-- end::Button-->
     </div>
-    <!-- end::Header -->
-    <!-- begin::Body -->
-    <div class="card-body h-100">
-        <!-- begin::PieCharts -->
-        <div #chartRef id="kt_charts_widget_1_chart"
-            class="flex-grow-1 w-100 d-flex justify-content-center align-items-center" style="min-height:350px;">
-            <apx-chart 
-                [series]="chartOptions?.series || []" 
-                [chart]="chartOptions?.chart || { type: 'pie', width: 650, height: 650 }" 
-                [labels]="chartOptions?.labels || []" 
-                [colors]="chartOptions?.colors" 
-                [responsive]="chartOptions?.responsive" 
-                [legend]="chartOptions?.legend" 
-                [plotOptions]="chartOptions?.plotOptions"
-                [dataLabels]="chartOptions?.dataLabels">
-            </apx-chart>
-        </div>
-        <!-- end::PieCharts -->
+  </div>
+  <!-- end::Header -->
+
+  <!-- Body -->
+  <div class="card-body h-100">
+    <!-- PieChart -->
+    <div id="kt_charts_widget_1_chart"
+         class="flex-grow-1 w-100 d-flex justify-content-center align-items-center chart-container">
+      <apx-chart
+        #chart
+        *ngIf="isLoaded"
+        [series]="chartOptions.series"
+        [chart]="chartOptions.chart"
+        [labels]="chartOptions.labels"
+        [colors]="chartOptions.colors"
+        [legend]="chartOptions.legend"
+        [plotOptions]="chartOptions.plotOptions"
+        [dataLabels]="chartOptions.dataLabels"
+        [stroke]="chartOptions.stroke"
+        [tooltip]="chartOptions.tooltip"
+        [responsive]="chartOptions.responsive">
+      </apx-chart>
     </div>
+    <!-- end::PieChart -->
+  </div>
 </div>
