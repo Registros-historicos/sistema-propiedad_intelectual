@@ -1,17 +1,17 @@
-import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {DataTablesResponse} from '../../../administrador/shared-services';
-import {Config} from 'datatables.net';
-import {SwalComponent} from '@sweetalert2/ngx-sweetalert2';
-import {SweetAlertOptions} from 'sweetalert2';
+import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { DataTablesResponse } from '../../../administrador/shared-services';
+import { Config } from 'datatables.net';
+import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { SweetAlertOptions } from 'sweetalert2';
 import moment from 'moment/moment';
-import {PatentsService} from '../../../../api/services/patents.service';
-import {TranslateService} from '@ngx-translate/core';
-import {Observable} from 'rxjs';
-import {IPatentModel} from 'src/app/api/models/patent.model';
-import {FederalEntity} from 'src/app/api/models/entity.model';
-import {ENTIDADES_FEDERATIVAS_DATA} from 'src/app/api/data/entity.data';
-import {ENTIDADES_FEDERATIVAS_MAP} from 'src/app/api/data/entity-institucion.data';
-import {ImpiRegistriesService} from '../../../../api/services/impi.service';
+import { PatentsService } from '../../../../api/services/patents.service';
+import { TranslateService } from '@ngx-translate/core';
+import { Observable } from 'rxjs';
+import { IPatentModel } from 'src/app/api/models/patent.model';
+import { FederalEntity } from 'src/app/api/models/entity.model';
+import { ENTIDADES_FEDERATIVAS_DATA } from 'src/app/api/data/entity.data';
+import { ENTIDADES_FEDERATIVAS_MAP } from 'src/app/api/data/entity-institucion.data';
+import { ImpiRegistriesService } from '../../../../api/services/impi.service';
 import { ParametrizacionesService, Catalogos, Parametrizacion, } from '../../../../api/services/parametrizaciones.service';
 
 type EstatusPatente = 'Registrada' | 'En trámite' | 'Trámite con observaciones' | 'Aprobada' | 'Concluida';
@@ -476,11 +476,11 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     this.placeholder = this.translate.instant('TABLE.PLACEHOLDER_SEARCH')
     this.cargarCatalogos();
     setTimeout(() => {
-    console.log('📚 Ramas disponibles:', this.ramasCatalogo);
-    console.log('📚 Estatus disponibles:', this.estatusCatalogo);
-    console.log('📚 Medios ingreso disponibles:', this.mediosIngresoCatalogo);
-    console.log('📚 Sectores disponibles:', this.tiposSectorCatalogo);
-  }, 2000);
+      console.log('📚 Ramas disponibles:', this.ramasCatalogo);
+      console.log('📚 Estatus disponibles:', this.estatusCatalogo);
+      console.log('📚 Medios ingreso disponibles:', this.mediosIngresoCatalogo);
+      console.log('📚 Sectores disponibles:', this.tiposSectorCatalogo);
+    }, 2000);
 
 
     // Para mostrar el mismo arreglo y columnas que en INDAUTOR/local, usa el dataset local propio de este componente
@@ -489,6 +489,8 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       serverSide: !this.useLocalFakeData,
       lengthMenu: this.lengthMenu,
       pageLength: this.pageLength,
+      ordering: true,
+      order: [[5, 'desc']],
       language: {
         info: this.translate.instant('TABLE.PAG_INFO'),
         infoFiltered: this.translate.instant('TABLE.PAG_INFO_FILTERED'),
@@ -509,87 +511,92 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
           numeroTitulo: item.numeroCertificado
         }))
       } : {
-       ajax: (dataTablesParameters: any, callback) => {
-  this.service.getPatents(dataTablesParameters).subscribe({
-    next: (resp: any) => {
-      callback(resp);
-    },
-    error: (error: any) => {
-      console.error('❌ Error al cargar patentes:', error);
-      callback({
-        draw: dataTablesParameters.draw,
-        recordsTotal: 0,
-        recordsFiltered: 0,
-        data: []
-      });
-    }
-  });
-}
+        ajax: (dataTablesParameters: any, callback) => {
+          this.service.getPatents(dataTablesParameters).subscribe({
+            next: (resp: any) => {
+              callback(resp);
+            },
+            error: (error: any) => {
+              console.error('❌ Error al cargar patentes:', error);
+              callback({
+                draw: dataTablesParameters.draw,
+                recordsTotal: 0,
+                recordsFiltered: 0,
+                data: []
+              });
+            }
+          });
+        }
       }),
       columns: [
-     {
-  title: 'No. de expediente',
-  data: 'numeroExpediente',
-  render: (data) => {
-    // Convertimos a string por seguridad, aunque sea numérico
-    const strData = data ? String(data) : '—';
+        {
+          title: 'No. de expediente',
+          data: 'numeroExpediente',
+          orderDataType: 'dom-text',
+          type: 'string',
+          orderable: true,
+          render: (data) => {
+            // Convertimos a string por seguridad, aunque sea numérico
+            const strData = data ? String(data) : '—';
 
-    return `
+            return `
       <span class="fw-semibold text-gray-600"
         style="display: inline-block; max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
         EXP-<br>${strData}
       </span>
     `;
-  },
-},
+          },
+        },
         {
-  title: 'No. de título',
-  data: 'numeroTitulo',
-  render: (data) => {
-    const strData = data ? String(data) : '—';
+          title: 'No. de título',
+          data: 'numeroTitulo',
+          orderable: true,
+          render: (data) => {
+            const strData = data ? String(data) : '—';
 
-    return `
+            return `
       <span class="fw-semibold text-gray-600"
         style="display: inline-block; max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
         CERT-<br>${strData}
       </span>
     `;
-  },
-},
-    {
-  title: this.translate.instant('TABLE.BRANCH'),
-  data: 'rama',
-  render: (data, type, full) => {
-    // Asegurar que sea string
-    const safeData = (data !== undefined && data !== null) ? String(data) : 'Invención';
+          },
+        },
+        {
+          title: this.translate.instant('TABLE.BRANCH'),
+          data: 'rama',
+          orderable: true,
+          render: (data, type, full) => {
+            // Asegurar que sea string
+            const safeData = (data !== undefined && data !== null) ? String(data) : 'Invención';
 
-    const colorClasses = ['success', 'info', 'warning', 'danger'];
-    const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
+            const colorClasses = ['success', 'info', 'warning', 'danger'];
+            const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
 
-    const nameParts = safeData.split(' ').filter((part: string) => part.length > 0 && !part.endsWith('.'));
+            const nameParts = safeData.split(' ').filter((part: string) => part.length > 0 && !part.endsWith('.'));
 
-    let initials = '';
-    if (nameParts.length >= 2) {
-      initials = (nameParts[0][0] + nameParts[1][0]).toUpperCase();
-    } else if (nameParts.length === 1 && nameParts[0].length >= 2) {
-      initials = (nameParts[0][0] + nameParts[0][1]).toUpperCase();
-    } else {
-      initials = 'IN';
-    }
+            let initials = '';
+            if (nameParts.length >= 2) {
+              initials = (nameParts[0][0] + nameParts[1][0]).toUpperCase();
+            } else if (nameParts.length === 1 && nameParts[0].length >= 2) {
+              initials = (nameParts[0][0] + nameParts[0][1]).toUpperCase();
+            } else {
+              initials = 'IN';
+            }
 
-    const symbolLabel = `
+            const symbolLabel = `
       <div class="symbol-label fs-3 bg-light-${randomColorClass} text-${randomColorClass}">
         ${initials}
       </div>
     `;
 
-    const nameAndEmail = `
+            const nameAndEmail = `
       <div class="d-flex flex-column" data-action="view" data-id="${full.id}">
         <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${safeData}</a>
       </div>
     `;
 
-    return `
+            return `
       <div class="d-flex align-items-center">
         <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" data-action="view" data-id="${full.id}">
           <a href="javascript:;">
@@ -599,11 +606,14 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         ${nameAndEmail}
       </div>
     `;
-  }
-},
+          }
+        },
         {
           title: this.translate.instant('TABLE.WORK_TITLE'),
           data: 'nombrePatente',
+          orderable: true,
+          orderDataType: 'dom-text',
+          type: 'string',
           render: (data) => {
             return `<span class="fw-bold fs-6 text-gray-800">${data || ''}</span>`;
           },
@@ -611,6 +621,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         {
           title: this.translate.instant('TABLE.INSTITUTION'),
           data: 'institucion',
+          orderable: true,
           render: (data) => {
             return `<span class="fw-semibold text-gray-600">${data || ''}</span>`;
           },
@@ -618,6 +629,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         {
           title: this.translate.instant('TABLE.DATE'),
           data: 'fechaSolicitud',
+          orderable: true,
           render: (data) => {
             return `<span class="fw-semibold text-gray-600">${moment(data).format('DD-MM-YYYY')}</span>`;
           },
@@ -707,33 +719,33 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     this.patenteModel.institucion = '';
   }
 
-delete(id: number) {
-  if (this.useLocalFakeData) {
-    // ... código para datos fake
-  } else {
-    this.service.deletePatent(id).subscribe({
-      next: () => {
-        console.log('✅ Registro deshabilitado correctamente');
-        this.reloadEvent.emit(true);
-        
-        // Opcional: Mostrar alerta de éxito
-        this.showAlert({
-          icon: 'success',
-          title: 'Eliminado',
-          text: 'El registro fue deshabilitado correctamente.'
-        });
-      },
-      error: (error) => {
-        console.error('❌ Error al deshabilitar:', error);
-        this.showAlert({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudo deshabilitar el registro.'
-        });
-      }
-    });
+  delete(id: number) {
+    if (this.useLocalFakeData) {
+      // ... código para datos fake
+    } else {
+      this.service.deletePatent(id).subscribe({
+        next: () => {
+          console.log('✅ Registro deshabilitado correctamente');
+          this.reloadEvent.emit(true);
+
+          // Opcional: Mostrar alerta de éxito
+          this.showAlert({
+            icon: 'success',
+            title: 'Eliminado',
+            text: 'El registro fue deshabilitado correctamente.'
+          });
+        },
+        error: (error) => {
+          console.error('❌ Error al deshabilitar:', error);
+          this.showAlert({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo deshabilitar el registro.'
+          });
+        }
+      });
+    }
   }
-}
 
   view(id: number) {
     this.isViewMode = true;
@@ -777,9 +789,9 @@ delete(id: number) {
           denominacion: patente.nombrePatente || this.patenteModel.denominacion,
         };
         console.log('📊 Datos de la patente recibidos:', patente);
-      console.log('🔢 Valor de rama:', this.patenteModel.rama);
-      console.log('🔢 Tipo de rama:', typeof this.patenteModel.rama);
-      console.log('✅ Resultado de getRamaNombre:', this.getRamaNombre(this.patenteModel.rama));
+        console.log('🔢 Valor de rama:', this.patenteModel.rama);
+        console.log('🔢 Tipo de rama:', typeof this.patenteModel.rama);
+        console.log('✅ Resultado de getRamaNombre:', this.getRamaNombre(this.patenteModel.rama));
         this.inicializarSeleccionesDesdePatente();
       });
     }
@@ -790,7 +802,7 @@ delete(id: number) {
     this.cdr.detectChanges();
 
     this.service.getPatent(id).subscribe((patente: IPatentModel) => {
-      this.patenteModel = {...patente};
+      this.patenteModel = { ...patente };
       this.observacionesChanged = false;
       this.resetEditMode();
     });
@@ -830,8 +842,8 @@ delete(id: number) {
       }
     } else {
       this.service.getPatent(id).subscribe((patente: IPatentModel) => {
-        this.patenteModel = {...this.patenteModel, ...patente};
-          this.convertirNombresAIdsParaEdicion();
+        this.patenteModel = { ...this.patenteModel, ...patente };
+        this.convertirNombresAIdsParaEdicion();
         if (!this.patenteModel.denominacion) {
           this.patenteModel.denominacion = this.patenteModel.nombrePatente;
         }
@@ -863,7 +875,7 @@ delete(id: number) {
         target.archivo = this.patenteModel.archivo || '';
         target.observaciones = this.patenteModel.observaciones || '';
         target.descripcion = this.patenteModel.descripcion || '';
-        target.inventores = (this.patenteModel.inventores || []).map(i => ({...i}));
+        target.inventores = (this.patenteModel.inventores || []).map(i => ({ ...i }));
 
         if (this.dtInstance) {
           const updatedRow = {
@@ -883,7 +895,7 @@ delete(id: number) {
           }
         }
       }
-      this.showAlert({icon: 'success', title: 'Actualizado', text: 'El registro fue actualizado correctamente.'});
+      this.showAlert({ icon: 'success', title: 'Actualizado', text: 'El registro fue actualizado correctamente.' });
       this.isViewMode = true;
       modal.dismiss('saved');
       return;
@@ -915,10 +927,10 @@ delete(id: number) {
           modal.dismiss('saved');
         },
         error: (err) => {
-            console.error('❌ Error completo al actualizar patente:', err);
-      console.error('❌ Error details:', err.error);
-      console.error('❌ Error status:', err.status);
-      console.error('❌ Error message:', err.message);
+          console.error('❌ Error completo al actualizar patente:', err);
+          console.error('❌ Error details:', err.error);
+          console.error('❌ Error status:', err.status);
+          console.error('❌ Error message:', err.message);
           console.error('Error al actualizar patente', err);
           this.showAlert({
             icon: 'error',
@@ -930,21 +942,21 @@ delete(id: number) {
     }
   }
 
- 
-private convertirNombresAIdsParaEdicion(): void {
-  if (this.patenteModel.rama && typeof this.patenteModel.rama === 'string') {
-    const ramaEncontrada = this.ramasCatalogo.find(r => 
-      r.nombre.toLowerCase().trim() === (this.patenteModel.rama as string).toLowerCase().trim()
-    );
-    if (ramaEncontrada) {
-      // Guardar el ID en una propiedad temporal para el select
-      (this.patenteModel as any).ramaIdTemp = ramaEncontrada.id;
-      console.log(`✅ Rama convertida: "${this.patenteModel.rama}" → ID ${ramaEncontrada.id}`);
-    } else {
-      console.warn(`⚠️ No se encontró rama con nombre: "${this.patenteModel.rama}"`);
+
+  private convertirNombresAIdsParaEdicion(): void {
+    if (this.patenteModel.rama && typeof this.patenteModel.rama === 'string') {
+      const ramaEncontrada = this.ramasCatalogo.find(r =>
+        r.nombre.toLowerCase().trim() === (this.patenteModel.rama as string).toLowerCase().trim()
+      );
+      if (ramaEncontrada) {
+        // Guardar el ID en una propiedad temporal para el select
+        (this.patenteModel as any).ramaIdTemp = ramaEncontrada.id;
+        console.log(`✅ Rama convertida: "${this.patenteModel.rama}" → ID ${ramaEncontrada.id}`);
+      } else {
+        console.warn(`⚠️ No se encontró rama con nombre: "${this.patenteModel.rama}"`);
+      }
     }
   }
-}
 
   getStatusBadgeClass(status: string): string {
     const statusClasses: { [key: string]: string } = {
@@ -963,23 +975,23 @@ private convertirNombresAIdsParaEdicion(): void {
     switch (currentStatus) {
       case 'Registrada':
         return [
-          {value: 'En trámite', label: 'En trámite'},
-          {value: 'Trámite con observaciones', label: 'Trámite con observaciones'}
+          { value: 'En trámite', label: 'En trámite' },
+          { value: 'Trámite con observaciones', label: 'Trámite con observaciones' }
         ];
 
       case 'Trámite con observaciones':
         return [
-          {value: 'En trámite', label: 'En trámite'}
+          { value: 'En trámite', label: 'En trámite' }
         ];
 
       case 'En trámite':
         return [
-          {value: 'Aprobada', label: 'Aprobada'}
+          { value: 'Aprobada', label: 'Aprobada' }
         ];
 
       case 'Aprobada':
         return [
-          {value: 'Concluida', label: 'Concluida'}
+          { value: 'Concluida', label: 'Concluida' }
         ];
 
       case 'Concluida':
@@ -1085,7 +1097,7 @@ private convertirNombresAIdsParaEdicion(): void {
     };
 
     this.service.updatePatentStatusAndObservations(this.patenteModel.id, updateData).subscribe({
-      next: (response : any) => {
+      next: (response: any) => {
         this.isSaving = false;
         this.patenteModel.estatus = updateData.estatus;
         this.patenteModel.observaciones = updateData.observaciones;
@@ -1325,84 +1337,84 @@ private convertirNombresAIdsParaEdicion(): void {
   }
 
   private cargarCatalogos(): void {
-  this.parametrizacionesServices.getAll().subscribe({
-    next: (catalogos: Catalogos) => {
-      console.log('✅ Catálogos completos cargados:', catalogos);
+    this.parametrizacionesServices.getAll().subscribe({
+      next: (catalogos: Catalogos) => {
+        console.log('✅ Catálogos completos cargados:', catalogos);
 
-      // 🔹 Cargar Ramas (id_tema = 3)
-      if (catalogos[3]?.lista) {
-        this.ramasCatalogo = catalogos[3].lista.map((r: Parametrizacion) => ({
-          id: r.id_param,
-          nombre: r.nombre
-        }));
-        console.log('✅ Ramas cargadas:', this.ramasCatalogo);
-      }
+        // 🔹 Cargar Ramas (id_tema = 3)
+        if (catalogos[3]?.lista) {
+          this.ramasCatalogo = catalogos[3].lista.map((r: Parametrizacion) => ({
+            id: r.id_param,
+            nombre: r.nombre
+          }));
+          console.log('✅ Ramas cargadas:', this.ramasCatalogo);
+        }
 
-      // 🔹 Cargar Medios de Ingreso (id_tema = 8)
-      if (catalogos[8]?.lista) {
-        this.mediosIngresoCatalogo = catalogos[8].lista.map((m: Parametrizacion) => ({
-          id: m.id_param,
-          nombre: m.nombre
-        }));
-        console.log('✅ Medios de ingreso cargados:', this.mediosIngresoCatalogo);
-      }
+        // 🔹 Cargar Medios de Ingreso (id_tema = 8)
+        if (catalogos[8]?.lista) {
+          this.mediosIngresoCatalogo = catalogos[8].lista.map((m: Parametrizacion) => ({
+            id: m.id_param,
+            nombre: m.nombre
+          }));
+          console.log('✅ Medios de ingreso cargados:', this.mediosIngresoCatalogo);
+        }
 
-      // 🔹 Cargar Tipos de Sector (id_tema = 2)
-      if (catalogos[2]?.lista) {
-        this.tiposSectorCatalogo = catalogos[2].lista.map((s: Parametrizacion) => ({
-          id: s.id_param,
-          nombre: s.nombre
-        }));
-        console.log('✅ Tipos de sector cargados:', this.tiposSectorCatalogo);
-      }
+        // 🔹 Cargar Tipos de Sector (id_tema = 2)
+        if (catalogos[2]?.lista) {
+          this.tiposSectorCatalogo = catalogos[2].lista.map((s: Parametrizacion) => ({
+            id: s.id_param,
+            nombre: s.nombre
+          }));
+          console.log('✅ Tipos de sector cargados:', this.tiposSectorCatalogo);
+        }
 
-      // 🔹 Cargar Estatus (id_tema = 5)
-      if (catalogos[5]?.lista) {
-        this.estatusCatalogo = catalogos[5].lista.map((e: Parametrizacion) => ({
-          id: e.id_param,
-          nombre: e.nombre
-        }));
-        console.log('✅ Estatus cargados:', this.estatusCatalogo);
-      }
-    },
-    error: (err) => console.error('❌ Error al cargar catálogos:', err)
-  });
-}
-  
+        // 🔹 Cargar Estatus (id_tema = 5)
+        if (catalogos[5]?.lista) {
+          this.estatusCatalogo = catalogos[5].lista.map((e: Parametrizacion) => ({
+            id: e.id_param,
+            nombre: e.nombre
+          }));
+          console.log('✅ Estatus cargados:', this.estatusCatalogo);
+        }
+      },
+      error: (err) => console.error('❌ Error al cargar catálogos:', err)
+    });
+  }
 
-getRamaNombre(ramaId: string | number | undefined): string {
-  if (!ramaId) return 'N/A';
-  const id = typeof ramaId === 'string' ? parseInt(ramaId) : ramaId;
-  const rama = this.ramasCatalogo.find(r => r.id === id);
-  return rama ? rama.nombre : 'N/A';
-}
 
-getMedioIngresoNombre(medioId: string | number | undefined): string {
-  if (!medioId) return 'N/A';
-  const id = typeof medioId === 'string' ? parseInt(medioId) : medioId;
-  const medio = this.mediosIngresoCatalogo.find(m => m.id === id);
-  return medio ? medio.nombre : 'N/A';
-}
+  getRamaNombre(ramaId: string | number | undefined): string {
+    if (!ramaId) return 'N/A';
+    const id = typeof ramaId === 'string' ? parseInt(ramaId) : ramaId;
+    const rama = this.ramasCatalogo.find(r => r.id === id);
+    return rama ? rama.nombre : 'N/A';
+  }
 
-getTipoSectorNombre(sectorId: string | number | undefined): string {
-  if (!sectorId) return 'N/A';
-  const id = typeof sectorId === 'string' ? parseInt(sectorId) : sectorId;
-  const sector = this.tiposSectorCatalogo.find(s => s.id === id);
-  return sector ? sector.nombre : 'N/A';
-}
+  getMedioIngresoNombre(medioId: string | number | undefined): string {
+    if (!medioId) return 'N/A';
+    const id = typeof medioId === 'string' ? parseInt(medioId) : medioId;
+    const medio = this.mediosIngresoCatalogo.find(m => m.id === id);
+    return medio ? medio.nombre : 'N/A';
+  }
 
-getEstatusNombre(estatusId: string | number | undefined): string {
-  if (!estatusId) return 'N/A';
-  const id = typeof estatusId === 'string' ? parseInt(estatusId) : estatusId;
-  const estatus = this.estatusCatalogo.find(e => e.id === id);
-  return estatus ? estatus.nombre : 'N/A';
-}
+  getTipoSectorNombre(sectorId: string | number | undefined): string {
+    if (!sectorId) return 'N/A';
+    const id = typeof sectorId === 'string' ? parseInt(sectorId) : sectorId;
+    const sector = this.tiposSectorCatalogo.find(s => s.id === id);
+    return sector ? sector.nombre : 'N/A';
+  }
+
+  getEstatusNombre(estatusId: string | number | undefined): string {
+    if (!estatusId) return 'N/A';
+    const id = typeof estatusId === 'string' ? parseInt(estatusId) : estatusId;
+    const estatus = this.estatusCatalogo.find(e => e.id === id);
+    return estatus ? estatus.nombre : 'N/A';
+  }
 
   ngOnDestroy(): void {
     this.reloadEvent.unsubscribe();
   }
 
-  
+
 }
 
 
