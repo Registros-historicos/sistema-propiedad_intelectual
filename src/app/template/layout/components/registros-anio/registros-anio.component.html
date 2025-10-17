@@ -61,12 +61,32 @@
         </div>
     </div>
     <div class="card-body p-5">
-        <!-- Debug eliminado: lastResponseRows ya no se muestra en la UI -->
-        <div class="table-responsive" style="min-height:400px;">
-            <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [xaxis]="chartOptions.xaxis"
-                [dataLabels]="chartOptions.dataLabels" [stroke]="chartOptions.stroke" [legend]="chartOptions.legend"
-                [fill]="chartOptions.fill" [tooltip]="chartOptions.tooltip" [colors]="chartOptions.colors"
-                [plotOptions]="chartOptions.plotOptions"></apx-chart>
+        <!-- Indicador de carga para peticiones por periodo -->
+        <div *ngIf="loadingPeriod" class="mb-3">
+            <span class="badge bg-info">Cargando datos del periodo...</span>
+        </div>
+
+        <div class="table-responsive chart-responsive-container" style="min-height:350px; padding:1rem;">
+            <!-- Estados visuales: loading, error, ready -->
+            <div *ngIf="isLoading" class="d-flex align-items-center justify-content-center h-100">
+                <span class="text-muted">Preparando gráfico...</span>
+            </div>
+
+            <div *ngIf="hasError" class="d-flex align-items-center justify-content-center h-100">
+                <span class="text-danger">Error al cargar el gráfico</span>
+            </div>
+
+            <div *ngIf="!isChartReady && !isLoading && !hasError" class="d-flex align-items-center justify-content-center h-100">
+                <span class="text-muted">No hay datos para mostrar</span>
+            </div>
+
+            <ng-container *ngIf="isChartReady">
+                <apx-chart *ngIf="chartOptions"
+                    [series]="chartOptions.series" [chart]="chartOptions.chart" [xaxis]="chartOptions.xaxis"
+                    [dataLabels]="chartOptions.dataLabels" [stroke]="chartOptions.stroke" [legend]="chartOptions.legend"
+                    [fill]="chartOptions.fill" [tooltip]="chartOptions.tooltip" [colors]="chartOptions.colors"
+                    [plotOptions]="chartOptions.plotOptions"></apx-chart>
+            </ng-container>
         </div>
     </div>
 </div>
