@@ -151,47 +151,88 @@ public getPatents(tableParams: any): Observable<any> {
     return formattedData;
   }
 
-  private mapBackendToFrontend(backendPatent: any): IPatentModel {
-    if (this.catalogos) {
-      console.log('Estatus convertido:', backendPatent.estatus_param);
-      backendPatent = this.paramService.convertirRegistroConObjetos(backendPatent, this.catalogos);
-    }
 
-    return {
-      id: backendPatent.id_registro || 0,
-      solicitudId: backendPatent.no_expediente?.toString() || 'N/A',
-      nombrePatente: backendPatent.titulo || 'Sin título',
-      solicitante: backendPatent.solicitante || 'TecNM',
-      institucion: backendPatent.institucion?.nombre || backendPatent.institucion || 'N/A',
-      correo: backendPatent.correo || 'N/A',
-      fechaSolicitud: backendPatent.fec_solicitud ? backendPatent.fec_solicitud.split('T')[0] : '',
-estatus:
-  typeof backendPatent.estatus_param === 'object'
-    ? backendPatent.estatus_param?.nombre
-    : backendPatent.estatus || 'N/A',      descripcion: backendPatent.descripcion || '',
-      documentos: backendPatent.archivo ? [backendPatent.archivo] : [],
-      observaciones: backendPatent.observaciones || '',
-      rama: backendPatent.rama_param?.nombre || backendPatent.rama || 'Invención',
-      numeroExpediente: backendPatent.no_expediente?.toString() || 'N/A',
-      numeroTitulo: backendPatent.id_registro?.toString() || 'N/A',
-      denominacion: backendPatent.titulo || 'Sin título',
-      medioIngreso: backendPatent.medio_ingreso_param?.nombre || backendPatent.medio_ingreso || 'N/A',
-      tipoSector: backendPatent.tipo_sector_param?.nombre || backendPatent.tipo_sector || 'N/A',
-    tecnologicoOrigen: backendPatent.institucion?.nombre || backendPatent.institucion || 'N/A',
-      cePat: 'N/A',
-      anioRenovacion: 'N/A',
-      sector: 'N/A',
-      subsector: 'N/A',
-      fechaExpedicion: backendPatent.fec_expedicion 
-        ? backendPatent.fec_expedicion.split('T')[0]
-        : 'Pendiente',
-      archivo: backendPatent.archivo || '',
-      tipoIngreso: backendPatent.tipo_ingreso_param?.nombre || backendPatent.tipo_ingreso || 'IMPI',
-      tipoRegistro: backendPatent.tipo_registro_param?.nombre || backendPatent.tipo_registro || 'IMPI',
-    } as any;
-
+private mapBackendToFrontend(backendPatent: any): IPatentModel {
+  // 🔹 Si ya tienes catálogos cargados, convertir numéricos a objetos legibles
+  if (this.catalogos) {
+    backendPatent = this.paramService.convertirRegistroConObjetos(backendPatent, this.catalogos);
   }
 
+  // 🔹 Extraer institución y usuario principal (si existen)
+  const institucion =
+    backendPatent.instituciones?.[0]?.nombre ||
+    backendPatent.instituciones?.[0] ||
+    backendPatent.institucion ||
+    'N/A';
+
+  const usuario =
+    backendPatent.id_usuarios?.[0] ||
+    backendPatent.id_usuario ||
+    'N/A';
+
+  return {
+    id: backendPatent.id_registro || 0,
+    solicitudId: backendPatent.no_expediente?.toString() || 'N/A',
+    nombrePatente: backendPatent.titulo || 'Sin título',
+    solicitante: usuario || 'TecNM',
+    institucion,
+    correo: backendPatent.correo || 'N/A',
+
+    fechaSolicitud: backendPatent.fec_solicitud
+      ? backendPatent.fec_solicitud.split('T')[0]
+      : '',
+
+    estatus:
+      typeof backendPatent.estatus_param === 'object'
+        ? backendPatent.estatus_param?.nombre
+        : backendPatent.estatus_param?.toString() || 'N/A',
+
+    descripcion: backendPatent.descripcion || '',
+    documentos: backendPatent.archivo ? [backendPatent.archivo] : [],
+    observaciones: backendPatent.observaciones || '',
+
+    rama:
+      typeof backendPatent.rama_param === 'object'
+        ? backendPatent.rama_param?.nombre
+        : backendPatent.rama_param?.toString() || 'N/A',
+
+    numeroExpediente: backendPatent.no_expediente?.toString() || 'N/A',
+    numeroTitulo: backendPatent.id_registro?.toString() || 'N/A',
+    denominacion: backendPatent.titulo || 'Sin título',
+
+    medioIngreso:
+      typeof backendPatent.medio_ingreso_param === 'object'
+        ? backendPatent.medio_ingreso_param?.nombre
+        : backendPatent.medio_ingreso_param?.toString() || 'N/A',
+
+    tipoSector:
+      typeof backendPatent.tipo_sector_param === 'object'
+        ? backendPatent.tipo_sector_param?.nombre
+        : backendPatent.tipo_sector_param?.toString() || 'N/A',
+
+    tecnologicoOrigen: institucion,
+    cePat: 'N/A',
+    anioRenovacion: 'N/A',
+    sector: 'N/A',
+    subsector: 'N/A',
+
+    fechaExpedicion: backendPatent.fec_expedicion
+      ? backendPatent.fec_expedicion.split('T')[0]
+      : 'Pendiente',
+
+    archivo: backendPatent.archivo || '',
+
+    tipoIngreso:
+      typeof backendPatent.tipo_ingreso_param === 'object'
+        ? backendPatent.tipo_ingreso_param?.nombre
+        : backendPatent.tipo_ingreso_param?.toString() || 'IMPI',
+
+    tipoRegistro:
+      typeof backendPatent.tipo_registro_param === 'object'
+        ? backendPatent.tipo_registro_param?.nombre
+        : backendPatent.tipo_registro_param?.toString() || 'IMPI',
+  } as any;
+}
   public getPatent(id: number): Observable<IPatentModel> {
     return this.http.get<any>(`${this.apiUrl}/${id}/`).pipe(
       map(patent => this.mapBackendToFrontend(patent))
