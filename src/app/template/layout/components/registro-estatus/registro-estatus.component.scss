@@ -35,8 +35,18 @@
    - Flex centrado
 */
 .chart-container {
-  min-height: 420px;         /* 👈 coherente con chart.height */
+  width: 100%;
+  min-height: 420px;       // ✅ garantiza espacio antes del render
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
+
+apx-chart {
+  width: 100% !important;  // ✅ ApexCharts toma todo el ancho
+  height: 420px !important;
+}
+
 
 /* NO limites el canvas a 480px: permite ocupar el ancho disponible */
 #kt_charts_widget_1_chart .apexcharts-canvas {
