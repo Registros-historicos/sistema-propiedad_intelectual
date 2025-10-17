@@ -40,6 +40,30 @@ public getPatents(tableParams: any): Observable<any> {
   const limit = tableParams.length || 10;
   const searchValue = tableParams.search?.value || '';
 
+  let sortColumn = 'fec_solicitud';
+  let sortOrder = 'DESC';
+
+  if (tableParams.order && tableParams.order.length > 0) {
+    const orderInfo = tableParams.order[0];
+    const columnIndex = orderInfo.column;
+    const direction = orderInfo.dir.toUpperCase();
+
+    
+    const columnMap: { [key: number]: string } = {
+      0: 'no_expediente',
+      1: 'id_registro',
+      2: 'rama_param',
+      3: 'titulo',
+      4: 'instituciones',
+      5: 'fec_solicitud'
+    };
+
+    if (columnMap[columnIndex]) {
+      sortColumn = columnMap[columnIndex];
+      sortOrder = direction;
+    }
+  }
+
   // 🔹 Esperar a que los catálogos estén cargados antes de formatear las patentes
   return this.paramService.getAll().pipe(
     switchMap((cats) => {
@@ -47,9 +71,9 @@ public getPatents(tableParams: any): Observable<any> {
 
       // 🔹 Elegir entre búsqueda o listado normal
       if (searchValue && searchValue.trim() !== '') {
-        return this.searchPatents(searchValue, page, limit);
+        return this.searchPatents(searchValue, page, limit, sortColumn, sortOrder);
       }
-      return this.listPatents(page, limit);
+      return this.listPatents(page, limit, sortColumn, sortOrder);
     }),
     map((response) => {
       // 🔹 Ahora sí formatear con los catálogos ya cargados
@@ -61,11 +85,14 @@ public getPatents(tableParams: any): Observable<any> {
 }
 
 
-  private listPatents(page: number = 1, limit: number = 10): Observable<IPaginatedPatentsResponse> {
+  private listPatents(page: number = 1, limit: number = 10, sortColumn: string = 'fec_solicitud', 
+  sortOrder: string = 'DESC'): Observable<IPaginatedPatentsResponse> {
     const params = new HttpParams()
       .set('tipo', this.TIPO_PATENTE)
       .set('page', page.toString())
-      .set('limit', limit.toString());
+      .set('limit', limit.toString())
+      .set('filter', sortColumn)
+      .set('order', sortOrder);
 
     return this.http.get<any>(this.apiUrl, { params }).pipe(
       map(response => {
@@ -101,12 +128,15 @@ public getPatents(tableParams: any): Observable<any> {
     );
   }
 
-  private searchPatents(query: string, page: number = 1, limit: number = 10): Observable<IPaginatedPatentsResponse> {
+  private searchPatents(query: string, page: number = 1, limit: number = 10, sortColumn: string = 'fec_solicitud',
+  sortOrder: string = 'DESC'): Observable<IPaginatedPatentsResponse> {
     const params = new HttpParams()
       .set('tipo', this.TIPO_PATENTE)
       .set('q', query)
       .set('page', page.toString())
-      .set('limit', limit.toString());
+      .set('limit', limit.toString())
+      .set('filter', sortColumn)
+      .set('order', sortOrder);
 
     return this.http.get<IPaginatedPatentsResponse>(`${this.apiUrl}/search/`, { params });
   }
