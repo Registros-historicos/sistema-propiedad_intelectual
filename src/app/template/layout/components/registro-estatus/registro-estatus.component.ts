@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ChartComponent } from 'ng-apexcharts';
 import { TablerosService } from 'src/app/api/services/tableros.service';
 
@@ -10,67 +10,81 @@ interface IRegisterStatus {
 @Component({
   selector: 'app-registro-estatus',
   templateUrl: './registro-estatus.component.html',
-  styleUrls: ['./registro-estatus.component.scss'] // 👈 plural para que cargue el SCSS
+  styleUrls: ['./registro-estatus.component.scss']
 })
-export class RegistroEstatusComponent implements AfterViewInit {
+export class RegistroEstatusComponent implements OnInit {
   @ViewChild('chart') chart?: ChartComponent;
 
+  chartOptions: any;
   data: IRegisterStatus[] = [];
-  chartOptions: any = {};
   isLoaded = false;
-
-  private readonly colors = [
-    '#008FFB','#00E396','#FEB019','#FF4560',
-    '#775DD0','#3F51B5','#546E7A','#D4526E','#8D5B4C'
-  ];
 
   constructor(
     private tablerosService: TablerosService,
     private cdRef: ChangeDetectorRef
   ) {}
 
-  // 👇 Esperamos a que exista el DOM con tamaño real
-  ngAfterViewInit(): void {
-    setTimeout(() => this.loadRegisterStatus(), 0);
+  ngOnInit(): void {
+    this.loadRegisterStatus();
   }
 
   private loadRegisterStatus(): void {
     this.tablerosService.getRegisterStatus().subscribe({
       next: (data) => {
         this.data = (data || []).filter(x => x && x.estatus != null);
-        this.buildChart();
+        this.chartOptions = this.getChartOptions(420);
         this.isLoaded = true;
-        this.cdRef.detectChanges();
+
+        // 👇 Forzamos el repaint una vez Angular ya renderizó el DOM
+        setTimeout(() => {
+          this.cdRef.detectChanges();
+          this.chart?.updateOptions(this.chartOptions, true, true);
+        }, 200);
       },
-      error: (err) => console.error('ERROR:', err)
+      error: (err) => console.error('❌ ERROR:', err)
     });
   }
 
-  private buildChart(): void {
-    const labels = this.data.map(s => s.estatus);
-    const series = this.data.map(s => Number(s.total) || 0);
+  /**
+   * 🎨 Genera una paleta dinámica de colores
+   * para que nunca falten tonos aunque haya muchos estatus
+   */
+  private generateColors(count: number): string[] {
+    const baseColors = [
+      '#008FFB', '#00E396', '#FEB019', '#FF4560',
+      '#775DD0', '#3F51B5', '#546E7A', '#D4526E', '#8D5B4C',
+      '#26A69A', '#7E36AF', '#F46036', '#F9C80E', '#2E294E', '#662E9B'
+    ];
+    const colors: string[] = [];
+    for (let i = 0; i < count; i++) {
+      colors.push(baseColors[i % baseColors.length]);
+    }
+    return colors;
+  }
 
-    this.chartOptions = {
+  private getChartOptions(height: number) {
+    const series = this.data.map(s => Number(s.total) || 0);
+    const labels = this.data.map(s => s.estatus);
+    const colors = this.generateColors(series.length);
+
+    return {
       series,
       labels,
-      colors: this.colors,
+      colors,
       chart: {
-        id: 'registro-estatus',
         type: 'pie',
-        height: 420,                 // 👈 alto suficiente y estable
+        height,
         toolbar: { show: false },
-        animations: {
-          enabled: true,
-          speed: 500,
-          dynamicAnimation: { enabled: false } // 👈 evita recalculados pesados
-        },
-        foreColor: '#3f4254'
+        animations: { enabled: true, speed: 500 },
+        foreColor: '#3f4254',
+        fontFamily: 'inherit'
       },
       legend: {
         show: true,
-        position: 'right',           // 👈 a la derecha por defecto
+        position: 'right',
         horizontalAlign: 'left',
         fontSize: '13px',
+        labels: { colors: '#3f4254' },
         markers: { width: 10, height: 10, radius: 12 },
         itemMargin: { vertical: 4, horizontal: 8 }
       },
@@ -78,22 +92,18 @@ export class RegistroEstatusComponent implements AfterViewInit {
         enabled: true,
         style: { fontSize: '13px', fontWeight: 'bold' }
       },
-      states: {                       // 👈 hover visible sin “parpadeo”
-        hover: { filter: { type: 'lighten', value: 0.08 } },
-        active: { filter: { type: 'none' } }
-      },
       stroke: { show: false },
       plotOptions: {
-        pie: {
-          expandOnClick: true,        // hover/click nativo
-          dataLabels: { offset: 0 },
-          customScale: 0.96            // un poco más grande sin chocar con la leyenda
+        pie: { expandOnClick: true, customScale: 0.96 }
+      },
+      tooltip: {
+        y: {
+          formatter: (val: number) => `${val} registros`
         }
       },
-      tooltip: { enabled: true },
+      theme: { monochrome: { enabled: false } },
       responsive: [
         {
-          // 👇 en < 1400px baja la leyenda para no romper el layout
           breakpoint: 1400,
           options: {
             legend: {

@@ -20,22 +20,23 @@
   <div class="card-body h-100">
     <!-- PieChart -->
     <div id="kt_charts_widget_1_chart"
-         class="flex-grow-1 w-100 d-flex justify-content-center align-items-center chart-container">
-      <apx-chart
-        #chart
-        *ngIf="isLoaded"
-        [series]="chartOptions.series"
-        [chart]="chartOptions.chart"
-        [labels]="chartOptions.labels"
-        [colors]="chartOptions.colors"
-        [legend]="chartOptions.legend"
-        [plotOptions]="chartOptions.plotOptions"
-        [dataLabels]="chartOptions.dataLabels"
-        [stroke]="chartOptions.stroke"
-        [tooltip]="chartOptions.tooltip"
-        [responsive]="chartOptions.responsive">
-      </apx-chart>
-    </div>
+     class="flex-grow-1 w-100 d-flex justify-content-center align-items-center chart-container">
+  <apx-chart
+    #chart
+    [hidden]="!isLoaded"
+    [series]="chartOptions.series"
+    [chart]="chartOptions.chart"
+    [labels]="chartOptions.labels"
+    [colors]="chartOptions.colors"
+    [legend]="chartOptions.legend"
+    [plotOptions]="chartOptions.plotOptions"
+    [dataLabels]="chartOptions.dataLabels"
+    [stroke]="chartOptions.stroke"
+    [tooltip]="chartOptions.tooltip"
+    [responsive]="chartOptions.responsive">
+  </apx-chart>
+</div>
+
     <!-- end::PieChart -->
   </div>
 </div>
