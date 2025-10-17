@@ -40,6 +40,30 @@ public getPatents(tableParams: any): Observable<any> {
   const limit = tableParams.length || 10;
   const searchValue = tableParams.search?.value || '';
 
+  let sortColumn = 'fec_solicitud';
+  let sortOrder = 'DESC';
+
+  if (tableParams.order && tableParams.order.length > 0) {
+    const orderInfo = tableParams.order[0];
+    const columnIndex = orderInfo.column;
+    const direction = orderInfo.dir.toUpperCase();
+
+    
+    const columnMap: { [key: number]: string } = {
+      0: 'no_expediente',
+      1: 'id_registro',
+      2: 'rama_param',
+      3: 'titulo',
+      4: 'instituciones',
+      5: 'fec_solicitud'
+    };
+
+    if (columnMap[columnIndex]) {
+      sortColumn = columnMap[columnIndex];
+      sortOrder = direction;
+    }
+  }
+
   // 🔹 Esperar a que los catálogos estén cargados antes de formatear las patentes
   return this.paramService.getAll().pipe(
     switchMap((cats) => {
@@ -47,9 +71,9 @@ public getPatents(tableParams: any): Observable<any> {
 
       // 🔹 Elegir entre búsqueda o listado normal
       if (searchValue && searchValue.trim() !== '') {
-        return this.searchPatents(searchValue, page, limit);
+        return this.searchPatents(searchValue, page, limit, sortColumn, sortOrder);
       }
-      return this.listPatents(page, limit);
+      return this.listPatents(page, limit, sortColumn, sortOrder);
     }),
     map((response) => {
       // 🔹 Ahora sí formatear con los catálogos ya cargados
@@ -61,11 +85,14 @@ public getPatents(tableParams: any): Observable<any> {
 }
 
 
-  private listPatents(page: number = 1, limit: number = 10): Observable<IPaginatedPatentsResponse> {
+  private listPatents(page: number = 1, limit: number = 10, sortColumn: string = 'fec_solicitud', 
+  sortOrder: string = 'DESC'): Observable<IPaginatedPatentsResponse> {
     const params = new HttpParams()
       .set('tipo', this.TIPO_PATENTE)
       .set('page', page.toString())
-      .set('limit', limit.toString());
+      .set('limit', limit.toString())
+      .set('filter', sortColumn)
+      .set('order', sortOrder);
 
     return this.http.get<any>(this.apiUrl, { params }).pipe(
       map(response => {
@@ -101,12 +128,15 @@ public getPatents(tableParams: any): Observable<any> {
     );
   }
 
-  private searchPatents(query: string, page: number = 1, limit: number = 10): Observable<IPaginatedPatentsResponse> {
+  private searchPatents(query: string, page: number = 1, limit: number = 10, sortColumn: string = 'fec_solicitud',
+  sortOrder: string = 'DESC'): Observable<IPaginatedPatentsResponse> {
     const params = new HttpParams()
       .set('tipo', this.TIPO_PATENTE)
       .set('q', query)
       .set('page', page.toString())
-      .set('limit', limit.toString());
+      .set('limit', limit.toString())
+      .set('filter', sortColumn)
+      .set('order', sortOrder);
 
     return this.http.get<IPaginatedPatentsResponse>(`${this.apiUrl}/search/`, { params });
   }
@@ -121,47 +151,88 @@ public getPatents(tableParams: any): Observable<any> {
     return formattedData;
   }
 
-  private mapBackendToFrontend(backendPatent: any): IPatentModel {
-    if (this.catalogos) {
-      console.log('Estatus convertido:', backendPatent.estatus_param);
-      backendPatent = this.paramService.convertirRegistroConObjetos(backendPatent, this.catalogos);
-    }
 
-    return {
-      id: backendPatent.id_registro || 0,
-      solicitudId: backendPatent.no_expediente?.toString() || 'N/A',
-      nombrePatente: backendPatent.titulo || 'Sin título',
-      solicitante: backendPatent.solicitante || 'TecNM',
-      institucion: backendPatent.institucion?.nombre || backendPatent.institucion || 'N/A',
-      correo: backendPatent.correo || 'N/A',
-      fechaSolicitud: backendPatent.fec_solicitud ? backendPatent.fec_solicitud.split('T')[0] : '',
-estatus:
-  typeof backendPatent.estatus_param === 'object'
-    ? backendPatent.estatus_param?.nombre
-    : backendPatent.estatus || 'N/A',      descripcion: backendPatent.descripcion || '',
-      documentos: backendPatent.archivo ? [backendPatent.archivo] : [],
-      observaciones: backendPatent.observaciones || '',
-      rama: backendPatent.rama_param?.nombre || backendPatent.rama || 'Invención',
-      numeroExpediente: backendPatent.no_expediente?.toString() || 'N/A',
-      numeroTitulo: backendPatent.id_registro?.toString() || 'N/A',
-      denominacion: backendPatent.titulo || 'Sin título',
-      medioIngreso: backendPatent.medio_ingreso_param?.nombre || backendPatent.medio_ingreso || 'N/A',
-      tipoSector: backendPatent.tipo_sector_param?.nombre || backendPatent.tipo_sector || 'N/A',
-    tecnologicoOrigen: backendPatent.institucion?.nombre || backendPatent.institucion || 'N/A',
-      cePat: 'N/A',
-      anioRenovacion: 'N/A',
-      sector: 'N/A',
-      subsector: 'N/A',
-      fechaExpedicion: backendPatent.fec_expedicion 
-        ? backendPatent.fec_expedicion.split('T')[0]
-        : 'Pendiente',
-      archivo: backendPatent.archivo || '',
-      tipoIngreso: backendPatent.tipo_ingreso_param?.nombre || backendPatent.tipo_ingreso || 'IMPI',
-      tipoRegistro: backendPatent.tipo_registro_param?.nombre || backendPatent.tipo_registro || 'IMPI',
-    } as any;
-
+private mapBackendToFrontend(backendPatent: any): IPatentModel {
+  // 🔹 Si ya tienes catálogos cargados, convertir numéricos a objetos legibles
+  if (this.catalogos) {
+    backendPatent = this.paramService.convertirRegistroConObjetos(backendPatent, this.catalogos);
   }
 
+  // 🔹 Extraer institución y usuario principal (si existen)
+  const institucion =
+    backendPatent.instituciones?.[0]?.nombre ||
+    backendPatent.instituciones?.[0] ||
+    backendPatent.institucion ||
+    'N/A';
+
+  const usuario =
+    backendPatent.id_usuarios?.[0] ||
+    backendPatent.id_usuario ||
+    'N/A';
+
+  return {
+    id: backendPatent.id_registro || 0,
+    solicitudId: backendPatent.no_expediente?.toString() || 'N/A',
+    nombrePatente: backendPatent.titulo || 'Sin título',
+    solicitante: usuario || 'TecNM',
+    institucion,
+    correo: backendPatent.correo || 'N/A',
+
+    fechaSolicitud: backendPatent.fec_solicitud
+      ? backendPatent.fec_solicitud.split('T')[0]
+      : '',
+
+    estatus:
+      typeof backendPatent.estatus_param === 'object'
+        ? backendPatent.estatus_param?.nombre
+        : backendPatent.estatus_param?.toString() || 'N/A',
+
+    descripcion: backendPatent.descripcion || '',
+    documentos: backendPatent.archivo ? [backendPatent.archivo] : [],
+    observaciones: backendPatent.observaciones || '',
+
+    rama:
+      typeof backendPatent.rama_param === 'object'
+        ? backendPatent.rama_param?.nombre
+        : backendPatent.rama_param?.toString() || 'N/A',
+
+    numeroExpediente: backendPatent.no_expediente?.toString() || 'N/A',
+    numeroTitulo: backendPatent.id_registro?.toString() || 'N/A',
+    denominacion: backendPatent.titulo || 'Sin título',
+
+    medioIngreso:
+      typeof backendPatent.medio_ingreso_param === 'object'
+        ? backendPatent.medio_ingreso_param?.nombre
+        : backendPatent.medio_ingreso_param?.toString() || 'N/A',
+
+    tipoSector:
+      typeof backendPatent.tipo_sector_param === 'object'
+        ? backendPatent.tipo_sector_param?.nombre
+        : backendPatent.tipo_sector_param?.toString() || 'N/A',
+
+    tecnologicoOrigen: institucion,
+    cePat: 'N/A',
+    anioRenovacion: 'N/A',
+    sector: 'N/A',
+    subsector: 'N/A',
+
+    fechaExpedicion: backendPatent.fec_expedicion
+      ? backendPatent.fec_expedicion.split('T')[0]
+      : 'Pendiente',
+
+    archivo: backendPatent.archivo || '',
+
+    tipoIngreso:
+      typeof backendPatent.tipo_ingreso_param === 'object'
+        ? backendPatent.tipo_ingreso_param?.nombre
+        : backendPatent.tipo_ingreso_param?.toString() || 'IMPI',
+
+    tipoRegistro:
+      typeof backendPatent.tipo_registro_param === 'object'
+        ? backendPatent.tipo_registro_param?.nombre
+        : backendPatent.tipo_registro_param?.toString() || 'IMPI',
+  } as any;
+}
   public getPatent(id: number): Observable<IPatentModel> {
     return this.http.get<any>(`${this.apiUrl}/${id}/`).pipe(
       map(patent => this.mapBackendToFrontend(patent))
