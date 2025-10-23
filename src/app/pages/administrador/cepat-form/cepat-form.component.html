@@ -1,0 +1,191 @@
+<div class="card">
+  <div class="card-header border-0 pt-6">
+    <div class="card-title">
+      <h3>Agregar CEPAT</h3>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <form #userForm="ngForm" (ngSubmit)="onSubmit(userForm)" class="form">
+      <div class="d-flex flex-column scroll-y me-n7 pe-7">
+        <div
+          class="notice d-flex bg-light-primary rounded border-primary border border-dashed mb-9 p-6"
+        >
+          <i class="ki-duotone ki-information fs-2tx text-primary me-4">
+            <span class="path1"></span>
+            <span class="path2"></span>
+            <span class="path3"></span>
+          </i>
+          <div class="d-flex flex-stack flex-grow-1">
+            <div class="fw-semibold">
+              <div class="fs-6 text-gray-700">
+                Por favor, complete todos los campos requeridos para registrar
+                al nuevo CEPAT.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row g-9 mb-7">
+          <div class="col-md-4 fv-row">
+            <label class="required fw-semibold fs-6 mb-2">Nombre</label>
+            <input
+              type="text"
+              class="form-control form-control-solid"
+              name="nombre"
+              [(ngModel)]="userModel.nombre"
+              #nombre="ngModel"
+              required
+              minlength="2"
+            />
+            <div
+              *ngIf="userForm.submitted && nombre.invalid"
+              class="fv-plugins-message-container invalid-feedback"
+            >
+              <div *ngIf="nombre.errors?.['required']">
+                El nombre es requerido.
+              </div>
+              <div *ngIf="nombre.errors?.['minlength']">
+                El nombre debe tener al menos 2 caracteres.
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 fv-row">
+            <label class="required fw-semibold fs-6 mb-2"
+              >Apellido Paterno</label
+            >
+            <input
+              type="text"
+              class="form-control form-control-solid"
+              name="ape_pat"
+              [(ngModel)]="userModel.ape_pat"
+              #ape_pat="ngModel"
+              required
+              minlength="2"
+            />
+            <div
+              *ngIf="userForm.submitted && ape_pat.invalid"
+              class="fv-plugins-message-container invalid-feedback"
+            >
+              <div *ngIf="ape_pat.errors?.['required']">
+                El apellido paterno es requerido.
+              </div>
+              <div *ngIf="ape_pat.errors?.['minlength']">
+                Debe tener al menos 2 caracteres.
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 fv-row">
+            <label class="required fw-semibold fs-6 mb-2"
+              >Apellido Materno</label
+            >
+            <input
+              type="text"
+              class="form-control form-control-solid"
+              name="ape_mat"
+              [(ngModel)]="userModel.ape_mat"
+              #ape_mat="ngModel"
+              required
+              minlength="2"
+            />
+            <div
+              *ngIf="userForm.submitted && ape_mat.invalid"
+              class="fv-plugins-message-container invalid-feedback"
+            >
+              <div *ngIf="ape_mat.errors?.['required']">
+                El apellido materno es requerido.
+              </div>
+              <div *ngIf="ape_mat.errors?.['minlength']">
+                Debe tener al menos 2 caracteres.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row g-9 mb-7">
+          <div class="col-md-6 fv-row">
+            <label class="required fw-semibold fs-6 mb-2"
+              >Correo Electrónico</label
+            >
+            <input
+              type="email"
+              class="form-control form-control-solid"
+              name="correo"
+              [(ngModel)]="userModel.correo"
+              #correo="ngModel"
+              required
+              pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+            />
+            <div
+              *ngIf="userForm.submitted && correo.invalid"
+              class="fv-plugins-message-container invalid-feedback"
+            >
+              <div *ngIf="correo.errors?.['required']">
+                El correo es requerido.
+              </div>
+              <div *ngIf="correo.errors?.['pattern']">
+                El formato del correo no es válido.
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 fv-row">
+            <label class="required fw-semibold fs-6 mb-2">Teléfono</label>
+            <input
+              type="tel"
+              class="form-control form-control-solid"
+              name="telefono"
+              [(ngModel)]="userModel.telefono"
+              #telefono="ngModel"
+              required
+              pattern="[0-9]{10}"
+              placeholder="10 dígitos sin espacios"
+            />
+            <div
+              *ngIf="userForm.submitted && telefono.invalid"
+              class="fv-plugins-message-container invalid-feedback"
+            >
+              <div *ngIf="telefono.errors?.['required']">
+                El teléfono es requerido.
+              </div>
+              <div *ngIf="telefono.errors?.['pattern']">
+                El teléfono debe contener 10 dígitos.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row g-9 mb-7">
+          <div class="col-md-6 fv-row">
+            <label class="required fw-semibold fs-6 mb-2">Contraseña</label>
+            <input
+              type="password"
+              class="form-control form-control-solid"
+              name="password"
+              [(ngModel)]="userModel.password"
+              #password="ngModel"
+              required
+              minlength="8"
+            />
+            <div
+              *ngIf="userForm.submitted && password.invalid"
+              class="fv-plugins-message-container invalid-feedback"
+            >
+              <div *ngIf="password.errors?.['required']">
+                La contraseña es requerida.
+              </div>
+              <div *ngIf="password.errors?.['minlength']">
+                La contraseña debe tener al menos 8 caracteres.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-end pt-5">
+        <button type="button" class="btn btn-light me-3" (click)="onCancel()">
+          Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary">
+          <span class="indicator-label">Guardar</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
