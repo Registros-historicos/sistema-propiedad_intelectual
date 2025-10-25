@@ -94,34 +94,14 @@ export class TablerosService {
   }
 
   //Get all institutions
-  //  getAllInstitutions(): Observable<Institutions[]> {
-  //   return this.http.get<any[]>('/api/tableros/instituciones/all/').pipe(
-  //     map(data => this.normalizeInstitutionsData(data)),
-  //     catchError(error => {
-  //       console.error('Error in getAllInstitutions:', error);
-  //       return of([]);
-  //     })
-  //   );
-  // }
-
-  getAllInstitutions(): Observable<Institutions[]> {
-    // 👇 Token temporal (sustituye por tu token real)
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1MTAiLCJjb3JyZW8iOiJhZG1pbkB0ZXN0LmNvbSIsInRpcG9fdXN1YXJpb19wYXJhbSI6MzUsImVzdGF0dXMiOm51bGwsIm5vbWJyZSI6ImFkbWluIiwiaWF0IjoxNzYxNDEzODY1LCJleHAiOjE3NjE0MTQxNjV9.i_i7ZIxIbKxUwhcpoLaIgsX8DN7qhpKhq9KUUhK0sow';
-
-    // 👇 Configuración de headers con el Bearer Token
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-    });
-
-    return this.http
-      .get<any[]>('/api/tableros/instituciones/all/', { headers })
-      .pipe(
-        map((data) => this.normalizeInstitutionsData(data)),
-        catchError((error) => {
-          console.error('Error in getAllInstitutions:', error);
-          return of([]);
-        })
-      );
+   getAllInstitutions(): Observable<Institutions[]> {
+    return this.http.get<any[]>('/api/tableros/instituciones/all/').pipe(
+      map(data => this.normalizeInstitutionsData(data)),
+      catchError(error => {
+        console.error('Error in getAllInstitutions:', error);
+        return of([]);
+      })
+    );
   }
 
 
