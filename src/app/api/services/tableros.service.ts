@@ -1,6 +1,6 @@
 
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
@@ -74,7 +74,7 @@ export class TablerosService {
       })
     );
   }
-  
+
   getRegisterStatus(): Observable<any[]> {
     return this.http.get<any[]>('/api/tableros/registros/estatus').pipe(
       catchError(error => {
@@ -94,15 +94,36 @@ export class TablerosService {
   }
 
   //Get all institutions
-   getAllInstitutions(): Observable<Institutions[]> {
-    return this.http.get<any[]>('/api/tableros/instituciones/all/').pipe(
-      map(data => this.normalizeInstitutionsData(data)),
-      catchError(error => {
-        console.error('Error in getAllInstitutions:', error);
-        return of([]);
-      })
-    );
+  //  getAllInstitutions(): Observable<Institutions[]> {
+  //   return this.http.get<any[]>('/api/tableros/instituciones/all/').pipe(
+  //     map(data => this.normalizeInstitutionsData(data)),
+  //     catchError(error => {
+  //       console.error('Error in getAllInstitutions:', error);
+  //       return of([]);
+  //     })
+  //   );
+  // }
+
+  getAllInstitutions(): Observable<Institutions[]> {
+    // 👇 Token temporal (sustituye por tu token real)
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1MTAiLCJjb3JyZW8iOiJhZG1pbkB0ZXN0LmNvbSIsInRpcG9fdXN1YXJpb19wYXJhbSI6MzUsImVzdGF0dXMiOm51bGwsIm5vbWJyZSI6ImFkbWluIiwiaWF0IjoxNzYxNDEzODY1LCJleHAiOjE3NjE0MTQxNjV9.i_i7ZIxIbKxUwhcpoLaIgsX8DN7qhpKhq9KUUhK0sow';
+
+    // 👇 Configuración de headers con el Bearer Token
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+
+    return this.http
+      .get<any[]>('/api/tableros/instituciones/all/', { headers })
+      .pipe(
+        map((data) => this.normalizeInstitutionsData(data)),
+        catchError((error) => {
+          console.error('Error in getAllInstitutions:', error);
+          return of([]);
+        })
+      );
   }
+
 
   private normalizeInstitutionsData(data: Institutions[]): Institutions[] {
     if (!Array.isArray(data)) return [];
@@ -185,15 +206,15 @@ export class TablerosService {
 
   private normalizeInstitutoData(data: any[], tipoFiltro?: number): Instituto[] {
     if (!Array.isArray(data)) return [];
-    
+
     console.log(`🎯 Normalizando ${data.length} items con tipoFiltro: ${tipoFiltro}`);
-    
+
     return data.map((item, index) => {
       // Si hay un filtro específico, forzar ese tipo
       if (tipoFiltro === 122 || tipoFiltro === 123) {
         const tipoForzado = this.getTipoInstitucion(tipoFiltro);
         console.log(`🎯 FORZANDO tipo: ${tipoForzado} para filtro ${tipoFiltro}`);
-        
+
         return {
           tipo_institucion_param: tipoFiltro,
           nombre_tipo_institucion: tipoForzado,
@@ -201,13 +222,13 @@ export class TablerosService {
           total_registros: item.total_registros || item.total || item.registros || item.count || 0
         };
       }
-      
+
       // Para "Todas las Instituciones", determinar el tipo basado en el ID
       const tipoInstitucion = this.getTipoByInstitucionId(item.id_institucion);
       const nombreTipo = this.getTipoInstitucion(tipoInstitucion);
-      
+
       console.log(`📋 Item ${index} - ID: ${item.id_institucion}, Tipo detectado: ${tipoInstitucion} (${nombreTipo})`);
-      
+
       return {
         tipo_institucion_param: tipoInstitucion,
         nombre_tipo_institucion: nombreTipo,
@@ -221,10 +242,10 @@ export class TablerosService {
   private getTipoByInstitucionId(idInstitucion: number): number {
     // Instituciones Federales (123) - basado en los logs
     const institucionesFederales = [212, 209, 218, 211, 214, 207];
-    
+
     // Instituciones Descentralizadas (122) - basado en los logs
     const institucionesDescentralizadas = [205, 216, 203, 210, 202, 204, 215, 206, 217, 213, 208, 201];
-    
+
     if (institucionesFederales.includes(idInstitucion)) {
       return 123;
     } else if (institucionesDescentralizadas.includes(idInstitucion)) {
