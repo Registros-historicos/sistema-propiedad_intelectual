@@ -11,11 +11,9 @@
 <div class="app-navbar-item me-3" [ngClass]="itemClass">
   <div *ngIf="user$ | async as user" class="d-flex align-items-center">
     <div class="d-flex flex-column text-end me-3">
-      <!-- Nombre del usuario -->
       <span class="text-gray-800 fw-bold fs-7">
-        Hola, {{ user.fullname }}! 👋
+        Hola, {{ user.name || 'Usuario' }}! 👋
       </span>
-      <!-- Fecha actual -->
       <span class="text-muted fs-8">
         {{ currentDate | date:'dd-MM-yyyy' }}
       </span>
@@ -28,7 +26,8 @@
 <div class="app-navbar-item" [ngClass]="itemClass">
   <!--begin::Menu wrapper-->
   <div *ngIf="user$ | async as _user" class="cursor-pointer symbol" [ngClass]="userAvatarClass" data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
-    <img [src]="_user.pic" />
+    <!-- <img [src]="_user.pic" /> -->
+    <span class="fw-bold text-gray-700">{{ getInitials(_user.name || '') }}</span>
   </div>
   <app-user-inner data-kt-menu='true'></app-user-inner>
   <!--end::Menu wrapper-->

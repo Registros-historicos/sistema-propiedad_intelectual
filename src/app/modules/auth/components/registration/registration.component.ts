@@ -25,7 +25,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router
   ) {
-    this.isLoading$ = this.authService.isLoading$;
+    // this.isLoading$ = this.authService.isLoading$;
     // redirect to home if already logged in
     if (this.authService.currentUserValue) {
       this.router.navigate(['/']);
@@ -86,7 +86,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
   }
 
   submit() {
-    this.hasError = false;
+    /* this.hasError = false;
     const result: {
       [key: string]: string;
     } = {};
@@ -105,7 +105,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
           this.hasError = true;
         }
       });
-    this.unsubscribe.push(registrationSubscr);
+    this.unsubscribe.push(registrationSubscr); */
   }
 
   ngOnDestroy() {

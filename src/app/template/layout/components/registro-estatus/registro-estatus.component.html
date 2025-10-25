@@ -21,19 +21,19 @@
     <!-- PieChart -->
     <div id="kt_charts_widget_1_chart"
      class="flex-grow-1 w-100 d-flex justify-content-center align-items-center chart-container">
-  <apx-chart
+  <apx-chart *ngIf="chartOptions"
     #chart
     [hidden]="!isLoaded"
-    [series]="chartOptions.series"
-    [chart]="chartOptions.chart"
-    [labels]="chartOptions.labels"
-    [colors]="chartOptions.colors"
-    [legend]="chartOptions.legend"
-    [plotOptions]="chartOptions.plotOptions"
-    [dataLabels]="chartOptions.dataLabels"
-    [stroke]="chartOptions.stroke"
-    [tooltip]="chartOptions.tooltip"
-    [responsive]="chartOptions.responsive">
+    [series]="chartOptions?.series"
+    [chart]="chartOptions?.chart"
+    [labels]="chartOptions?.labels"
+    [colors]="chartOptions?.colors"
+    [legend]="chartOptions?.legend"
+    [plotOptions]="chartOptions?.plotOptions"
+    [dataLabels]="chartOptions?.dataLabels"
+    [stroke]="chartOptions?.stroke"
+    [tooltip]="chartOptions?.tooltip"
+    [responsive]="chartOptions?.responsive">
   </apx-chart>
 </div>
 

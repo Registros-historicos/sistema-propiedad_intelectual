@@ -2,8 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription, Observable, of } from 'rxjs';
 import { first, catchError, finalize } from 'rxjs/operators';
-import { UserModel } from '../../models/user.model';
-import { AuthService } from '../../services/auth.service';
+import { AuthService, CurrentUser } from '../../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
@@ -16,8 +15,9 @@ export class LoginComponent implements OnInit, OnDestroy {
     email: 'jose.sc@demo.com',
     password: 'demo',
   };
+
   loginForm: FormGroup;
-  hasError: boolean;
+  hasError = false;
   returnUrl: string;
   isLoading$: Observable<boolean>;
   showFullscreenLoader = false; // Nueva propiedad para el loader
@@ -31,13 +31,13 @@ export class LoginComponent implements OnInit, OnDestroy {
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {
-    this.isLoading$ = this.authService.isLoading$;
     if (this.authService.currentUserValue) {
       this.router.navigate(['/']);
     }
   }
 
   ngOnInit(): void {
+    this.isLoading$ = this.authService.isLoading$;
     this.initForm();
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
   }
@@ -70,6 +70,12 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   submit() {
     this.hasError = false;
+
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      return;
+    }
+
     this.showFullscreenLoader = true;
 
     const loginSubscr = this.authService
@@ -85,9 +91,8 @@ export class LoginComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
         })
       )
-      .subscribe((user: UserModel | undefined) => {
+      .subscribe((user: CurrentUser | undefined) => {
         if (user) {
-          const role = user.roles[0] || 0;
           this.router.navigate([this.returnUrl]);
         }
       });

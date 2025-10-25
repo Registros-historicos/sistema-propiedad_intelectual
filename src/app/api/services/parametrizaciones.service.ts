@@ -21,7 +21,7 @@ export interface Catalogos {
   providedIn: 'root'
 })
 export class ParametrizacionesService {
-  private apiUrl = '/api/parametrizaciones/all/';
+  private apiUrl = 'http://127.0.0.1:8000/api/parametrizaciones/all/';
   private cache$?: Observable<Catalogos>;
 
   constructor(private http: HttpClient) {}
@@ -119,7 +119,6 @@ convertirRegistroConObjetos(registro: any, catalogos: Catalogos): any {
             result[key] = objeto;
             console.log('✅ Convertido:', key, '→', objeto.nombre);
           } else {
-            // 🔥 USAR FALLBACK SI NO SE ENCUENTRA EN CATÁLOGOS
             if (key === 'estatus_param' && this.ESTATUS_FALLBACK[idNum]) {
               result[key] = {
                 id_param: idNum,
