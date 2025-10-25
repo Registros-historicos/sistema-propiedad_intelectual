@@ -9,6 +9,10 @@ import { TablerosService, Top10Instituciones } from 'src/app/api/services/tabler
 export class DashboardComponent implements OnInit{
 
   dataTop10Institutions: Top10Instituciones[] = [];
+  
+  // Datos para los tableros insertados (compatible con la plantilla copiada)
+  dataFederalInstitutes: any[] = [];
+  dataDecentralizedInstitutes: any[] = [];
 
   constructor(
       private tablerosService: TablerosService,
@@ -17,6 +21,34 @@ export class DashboardComponent implements OnInit{
 
   ngOnInit(): void {
     this.loadTop10Institutions();
+    // Cargar datos reales desde el servicio (igual que en AdminDashboard)
+    this.loadRegisterInstitutes(123);
+    this.loadRegisterInstitutes(122);
+  }
+
+  // Método invocado por el evento (retry) en la plantilla para recargar datos
+  loadRegisterInstitutes(tipo: number): void {
+    // Llama al servicio para obtener las instituciones filtradas (mismo comportamiento que AdminDashboard)
+    this.tablerosService.getNewInstitucionesFiltradas(tipo ?? 0).subscribe({
+      next: (data) => {
+        if (tipo === 122) {
+          this.dataDecentralizedInstitutes = [...data];
+        } else {
+          this.dataFederalInstitutes = [...data];
+        }
+        this.cdRef.detectChanges();
+      },
+      error: (error: any) => {
+        console.error('ERROR cargando instituciones filtradas:', error);
+        // fallback a datos estáticos si el endpoint falla
+        if (tipo === 122) {
+          this.dataDecentralizedInstitutes = this.institutosDescentralizados;
+        } else {
+          this.dataFederalInstitutes = this.institutosFederales;
+        }
+        this.cdRef.detectChanges();
+      }
+    });
   }
 
   private loadTop10Institutions(): void {
