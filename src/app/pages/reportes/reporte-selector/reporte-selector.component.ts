@@ -5,7 +5,7 @@ import { NgZone } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpEventType, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment'; // En su momento, se deberá tomar las variables de entorno desde el backend final
 import { Observable } from 'rxjs';
-import { UserType, AuthService } from 'src/app/modules/auth';
+import { AuthService } from 'src/app/modules/auth';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { HttpResponse } from '@angular/common/http';
 import { ENTIDADES_FEDERATIVAS_DATA } from 'src/app/api/data/entity.data';
@@ -39,7 +39,7 @@ export class ReporteSelectorComponent implements OnInit {
   currentFields: FieldConfig[] = [];
   entidades: FederalEntity[] = ENTIDADES_FEDERATIVAS_DATA;
   
-  user$: Observable<UserType>;
+  // user$: Observable<UserType>;
 
   // Modal
   modalOpen = false;
@@ -58,7 +58,7 @@ export class ReporteSelectorComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.user$ = this.auth.currentUserSubject.asObservable();
+    // this.user$ = this.auth.currentUserSubject.asObservable();
     const url = this.router.url;
     if (url.includes('/administrador/')) this.perfil = 'admin';
     else if (url.includes('/coordinador/')) this.perfil = 'coordinador';

@@ -1,174 +1,140 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { Observable, BehaviorSubject, of, Subscription } from 'rxjs';
+import { Observable, BehaviorSubject, of, Subscription, throwError } from 'rxjs';
 import { map, catchError, switchMap, finalize } from 'rxjs/operators';
-import { UserModel } from '../models/user.model';
-import { AuthModel } from '../models/auth.model';
-import { AuthHTTPService } from './auth-http';
-import { environment } from 'src/environments/environment';
+import { HttpClient } from '@angular/common/http';
+import { StorageService } from 'src/app/api/Storage.service';
 import { Router } from '@angular/router';
 
-export type UserType = UserModel | undefined;
+export interface LoginResponse {
+  access: string;
+  access_exp: string;
+  refresh: string;
+  refresh_exp: string;
+  user: {
+    id_usuario: number;
+    correo: string;
+    tipo_usuario_param: number;
+    estatus: number | null;
+    nombre: string | null;
+  };
+}
+
+enum Rol {
+  ADMINISTRADOR = 1,
+  COORDINADOR   = 2,
+  CEPAT         = 4,
+}
+
+function mapTipoUsuarioParamToRol(tipo: number): Rol {
+  if (tipo === 37) return Rol.CEPAT;
+  if (tipo === 36) return Rol.COORDINADOR;
+  if (tipo === 35) return Rol.ADMINISTRADOR;
+  return 0 as any;
+}
+
+export interface CurrentUser {
+  id: number;
+  email: string; 
+  name: string | null;
+  roles: number[]; 
+  token: string; 
+  exp?: string;
+  refresh?: string; 
+  refresh_exp?: string;
+}
 
 @Injectable({
   providedIn: 'root',
 })
-export class AuthService implements OnDestroy {
-  // private fields
-  private unsubscribe: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
-  private authLocalStorageToken = `${environment.appVersion}-${environment.USERDATA_KEY}`;
+export class AuthService {
+  private currentUserSubject = new BehaviorSubject<CurrentUser | null>(null);
+  public currentUser$ = this.currentUserSubject.asObservable();
 
-  // public fields
-  currentUser$: Observable<UserType>;
-  isLoading$: Observable<boolean>;
-  currentUserSubject: BehaviorSubject<UserType>;
-  isLoadingSubject: BehaviorSubject<boolean>;
+  private readonly STORAGE_KEY = 'auth.user';
 
-  get currentUserValue(): UserType {
+  private _isLoading$ = new BehaviorSubject<boolean>(false);
+  public  isLoading$  = this._isLoading$.asObservable();
+
+  constructor(
+    private http: HttpClient,
+    private store: StorageService,
+    private router: Router
+  ) {
+    const saved = this.store.getLocal(this.STORAGE_KEY);
+    if (saved) this.currentUserSubject.next(saved);
+  }
+
+  get currentUserValue(): CurrentUser | null {
     return this.currentUserSubject.value;
   }
 
-  set currentUserValue(user: UserType) {
-    this.currentUserSubject.next(user);
-  }
+  login(email: string, password: string): Observable<CurrentUser> {
+    const body = { correo: email, password };
+    this._isLoading$.next(true);
 
-  constructor(
-    private authHttpService: AuthHTTPService,
-    private router: Router
-  ) {
-    this.isLoadingSubject = new BehaviorSubject<boolean>(false);
-    this.currentUserSubject = new BehaviorSubject<UserType>(undefined);
-    this.currentUser$ = this.currentUserSubject.asObservable();
-    this.isLoading$ = this.isLoadingSubject.asObservable();
-    const subscr = this.getUserByToken().subscribe();
-    this.unsubscribe.push(subscr);
-  }
-
-  // public methods
-  login(email: string, password: string): Observable<UserType> {
-    this.isLoadingSubject.next(true);
-    return this.authHttpService.login(email, password).pipe(
-      map((auth: AuthModel) => {
-        const result = this.setAuthFromLocalStorage(auth);
-        return result;
-      }),
-      switchMap(() => this.getUserByToken()),
-      map((user: UserType) => {
-        if (user) {
-          this.redirectUserBasedOnRole(user);
-        }
+    return this.http.post<LoginResponse>('/api/usuarios/auth/login/', body).pipe(
+      map(res => {
+        const role = mapTipoUsuarioParamToRol(res.user.tipo_usuario_param);
+        const user: CurrentUser = {
+          id: res.user.id_usuario,
+          email: res.user.correo,
+          name: res.user.nombre ?? null,
+          roles: role ? [role] : [],
+          token: res.access,
+          exp: res.access_exp,
+          refresh: res.refresh,
+          refresh_exp: res.refresh_exp,
+        };
+        this.store.setLocal(this.STORAGE_KEY, user);
+        this.currentUserSubject.next(user);
         return user;
       }),
-      catchError((err) => {
-        console.error('err', err);
-        return of(undefined);
+      catchError(err => {
+        this.logout();
+        return throwError(() => err);
       }),
-      finalize(() => this.isLoadingSubject.next(false))
+      finalize(() => this._isLoading$.next(false))
     );
   }
 
-  private redirectUserBasedOnRole(user: UserModel): void {
-    if (user.roles && user.roles.length > 0) {
-      const userRole = user.roles[0];
-      switch (userRole) {
-        case 1:
-          this.router.navigate(['/administrador/dashboard']);
-          break;
-        case 2:
-          this.router.navigate(['/coordinador/dashboard']);
-          break;
-        case 3:
-          this.router.navigate(['/solicitante/dashboard']);
-          break;
-        case 4:
-          this.router.navigate(['/cepat/dashboard']);
-          break;  
-        default:
-          this.router.navigate(['/auth/login']);
-          break;
-      }
-    } else {
-      this.router.navigate(['/auth/login']);
+  getUserByToken(): Observable<CurrentUser | null> {
+    const saved = this.store.getLocal(this.STORAGE_KEY);
+    if (!saved?.token) {
+      this.logout();
+      return of(null);
     }
+    this.currentUserSubject.next(saved);
+    return of(saved);
+  }
+
+  refreshAccess(): Observable<string | null> {
+    const saved = this.currentUserValue;
+    if (!saved?.refresh) return of(null);
+    return this.http.post<{access: string; access_exp: string}>('/api/usuarios/auth/refresh/', { refresh: saved.refresh }).pipe(
+      map(r => {
+        const updated: CurrentUser = { ...saved, token: r.access, exp: r.access_exp };
+        this.store.setLocal(this.STORAGE_KEY, updated);
+        this.currentUserSubject.next(updated);
+        return r.access;
+      }),
+      catchError(() => { this.logout(); return of(null); })
+    );
+  }
+
+  secondsToExpiry(): number {
+    const expIso = this.currentUserValue?.exp;
+    if (!expIso) return 0;
+    const ms = new Date(expIso).getTime() - Date.now();
+    return Math.floor(ms / 1000);
   }
 
   logout() {
-    localStorage.removeItem(this.authLocalStorageToken);
-    this.currentUserSubject.next(undefined);
-    this.isLoadingSubject.next(false);
+    this.store.localDeleteByKey(this.STORAGE_KEY);
+    this.currentUserSubject.next(null);
     this.router.navigate(['/auth/login'], {
       queryParams: {},
     });
   }
 
-  getUserByToken(): Observable<UserType> {
-    const auth = this.getAuthFromLocalStorage();
-    if (!auth || !auth.authToken) {
-      return of(undefined);
-    }
-
-    this.isLoadingSubject.next(true);
-    return this.authHttpService.getUserByToken(auth.authToken).pipe(
-      map((user: UserType) => {
-        if (user) {
-          this.currentUserSubject.next(user);
-        } else {
-          this.logout();
-        }
-        return user;
-      }),
-      finalize(() => this.isLoadingSubject.next(false))
-    );
-  }
-
-  // need create new user then login
-  registration(user: UserModel): Observable<any> {
-    this.isLoadingSubject.next(true);
-    return this.authHttpService.createUser(user).pipe(
-      map(() => {
-        this.isLoadingSubject.next(false);
-      }),
-      switchMap(() => this.login(user.email, user.password)),
-      catchError((err) => {
-        console.error('err', err);
-        return of(undefined);
-      }),
-      finalize(() => this.isLoadingSubject.next(false))
-    );
-  }
-
-  forgotPassword(email: string): Observable<boolean> {
-    this.isLoadingSubject.next(true);
-    return this.authHttpService
-      .forgotPassword(email)
-      .pipe(finalize(() => this.isLoadingSubject.next(false)));
-  }
-
-  // private methods
-  private setAuthFromLocalStorage(auth: AuthModel): boolean {
-    // store auth authToken/refreshToken/epiresIn in local storage to keep user logged in between page refreshes
-    if (auth && auth.authToken) {
-      localStorage.setItem(this.authLocalStorageToken, JSON.stringify(auth));
-      return true;
-    }
-    return false;
-  }
-
-  private getAuthFromLocalStorage(): AuthModel | undefined {
-    try {
-      const lsValue = localStorage.getItem(this.authLocalStorageToken);
-      if (!lsValue) {
-        return undefined;
-      }
-
-      const authData = JSON.parse(lsValue);
-      return authData;
-    } catch (error) {
-      console.error(error);
-      return undefined;
-    }
-  }
-
-  ngOnDestroy() {
-    this.unsubscribe.forEach((sb) => sb.unsubscribe());
-  }
+  
 }

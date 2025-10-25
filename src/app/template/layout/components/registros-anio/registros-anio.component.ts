@@ -67,7 +67,6 @@ export class RegistrosAnioComponent implements OnChanges {
     if (this.year === undefined || this.year === null) {
       this.year = current;
     }
-    console.debug('[RegistrosAnio] buildYearOptions -> yearOptions:', this.yearOptions, 'selected year:', this.year);
   }
 
   selectYear(y: number, event?: Event) {
@@ -87,8 +86,6 @@ export class RegistrosAnioComponent implements OnChanges {
     const shouldCompact = y > 80;
     if (shouldCompact !== this.compactYearButton) {
       this.compactYearButton = shouldCompact;
-      // opcional: debug
-      console.debug('[RegistrosAnio] onWindowScroll -> compactYearButton =', this.compactYearButton);
     }
   }
 
@@ -284,11 +281,9 @@ export class RegistrosAnioComponent implements OnChanges {
       return;
     }
     const requestedYear = this.year ?? 2025;
-    console.debug('[RegistrosAnio] loadRegistrosByMonth -> requesting year:', requestedYear, 'expected URL: /api/tableros/registros/mes/?anio=' + requestedYear);
 
     this.tablerosService.getRegistrosPorMes(this.year ?? undefined).subscribe({
       next: (rows) => {
-        console.debug('[RegistrosAnio] loadRegistrosByMonth -> response rows:', rows);
         this.lastResponseRows = rows || [];
         // rows: [{mes: number (1-12?), total: number}]
         // Normalizar a 12 meses
@@ -316,8 +311,6 @@ export class RegistrosAnioComponent implements OnChanges {
             months[m - 1].series2 = 0;
           }
         }
-
-        console.debug('[RegistrosAnio] loadRegistrosByMonth -> mapped months:', months);
 
         this.anios = months;
         this.initializeChart();
