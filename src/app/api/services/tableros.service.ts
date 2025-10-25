@@ -50,7 +50,7 @@ export class TablerosService {
   constructor(private http: HttpClient) {}
 
   getTopEntities(): Observable<Top10Instituciones[]> {
-    return this.http.get<Top10Instituciones[]>('http://127.0.0.1:8000/api/tableros/entidades/top10').pipe(
+    return this.http.get<Top10Instituciones[]>('/api/tableros/entidades/top10').pipe(
       catchError(error => {
         return of([]);
       })
@@ -58,7 +58,7 @@ export class TablerosService {
   }
 
   getTopInstitutions(): Observable<any[]> {
-    return this.http.get<any[]>('http://127.0.0.1:8000/api/tableros/instituciones/top10').pipe(
+    return this.http.get<any[]>('/api/tableros/instituciones/top10').pipe(
       catchError(error => {
         console.error('Error en getTopInstitutions:', error);
         return of([]);
@@ -67,7 +67,7 @@ export class TablerosService {
   }
 
   getCategoriasInvestigadores(): Observable<CategoriaInvestigador[]> {
-    return this.http.get<CategoriaInvestigador[]>('http://127.0.0.1:8000/api/tableros/investigadores/categorias/').pipe(
+    return this.http.get<CategoriaInvestigador[]>('/api/tableros/investigadores/categorias/').pipe(
       catchError(error => {
         console.error('Error en getCategoriasInvestigadores:', error);
         return of([]);
@@ -76,7 +76,7 @@ export class TablerosService {
   }
   
   getRegisterStatus(): Observable<any[]> {
-    return this.http.get<any[]>('http://127.0.0.1:8000/api/tableros/registros/estatus').pipe(
+    return this.http.get<any[]>('/api/tableros/registros/estatus').pipe(
       catchError(error => {
         console.error('Error en getRegisterStatus:', error);
         return of([]);
@@ -85,7 +85,7 @@ export class TablerosService {
   }
 
   getRegisterSector(): Observable<any[]> {
-    return this.http.get<any[]>('http://127.0.0.1:8000/api/tableros/sectores/actividad/all').pipe(
+    return this.http.get<any[]>('/api/tableros/sectores/actividad/all').pipe(
       catchError(error => {
         console.error('Error en getRegisterSector:', error);
         return of([]);
@@ -95,7 +95,7 @@ export class TablerosService {
 
   //Get all institutions
    getAllInstitutions(): Observable<Institutions[]> {
-    return this.http.get<any[]>('http://127.0.0.1:8000/api/tableros/instituciones/all/').pipe(
+    return this.http.get<any[]>('/api/tableros/instituciones/all/').pipe(
       map(data => this.normalizeInstitutionsData(data)),
       catchError(error => {
         console.error('Error in getAllInstitutions:', error);
@@ -124,7 +124,7 @@ export class TablerosService {
 
   // NUEVOS MÉTODOS PARA INSTITUCIONES
   getInstitucionesAll(): Observable<Instituto[]> {
-    return this.http.get<any[]>('http://127.0.0.1:8000/api/tableros/instituciones/all/').pipe(
+    return this.http.get<any[]>('/api/tableros/instituciones/all/').pipe(
       map(data => this.normalizeInstitutoData(data)),
       catchError(error => {
         console.error('Error en getInstitucionesAll:', error);
@@ -134,7 +134,7 @@ export class TablerosService {
   }
   //Metodo para obtener registros por sexo
   getRegistrosPorSexo(): Observable<any[]> {
-    return this.http.get<any[]>('http://127.0.0.1:8000/api/tableros/investigadores/sexo');
+    return this.http.get<any[]>('/api/tableros/investigadores/sexo');
   }
 
   getInstitucionesFiltradas(tipoInstitucion: number): Observable<Instituto[]> {
@@ -142,7 +142,7 @@ export class TablerosService {
     if (tipoInstitucion) {
       params = params.set('tipo_institucion', tipoInstitucion.toString());
     }
-    return this.http.get<any[]>('http://127.0.0.1:8000/api/tableros/instituciones/filtradas/', { params }).pipe(
+    return this.http.get<any[]>('/api/tableros/instituciones/filtradas/', { params }).pipe(
       map(data => this.normalizeInstitutoData(data, tipoInstitucion)),
       catchError(error => {
         console.error('Error en getInstitucionesFiltradas:', error);
@@ -158,7 +158,7 @@ export class TablerosService {
 
     const params = new HttpParams().set('tipo_institucion', String(tipoInstitucion));
 
-    return this.http.get<any[]>('http://127.0.0.1:8000/api/tableros/instituciones/filtradas', { params }).pipe(
+    return this.http.get<any[]>('/api/tableros/instituciones/filtradas', { params }).pipe(
       catchError(error => {
         return of<Institute[]>([]);
       })
@@ -170,14 +170,14 @@ export class TablerosService {
   getRegistrosPorMes(year?: number): Observable<{ mes: number; total: number }[]> {
     // El backend requiere el parámetro 'anio' en la query. Si no se provee, usamos 2025 por defecto.
     const y = year !== undefined && year !== null ? year : 2025;
-    const url = `http://127.0.0.1:8000/api/tableros/registros/mes/?anio=${y}`;
+    const url = `/api/tableros/registros/mes/?anio=${y}`;
     return this.http.get<{ mes: number; total: number }[]>(url);
   }
 
   // Método para obtener registros por periodo (trimestre o rango de fechas)
   // Nota: el backend espera primero el parámetro "fin" y luego "inicio" en la query
   getRegistrosPorPeriodo(start: string, end: string): Observable<{ mes: number; total: number }[]> {
-    const url = `http://127.0.0.1:8000/api/tableros/registros/periodo/?fin=${end}&inicio=${start}`;
+    const url = `/api/tableros/registros/periodo/?fin=${end}&inicio=${start}`;
     return this.http.get<{ mes: number; total: number }[]>(url);
   }
 
@@ -244,7 +244,7 @@ export class TablerosService {
   }
 
   getTotalIMPIApplications(): Observable<any[]> {
-    return this.http.get<any[]>('http://127.0.0.1:8000/api/tableros/solicitudes/impi/').pipe(
+    return this.http.get<any[]>('/api/tableros/solicitudes/impi/').pipe(
       catchError(error => {
         return of([]);
       })
@@ -252,7 +252,7 @@ export class TablerosService {
   }
 
   getTotalINDAUTORApplications(): Observable<any[]> {
-    return this.http.get<any[]>('http://127.0.0.1:8000/api/tableros/solicitudes/indautor/').pipe(
+    return this.http.get<any[]>('/api/tableros/solicitudes/indautor/').pipe(
       catchError(error => {
         return of([]);
       })
@@ -260,7 +260,7 @@ export class TablerosService {
   }
 
   getRegistrosPorPeriodoFiltro(inicio: string, fin: string): Observable<{ mes: number; total: number }[]> {
-  const url = `http://127.0.0.1:8000/api/tableros/registros/periodo/?inicio=${inicio}&fin=${fin}`;
+  const url = `/api/tableros/registros/periodo/?inicio=${inicio}&fin=${fin}`;
   return this.http.get<{ mes: number; total: number }[]>(url);
 }
 

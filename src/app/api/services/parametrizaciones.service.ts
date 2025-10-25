@@ -21,7 +21,7 @@ export interface Catalogos {
   providedIn: 'root'
 })
 export class ParametrizacionesService {
-  private apiUrl = 'http://127.0.0.1:8000/api/parametrizaciones/all/';
+  private apiUrl = '/api/parametrizaciones/all/';
   private cache$?: Observable<Catalogos>;
 
   constructor(private http: HttpClient) {}

@@ -72,7 +72,7 @@ export class AuthService {
     const body = { correo: email, password };
     this._isLoading$.next(true);
 
-    return this.http.post<LoginResponse>('http://127.0.0.1:8000/api/usuarios/auth/login/', body).pipe(
+    return this.http.post<LoginResponse>('/api/usuarios/auth/login/', body).pipe(
       map(res => {
         const role = mapTipoUsuarioParamToRol(res.user.tipo_usuario_param);
         const user: CurrentUser = {
