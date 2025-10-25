@@ -22,15 +22,12 @@ import { IdleService } from './api/services/idle.service';
 export function appInitializer(auth: AuthService, idle: IdleService) {
   return () => new Promise<void>(resolve => {
     auth.getUserByToken().subscribe(() => {
-      idle.start(3 * 60 * 1000); // 3 minutos de inactividad
+      idle.start(3 * 60 * 1000); 
 
-      // Auto-logout por inactividad
       idle.onIdle().subscribe(() => {
         auth.logout();
-        // Opcional: inyecta Router y navega a /auth/login
       });
 
-      // Sliding refresh: si hay actividad y al access le faltan <60s, refresca
       idle.onActivity().subscribe(() => {
         const secs = auth.secondsToExpiry();
         if (secs > 0 && secs < 60) auth.refreshAccess().subscribe();
