@@ -1,0 +1,21 @@
+.applicant-form {
+  .form-control,
+  .form-select {
+    &:focus {
+      border-color: var(--bs-primary);
+      box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+    }
+  }
+}
+.scroll-container {
+  // Altura aproximada para 8 items (8 * 42px) + padding
+  max-height: 350px;
+  overflow-y: auto;
+  border: 1px solid #eff2f5; // Borde sutil que coincide con el tema
+  border-radius: 0.475rem;
+}
+
+// Para que el cursor cambie al pasar sobre los items
+.cursor-pointer {
+  cursor: pointer;
+}

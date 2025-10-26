@@ -1,19 +1,12 @@
 <div class="card">
   <div class="card-header border-0 pt-6">
-    <!--begin::Card title-->
     <div class="card-title">
-      <!--begin::Search-->
       <div class="d-flex align-items-center position-relative my-1">
         <app-keenicon name="magnifier" class="fs-3 position-absolute ms-5"></app-keenicon>
         <input type="text" data-action="filter" class="form-control form-control-solid w-250px ps-12" [placeholder]="placeholder">
       </div>
-      <!--end::Search-->
-    </div>
-    <!--begin::Card title-->
-
-    <!--begin::Card toolbar-->
+      </div>
     <div class="card-toolbar">
-      <!--begin::Toolbar-->
       <div class="d-flex justify-content-end align-items-center">
         <div class="d-flex align-items-center me-4">
           <label class="form-label text-gray-600 me-3 mb-0 fw-semibold" translate="TABLE.PAGE_LENGTH.LABEL"></label>
@@ -24,50 +17,54 @@
           <span class="text-gray-600 ms-2 fw-semibold" translate="TABLE.PAGE_LENGTH.RECORDS"></span>
         </div>
       </div>
-      <!--end::Toolbar-->
+      </div>
     </div>
-    <!--end::Card toolbar-->
-  </div>
 
   <div class="card-body pt-0">
-    <!-- 🆕 Modal de edición -->
-    <app-crud
-      [datatableConfig]="datatableConfig"
-      route="/administrador/coordinadores"
-      (deleteEvent)="delete($event)"
-      (editEvent)="edit($event)"
-      [reload]="reloadEvent"
-      [modal]="editModal">
-    </app-crud>
+    
+    <div *ngIf="isDataReady; else loadingTemplate">
+      <app-crud
+        [datatableConfig]="datatableConfig"
+        route="/administrador/coordinadores"
+        (deleteEvent)="delete($event)"
+        (editEvent)="edit($event)"
+        [reload]="reloadEvent"
+        [modal]="editModal">
+      </app-crud>
+    </div>
+
+    <ng-template #loadingTemplate>
+      <div class="d-flex justify-content-center my-10">
+        <span class="spinner-border spinner-border-lg" role="status" aria-hidden="true"></span>
+        <span class="ms-3 fs-5 fw-semibold">Cargando datos...</span>
+      </div>
+    </ng-template>
+
   </div>
 </div>
 
-<!-- SweetAlert2 para notificaciones -->
 <swal #noticeSwal [swalOptions]="swalOptions"></swal>
 
 <ng-template #editModal let-modal>
   <div class="modal-header">
     <h3 class="modal-title fw-bold text-gray-800">
       <app-keenicon name="pencil" class="fs-2 me-2"></app-keenicon>
-      <span>Editar Coordinador</span>
+      <span>Editar Usuario</span>
     </h3>
     <button type="button" class="btn-close" aria-label="Close" (click)="closeForm(modal)"></button>
   </div>
 
   <div class="modal-body py-6 px-8">
     <div class="d-flex flex-column">
-      <!-- Notificación informativa -->
       <div class="notice d-flex bg-light-primary rounded border-primary border border-dashed mb-7 p-6">
         <app-keenicon name="information-5" class="fs-2 text-primary me-4"></app-keenicon>
         <div class="d-flex flex-column">
-          <h4 class="text-gray-900 fw-bold mb-2">Información del Coordinador</h4>
-          <span class="text-gray-700">Revise y modifique la información del coordinador según sea necesario.</span>
+          <h4 class="text-gray-900 fw-bold mb-2">Información del Usuario</h4>
+          <span class="text-gray-700">Revise y modifique la información del usuario según sea necesario.</span>
         </div>
       </div>
 
-      <!-- Formulario en dos columnas -->
       <div class="row g-6 mb-6">
-        <!-- Columna izquierda -->
         <div class="col-md-6">
           <div class="fv-row mb-6">
             <label class="fs-6 fw-semibold mb-2 required">Nombre</label>
@@ -75,37 +72,21 @@
           </div>
 
           <div class="fv-row mb-6">
+            <label class="fs-6 fw-semibold mb-2 required">Apellido Paterno</label>
+            <input type="text" class="form-control form-control-solid" [(ngModel)]="coordinadorModel.ape_pat" name="ape_pat">
+          </div>
+          
+          <div class="fv-row mb-6">
             <label class="fs-6 fw-semibold mb-2 required">Email</label>
-            <input type="email" class="form-control form-control-solid" [(ngModel)]="coordinadorModel.email" name="email">
+            <input type="email" class="form-control form-control-solid" [(ngModel)]="coordinadorModel.correo" name="correo">
           </div>
 
-          <div class="fv-row mb-6">
-            <label class="fs-6 fw-semibold mb-2">Entidad Federativa</label>
-            <select class="form-select form-select-solid" [(ngModel)]="coordinadorModel.entidad_federativa" name="entidad_federativa">
-              <option value="">Seleccionar entidad federativa</option>
-              <option *ngFor="let entidad of entidadesFederativas" [value]="entidad">{{entidad}}</option>
-            </select>
-          </div>
-
-          <div class="fv-row mb-6">
-            <label class="fs-6 fw-semibold mb-2">Sexo</label>
-            <select class="form-select form-select-solid" [(ngModel)]="coordinadorModel.sexo" name="sexo">
-              <option value="">Seleccionar sexo</option>
-              <option *ngFor="let sexo of sexoOptions" [value]="sexo">{{sexo}}</option>
-            </select>
-          </div>
-
-          <div class="fv-row mb-6">
-            <label class="fs-6 fw-semibold mb-2">RFC</label>
-            <input type="text" class="form-control form-control-solid" [(ngModel)]="coordinadorModel.rfc" name="rfc">
-          </div>
         </div>
 
-        <!-- Columna derecha -->
         <div class="col-md-6">
           <div class="fv-row mb-6">
-            <label class="fs-6 fw-semibold mb-2 required">Apellidos</label>
-            <input type="text" class="form-control form-control-solid" [(ngModel)]="coordinadorModel.apellidos" name="apellidos">
+            <label class="fs-6 fw-semibold mb-2">Apellido Materno</label>
+            <input type="text" class="form-control form-control-solid" [(ngModel)]="coordinadorModel.ape_mat" name="ape_mat">
           </div>
 
           <div class="fv-row mb-6">
@@ -114,18 +95,10 @@
           </div>
 
           <div class="fv-row mb-6">
-            <label class="fs-6 fw-semibold mb-2">Institución</label>
-            <input type="text" class="form-control form-control-solid" [(ngModel)]="coordinadorModel.institucion_adscripcion" name="institucion_adscripcion">
-          </div>
-
-          <div class="fv-row mb-6">
-            <label class="fs-6 fw-semibold mb-2">Edad</label>
-            <input type="number" class="form-control form-control-solid" [(ngModel)]="coordinadorModel.edad" name="edad">
-          </div>
-
-          <div class="fv-row mb-6">
-            <label class="fs-6 fw-semibold mb-2">CURP</label>
-            <input type="text" class="form-control form-control-solid" [(ngModel)]="coordinadorModel.curp" name="curp">
+            <label class="fs-6 fw-semibold mb-2">Estatus</label>
+            <select class="form-select form-select-solid" [(ngModel)]="coordinadorModel.estatus" name="estatus">
+              <option *ngFor="let estatus of estatusOptions" [value]="estatus.value">{{estatus.label}}</option>
+            </select>
           </div>
         </div>
       </div>

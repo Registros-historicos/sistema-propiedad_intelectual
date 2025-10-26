@@ -18,7 +18,7 @@ import {TranslateModule} from '@ngx-translate/core';
 import {MatIcon} from '@angular/material/icon';
 import { HistoricalImpiComponent } from './historical-impi/historical-impi.component';
 import { NgApexchartsModule } from 'ng-apexcharts';
-
+import { CepatFormComponent } from './cepat-form/cepat-form.component';
 
 @NgModule({
   declarations: [
@@ -43,7 +43,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
     TranslationModule,
     TranslateModule,
     MatIcon,
-    
+    CepatFormComponent,
     HistoricalImpiComponent,
     NgApexchartsModule
   ],
