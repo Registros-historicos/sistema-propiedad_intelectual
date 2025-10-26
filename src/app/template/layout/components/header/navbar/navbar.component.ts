@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AuthService, UserType } from 'src/app/modules/auth';
+import { AuthService, CurrentUser } from 'src/app/modules/auth';
 import { menuReinitialization } from 'src/app/template/kt/kt-helpers';
 
 @Component({
@@ -17,7 +17,7 @@ export class NavbarComponent implements OnInit, AfterViewInit {
   userAvatarClass: string = 'symbol-35px symbol-md-40px';
   btnIconClass: string = 'fs-2 fs-md-1';
 
-  user$: Observable<UserType>;
+  user$: Observable<CurrentUser | null>;
   currentDate: Date = new Date();
 
   constructor(private auth: AuthService) { }
@@ -27,13 +27,17 @@ export class NavbarComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.user$ = this.auth.currentUserSubject.asObservable();
+    this.user$ = this.auth.currentUser$;
     this.updateCurrentDate();
   }
 
-  private updateCurrentDate(): void {
-    this.currentDate = new Date();
+  getInitials(name?: string): string {
+    if (!name) return 'U';
+    const parts = name.trim().split(/\s+/).slice(0, 2);
+    return parts.map(p => p[0]?.toUpperCase() ?? '').join('') || 'U';
+  }
 
+  private updateCurrentDate(): void {
     const now = new Date();
     const tomorrow = new Date(now);
     tomorrow.setDate(now.getDate() + 1);
@@ -42,6 +46,7 @@ export class NavbarComponent implements OnInit, AfterViewInit {
     const msUntilMidnight = tomorrow.getTime() - now.getTime();
 
     setTimeout(() => {
+      this.currentDate = new Date();
       this.updateCurrentDate();
     }, msUntilMidnight);
   }

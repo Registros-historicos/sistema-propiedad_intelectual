@@ -1,8 +1,8 @@
-import { ChangeDetectorRef, Component, Input, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ChartComponent } from 'ng-apexcharts';
 import { TablerosService } from 'src/app/api/services/tableros.service';
 
-interface ChartOptions {
+interface IRegisterStatus {
   estatus: string;
   total: number;
 }
@@ -10,109 +10,121 @@ interface ChartOptions {
 @Component({
   selector: 'app-registro-estatus',
   templateUrl: './registro-estatus.component.html',
-  styleUrl: './registro-estatus.component.scss'
+  styleUrls: ['./registro-estatus.component.scss']
 })
-export class RegistroEstatusComponent {
-  @ViewChild("chart") chart: ChartComponent;
+export class RegistroEstatusComponent implements OnInit {
+  @ViewChild('chart') chart?: ChartComponent;
 
-  data: ChartOptions[];
-  
-  chartOptions: any = {};
+  chartOptions: any;
+  data: IRegisterStatus[] = [];
+  isLoaded = false;
 
   constructor(
     private tablerosService: TablerosService,
-    private cdRef: ChangeDetectorRef 
+    private cdRef: ChangeDetectorRef
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadRegisterStatus();
   }
 
   private loadRegisterStatus(): void {
     this.tablerosService.getRegisterStatus().subscribe({
       next: (data) => {
-        this.data = data;
-        this.loadChart();
-        this.cdRef.detectChanges();
+        this.data = (data || []).filter(x => x && x.estatus != null);
+        this.chartOptions = this.getChartOptions(420);
+        this.isLoaded = true;
+
+        // 👇 Forzamos el repaint una vez Angular ya renderizó el DOM
+        setTimeout(() => {
+          this.cdRef.detectChanges();
+          this.chart?.updateOptions(this.chartOptions, true, true);
+        }, 200);
       },
-      error: (error: any) => {
-        console.error('ERROR:', error);
-      }
+      error: (err) => console.error('❌ ERROR:', err)
     });
   }
 
-  loadChart() {
-    const labels = this.data.map(s => s.estatus );
-    const series = this.data.map(s => s.total );
-    const colors = [
-      '#008FFB',
-      '#00E396',
-      '#FEB019',
-      '#FF4560',
-      '#775DD0',
-      '#3F51B5',
-      '#546E7A',
-      '#D4526E',
-      '#8D5B4C'
+  /**
+   * 🎨 Genera una paleta dinámica de colores
+   * para que nunca falten tonos aunque haya muchos estatus
+   */
+  private generateColors(count: number): string[] {
+    const baseColors = [
+      '#008FFB', '#00E396', '#FEB019', '#FF4560',
+      '#775DD0', '#3F51B5', '#546E7A', '#D4526E', '#8D5B4C',
+      '#26A69A', '#7E36AF', '#F46036', '#F9C80E', '#2E294E', '#662E9B'
     ];
+    const colors: string[] = [];
+    for (let i = 0; i < count; i++) {
+      colors.push(baseColors[i % baseColors.length]);
+    }
+    return colors;
+  }
 
-    this.chartOptions = {
+  private getChartOptions(height: number) {
+    const series = this.data.map(s => Number(s.total) || 0);
+    const labels = this.data.map(s => s.estatus);
+    const colors = this.generateColors(series.length);
+
+    return {
       series,
-      chart: {
-        width: 650,
-        height: 650,
-        offsetY: -30,
-        type: "pie",
-      },
       labels,
       colors,
-      dataLabels: {
-        enabled: true,
-        style: {
-          fontSize: "16px",  
-          fontWeight: 'bold',
-          colors: ['#fff']  
-        },
+      chart: {
+        type: 'pie',
+        height,
+        toolbar: { show: false },
+        animations: { enabled: true, speed: 500 },
+        foreColor: '#3f4254',
+        fontFamily: 'inherit'
       },
       legend: {
+        show: true,
         position: 'right',
         horizontalAlign: 'left',
-        fontSize: '16px',
-        offsetY: 75,
-        offsetX: 20,
-        height: 350,
+        fontSize: '13px',
+        labels: { colors: '#3f4254' },
+        markers: { width: 10, height: 10, radius: 12 },
+        itemMargin: { vertical: 4, horizontal: 8 }
       },
+      dataLabels: {
+        enabled: true,
+        style: { fontSize: '13px', fontWeight: 'bold' }
+      },
+      stroke: { show: false },
       plotOptions: {
-        pie: {
-          customScale: 0.8,
-          dataLabels: {
-            offset: 0,
-          }
+        pie: { expandOnClick: true, customScale: 0.96 }
+      },
+      tooltip: {
+        y: {
+          formatter: (val: number) => `${val} registros`
         }
       },
+      theme: { monochrome: { enabled: false } },
       responsive: [
         {
-          breakpoint: 480,
+          breakpoint: 1400,
           options: {
-            chart: {
-              width: 450,
-              height: 450,
-            },
             legend: {
               position: 'bottom',
-              fontSize: '30px'
+              horizontalAlign: 'center',
+              fontSize: '12px'
             },
-            dataLabels: {
-              style: { 
-                fontSize: '16px'
-              }
-            }
+            chart: { height: 380 },
+            dataLabels: { style: { fontSize: '12px' } },
+            plotOptions: { pie: { customScale: 0.98 } }
+          }
+        },
+        {
+          breakpoint: 992,
+          options: {
+            chart: { height: 340 },
+            dataLabels: { style: { fontSize: '11px' } },
+            plotOptions: { pie: { customScale: 1.0 } }
           }
         }
       ]
     };
   }
-
 }
-
-

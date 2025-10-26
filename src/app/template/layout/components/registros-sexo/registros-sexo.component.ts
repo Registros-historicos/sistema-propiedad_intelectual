@@ -59,6 +59,7 @@ export class RegistrosSexoComponent implements OnInit {
     plotOptions: {
       pie: {
         donut: {
+          size: '65%', //SE AGREGÓ PARA VLA RESPONSIVIDAD
           labels: {
             show: true,
             name: {
@@ -93,11 +94,61 @@ export class RegistrosSexoComponent implements OnInit {
     responsive: [
       {
         breakpoint: 480,
-        options: {
-          chart: { width: 300 },
-          legend: { position: 'bottom' }
+        options: { //SE AGREGÓ DE AQUÍ
+        chart: {
+          height: 300,
+          width: '100%'
+        },
+        legend: {
+          position: 'bottom',
+          horizontalAlign: 'center',
+          fontSize: '10px', // Texto más pequeño en móviles
+          itemMargin: {
+            horizontal: 5,
+            vertical: 2
+          }
+        },
+        plotOptions: {
+          pie: {
+            donut: {
+              size: '60%', // Donut más pequeño en móviles
+              labels: {
+                name: {
+                  fontSize: '14px'
+                },
+                value: {
+                  fontSize: '20px'
+                }
+              }
+            }
+          }
+        },
+        dataLabels: {
+          style: {
+            fontSize: '10px'
+          }
         }
       }
+    },
+    {
+      breakpoint: 768, // Tablets
+      options: {
+        chart: {
+          height: 320
+        },
+        legend: {
+          fontSize: '11px'
+        }
+      }
+    },
+    {
+      breakpoint: 1024, // Pantallas grandes
+      options: {
+        chart: {
+          height: 350
+        }
+      }
+    }//HASTA AQUÍ
     ]
   };
 
@@ -109,8 +160,6 @@ export class RegistrosSexoComponent implements OnInit {
   ngOnInit(): void {
     this.tablerosService.getRegistrosPorSexo().subscribe({
       next: (data) => {
-        console.debug('[DEBUG] Respuesta registros por sexo:', data);
-        console.log('Datos recibidos:', data);
 
         //const labels = data.map(item => item.sexo);   // ['Femenino', 'Masculino']
         //const series = data.map(item => item.total);  // [99, 99]

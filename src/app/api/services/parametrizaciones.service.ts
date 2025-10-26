@@ -119,7 +119,6 @@ convertirRegistroConObjetos(registro: any, catalogos: Catalogos): any {
             result[key] = objeto;
             console.log('✅ Convertido:', key, '→', objeto.nombre);
           } else {
-            // 🔥 USAR FALLBACK SI NO SE ENCUENTRA EN CATÁLOGOS
             if (key === 'estatus_param' && this.ESTATUS_FALLBACK[idNum]) {
               result[key] = {
                 id_param: idNum,

@@ -16,7 +16,7 @@ import { Observable, Subscription } from 'rxjs';
 import { APPLICANTS_REQUEST_DATA } from 'src/app/api/data/applicant.data';
 import { IAplicantModel } from 'src/app/api/models/applicant.model';
 import { ApplicantsService } from 'src/app/api/services/applicant.service';
-import { AuthService, UserType } from 'src/app/modules/auth';
+import { AuthService } from 'src/app/modules/auth';
 import { SweetAlertOptions } from 'sweetalert2';
 
 @Component({
@@ -25,7 +25,7 @@ import { SweetAlertOptions } from 'sweetalert2';
   styleUrls: ['./solicitudes.component.scss'],
 })
 export class SolicitudesComponent implements OnInit, OnDestroy {
-  user$: Observable<UserType>;
+  // user$: Observable<UserType>;
   aplicantModel: IAplicantModel = {
     id: 0,
     titulo: '',
@@ -151,7 +151,7 @@ export class SolicitudesComponent implements OnInit, OnDestroy {
       },
     };
 
-    this.user$ = this.auth.currentUserSubject.asObservable();
+    // this.user$ = this.auth.currentUserSubject.asObservable();
     this.updateCurrentDate();
   }
 

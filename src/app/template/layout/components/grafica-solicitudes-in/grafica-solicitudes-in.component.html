@@ -32,19 +32,19 @@
       </div>
       <div class="card-body">
         <div #chartRef id="dashboard_chart" [style.height]="'350px'">
-          <apx-chart
-            [series]="chartOptions.series"
-            [chart]="chartOptions.chart"
-            [xaxis]="chartOptions.xaxis"
-            [yaxis]="chartOptions.yaxis"
-            [dataLabels]="chartOptions.dataLabels"
-            [stroke]="chartOptions.stroke"
-            [legend]="chartOptions.legend"
-            [fill]="chartOptions.fill"
-            [states]="chartOptions.states"
-            [tooltip]="chartOptions.tooltip"
-            [colors]="chartOptions.colors"
-            [plotOptions]="chartOptions.plotOptions"
+          <apx-chart *ngIf="chartOptions"
+            [series]="chartOptions?.series"
+            [chart]="chartOptions?.chart"
+            [xaxis]="chartOptions?.xaxis"
+            [yaxis]="chartOptions?.yaxis"
+            [dataLabels]="chartOptions?.dataLabels"
+            [stroke]="chartOptions?.stroke"
+            [legend]="chartOptions?.legend"
+            [fill]="chartOptions?.fill"
+            [states]="chartOptions?.states"
+            [tooltip]="chartOptions?.tooltip"
+            [colors]="chartOptions?.colors"
+            [plotOptions]="chartOptions?.plotOptions"
           ></apx-chart>
         </div>
       </div>

@@ -1,7 +1,7 @@
 import { Component, HostBinding, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { TranslationService } from '../../../../../../modules/i18n';
-import { AuthService, UserType } from '../../../../../../modules/auth';
+import { AuthService, CurrentUser } from '../../../../../../modules/auth';
 import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
@@ -27,12 +27,10 @@ export class UserInnerComponent implements OnInit, OnDestroy {
   public readonly deleteSwal!: SwalComponent;
 
   swalOptions: SweetAlertOptions;
-
   titleDelete: string = '';
-
   language: LanguageFlag;
-  user$: Observable<UserType>;
   langs: LanguageFlag[] = [];
+  user$: Observable<CurrentUser | null>;
   private unsubscribe: Subscription[] = [];
 
   constructor(
@@ -44,11 +42,16 @@ export class UserInnerComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.titleDelete = this.translate.instant('ALERT.LOGOUT.TITLE');
-
+    this.user$ = this.authS.currentUser$;
     this.setupSweetAlert();
-    this.user$ = this.authS.currentUserSubject.asObservable();
     this.initializeLanguages();
     this.setLanguage(this.translationService.getSelectedLanguage());
+  }
+
+  getInitials(name?: string): string {
+    if (!name) return 'U';
+    const parts = name.trim().split(/\s+/).slice(0, 2);
+    return parts.map(p => p[0]?.toUpperCase() ?? '').join('') || 'U';
   }
 
   setupSweetAlert() {
@@ -63,9 +66,6 @@ export class UserInnerComponent implements OnInit, OnDestroy {
     this.deleteSwal.fire().then((clicked) => {
       if (clicked.isConfirmed) {
         this.authS.logout();
-        this.router.navigate(['/auth/login'], {
-          queryParams: {},
-        });
       }
     });
   }
