@@ -21,7 +21,6 @@ import { TranslationModule } from 'src/app/modules/i18n';
 import { CrudModule } from '../../../modules/crud/crud.module';
 import { SharedModule } from '../../../template/shared/shared.module';
 
-// Opciones para el selector de estatus en el modal
 const ESTATUS_OPTIONS = [
   { value: 24, label: 'Activo' },
   { value: 25, label: 'Inactivo' },
@@ -62,8 +61,6 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
   };
 
   estatusOptions = ESTATUS_OPTIONS;
-
-  // NUEVO: Esta es la bandera para el *ngIf
   isDataReady: boolean = false;
 
   private allCoordinators: any[] = [];
@@ -84,23 +81,15 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.placeholder = this.translate.instant('TABLE.PLACEHOLDER_SEARCH');
-
-    // MODIFICADO: Usamos el valor 37 que especificaste
     const userType = 37;
-
-    // MODIFICADO: Llamamos a tu servicio
     this.cepatService.getCepatUserByType(userType).subscribe(
       (data) => {
         console.log('Datos recibidos:', data);
         this.allCoordinators = data;
-
-        // Preparamos la config
         this.initializeDataTables(this.allCoordinators);
-
-        // MODIFICADO: Activamos el interruptor
         this.isDataReady = true;
 
-        this.cdr.detectChanges(); // Forzamos la detección de cambios
+        this.cdr.detectChanges();
       },
       (error) => {
         console.error('Error al cargar coordinadores:', error);
@@ -109,7 +98,7 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
           text: 'No se pudieron cargar los datos.',
           icon: 'error',
         });
-        this.initializeDataTables([]); // Inicializar tabla vacía
+        this.initializeDataTables([]);
 
         this.isDataReady = true;
         this.cdr.detectChanges();
@@ -117,7 +106,6 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
     );
   }
 
-  // Método para configurar DataTables después de recibir los datos
   initializeDataTables(data: any[]): void {
     this.datatableConfig = {
       serverSide: false,
@@ -132,13 +120,11 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
         infoEmpty: this.translate.instant('TABLE.PAG_INFO_EMPTY'),
         zeroRecords: this.translate.instant('TABLE.ZERO_RECORDS'),
       },
-      // Usamos los datos locales
       data: data,
       initComplete: (settings, json) => {
         this.dtInstance = settings.oInstance.api();
         this.cdr.detectChanges();
       },
-      // Columnas adaptadas a tu JSON
       columns: [
         {
           title: 'Usuario',
@@ -185,7 +171,7 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
           data: 'estatus',
           className: 'text-center',
           render: (data) => {
-            const isActive = data === 25;
+            const isActive = data === 24;
             const badgeClass = isActive
               ? 'badge-light-success'
               : 'badge-light-danger';
@@ -210,48 +196,43 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
   }
 
   delete(id: number) {
-    // 1. Aquí llamas a tu servicio de API DELETE
-    // this.cepatService.deleteUser(id).subscribe(() => {
-
     this.showAlert({
       title: '¡Éxito!',
       text: 'El coordinador ha sido eliminado',
       icon: 'success',
     });
 
-    // 2. Actualizar el arreglo local
     this.allCoordinators = this.allCoordinators.filter(
       (u) => u.id_usuario !== Number(id)
     );
-
-    // 3. Actualizar los datos en la config y recargar
     this.datatableConfig.data = this.allCoordinators;
     this.reloadEvent.emit(true);
     this.cdr.detectChanges();
-
-    // }, error => { ... });
   }
 
-  edit(id: number) {
-    const numericId = Number(id);
-    this.cdr.detectChanges();
+  // edit(id: number) {
+  //   const numericId = Number(id);
+  //   this.cdr.detectChanges();
+  //   const foundCoordinator = this.allCoordinators.find(
+  //     (c) => c.id_usuario === numericId
+  //   );
 
-    // Buscar el coordinador en el arreglo local
-    const foundCoordinator = this.allCoordinators.find(
-      (c) => c.id_usuario === numericId
-    );
+  //   if (foundCoordinator) {
+  //     this.coordinadorModel = { ...foundCoordinator };
+  //     this.cdr.detectChanges();
+  //   } else {
+  //     this.showAlert({
+  //       title: 'No encontrado',
+  //       text: `El coordinador con ID ${id} no existe en la lista.`,
+  //       icon: 'warning',
+  //     });
+  //   }
+  // }
 
-    if (foundCoordinator) {
-      this.coordinadorModel = { ...foundCoordinator };
-      this.cdr.detectChanges();
-    } else {
-      this.showAlert({
-        title: 'No encontrado',
-        text: `El coordinador con ID ${id} no existe en la lista.`,
-        icon: 'warning',
-      });
-    }
-  }
+edit(id: number) {
+  console.log('ID recibido para editar:', id);
+  console.log('Coordinadores disponibles:', this.allCoordinators);
+}
 
   closeForm(modal: any) {
     modal.dismiss('cancel');
@@ -297,6 +278,7 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
   }
 
   async navigateToEdit(id: number, modalTemplate: TemplateRef<any>) {
+    console.log('Navegando a editar coordinador con ID:', id);
     this.edit(id);
   }
 
