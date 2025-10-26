@@ -4,6 +4,7 @@ import { Observable, of, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
 export interface UserCepat {
+  id_usuario?: number;
   nombre: string;
   ape_pat: string;
   ape_mat: string;
