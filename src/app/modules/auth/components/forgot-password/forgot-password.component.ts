@@ -38,7 +38,7 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
     private renderer: Renderer2,  // Para manipulación segura del DOM
     private el: ElementRef  // Referencia al elemento del componente
   ) {
-    this.isLoading$ = this.authService.isLoading$;  // Inicializa observable de carga
+    // this.isLoading$ = this.authService.isLoading$;  // Inicializa observable de carga
     this.styleElement = this.renderer.createElement('style');  // Crea elemento style
   }
 
@@ -138,7 +138,7 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
 
   // Método para manejar el envío del formulario
   submit() {
-    this.errorState = ErrorStates.NotSubmitted;  // Resetea estado
+    /* this.errorState = ErrorStates.NotSubmitted;  // Resetea estado
     
     // Realiza petición al servicio de autenticación
     const forgotPasswordSubscr = this.authService
@@ -150,6 +150,6 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
       });
     
     // Guarda suscripción para limpieza
-    this.unsubscribe.push(forgotPasswordSubscr);
+    this.unsubscribe.push(forgotPasswordSubscr); */
   }
 }

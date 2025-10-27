@@ -31,7 +31,7 @@ const routes: Routes = [
       },
       {
         path: 'solicitante/registro',
-        loadComponent: () => import('./applicant-form/applicant-form.component').then(m => m.ApplicantFormComponent)
+        loadComponent: () => import('./cepat-form/cepat-form.component').then(m => m.CepatFormComponent)
       },
       {
         path: 'reportes',

@@ -17,7 +17,18 @@ export class GraficaSolicitudesInComponent implements OnInit {
 
   tiposSolicitudes: Solicitudes[] = [];
 
-  chartOptions: any;
+  chartOptions: any = {
+    series: [],
+    chart: { type: 'donut', height: 350, toolbar: { show: false } },
+    labels: [],
+    colors: [],
+    dataLabels: { enabled: false },
+    legend: { show: false },
+    stroke: { show: false },
+    plotOptions: {},
+    tooltip: {},
+    states: {}
+  };
   totalSolicitudes: number = 0;
 
   constructor(
@@ -26,6 +37,7 @@ export class GraficaSolicitudesInComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.chartOptions = this.getChartOptions(350);
     this.loadTotalINDAUTORApplications()
   }
 
@@ -140,7 +152,7 @@ export class GraficaSolicitudesInComponent implements OnInit {
   private loadTotalINDAUTORApplications(): void {
     this.tablerosService.getTotalINDAUTORApplications().subscribe({
       next: (data) => {
-        this.tiposSolicitudes = data;
+        this.tiposSolicitudes = data ?? [];
         this.totalSolicitudes = this.tiposSolicitudes
           .reduce((acc, item) => acc + (item.total ?? 0), 0);
         this.chartOptions = this.getChartOptions(350);
@@ -148,6 +160,7 @@ export class GraficaSolicitudesInComponent implements OnInit {
       },
       error: (error: any) => {
         console.error('ERROR:', error);
+        this.chartOptions = this.getChartOptions(350);
       }
     });
   }

@@ -1,7 +1,7 @@
 import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { BrowserModule, provideClientHydration } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
 import { ClipboardModule } from 'ngx-clipboard';
 import { TranslateModule } from '@ngx-translate/core';
@@ -15,15 +15,27 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 // #fake-start#
 import { FakeAPIService } from './api/fake-api.service';
 import {FormsModule} from '@angular/forms';
+import { JwtInterceptor } from './modules/auth/services/jwt.interceptor';
+import { IdleService } from './api/services/idle.service';
 // #fake-end#
 
-function appInitializer(authService: AuthService) {
-  return () => {
-    return new Promise((resolve) => {
-      //@ts-ignore
-      authService.getUserByToken().subscribe().add(resolve);
+export function appInitializer(auth: AuthService, idle: IdleService) {
+  return () => new Promise<void>(resolve => {
+    auth.getUserByToken().subscribe(() => {
+      idle.start(3 * 60 * 1000); 
+
+      idle.onIdle().subscribe(() => {
+        auth.logout();
+      });
+
+      idle.onActivity().subscribe(() => {
+        const secs = auth.secondsToExpiry();
+        if (secs > 0 && secs < 60) auth.refreshAccess().subscribe();
+      });
+
+      resolve();
     });
-  };
+  });
 }
 
 @NgModule({
@@ -53,7 +65,12 @@ function appInitializer(authService: AuthService) {
       provide: APP_INITIALIZER,
       useFactory: appInitializer,
       multi: true,
-      deps: [AuthService],
+      deps: [AuthService, IdleService],
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: JwtInterceptor,
+      multi: true
     },
     provideClientHydration(),
   ],

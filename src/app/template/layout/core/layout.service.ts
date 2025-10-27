@@ -153,19 +153,14 @@ export class LayoutService {
   getLayoutByType(layoutType: LayoutType | undefined): ILayout {
     switch (layoutType) {
       case 'dark-sidebar':
-        console.log('LayoutType:', DarkSidebarConfig);
         return DarkSidebarConfig;
       case 'light-sidebar':
-        console.log('LayoutType:', LightSidebarConfig);
         return LightSidebarConfig;
       case 'dark-header':
-        console.log('LayoutType:', DarkHeaderConfig);
         return DarkHeaderConfig;
       case 'light-header':
-        console.log('LayoutType:', LightHeaderConfig);
         return LightHeaderConfig;
       default:
-        console.log('LayoutType:', defaultLayoutConfig);
         return defaultLayoutConfig;
     }
   }

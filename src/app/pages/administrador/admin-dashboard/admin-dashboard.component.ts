@@ -86,10 +86,7 @@ export class AdminDashboardComponent implements OnInit {
 private loadTopEntities(): void {
   this.tablerosService.getTopEntities().subscribe({
     next: (data) => {
-      console.log('✅ ENTIDADES FEDERATIVAS RECIBIDAS:', data);
       this.topFiveEntities = data;
-      console.log('🔍 topFiveEntities asignado:', this.topFiveEntities);
-      
       this.cdRef.detectChanges();
     },
     error: (error) => {
