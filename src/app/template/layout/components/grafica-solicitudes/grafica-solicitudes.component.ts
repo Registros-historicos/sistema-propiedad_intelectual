@@ -1,10 +1,11 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { TablerosService } from 'src/app/api/services/tableros.service';
 import { getCSSVariableValue } from 'src/app/template/kt/_utils';
+import ApexCharts from 'apexcharts'; 
 
 interface Solicitudes {
   tipo_registro: string;
-  rama: string;
+  rama_nombre: string;
   total: number;
 }
 
@@ -19,7 +20,7 @@ export class GraficaSolicitudesComponent implements OnInit {
 
   chartOptions: any = {
     series: [],
-    chart: { type: 'donut', height: 350, toolbar: { show: false } },
+    chart: {  id: 'graficaSolicitudesIM', type: 'donut', height: 350, toolbar: { show: false } },
     labels: [],
     colors: [],
     dataLabels: { enabled: false },
@@ -54,7 +55,7 @@ export class GraficaSolicitudesComponent implements OnInit {
     ];
 
     const pieData = this.tiposSolicitudes.map(item => item.total);
-    const pieLabels = this.tiposSolicitudes.map(item => item.rama);
+    const pieLabels = this.tiposSolicitudes.map(item => item.rama_nombre);
 
     return {
       series: pieData,
@@ -82,7 +83,7 @@ export class GraficaSolicitudesComponent implements OnInit {
           useSeriesColors: false
         },
         formatter: (seriesName: string, opts: any) => {
-          return this.tiposSolicitudes[opts.seriesIndex].rama;
+          return this.tiposSolicitudes[opts.seriesIndex].rama_nombre;
         },
         itemMargin: { horizontal: 10, vertical: 5 }
       },
@@ -133,7 +134,7 @@ export class GraficaSolicitudesComponent implements OnInit {
           formatter: (val: number) => `${val} solicitudes`,
           title: {
             formatter: (seriesName: any, { seriesIndex }: any) => {
-              return this.tiposSolicitudes[seriesIndex].rama;
+              return this.tiposSolicitudes[seriesIndex].rama_nombre;
             }
           }
         }
@@ -149,11 +150,16 @@ export class GraficaSolicitudesComponent implements OnInit {
   private loadTotalIMPIApplications(): void {
     this.tablerosService.getTotalIMPIApplications().subscribe({
       next: (data) => {
+        console.log('DATA TABLERO :', data);
         this.tiposSolicitudes = data ?? [];
         this.totalSolicitudes = this.tiposSolicitudes
           .reduce((acc, item) => acc + (item.total ?? 0), 0);
         this.chartOptions = this.getChartOptions(350);
         this.cdRef.detectChanges();
+                setTimeout(() => {
+                  ApexCharts.exec('graficaSolicitudesIN', 'updateOptions', this.chartOptions, true);
+                }, 0);
+        
       },
       error: (error: any) => {
         console.error('ERROR:', error);
