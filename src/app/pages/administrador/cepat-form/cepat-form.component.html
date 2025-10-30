@@ -110,28 +110,37 @@
                 </div>
               </div>
             </div>
+
             <div class="col-md-6 fv-row">
               <label class="required fw-semibold fs-6 mb-2"
                 >Nombre de la institución (CEPAT)</label
               >
-              <input
-                type="text"
-                class="form-control form-control-solid"
-                name="cepat_name"
-                [(ngModel)]="userModel.cepat_name"
-                #cepat_name="ngModel"
+
+              <select
+                class="form-select form-select-solid"
+                name="id_cepat"
+                [(ngModel)]="userModel.id_cepat"
+                #id_cepat="ngModel"
                 required
-                minlength="2"
-              />
+              >
+                <option [ngValue]="null" disabled>
+                  Seleccione una institución
+                </option>
+
+                <option
+                  *ngFor="let cepat of cepatList"
+                  [value]="cepat.id_cepat"
+                >
+                  {{ cepat.nombre }}
+                </option>
+              </select>
+
               <div
-                *ngIf="userForm.submitted && cepat_name.invalid"
+                *ngIf="userForm.submitted && id_cepat.invalid"
                 class="fv-plugins-message-container invalid-feedback"
               >
-                <div *ngIf="cepat_name.errors?.['required']">
-                  El nombre del CEPAT es requerido.
-                </div>
-                <div *ngIf="cepat_name.errors?.['minlength']">
-                  Debe tener al menos 2 caracteres.
+                <div *ngIf="id_cepat.errors?.['required']">
+                  Debe seleccionar una institución CEPAT.
                 </div>
               </div>
             </div>

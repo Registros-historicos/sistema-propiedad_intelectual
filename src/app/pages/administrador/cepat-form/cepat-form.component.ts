@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CepatService } from 'src/app/api/services/cepat.service';
+import { Cepat, CepatService } from 'src/app/api/services/cepat.service';
 import {
   Institutions,
   TablerosService,
@@ -25,6 +25,7 @@ export class CepatFormComponent implements OnInit {
   public confirmPassword = '';
   public passwordVisible = false;
   public confirmPasswordVisible = false;
+  public cepatList: Cepat[] = [];
 
   public userModel = {
     nombre: '',
@@ -36,7 +37,8 @@ export class CepatFormComponent implements OnInit {
     telefono: '',
     tipo_usuario_param: 37, // 37 es para cepatp.
     estatus: 24, // 24 es un usuario habilitado
-    cepat_name: '',
+    // cepat_name: '',
+    id_cepat: null as number | null
   };
 
   constructor(
@@ -48,6 +50,7 @@ export class CepatFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.getAllInstitutions();
+    this.loadCepats();
   }
 
   getAllInstitutions(): void {
@@ -60,17 +63,31 @@ export class CepatFormComponent implements OnInit {
     });
   }
 
+  loadCepats(): void {
+    this.cepatService.getAllCepat().subscribe({
+      next: (data) => {
+        this.cepatList = data;
+        this.cdr.detectChanges(); // Asegura que la vista se actualice
+      },
+      error: (err) => {
+        console.error('Error al cargar la lista de CEPATs:', err);
+        // Aquí podrías mostrar un mensaje de error al usuario
+      },
+    });
+  }
+
   createNewCepat(): void {
-    const { cepat_name, ...cepatData } = this.userModel;
+    const { id_cepat, ...cepatData } = this.userModel;
+    console.log('Id cepat:', id_cepat);
     forkJoin({
       user: this.cepatService.createNewUserCepat(cepatData),
-      cepat: this.cepatService.createNewCepat(cepat_name),
+      // cepat: this.cepatService.createNewCepat(cepat_name),
     }).subscribe({
-      next: (response) => {
+      next: () => {
         this.cepatCreated = true;
         this.cdr.detectChanges();
       },
-      error: (err) => {
+      error: () => {
         this.cepatCreated = false;
       },
     });

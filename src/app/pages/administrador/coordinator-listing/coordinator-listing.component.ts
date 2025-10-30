@@ -5,7 +5,6 @@ import {
   EventEmitter,
   OnDestroy,
   OnInit,
-  TemplateRef,
   ViewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
@@ -14,9 +13,9 @@ import { TranslateService } from '@ngx-translate/core';
 import { SwalComponent, SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { Config } from 'datatables.net';
 import { SweetAlertOptions } from 'sweetalert2';
-
 import { FormsModule } from '@angular/forms';
 import { CepatService } from 'src/app/api/services/cepat.service';
+import { UsersService } from 'src/app/api/services/usuarios.service';
 import { TranslationModule } from 'src/app/modules/i18n';
 import { CrudModule } from '../../../modules/crud/crud.module';
 import { SharedModule } from '../../../template/shared/shared.module';
@@ -76,34 +75,57 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private modalService: NgbModal,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private userService: UsersService
   ) {}
 
-  ngOnInit(): void {
-    this.placeholder = this.translate.instant('TABLE.PLACEHOLDER_SEARCH');
+  private loadCoordinators(isInitialLoad: boolean = false): void {
     const userType = 37;
-    this.cepatService.getCepatUserByType(userType).subscribe(
-      (data) => {
-        console.log('Datos recibidos:', data);
-        this.allCoordinators = data;
-        this.initializeDataTables(this.allCoordinators);
-        this.isDataReady = true;
+    if (isInitialLoad) {
+      this.isDataReady = false;
+      this.cdr.detectChanges();
+    }
+
+    this.cepatService.getCepatUserByType(userType).subscribe({
+      next: (data) => {
+        this.allCoordinators = data.map((coord: any) => ({
+          ...coord,
+          id: coord.id_usuario,
+        }));
+
+        if (isInitialLoad) {
+          this.initializeDataTables(this.allCoordinators);
+          this.isDataReady = true;
+        } else if (this.dtInstance) {
+          this.dtInstance.clear();
+          this.dtInstance.rows.add(this.allCoordinators);
+          this.dtInstance.draw();
+        } else {
+          this.datatableConfig.data = [...this.allCoordinators];
+          this.reloadEvent.emit(true);
+        }
 
         this.cdr.detectChanges();
       },
-      (error) => {
-        console.error('Error al cargar coordinadores:', error);
+      error: () => {
         this.showAlert({
           title: 'Error',
           text: 'No se pudieron cargar los datos.',
           icon: 'error',
         });
-        this.initializeDataTables([]);
 
-        this.isDataReady = true;
-        this.cdr.detectChanges();
-      }
-    );
+        if (isInitialLoad) {
+          this.initializeDataTables([]);
+          this.isDataReady = true;
+          this.cdr.detectChanges();
+        }
+      },
+    });
+  }
+
+  ngOnInit(): void {
+    this.placeholder = this.translate.instant('TABLE.PLACEHOLDER_SEARCH');
+    this.loadCoordinators(true);
   }
 
   initializeDataTables(data: any[]): void {
@@ -132,8 +154,11 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
           render: (data, type, row) => {
             const fullName = `${data} ${row.ape_pat} ${row.ape_mat}`.trim();
             const colorClasses = ['success', 'info', 'warning', 'danger'];
-            const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
-            const initials = (data[0] + (row.apellidos ? row.apellidos[0] : '')).toUpperCase();
+            const randomColorClass =
+              colorClasses[Math.floor(Math.random() * colorClasses.length)];
+            const initials = (
+              data[0] + (row.apellidos ? row.apellidos[0] : '')
+            ).toUpperCase();
             const symbol = `
               <div class="symbol-label mx-5 fs-1 bg-light-${randomColorClass} text-${randomColorClass}" style="height: 60px; width: 60px;">
               ${initials}
@@ -210,29 +235,11 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  // edit(id: number) {
-  //   const numericId = Number(id);
-  //   this.cdr.detectChanges();
-  //   const foundCoordinator = this.allCoordinators.find(
-  //     (c) => c.id_usuario === numericId
-  //   );
-
-  //   if (foundCoordinator) {
-  //     this.coordinadorModel = { ...foundCoordinator };
-  //     this.cdr.detectChanges();
-  //   } else {
-  //     this.showAlert({
-  //       title: 'No encontrado',
-  //       text: `El coordinador con ID ${id} no existe en la lista.`,
-  //       icon: 'warning',
-  //     });
-  //   }
-  // }
-
-edit(id: number) {
-  console.log('ID recibido para editar:', id);
-  console.log('Coordinadores disponibles:', this.allCoordinators);
-}
+  edit(id: number) {
+    const cepat = this.allCoordinators.find((c) => c.id === Number(id));
+    if (!cepat) return;
+    this.coordinadorModel = { ...cepat };
+  }
 
   closeForm(modal: any) {
     modal.dismiss('cancel');
@@ -245,41 +252,48 @@ edit(id: number) {
       url_foto: '',
       correo: '',
       telefono: '',
-      tipo_usuario_param: 0,
+      tipo_usuario_param: 37,
       estatus: 24,
     };
   }
 
   saveChanges(modal: any) {
-    // 1. Aquí llamas a tu servicio de API PUT/PATCH
-    // this.cepatService.updateUser(this.coordinadorModel).subscribe((updatedUser) => {
-
-    this.showAlert({
-      title: '¡Éxito!',
-      text: 'Los cambios se han guardado correctamente',
-      icon: 'success',
-    });
-
-    // 2. Actualizar el arreglo local
-    const index = this.allCoordinators.findIndex(
-      (u) => u.id_usuario === this.coordinadorModel.id_usuario
-    );
-    if (index !== -1) {
-      this.allCoordinators[index] = { ...this.coordinadorModel };
+    if (!this.coordinadorModel?.correo) {
+      this.showAlert({
+        title: 'Error',
+        text: 'No se encontró el correo del usuario a actualizar.',
+        icon: 'error',
+      });
+      return;
     }
+    const email = this.coordinadorModel.correo;
+    const updatedData = {
+      nombre: this.coordinadorModel.nombre,
+      ape_pat: this.coordinadorModel.ape_pat,
+      ape_mat: this.coordinadorModel.ape_mat,
+      telefono: this.coordinadorModel.telefono,
+      tipo_usuario_param: this.coordinadorModel.tipo_usuario_param,
+      estatus: this.coordinadorModel.estatus,
+    };
 
-    // 3. Actualizar datos en config y recargar tabla
-    this.datatableConfig.data = this.allCoordinators;
-    this.reloadEvent.emit(true);
-    this.cdr.detectChanges();
-    modal.close();
-
-    // }, error => { ... });
-  }
-
-  async navigateToEdit(id: number, modalTemplate: TemplateRef<any>) {
-    console.log('Navegando a editar coordinador con ID:', id);
-    this.edit(id);
+    this.userService.updateUserByEmail(email, updatedData).subscribe({
+      next: (updatedUser) => {
+        this.showAlert({
+          title: '¡Éxito!',
+          text: 'Los cambios se han guardado correctamente',
+          icon: 'success',
+        });
+        modal.close();
+        this.loadCoordinators(false);
+      },
+      error: (error) => {
+        this.showAlert({
+          title: 'Error',
+          text: `No se pudo actualizar el usuario: ${error.message}`,
+          icon: 'error',
+        });
+      },
+    });
   }
 
   navigateToCreate() {

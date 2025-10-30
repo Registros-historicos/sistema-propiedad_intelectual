@@ -1,5 +1,5 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
@@ -19,6 +19,7 @@ export interface UserCepat {
 export interface Cepat {
   id_cepat: number;
   nombre: string;
+  id_usuario?: number | null;
 }
 
 @Injectable({
@@ -26,6 +27,7 @@ export interface Cepat {
 })
 export class CepatService {
   constructor(private http: HttpClient) {}
+  
   createNewUserCepat(usuario: UserCepat): Observable<UserCepat> {
     return this.http.post<UserCepat>("/api/usuarios/", usuario).pipe(
       catchError((error: any) => {
@@ -55,9 +57,19 @@ export class CepatService {
           return data;
         }),
         catchError((error) => {
-          console.error('❌ Error en getCepatUserByType:', error);
           return of([]);
         })
       );
+  }
+
+  getAllCepat(): Observable<Cepat[]> {
+    return this.http.get<Cepat[]>('/api/cepat/').pipe(
+      map((data) => {
+        return data;
+      }),
+      catchError((erro) => {
+        return of([]);
+      })
+    );
   }
 }
