@@ -12,8 +12,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class LoginComponent implements OnInit, OnDestroy {
   defaultAuth: any = {
-    email: 'jose.sc@demo.com',
-    password: 'demo',
+    email: 'admin@test.com',
+    password: 'MiPasswordAdmin',
   };
 
   loginForm: FormGroup;

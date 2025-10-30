@@ -22,6 +22,10 @@ export class CepatFormComponent implements OnInit {
   public allInstitutions: Institutions[] = [];
   public filteredInstitutions: Institutions[] = [];
   public selectedInstitutions: Institutions[] = [];
+  public confirmPassword = '';
+  public passwordVisible = false;
+  public confirmPasswordVisible = false;
+
   public userModel = {
     nombre: '',
     ape_pat: '',
@@ -57,35 +61,26 @@ export class CepatFormComponent implements OnInit {
   }
 
   createNewCepat(): void {
-  const { cepat_name, ...cepatData } = this.userModel;
-
-  // Ejecuta ambas peticiones en paralelo
-  forkJoin({
-    user: this.cepatService.createNewUserCepat(cepatData),
-    cepat: this.cepatService.createNewCepat(cepat_name)
-  }).subscribe({
-    next: (response) => {
-      console.log('✅ Ambas peticiones completadas:', response);
-      this.cepatCreated = true;
-      this.cdr.detectChanges();
-    },
-    error: (err) => {
-      console.error('❌ Error en alguna petición:', err);
-      this.cepatCreated = false;
-      // Aquí podrías mostrar un mensaje de error en el UI:
-      alert('Error al crear el usuario o el cepat.');
-    }
-  });
-}
+    const { cepat_name, ...cepatData } = this.userModel;
+    forkJoin({
+      user: this.cepatService.createNewUserCepat(cepatData),
+      cepat: this.cepatService.createNewCepat(cepat_name),
+    }).subscribe({
+      next: (response) => {
+        this.cepatCreated = true;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.cepatCreated = false;
+      },
+    });
+  }
 
   onSubmit(form: NgForm): void {
-    form.form.markAllAsTouched();
-    if (form.invalid) {
-      return;
-    }
+    const f = form.form;
+    f.markAllAsTouched();
+    if (f.invalid || this.userModel.password !== this.confirmPassword) return;
     this.createNewCepat();
-    // console.log('Formulario enviado:', cepatData);
-    // console.log('Nombre del CEPAT:', cepat_name);
     // this.cepatCreated = true;
   }
 
@@ -101,50 +96,35 @@ export class CepatFormComponent implements OnInit {
           (selected) => selected.id_institucion === inst.id_institucion
         )
     );
-
     this.filteredInstitutions = available.filter((inst) =>
       inst.institucion_nombre.toLowerCase().includes(lowerCaseSearch)
     );
   }
 
-  /**
-   * Agrega una institución a la lista de seleccionadas.
-   * @param institucion La institución a agregar.
-   */
   selectInstitution(institucion: Institutions): void {
     this.selectedInstitutions.push(institucion);
-    this.searchTerm = ''; // Limpia el input de búsqueda
-    this.filteredInstitutions = []; // Oculta la lista de resultados
+    this.searchTerm = '';
+    this.filteredInstitutions = [];
   }
 
-  /**
-   * Remueve una institución de la lista de seleccionadas.
-   * @param institucionToRemove La institución a remover.
-   */
   removeInstitution(institucionToRemove: Institutions): void {
     this.selectedInstitutions = this.selectedInstitutions.filter(
       (inst) => inst.id_institucion !== institucionToRemove.id_institucion
     );
   }
 
-  /**
-   * Lógica para el botón de cancelar.
-   */
   onCancel(): void {
-    console.log('Operación cancelada.');
-    // Aquí podrías añadir lógica para resetear el formulario o navegar a otra ruta.
+    this.router.navigate(['/administrador/registro']);
   }
 
-  /**
-   * Finaliza el proceso, guardando las instituciones vinculadas.
-   */
   finishProcess(): void {
-    console.log('Proceso finalizado.');
     console.log(
       'Instituciones vinculadas:',
-      this.selectedInstitutions.map((inst) => inst.institucion_nombre)
+      this.selectedInstitutions.map((inst) => ({
+        id: inst.id_institucion,
+        nombre: inst.institucion_nombre,
+      }))
     );
-    // Aquí harías la llamada a la API para guardar las vinculaciones y/o navegar a otra página.
     this.router.navigate(['/administrador/coordinadores']);
   }
 }
