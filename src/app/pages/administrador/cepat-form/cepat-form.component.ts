@@ -2,12 +2,17 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Cepat, CepatService } from 'src/app/api/services/cepat.service';
+import {
+  Cepat,
+  CepatService,
+  Estado,
+  Institucion,
+} from 'src/app/api/services/cepat.service';
 import {
   Institutions,
   TablerosService,
 } from 'src/app/api/services/tableros.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-cepat-form',
@@ -26,6 +31,8 @@ export class CepatFormComponent implements OnInit {
   public passwordVisible = false;
   public confirmPasswordVisible = false;
   public cepatList: Cepat[] = [];
+  public estados: Estado[] = [];
+  public estadosSeleccionados: Estado[] = [];
 
   public userModel = {
     nombre: '',
@@ -37,8 +44,7 @@ export class CepatFormComponent implements OnInit {
     telefono: '',
     tipo_usuario_param: 37, // 37 es para cepatp.
     estatus: 24, // 24 es un usuario habilitado
-    // cepat_name: '',
-    id_cepat: null as number | null
+    id_cepat: null as number | null,
   };
 
   constructor(
@@ -50,6 +56,7 @@ export class CepatFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.getAllInstitutions();
+    this.loadStates();
     this.loadCepats();
   }
 
@@ -67,27 +74,46 @@ export class CepatFormComponent implements OnInit {
     this.cepatService.getAllCepat().subscribe({
       next: (data) => {
         this.cepatList = data;
-        this.cdr.detectChanges(); // Asegura que la vista se actualice
+        this.cdr.detectChanges();
       },
-      error: (err) => {
-        console.error('Error al cargar la lista de CEPATs:', err);
-        // Aquí podrías mostrar un mensaje de error al usuario
+      error: () => {
+        this.cepatList = [];
+      },
+    });
+  }
+
+  loadStates(): void {
+    this.cepatService.getEstados().subscribe({
+      next: (data) => {
+        this.estados = data;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.estados = [];
       },
     });
   }
 
   createNewCepat(): void {
-    const { id_cepat, ...cepatData } = this.userModel;
-    console.log('Id cepat:', id_cepat);
-    forkJoin({
-      user: this.cepatService.createNewUserCepat(cepatData),
-      // cepat: this.cepatService.createNewCepat(cepat_name),
-    }).subscribe({
-      next: () => {
-        this.cepatCreated = true;
-        this.cdr.detectChanges();
+    const { id_cepat, ...userData } = this.userModel;
+    this.cepatService.createNewUserCepat(userData).subscribe({
+      next: (newUser) => {
+        const idUsuario = newUser.id_usuario;
+        if (!idUsuario || !id_cepat) {
+          this.cepatCreated = false;
+          return;
+        }
+        this.cepatService.updateCepatById(id_cepat, idUsuario).subscribe({
+          next: () => {
+            this.cepatCreated = true;
+            this.cdr.detectChanges();
+          },
+          error: (err) => {
+            this.cepatCreated = false;
+          },
+        });
       },
-      error: () => {
+      error: (err) => {
         this.cepatCreated = false;
       },
     });
@@ -98,7 +124,7 @@ export class CepatFormComponent implements OnInit {
     f.markAllAsTouched();
     if (f.invalid || this.userModel.password !== this.confirmPassword) return;
     this.createNewCepat();
-    // this.cepatCreated = true;
+    this.cepatCreated = true;
   }
 
   onSearchInstitutions(): void {
@@ -135,13 +161,73 @@ export class CepatFormComponent implements OnInit {
   }
 
   finishProcess(): void {
-    console.log(
-      'Instituciones vinculadas:',
-      this.selectedInstitutions.map((inst) => ({
-        id: inst.id_institucion,
-        nombre: inst.institucion_nombre,
-      }))
+    this.assignStatesAndInstitutions();
+  }
+
+  assignStatesAndInstitutions(): void {
+    const { id_cepat } = this.userModel;
+    if (!id_cepat) {
+      return;
+    }
+    if (!this.estadosSeleccionados || this.estadosSeleccionados.length === 0) {
+      this.router.navigate(['/administrador/coordinadores']);
+      return;
+    }
+    const observablesGet: Observable<Institucion[]>[] =
+      this.estadosSeleccionados.map((estado) => {
+        return this.cepatService.getInstitucionesPorEstado(
+          estado.id_entidad_federativa
+        );
+      });
+
+    forkJoin(observablesGet).subscribe({
+      next: (resultados) => {
+        const todasLasInstituciones: Institucion[] = resultados.reduce(
+          (acc, val) => acc.concat(val),
+          []
+        );
+        if (todasLasInstituciones.length === 0) {
+          this.router.navigate(['/administrador/coordinadores']);
+          return;
+        }
+        const observablesPut: Observable<any>[] = todasLasInstituciones.map(
+          (institucion) => {
+            return this.cepatService.actualizarInstitucionByIdCepat(
+              institucion.id_institucion,
+              id_cepat
+            );
+          }
+        );
+        forkJoin(observablesPut).subscribe({
+          next: (resultadosPut) => {
+            this.router.navigate(['/administrador/coordinadores']);
+          },
+          error: (errPut) => {},
+        });
+      },
+      error: (errGet) => {},
+    });
+  }
+
+  onSelectEstado(event: any): void {
+    const idSeleccionado = Number(event.target.value);
+    const estado = this.estados.find(
+      (e) => e.id_entidad_federativa === idSeleccionado
     );
-    this.router.navigate(['/administrador/coordinadores']);
+    if (estado) {
+      const yaSeleccionado = this.estadosSeleccionados.some(
+        (e) => e.id_entidad_federativa === estado.id_entidad_federativa
+      );
+      if (!yaSeleccionado) {
+        this.estadosSeleccionados.push(estado);
+      }
+    }
+    event.target.value = '';
+  }
+
+  removeEstado(estadoToRemove: Estado): void {
+    this.estadosSeleccionados = this.estadosSeleccionados.filter(
+      (e) => e.id_entidad_federativa !== estadoToRemove.id_entidad_federativa
+    );
   }
 }
