@@ -52,4 +52,16 @@ export class UsersService {
       })
     );
   }
+
+  deleteUserById(idUsuario: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}delete/${idUsuario}/`).pipe(
+      catchError((error: any) => {
+        const mensaje =
+          error?.error?.message ||
+          error.message ||
+          'Error desconocido al eliminar el usuario';
+        return throwError(() => new Error(mensaje));
+      })
+    );
+  }
 }

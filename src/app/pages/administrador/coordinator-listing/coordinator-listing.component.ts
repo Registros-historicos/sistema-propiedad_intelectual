@@ -70,7 +70,6 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
   swalOptions: SweetAlertOptions = {};
 
   constructor(
-    // MODIFICADO: Inyectamos tu servicio
     private cepatService: CepatService,
     private cdr: ChangeDetectorRef,
     private router: Router,
@@ -79,7 +78,7 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
     private userService: UsersService
   ) {}
 
-  private loadCoordinators(isInitialLoad: boolean = false): void {
+  private loadCepats(isInitialLoad: boolean = false): void {
     const userType = 37;
     if (isInitialLoad) {
       this.isDataReady = false;
@@ -125,7 +124,7 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.placeholder = this.translate.instant('TABLE.PLACEHOLDER_SEARCH');
-    this.loadCoordinators(true);
+    this.loadCepats(true);
   }
 
   initializeDataTables(data: any[]): void {
@@ -221,18 +220,24 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
   }
 
   delete(id: number) {
-    this.showAlert({
-      title: '¡Éxito!',
-      text: 'El coordinador ha sido eliminado',
-      icon: 'success',
-    });
+    this.userService.deleteUserById(id).subscribe({
+      next: () => {
+        this.showAlert({
+          title: '¡Éxito!',
+          text: 'El usuario CEPAT ha sido eliminado',
+          icon: 'success',
+        });
 
-    this.allCoordinators = this.allCoordinators.filter(
-      (u) => u.id_usuario !== Number(id)
-    );
-    this.datatableConfig.data = this.allCoordinators;
-    this.reloadEvent.emit(true);
-    this.cdr.detectChanges();
+        this.loadCepats(false);
+      },
+      error: (error) => {
+        this.showAlert({
+          title: 'Error',
+          text: `No se pudo eliminar el usuario: ${error.message}`,
+          icon: 'error',
+        });
+      },
+    });
   }
 
   edit(id: number) {
@@ -284,7 +289,7 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
           icon: 'success',
         });
         modal.close();
-        this.loadCoordinators(false);
+        this.loadCepats(false);
       },
       error: (error) => {
         this.showAlert({
