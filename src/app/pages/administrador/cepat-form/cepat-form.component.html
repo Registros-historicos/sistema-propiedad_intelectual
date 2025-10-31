@@ -323,7 +323,7 @@
   <ng-container *ngIf="cepatCreated">
     <div class="card-header border-0 pt-6">
       <div class="card-title">
-        <h3>Vincular Instituciones (Opcional)</h3>
+        <h3>Seleccionar Estado</h3>
       </div>
     </div>
 
@@ -341,89 +341,59 @@
                 CEPAT Registrado Exitosamente
               </h4>
               <div class="fs-6 text-gray-700">
-                Ahora puede vincular las instituciones a las que pertenece o
-                finalizar el proceso.
+                Ahora puede seleccionar un estado para continuar.
               </div>
             </div>
           </div>
         </div>
 
         <div class="mb-7">
-          <label class="fw-semibold fs-6 mb-2">Buscar Institución:</label>
-          <input
-            type="text"
-            class="form-control form-control-solid"
-            placeholder="Escribe el nombre de la institución..."
-            [(ngModel)]="searchTerm"
-            (ngModelChange)="onSearchInstitutions()"
-            name="searchTerm"
-            autocomplete="off"
-          />
-
-          <div
-            *ngIf="searchTerm && filteredInstitutions.length > 0"
-            class="mt-3 border rounded"
-            style="max-height: 300px; overflow-y: auto"
+          <label class="fw-semibold fs-6 mb-2">Seleccionar Estado:</label>
+          <select
+            class="form-select form-select-solid"
+            (change)="onSelectEstado($event)"
           >
-            <ul class="list-group list-group-flush">
-              <li
-                *ngFor="let inst of filteredInstitutions"
-                class="list-group-item list-group-item-action cursor-pointer"
-                (click)="selectInstitution(inst)"
-              >
-                {{ inst.institucion_nombre }}
-              </li>
-            </ul>
-          </div>
-
-          <div
-            *ngIf="searchTerm && filteredInstitutions.length === 0"
-            class="mt-3 text-muted fs-7 text-center p-3 border rounded"
-          >
-            No se encontraron instituciones.
-          </div>
+            <option value="" selected disabled>
+              -- Selecciona un estado --
+            </option>
+            <option
+              *ngFor="let estado of estados"
+              [value]="estado.id_entidad_federativa"
+            >
+              {{ estado.nombre_entidad }}
+            </option>
+          </select>
         </div>
 
-        <div class="mb-7">
-          <label class="fw-semibold fs-6 mb-2">Instituciones Vinculadas:</label>
+        <div *ngIf="estadosSeleccionados.length > 0" class="mt-5">
+          <label class="fw-semibold fs-6 mb-3">Estados Seleccionados:</label>
 
-          <div
-            class="border rounded"
-            style="max-height: 300px; overflow-y: auto; min-height: 100px"
-          >
+          <div class="d-flex flex-column gap-3">
             <div
-              *ngIf="selectedInstitutions.length === 0"
-              class="text-muted fs-7 text-center p-5"
+              *ngFor="let estado of estadosSeleccionados"
+              class="d-flex justify-content-between align-items-center bg-light rounded border border-dashed p-3"
             >
-              Aún no se han vinculado instituciones.
-            </div>
+              <span class="text-gray-800 fw-semibold">{{
+                estado.nombre_entidad
+              }}</span>
 
-            <ul
-              *ngIf="selectedInstitutions.length > 0"
-              class="list-group list-group-flush"
-            >
-              <li
-                *ngFor="let inst of selectedInstitutions"
-                class="list-group-item d-flex justify-content-between align-items-center"
+              <button
+                type="button"
+                class="btn btn-sm btn-icon btn-active-light-danger"
+                (click)="removeEstado(estado)"
+                aria-label="Quitar estado"
               >
-                <div class="fw-semibold">{{ inst.institucion_nombre }}</div>
-                <button
-                  type="button"
-                  class="btn btn-sm btn-light btn-icon btn-sm btn-light-danger"
-                  (click)="removeInstitution(inst)"
-                  title="Quitar"
-                >
-                  <i class="ki-duotone ki-trash fs-5"
-                    ><span class="path1"></span><span class="path2"></span
-                    ><span class="path3"></span><span class="path4"></span
-                    ><span class="path5"></span
-                  ></i>
-                </button>
-              </li>
-            </ul>
+                <i class="ki-duotone ki-trash fs-3">
+                  <span class="path1"></span>
+                  <span class="path2"></span>
+                  <span class="path3"></span>
+                  <span class="path4"></span>
+                  <span class="path5"></span>
+                </i>
+              </button>
+            </div>
           </div>
         </div>
-
         <div class="d-flex justify-content-end pt-5">
           <button
             type="button"
