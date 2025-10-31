@@ -110,28 +110,37 @@
                 </div>
               </div>
             </div>
+
             <div class="col-md-6 fv-row">
               <label class="required fw-semibold fs-6 mb-2"
                 >Nombre de la institución (CEPAT)</label
               >
-              <input
-                type="text"
-                class="form-control form-control-solid"
-                name="cepat_name"
-                [(ngModel)]="userModel.cepat_name"
-                #cepat_name="ngModel"
+
+              <select
+                class="form-select form-select-solid"
+                name="id_cepat"
+                [(ngModel)]="userModel.id_cepat"
+                #id_cepat="ngModel"
                 required
-                minlength="2"
-              />
+              >
+                <option [ngValue]="null" disabled>
+                  Seleccione una institución
+                </option>
+
+                <option
+                  *ngFor="let cepat of cepatList"
+                  [value]="cepat.id_cepat"
+                >
+                  {{ cepat.nombre }}
+                </option>
+              </select>
+
               <div
-                *ngIf="userForm.submitted && cepat_name.invalid"
+                *ngIf="userForm.submitted && id_cepat.invalid"
                 class="fv-plugins-message-container invalid-feedback"
               >
-                <div *ngIf="cepat_name.errors?.['required']">
-                  El nombre del CEPAT es requerido.
-                </div>
-                <div *ngIf="cepat_name.errors?.['minlength']">
-                  Debe tener al menos 2 caracteres.
+                <div *ngIf="id_cepat.errors?.['required']">
+                  Debe seleccionar una institución CEPAT.
                 </div>
               </div>
             </div>
@@ -161,26 +170,138 @@
                 </div>
               </div>
             </div>
+
             <div class="col-md-6 fv-row">
               <label class="required fw-semibold fs-6 mb-2">Contraseña</label>
-              <input
-                type="password"
-                class="form-control form-control-solid"
-                name="password"
-                [(ngModel)]="userModel.password"
-                #password="ngModel"
-                required
-                minlength="8"
-              />
+              <div class="position-relative">
+                <input
+                  [type]="passwordVisible ? 'text' : 'password'"
+                  class="form-control form-control-solid"
+                  name="password"
+                  [(ngModel)]="userModel.password"
+                  #password="ngModel"
+                  required
+                  minlength="8"
+                  pattern="^(?=.*[A-Z])(?=.*\d).{8,}$"
+                />
+                <button
+                  type="button"
+                  (click)="passwordVisible = !passwordVisible"
+                  class="btn btn-sm btn-icon btn-active-color-primary position-absolute top-50 end-0 translate-middle-y me-2"
+                  tabindex="-1"
+                >
+                  <i
+                    class="ki-duotone fs-2"
+                    [class.ki-eye-slash]="!passwordVisible"
+                    [class.ki-eye]="passwordVisible"
+                  >
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                    <span class="path4"></span>
+                  </i>
+                </button>
+              </div>
+
               <div
-                *ngIf="userForm.submitted && password.invalid"
+                *ngIf="
+                  password.invalid &&
+                  (password.dirty || password.touched || userForm.submitted)
+                "
                 class="fv-plugins-message-container invalid-feedback"
               >
                 <div *ngIf="password.errors?.['required']">
                   La contraseña es requerida.
                 </div>
                 <div *ngIf="password.errors?.['minlength']">
-                  La contraseña debe tener al menos 8 caracteres.
+                  Al menos 8 caracteres.
+                </div>
+                <div *ngIf="password.errors?.['pattern']">
+                  Debe incluir al menos una mayúscula y un número.
+                </div>
+              </div>
+
+              <div
+                class="text-muted mt-2 fs-7"
+                *ngIf="!password.valid && (password.dirty || password.touched)"
+              >
+                <span
+                  [class.text-danger]="
+                    !password.value || password.value.length < 8
+                  "
+                  [class.text-success]="password.value?.length >= 8"
+                >
+                  Al menos 8 caracteres </span
+                ><br />
+                <span
+                  [class.text-danger]="
+                    !password.value || !password.value.match('[A-Z]')
+                  "
+                  [class.text-success]="password.value?.match('[A-Z]')"
+                >
+                  Al menos una letra mayúscula </span
+                ><br />
+                <span
+                  [class.text-danger]="
+                    !password.value || !password.value.match('[0-9]')
+                  "
+                  [class.text-success]="password.value?.match('[0-9]')"
+                >
+                  Al menos un número
+                </span>
+              </div>
+            </div>
+
+            <div class="row g-9 mb-7">
+              <div class="col-md-6 fv-row">
+                <label class="required fw-semibold fs-6 mb-2"
+                  >Confirmar Contraseña</label
+                >
+                <div class="position-relative">
+                  <input
+                    [type]="confirmPasswordVisible ? 'text' : 'password'"
+                    class="form-control form-control-solid"
+                    name="confirmPasswordInput"
+                    [(ngModel)]="confirmPassword"
+                    #confirmPasswordInput="ngModel"
+                    required
+                  />
+                  <button
+                    type="button"
+                    (click)="confirmPasswordVisible = !confirmPasswordVisible"
+                    class="btn btn-sm btn-icon btn-active-color-primary position-absolute top-50 end-0 translate-middle-y me-2"
+                    tabindex="-1"
+                  >
+                    <i
+                      class="ki-duotone fs-2"
+                      [class.ki-eye-slash]="!confirmPasswordVisible"
+                      [class.ki-eye]="confirmPasswordVisible"
+                    >
+                      <span class="path1"></span>
+                      <span class="path2"></span>
+                      <span class="path3"></span>
+                      <span class="path4"></span>
+                    </i>
+                  </button>
+                </div>
+
+                <div
+                  *ngIf="
+                    (confirmPasswordInput.invalid &&
+                      (confirmPasswordInput.touched || userForm.submitted)) ||
+                    (userForm.submitted &&
+                      userModel.password !== confirmPassword)
+                  "
+                  class="fv-plugins-message-container invalid-feedback"
+                >
+                  <div *ngIf="confirmPasswordInput.errors?.['required']">
+                    La confirmación es requerida.
+                  </div>
+                  <div
+                    *ngIf="!confirmPasswordInput.errors?.['required'] && userModel.password !== confirmPassword"
+                  >
+                    Las contraseñas deben coincidir.
+                  </div>
                 </div>
               </div>
             </div>
