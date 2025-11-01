@@ -95,7 +95,10 @@ export class CepatService {
     );
   }
 
-  actualizarInstitucionByIdCepat(idInstitucion: number, idCepat: number): Observable<any> {
+  actualizarInstitucionByIdCepat(
+    idInstitucion: number,
+    idCepat: number | null
+  ): Observable<any> {
     const url = `/api/institucion/${idInstitucion}/actualizar-id-cepat/`;
     const body = { id_cepat: idCepat };
     return this.http.put(url, body).pipe(
@@ -122,6 +125,21 @@ export class CepatService {
           'Error al actualizar el id_usuario del CEPAT';
         return throwError(() => new Error(mensaje));
       })
+    );
+  }
+
+  getStatesByUserId(idUser: number): Observable<Estado[]> {
+    const url = `/api/parametrizaciones/estados/${idUser}/`;
+    return this.http.get<Estado[]>(url).pipe(
+      map((data) => data),
+      catchError(() => of([]))
+    );
+  }
+
+  getCepatByIdUser(idUser: number): Observable<Cepat> {
+    const url = `/api/cepat/user/${idUser}/`;
+    return this.http.get<Cepat>(url).pipe(
+      catchError(() => of(null as unknown as Cepat))
     );
   }
 }

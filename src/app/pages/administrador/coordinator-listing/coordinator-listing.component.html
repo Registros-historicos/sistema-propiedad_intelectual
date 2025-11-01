@@ -47,23 +47,25 @@
 
 <ng-template #editModal let-modal>
   <div class="modal-header">
-    <h3 class="modal-title fw-bold text-gray-800">
+    <h3 class="modal-title fw-bold text-gray-800 d-flex align-items-center">
       <app-keenicon name="pencil" class="fs-2 me-2"></app-keenicon>
-      <span>Editar Usuario</span>
+      Editar Usuario
     </h3>
     <button type="button" class="btn-close" aria-label="Close" (click)="closeForm(modal)"></button>
   </div>
 
   <div class="modal-body py-6 px-8">
     <div class="d-flex flex-column">
+      <!-- Información del usuario -->
       <div class="notice d-flex bg-light-primary rounded border-primary border border-dashed mb-7 p-6">
         <app-keenicon name="information-5" class="fs-2 text-primary me-4"></app-keenicon>
-        <div class="d-flex flex-column">
+        <div>
           <h4 class="text-gray-900 fw-bold mb-2">Información del Usuario</h4>
-          <span class="text-gray-700">Revise y modifique la información del usuario según sea necesario.</span>
+          <span class="text-gray-700" *ngIf="cepatName">Atiende al {{ cepatName }}</span>
         </div>
       </div>
 
+      <!-- Campos principales -->
       <div class="row g-6 mb-6">
         <div class="col-md-6">
           <div class="fv-row mb-6">
@@ -75,12 +77,11 @@
             <label class="fs-6 fw-semibold mb-2 required">Apellido Paterno</label>
             <input type="text" class="form-control form-control-solid" [(ngModel)]="coordinadorModel.ape_pat" name="ape_pat">
           </div>
-          
+
           <div class="fv-row mb-6">
             <label class="fs-6 fw-semibold mb-2 required">Email</label>
             <input type="email" class="form-control form-control-solid" [(ngModel)]="coordinadorModel.correo" name="correo">
           </div>
-
         </div>
 
         <div class="col-md-6">
@@ -97,20 +98,95 @@
           <div class="fv-row mb-6">
             <label class="fs-6 fw-semibold mb-2">Estatus</label>
             <select class="form-select form-select-solid" [(ngModel)]="coordinadorModel.estatus" name="estatus">
-              <option *ngFor="let estatus of estatusOptions" [value]="estatus.value">{{estatus.label}}</option>
+              <option *ngFor="let estatus of estatusOptions" [value]="estatus.value">{{ estatus.label }}</option>
             </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estados -->
+      <div class="mt-4 border-top pt-4">
+        <h5 class="fw-bold mb-3">Estados que atiende</h5>
+
+        <div *ngIf="estadosAsignados.length > 0; else sinEstados">
+          <ul class="list-group mb-5">
+            <li 
+              *ngFor="let estado of estadosAsignados" 
+              class="list-group-item d-flex justify-content-between align-items-center"
+            >
+              <span class="fw-semibold text-gray-800">
+                {{ estado.nombre_entidad }}
+              </span>
+              <button 
+                type="button" 
+                class="btn btn-sm btn-light-danger"
+                (click)="eliminarEstado(estado.id_entidad_federativa)"
+                aria-label="Eliminar estado asignado"
+              >
+                <i class="bi bi-trash"></i>
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <ng-template #sinEstados>
+          <p class="text-muted mb-5">Este usuario no tiene estados asignados.</p>
+        </ng-template>
+
+        <div class="separator separator-dashed my-6"></div>
+
+        <!-- Agregar nuevos estados -->
+        <h5 class="fw-bold mb-3">Agregar nuevos estados</h5>
+
+        <div class="mb-5">
+          <label class="fw-semibold fs-6 mb-2">Seleccionar Estado:</label>
+          <select
+            class="form-select form-select-solid"
+            (change)="onSelectEstado($event)"
+          >
+            <option value="" selected disabled>-- Selecciona un estado --</option>
+            <option
+              *ngFor="let estado of availableStates"
+              [value]="estado.id_entidad_federativa"
+            >
+              {{ estado.nombre_entidad }}
+            </option>
+          </select>
+        </div>
+
+        <div *ngIf="estadosSeleccionados.length > 0" class="mt-4">
+          <label class="fw-semibold fs-6 mb-3">Nuevos estados a agregar:</label>
+          
+          <div class="d-flex flex-column gap-3">
+            <div
+              *ngFor="let estado of estadosSeleccionados"
+              class="d-flex justify-content-between align-items-center bg-light-primary rounded border border-primary border-dashed p-3"
+            >
+              <span class="text-gray-800 fw-semibold">{{ estado.nombre_entidad }}</span>
+
+              <button
+                type="button"
+                class="btn btn-sm btn-icon btn-active-light-danger"
+                (click)="removeEstado(estado)"
+                aria-label="Quitar estado de la lista"
+              >
+                <i class="bi bi-x-lg"></i>
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Footer -->
   <div class="modal-footer border-0 px-8 py-5">
     <button type="button" class="btn btn-light me-3" (click)="closeForm(modal)">
-      <span>Cancelar</span>
+      Cancelar
     </button>
     <button type="button" class="btn btn-primary" (click)="saveChanges(modal)">
-      <span class="indicator-label">Guardar</span>
+      Guardar
     </button>
   </div>
 </ng-template>
+
