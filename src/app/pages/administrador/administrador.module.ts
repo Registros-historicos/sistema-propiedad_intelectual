@@ -16,7 +16,6 @@ import {DropdownMenusModule} from '../../template/widgets';
 import {TranslationModule} from '../../modules/i18n';
 import {TranslateModule} from '@ngx-translate/core';
 import {MatIcon} from '@angular/material/icon';
-import { HistoricalImpiComponent } from './historical-impi/historical-impi.component';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { CepatFormComponent } from './cepat-form/cepat-form.component';
 
@@ -44,7 +43,6 @@ import { CepatFormComponent } from './cepat-form/cepat-form.component';
     TranslateModule,
     MatIcon,
     CepatFormComponent,
-    HistoricalImpiComponent,
     NgApexchartsModule
   ],
   providers: [
