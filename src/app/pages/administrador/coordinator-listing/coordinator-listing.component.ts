@@ -1,5 +1,4 @@
 import { CommonModule } from '@angular/common';
-import { forkJoin, Observable, of } from 'rxjs';
 import {
   ChangeDetectorRef,
   Component,
@@ -8,16 +7,19 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { Router } from '@angular/router';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { FormsModule } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { SwalComponent, SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { Config } from 'datatables.net';
-import { SweetAlertOptions } from 'sweetalert2';
-import { FormsModule } from '@angular/forms';
-import { CepatService, Estado } from 'src/app/api/services/cepat.service';
+import { forkJoin, Observable } from 'rxjs';
+import {
+  CepatService,
+  Estado,
+  Institucion,
+} from 'src/app/api/services/cepat.service';
 import { UsersService } from 'src/app/api/services/usuarios.service';
 import { TranslationModule } from 'src/app/modules/i18n';
+import { SweetAlertOptions } from 'sweetalert2';
 import { CrudModule } from '../../../modules/crud/crud.module';
 import { SharedModule } from '../../../template/shared/shared.module';
 
@@ -54,6 +56,7 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
   isDataReady: boolean = false;
   private allCoordinators: any[] = [];
   estadosAsignados: Estado[] = [];
+  cepatName: string = '';
 
   coordinadorModel: any = {
     id_usuario: 0,
@@ -65,6 +68,7 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
     telefono: '',
     tipo_usuario_param: 0,
     estatus: 24,
+    id_cepa: 0,
   };
 
   @ViewChild('noticeSwal')
@@ -75,8 +79,6 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
   constructor(
     private cepatService: CepatService,
     private cdr: ChangeDetectorRef,
-    private router: Router,
-    private modalService: NgbModal,
     private translate: TranslateService,
     private userService: UsersService
   ) {}
@@ -189,52 +191,68 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
   }
 
   saveNewStates(onComplete: () => void): void {
+    const id_cepat = this.coordinadorModel.id_cepat;
     if (this.estadosSeleccionados.length === 0) {
       onComplete();
       return;
     }
-
-    const userId = this.coordinadorModel.id_usuario;
-    if (!userId) {
+    if (!id_cepat) {
       this.showAlert({
         title: 'Error',
-        text: 'No se encontró ID de usuario para asignar estados.',
+        text: 'No se encontró ID de CEPAT para asignar instituciones.',
         icon: 'error',
       });
       onComplete();
       return;
     }
+    const observablesGet: Observable<Institucion[]>[] =
+      this.estadosSeleccionados.map((estado) =>
+        this.cepatService.getInstitucionesPorEstado(
+          estado.id_entidad_federativa
+        )
+      );
 
-    // --- ¡IMPORTANTE! ---
-    // Debes tener un método en tu servicio (ej. 'assignStateToUser')
-    // que asigne un estado a un usuario.
-    const observables: Observable<any>[] = this.estadosSeleccionados.map(
-      (estado) => {
-        console.log(
-          `Asignando estado ${estado.id_entidad_federativa} a usuario ${userId}`
+    forkJoin(observablesGet).subscribe({
+      next: (resultados) => {
+        const todasLasInstituciones: Institucion[] = resultados.reduce(
+          (acc, val) => acc.concat(val),
+          []
         );
 
-        // REEMPLAZA ESTO con tu llamada real al servicio:
-        // return this.cepatService.assignStateToUser(userId, estado.id_entidad_federativa);
+        if (todasLasInstituciones.length === 0) {
+          onComplete();
+          return;
+        }
 
-        // --- INICIO CÓDIGO DE SIMULACIÓN (BORRAR DESPUÉS) ---
-        return of(null); // Simula una llamada exitosa
-        // --- FIN CÓDIGO DE SIMULACIÓN ---
-      }
-    );
+        const observablesPut: Observable<any>[] = todasLasInstituciones.map(
+          (institucion) =>
+            this.cepatService.actualizarInstitucionByIdCepat(
+              institucion.id_institucion,
+              id_cepat
+            )
+        );
 
-    forkJoin(observables).subscribe({
-      next: () => {
-        // No mostramos alerta de éxito aquí, 'saveChanges' ya muestra una general.
-        onComplete();
+        forkJoin(observablesPut).subscribe({
+          next: () => {
+            onComplete();
+          },
+          error: () => {
+            this.showAlert({
+              title: 'Error',
+              text: 'Ocurrió un error al asignar las instituciones al CEPAT.',
+              icon: 'error',
+            });
+            onComplete();
+          },
+        });
       },
-      error: (err) => {
+      error: (errGet) => {
         this.showAlert({
-          title: 'Error de Asignación',
-          text: 'Se actualizó el usuario, pero falló la asignación de nuevos estados.',
+          title: 'Error',
+          text: 'No se pudieron obtener las instituciones de los estados seleccionados.',
           icon: 'error',
         });
-        onComplete(); // Completa igual para cerrar el modal, etc.
+        onComplete();
       },
     });
   }
@@ -350,21 +368,45 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
     });
   }
 
+  // edit(id: number) {
+  //   console.log('Editar usuario CEPAT con ID:', id);
+  //   const cepat = this.allCoordinators.find((c) => c.id === Number(id));
+  //   if (!cepat) return;
+  //   this.coordinadorModel = { ...cepat };
+  //   this.cepatService.getStatesByUserId(id).subscribe({
+  //     next: (estados) => {
+  //       this.estadosAsignados = estados;
+  //       console.log('Estados cargados:', estados);
+  //     },
+  //     error: (err) => {
+  //       console.error('Error al obtener estados:', err);
+  //       this.estadosAsignados = [];
+  //     },
+  //   });
+  // }
+
   edit(id: number) {
     const cepat = this.allCoordinators.find((c) => c.id === Number(id));
     if (!cepat) return;
     this.coordinadorModel = { ...cepat };
-    this.cepatService.getStatesByUserId(id).subscribe({
-      next: (estados) => {
+
+    forkJoin({
+      cepatData: this.cepatService.getCepatByIdUser(id),
+      estados: this.cepatService.getStatesByUserId(id),
+    }).subscribe({
+      next: ({ cepatData, estados }) => {
+        if (cepatData) {
+          this.coordinadorModel.id_cepat = cepatData.id_cepat;
+          this.cepatName = cepatData.nombre || '';
+        }
         this.estadosAsignados = estados;
-        console.log('Estados cargados:', estados);
       },
-      error: (err) => {
-        console.error('Error al obtener estados:', err);
+      error: () => {
         this.estadosAsignados = [];
       },
     });
   }
+
   eliminarEstado(idEstado: number): void {
     console.log('Eliminar estado con ID:', idEstado);
   }
@@ -381,6 +423,7 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
       telefono: '',
       tipo_usuario_param: 37,
       estatus: 24,
+      id_cepa: 0,
     };
     this.estadosAsignados = [];
     this.estadosSeleccionados = [];
