@@ -102,6 +102,35 @@
           </div>
         </div>
       </div>
+      <div class="mt-4 border-top pt-4">
+        <h5 class="fw-bold mb-3">Estados que atiende</h5>
+
+        <div *ngIf="estadosAsignados.length > 0; else sinEstados">
+          <ul class="list-group">
+            <li 
+              *ngFor="let estado of estadosAsignados" 
+              class="list-group-item d-flex justify-content-between align-items-center"
+            >
+              <span>
+                <span *ngIf="estado.nombre_entidad">{{ estado.nombre_entidad }}</span>
+              </span>
+
+              <button 
+                type="button" 
+                class="btn btn-sm btn-light-danger"
+                (click)="eliminarEstado(estado.id_entidad_federativa)"
+              >
+                <i class="bi bi-trash"></i>
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <ng-template #sinEstados>
+          <p class="text-muted mb-0">Este usuario no tiene estados asignados.</p>
+        </ng-template>
+      </div>
+      <!-- Fin lista estados -->
     </div>
   </div>
 

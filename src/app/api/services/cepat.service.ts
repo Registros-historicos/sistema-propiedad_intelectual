@@ -124,4 +124,12 @@ export class CepatService {
       })
     );
   }
+
+  getStatesByUserId(idUser: number): Observable<Estado[]> {
+    const url = `/api/parametrizaciones/estados/${idUser}/`;
+    return this.http.get<Estado[]>(url).pipe(
+      map((data) => data),
+      catchError(() => of([]))
+    );
+  }
 }

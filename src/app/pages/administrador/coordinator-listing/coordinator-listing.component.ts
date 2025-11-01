@@ -14,7 +14,7 @@ import { SwalComponent, SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { Config } from 'datatables.net';
 import { SweetAlertOptions } from 'sweetalert2';
 import { FormsModule } from '@angular/forms';
-import { CepatService } from 'src/app/api/services/cepat.service';
+import { CepatService, Estado } from 'src/app/api/services/cepat.service';
 import { UsersService } from 'src/app/api/services/usuarios.service';
 import { TranslationModule } from 'src/app/modules/i18n';
 import { CrudModule } from '../../../modules/crud/crud.module';
@@ -61,8 +61,8 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
 
   estatusOptions = ESTATUS_OPTIONS;
   isDataReady: boolean = false;
-
   private allCoordinators: any[] = [];
+  estadosAsignados: Estado[] = [];
 
   @ViewChild('noticeSwal')
   noticeSwal!: SwalComponent;
@@ -213,7 +213,6 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
   onPageLengthChange(event: any): void {
     const newLength = parseInt(event.target.value);
     this.pageLength = newLength;
-
     if (this.dtInstance) {
       this.dtInstance.page.len(newLength).draw();
     }
@@ -227,7 +226,6 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
           text: 'El usuario CEPAT ha sido eliminado',
           icon: 'success',
         });
-
         this.loadCepats(false);
       },
       error: (error) => {
@@ -242,13 +240,25 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
 
   edit(id: number) {
     const cepat = this.allCoordinators.find((c) => c.id === Number(id));
-    if (!cepat) return;
+    if (!cepat) return
     this.coordinadorModel = { ...cepat };
+    this.cepatService.getStatesByUserId(id).subscribe({
+      next: (estados) => {
+        this.estadosAsignados = estados;
+        console.log('Estados cargados:', estados);
+      },
+      error: (err) => {
+        console.error('Error al obtener estados:', err);
+        this.estadosAsignados = [];
+      },
+    });
+  }
+  eliminarEstado(idEstado: number): void {
+    console.log('Eliminar estado con ID:', idEstado);
   }
 
   closeForm(modal: any) {
     modal.dismiss('cancel');
-
     this.coordinadorModel = {
       id_usuario: 0,
       nombre: '',
@@ -260,6 +270,7 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
       tipo_usuario_param: 37,
       estatus: 24,
     };
+    this.estadosAsignados = [];
   }
 
   saveChanges(modal: any) {
@@ -282,7 +293,7 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
     };
 
     this.userService.updateUserByEmail(email, updatedData).subscribe({
-      next: (updatedUser) => {
+      next: () => {
         this.showAlert({
           title: '¡Éxito!',
           text: 'Los cambios se han guardado correctamente',
