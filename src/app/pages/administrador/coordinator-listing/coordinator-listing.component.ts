@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { forkJoin, Observable, of } from 'rxjs';
 import {
   ChangeDetectorRef,
   Component,
@@ -46,6 +47,13 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
   pageLength: number = 10;
   dtInstance: any;
   placeholder: string = '';
+  estados: Estado[] = [];
+  estadosSeleccionados: Estado[] = [];
+
+  estatusOptions = ESTATUS_OPTIONS;
+  isDataReady: boolean = false;
+  private allCoordinators: any[] = [];
+  estadosAsignados: Estado[] = [];
 
   coordinadorModel: any = {
     id_usuario: 0,
@@ -58,11 +66,6 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
     tipo_usuario_param: 0,
     estatus: 24,
   };
-
-  estatusOptions = ESTATUS_OPTIONS;
-  isDataReady: boolean = false;
-  private allCoordinators: any[] = [];
-  estadosAsignados: Estado[] = [];
 
   @ViewChild('noticeSwal')
   noticeSwal!: SwalComponent;
@@ -125,6 +128,115 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.placeholder = this.translate.instant('TABLE.PLACEHOLDER_SEARCH');
     this.loadCepats(true);
+    this.loadStates();
+  }
+
+  loadStates(): void {
+    this.cepatService.getEstados().subscribe({
+      next: (data) => {
+        this.estados = data;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.estados = [];
+        this.showAlert({
+          title: 'Error',
+          text: 'No se pudo cargar la lista de estados.',
+          icon: 'error',
+        });
+      },
+    });
+  }
+
+  get availableStates(): Estado[] {
+    const assignedIds = new Set(
+      this.estadosAsignados.map((e) => e.id_entidad_federativa)
+    );
+    const selectedIds = new Set(
+      this.estadosSeleccionados.map((e) => e.id_entidad_federativa)
+    );
+
+    return this.estados.filter(
+      (e) =>
+        !assignedIds.has(e.id_entidad_federativa) &&
+        !selectedIds.has(e.id_entidad_federativa)
+    );
+  }
+
+  onSelectEstado(event: any): void {
+    const idSeleccionado = Number(event.target.value);
+    if (!idSeleccionado) return;
+
+    const estado = this.estados.find(
+      (e) => e.id_entidad_federativa === idSeleccionado
+    );
+    if (estado) {
+      const yaSeleccionado = this.estadosSeleccionados.some(
+        (e) => e.id_entidad_federativa === estado.id_entidad_federativa
+      );
+      if (!yaSeleccionado) {
+        this.estadosSeleccionados.push(estado);
+      }
+    }
+    // Resetea el dropdown
+    event.target.value = '';
+  }
+
+  removeEstado(estadoToRemove: Estado): void {
+    this.estadosSeleccionados = this.estadosSeleccionados.filter(
+      (e) => e.id_entidad_federativa !== estadoToRemove.id_entidad_federativa
+    );
+  }
+
+  saveNewStates(onComplete: () => void): void {
+    if (this.estadosSeleccionados.length === 0) {
+      onComplete();
+      return;
+    }
+
+    const userId = this.coordinadorModel.id_usuario;
+    if (!userId) {
+      this.showAlert({
+        title: 'Error',
+        text: 'No se encontró ID de usuario para asignar estados.',
+        icon: 'error',
+      });
+      onComplete();
+      return;
+    }
+
+    // --- ¡IMPORTANTE! ---
+    // Debes tener un método en tu servicio (ej. 'assignStateToUser')
+    // que asigne un estado a un usuario.
+    const observables: Observable<any>[] = this.estadosSeleccionados.map(
+      (estado) => {
+        console.log(
+          `Asignando estado ${estado.id_entidad_federativa} a usuario ${userId}`
+        );
+
+        // REEMPLAZA ESTO con tu llamada real al servicio:
+        // return this.cepatService.assignStateToUser(userId, estado.id_entidad_federativa);
+
+        // --- INICIO CÓDIGO DE SIMULACIÓN (BORRAR DESPUÉS) ---
+        return of(null); // Simula una llamada exitosa
+        // --- FIN CÓDIGO DE SIMULACIÓN ---
+      }
+    );
+
+    forkJoin(observables).subscribe({
+      next: () => {
+        // No mostramos alerta de éxito aquí, 'saveChanges' ya muestra una general.
+        onComplete();
+      },
+      error: (err) => {
+        this.showAlert({
+          title: 'Error de Asignación',
+          text: 'Se actualizó el usuario, pero falló la asignación de nuevos estados.',
+          icon: 'error',
+        });
+        onComplete(); // Completa igual para cerrar el modal, etc.
+      },
+    });
   }
 
   initializeDataTables(data: any[]): void {
@@ -240,7 +352,7 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
 
   edit(id: number) {
     const cepat = this.allCoordinators.find((c) => c.id === Number(id));
-    if (!cepat) return
+    if (!cepat) return;
     this.coordinadorModel = { ...cepat };
     this.cepatService.getStatesByUserId(id).subscribe({
       next: (estados) => {
@@ -271,6 +383,7 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
       estatus: 24,
     };
     this.estadosAsignados = [];
+    this.estadosSeleccionados = [];
   }
 
   saveChanges(modal: any) {
@@ -294,13 +407,16 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
 
     this.userService.updateUserByEmail(email, updatedData).subscribe({
       next: () => {
-        this.showAlert({
-          title: '¡Éxito!',
-          text: 'Los cambios se han guardado correctamente',
-          icon: 'success',
+        this.saveNewStates(() => {
+          this.showAlert({
+            title: '¡Éxito!',
+            text: 'Los cambios se han guardado correctamente',
+            icon: 'success',
+          });
+          modal.close();
+          this.loadCepats(false);
+          this.estadosSeleccionados = [];
         });
-        modal.close();
-        this.loadCepats(false);
       },
       error: (error) => {
         this.showAlert({
@@ -310,10 +426,6 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
         });
       },
     });
-  }
-
-  navigateToCreate() {
-    this.router.navigate(['/administrador/coordinador/registro']);
   }
 
   showAlert(swalOptions: SweetAlertOptions) {
