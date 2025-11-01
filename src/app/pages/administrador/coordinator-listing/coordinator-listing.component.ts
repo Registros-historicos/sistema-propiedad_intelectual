@@ -19,7 +19,7 @@ import {
 } from 'src/app/api/services/cepat.service';
 import { UsersService } from 'src/app/api/services/usuarios.service';
 import { TranslationModule } from 'src/app/modules/i18n';
-import { SweetAlertOptions } from 'sweetalert2';
+import Swal, { SweetAlertOptions } from 'sweetalert2';
 import { CrudModule } from '../../../modules/crud/crud.module';
 import { SharedModule } from '../../../template/shared/shared.module';
 
@@ -57,6 +57,7 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
   private allCoordinators: any[] = [];
   estadosAsignados: Estado[] = [];
   cepatName: string = '';
+  estadosAEliminar: number[] = [];
 
   coordinadorModel: any = {
     id_usuario: 0,
@@ -180,7 +181,6 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
         this.estadosSeleccionados.push(estado);
       }
     }
-    // Resetea el dropdown
     event.target.value = '';
   }
 
@@ -368,23 +368,6 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
     });
   }
 
-  // edit(id: number) {
-  //   console.log('Editar usuario CEPAT con ID:', id);
-  //   const cepat = this.allCoordinators.find((c) => c.id === Number(id));
-  //   if (!cepat) return;
-  //   this.coordinadorModel = { ...cepat };
-  //   this.cepatService.getStatesByUserId(id).subscribe({
-  //     next: (estados) => {
-  //       this.estadosAsignados = estados;
-  //       console.log('Estados cargados:', estados);
-  //     },
-  //     error: (err) => {
-  //       console.error('Error al obtener estados:', err);
-  //       this.estadosAsignados = [];
-  //     },
-  //   });
-  // }
-
   edit(id: number) {
     const cepat = this.allCoordinators.find((c) => c.id === Number(id));
     if (!cepat) return;
@@ -408,7 +391,12 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
   }
 
   eliminarEstado(idEstado: number): void {
-    console.log('Eliminar estado con ID:', idEstado);
+    if (!this.estadosAEliminar.includes(idEstado)) {
+      this.estadosAEliminar.push(idEstado);
+    }
+    this.estadosAsignados = this.estadosAsignados.filter(
+      (e) => e.id_entidad_federativa !== idEstado
+    );
   }
 
   closeForm(modal: any) {
@@ -438,6 +426,7 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
       });
       return;
     }
+
     const email = this.coordinadorModel.correo;
     const updatedData = {
       nombre: this.coordinadorModel.nombre,
@@ -448,20 +437,34 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
       estatus: this.coordinadorModel.estatus,
     };
 
+    Swal.fire({
+      title: 'Guardando cambios...',
+      text: 'Por favor espera mientras se actualizan los datos.',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
     this.userService.updateUserByEmail(email, updatedData).subscribe({
       next: () => {
         this.saveNewStates(() => {
-          this.showAlert({
-            title: '¡Éxito!',
-            text: 'Los cambios se han guardado correctamente',
-            icon: 'success',
+          this.desvincularEstados(() => {
+            Swal.close();
+            this.showAlert({
+              title: '¡Éxito!',
+              text: 'Los cambios se han guardado correctamente',
+              icon: 'success',
+            });
+            modal.close();
+            this.loadCepats(false);
+            this.estadosSeleccionados = [];
+            this.estadosAEliminar = [];
           });
-          modal.close();
-          this.loadCepats(false);
-          this.estadosSeleccionados = [];
         });
       },
       error: (error) => {
+        Swal.close();
         this.showAlert({
           title: 'Error',
           text: `No se pudo actualizar el usuario: ${error.message}`,
@@ -492,5 +495,62 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.reloadEvent.unsubscribe();
+  }
+
+  desvincularEstados(onComplete: () => void): void {
+    if (this.estadosAEliminar.length === 0) {
+      onComplete();
+      return;
+    }
+
+    const observablesGet: Observable<Institucion[]>[] =
+      this.estadosAEliminar.map((idEstado) =>
+        this.cepatService.getInstitucionesPorEstado(idEstado)
+      );
+
+    forkJoin(observablesGet).subscribe({
+      next: (resultados) => {
+        const todasLasInstituciones: Institucion[] = resultados.reduce(
+          (acc, val) => acc.concat(val),
+          []
+        );
+
+        if (todasLasInstituciones.length === 0) {
+          onComplete();
+          return;
+        }
+
+        const observablesPut: Observable<any>[] = todasLasInstituciones.map(
+          (institucion) =>
+            this.cepatService.actualizarInstitucionByIdCepat(
+              institucion.id_institucion,
+              null
+            )
+        );
+
+        forkJoin(observablesPut).subscribe({
+          next: () => {
+            this.estadosAEliminar = [];
+            onComplete();
+          },
+          error: () => {
+            this.showAlert({
+              title: 'Error',
+              text: 'Ocurrió un error al desvincular las instituciones.',
+              icon: 'error',
+            });
+            onComplete();
+          },
+        });
+      },
+      error: () => {
+        this.showAlert({
+          title: 'Error',
+          text: 'No se pudieron obtener las instituciones de los estados a desvincular.',
+          icon: 'error',
+        });
+        onComplete();
+      },
+    });
   }
 }

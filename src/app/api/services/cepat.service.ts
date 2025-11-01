@@ -97,7 +97,7 @@ export class CepatService {
 
   actualizarInstitucionByIdCepat(
     idInstitucion: number,
-    idCepat: number
+    idCepat: number | null
   ): Observable<any> {
     const url = `/api/institucion/${idInstitucion}/actualizar-id-cepat/`;
     const body = { id_cepat: idCepat };
