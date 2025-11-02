@@ -1,0 +1,224 @@
+<div class="container mt-5">
+  <div class="mb-3">
+    <button
+      [routerLink]="[backRoute]"
+      class="btn btn-outline"
+      type="button"
+    >
+      <i class="bi bi-arrow-left"></i>
+      Regresar
+    </button>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <div class="mb-4">
+        <h4 class="fw-bold mb-1">
+          <i class="bi bi-file-earmark-plus fs-3 me-2"></i>
+          Cargar documento histórico INDAUTOR
+        </h4>
+        <small class="text-muted">
+          Los encabezados deben estar en la fila 6 (columnas B-R) para hojas de años, y fila 6 (columnas B-N) para AUTORES
+        </small>
+      </div>
+
+      <div class="alert alert-info mb-4">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <i class="bi bi-info-circle me-2"></i>
+            Descarga la plantilla de ejemplo para asegurar el formato correcto
+          </div>
+          <button
+            class="btn btn-sm btn-outline-primary"
+            (click)="downloadTemplate()"
+          >
+            <i class="bi bi-download me-1"></i> Descargar plantilla
+          </button>
+        </div>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Seleccionar año</label>
+          <select class="form-select" formControlName="year">
+            <option *ngFor="let year of years" [value]="year">
+              {{ year }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label fw-semibold">Seleccionar archivo</label>
+          <div
+            class="upload-dropzone"
+            [class.has-file]="file"
+            (drop)="onDrop($event)"
+            (dragover)="onDragOver($event)"
+          >
+            <ng-container *ngIf="!file">
+              <div class="d-flex flex-column align-items-center py-4">
+                <i class="bi bi-upload fs-1 text-muted"></i>
+                <div class="mt-2 text-center text-muted">
+                  Arrastra y suelta tu archivo aquí,
+                  <label
+                    class="text-primary fw-semibold cursor-pointer"
+                    style="cursor: pointer"
+                  >
+                    o selecciona un archivo
+                    <input
+                      type="file"
+                      accept=".xls,.xlsx"
+                      hidden
+                      (change)="onFileSelected($event)"
+                    />
+                  </label>
+                </div>
+                <div class="small text-muted mt-1">
+                  Formatos soportados: .xls, .xlsx (máx. 50MB)
+                </div>
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="file">
+              <div
+                class="d-flex align-items-center justify-content-between px-3 py-3"
+              >
+                <div class="d-flex align-items-center">
+                  <i class="bi bi-file-earmark-spreadsheet fs-3 me-2 text-success"></i>
+                  <div>
+                    <div class="fw-semibold">{{ fileName }}</div>
+                    <small class="text-muted">
+                      {{ (file.size / 1024 / 1024).toFixed(2) }} MB
+                      <ng-container *ngIf="availableSheets.length > 0">
+                        • {{ availableSheets.length }} hojas
+                      </ng-container>
+                    </small>
+                  </div>
+                </div>
+                <div>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-primary me-2"
+                    (click)="previewExcel()"
+                    title="Vista previa (excluye hojas de configuración)"
+                    [disabled]="!workbook"
+                  >
+                    <i class="bi bi-eye"></i> Vista previa
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-link text-danger px-2"
+                    (click)="removeFile()"
+                    title="Quitar archivo"
+                  >
+                    <i class="bi bi-x-circle"></i>
+                  </button>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-center gap-3 mt-4">
+          <button
+            type="submit"
+            class="btn btn-primary d-flex align-items-center gap-2"
+            [disabled]="form.invalid || isUploading || !workbook"
+          >
+            <ng-container *ngIf="!isUploading">
+              <i class="bi bi-upload"></i>
+              Guardar
+            </ng-container>
+            <ng-container *ngIf="isUploading">
+              <i class="bi bi-arrow-repeat loading-icon"></i>
+              Procesando...
+            </ng-container>
+          </button>
+          <button
+            type="button"
+            class="btn btn-danger text-white"
+            (click)="cancel()"
+            [disabled]="isUploading"
+            [routerLink]="[backRoute]"
+          >
+            Cancelar
+          </button>
+        </div>
+      </form>
+
+      <div class="alert alert-warning bg-light-alert mt-4" style="color: #0e0d0d">
+        <div class="fw-semibold mb-2">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          Información importante para INDAUTOR:
+        </div>
+        <ul class="mb-0 small">
+          <li><strong>Estructura requerida:</strong> Los encabezados deben estar en la fila 6 (columnas B-R) para hojas de años</li>
+          <li><strong>Hoja AUTORES:</strong> Los encabezados deben estar en la fila 6 (columnas B-N)</li>
+          <li><strong>Campos principales:</strong> N. Expediente, Título, Descripción, Fecha de Solicitud, N. de Certificado, Estatus, Rama</li>
+          <li><strong>Hojas excluidas:</strong> Las hojas "INSTRUCTIVO", "PRIMARIO", "SECUNDARIO", "TERCIARIO", "CUATERNARIO", "QUINARIO" y "CLASIFICACIONES" no se procesarán</li>
+          <li><strong>Validación:</strong> Los encabezados del archivo deben coincidir exactamente con la plantilla INDAUTOR</li>
+          <li><strong>Formato:</strong> Solo archivos .xls o .xlsx (máximo 50MB)</li>
+          <li><strong>Procesamiento:</strong> La validación y carga puede tardar varios minutos</li>
+          <li><strong>Vista previa:</strong> Usa la función de vista previa para verificar la estructura antes de guardar</li>
+        </ul>
+      </div>
+      <ng-container *ngIf="availableSheets.length > 0">
+        <div class="mt-3">
+          <details class="border rounded p-3">
+            <summary class="fw-semibold text-primary cursor-pointer">
+              <i class="bi bi-info-circle me-2"></i>
+              Hojas detectadas en el archivo ({{ availableSheets.length }})
+            </summary>
+            <div class="mt-2">
+              <div class="row">
+                <div class="col-md-6">
+                  <h6 class="small fw-semibold text-success">Hojas que se procesarán:</h6>
+                  <ul class="list-unstyled small">
+                    <li *ngFor="let sheet of getPreviewableSheets()" class="mb-1">
+                      <i class="bi bi-check-circle text-success me-2"></i>
+                      {{ sheet }}
+                      <ng-container *ngIf="sheet === '2022' || sheet === '2023' || sheet === '2024' || sheet === '2025'">
+                        <span class="text-muted">(Registros INDAUTOR)</span>
+                      </ng-container>
+                      <ng-container *ngIf="sheet.toUpperCase() === 'AUTORES'">
+                        <span class="text-muted">(Datos de autores)</span>
+                      </ng-container>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+      </ng-container>
+      <div class="mt-3">
+        <div class="alert alert-light border">
+          <h6 class="fw-semibold mb-2">
+            <i class="bi bi-info-circle text-primary me-2"></i>
+            Estructura específica INDAUTOR
+          </h6>
+          <div class="row small">
+            <div class="col-md-6">
+              <strong>Hojas de años (2022-2025):</strong>
+              <ul class="mt-1 mb-0">
+                <li>N. Expediente(1) - Título (2) - Descripción (3)</li>
+                <li>Fecha de Solicitud (4) - N. de Certificado (5)</li>
+                <li>Estatus (6) - Rama (7) - Medio de Ingreso (8)</li>
+                <li>Tecnológico de Origen (9) - Año renovación (10)</li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <strong>Hoja AUTORES:</strong>
+              <ul class="mt-1 mb-0">
+                <li>CURP (18) - Nombres (19) - Apellidos (20-21)</li>
+                <li>Sexo (22) - Tipo de investigador (23)</li>
+                <li>Institución (24) - Programa Educativo (25)</li>
+                <li>Cuerpo Académico (26) - Departamento (27)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

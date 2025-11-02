@@ -12,14 +12,14 @@ export const HISTORICAL_REGISTERS: { [key: string]: HistoricalRegisterCard } = {
     descripcion: 'HISTORICAL_REGISTER.IMPI.DESCRIPTION',
     color: 'sky',
     icono: 'description',
-    ruta: '/coordinador/registros/historicos/impi',
+    ruta: 'impi',
   },
   'indautor': {
     titulo: 'HISTORICAL_REGISTER.INDAUTOR.TITLE',
     descripcion: 'HISTORICAL_REGISTER.INDAUTOR.DESCRIPTION',
     color: 'peach',
     icono: 'person_add_alt',
-    ruta: '/coordinador/registros/historicos/indautor',
+    ruta: 'indautor',
   },
 
 };

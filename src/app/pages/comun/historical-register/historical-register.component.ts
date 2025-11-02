@@ -7,6 +7,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/app/template/shared/shared.module';
+import { NavigationService } from 'src/app/pages/comun/navigation.service';
 
 @Component({
   selector: 'app-historical-register',
@@ -18,13 +19,18 @@ import { SharedModule } from 'src/app/template/shared/shared.module';
 export class HistoricalRegisterComponent {
   registers: HistoricalRegisterCard[] = [];
 
-  constructor(private router: Router, private route: ActivatedRoute) {}
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private navigationService: NavigationService
+  ) {}
 
   ngOnInit(): void {
     this.registers = Object.values(HISTORICAL_REGISTERS);
   }
 
   verRegistro(archivo: string): void {
-    this.router.navigate([archivo], { relativeTo: this.route });
+    const baseRoute = this.navigationService.getHistoricalRecordsRoute();
+    this.router.navigate([`${baseRoute}/${archivo}`]);
   }
 }
