@@ -13,6 +13,7 @@ import Swal from 'sweetalert2';
 import { SharedModule } from 'src/app/template/shared/shared.module';
 import { NavigationService } from 'src/app/pages/comun/navigation.service';
 import * as XLSX from 'xlsx';
+import { CargaMasivaService } from 'src/app/api/services/carga-masiva.service';
 
 @Component({
   selector: 'app-historical-indautor',
@@ -51,55 +52,53 @@ export class HistoricalIndautorComponent {
     'QUINARIO',
     'CLASIFICACIONES'
   ];
+private readonly EXPECTED_YEAR_HEADERS = [
+  'N. Expediente (1)',          // B6
+  'Título (2)',                 // C6
+  'Descripción (3)',            // D6
+  'Fecha de Solicitud (4)',     // E6
+  'N. de Certificado (5)',      // F6
+  'Estatus (6)',                // G6
+  'Rama (7)',                   // H6
+  'Medio de Ingreso (8)',       // I6
+  'Tecnológico de Origen (9)',  // J6
+  'Año Renovación (10)',        // K6
+  'Tipo de Sector (11)',        // L6
+  'Sector (12)',                // M6
+  'Subsector (13)',             // N6
+  'Autores (14)',               // O6
+  'Fecha de Expedición (15)',   // P6
+  'Archivo (16)',               // Q6
+  'Observaciones (17)'          // R6
+];
 
- private readonly EXPECTED_YEAR_HEADERS = [
-    'N. Expediente(1)',         // B6
-    'Título (2)',               // D6
-    'Descripción (3)',          // E6
-    'Fecha de Solicitud (4)',   // F6
-    'N. de Certificado (5)',    // G6
-    'Estatus (6)',              // H6
-    'Rama (7)',                 // I6
-    'Medio de Ingreso (8)',     // J6
-    'Tecnologico de Origen (9)', // K6
-    'Año renovación (10)',      // L6
-    'Tipo de Sector (11)',      // M6
-    'Sector (12)',              // N6
-    'Subsector (13)',           // O6
-    'Autores (14)',             // P6
-    'Fecha de Expedición (15)', // Q6
-    'Archivo (16)',             // R6
-    'Observaciones (17)'        // S6
-  ];
-
-  private readonly EXPECTED_AUTHORS_HEADERS = [
-    'CURP (18)',                  // B6
-    'Nombres (19)',               // C6
-    'Apellido Paterno (20)',      // D6
-    'Apellido Materno (21)',      // E6
-    'Sexo (22)',                  // F6
-    'Tipo de investigador (23)',  // G6
-    'Institución (24)',           // H6
-    'Programa Educativo (25)',    // I6
-    'Cuerpo Academico (26)',      // J6
-    'Departamento (27)',          // K6
-    'Fecha de Afiliación (28)',   // L6
-    'Fecha de Fin (29)',          // M6
-    'Observaciones (30)'          // N6
-  ];
+private readonly EXPECTED_AUTHORS_HEADERS = [
+  'CURP (18)',                   // B6
+  'Nombres (19)',                // C6
+  'Apellido Paterno (20)',       // D6
+  'Apellido Materno (21)',       // E6
+  'Sexo (22)',                   // F6
+  'Tipo de Investigador (23)',   // G6
+  'Institución (24)',            // H6
+  'Programa Educativo (25)',     // I6
+  'Cuerpo Académico (26)',       // J6
+  'Departamento (27)',           // K6
+  'Fecha de Afiliación (28)',    // L6
+  'Fecha de Fin (29)',           // M6
+  'Observaciones (30)'           // N6
+];
+  authService: any;
 
   constructor(
     private fb: FormBuilder,
-    private navigationService: NavigationService
+    private navigationService: NavigationService,
+    private cargaMasivaService: CargaMasivaService
   ) {
     this.backRoute = this.navigationService.getHistoricalRecordsRoute();
 
-    // Rango: 2022 - Año actual
     const currentYear = new Date().getFullYear();
     this.years = ['Seleccionar todo'];
-    for (let y = 2022; y <= currentYear; y++) {
-      this.years.push(y);
-    }
+    for (let y = 2022; y <= currentYear; y++) this.years.push(y);
 
     this.form = this.fb.group({
       year: ['Seleccionar todo'],
@@ -111,14 +110,11 @@ export class HistoricalIndautorComponent {
     this.navigationService.navigateToHistoricalRecords();
   }
 
-  async onFileSelected(event: Event | DragEvent) {
+async onFileSelected(event: Event | DragEvent) {
     let file: File | null = null;
     if ('dataTransfer' in event && event.dataTransfer?.files.length) {
       file = event.dataTransfer.files[0];
-    } else if (
-      'target' in event &&
-      (event.target as HTMLInputElement).files?.length
-    ) {
+    } else if ('target' in event && (event.target as HTMLInputElement).files?.length) {
       file = (event.target as HTMLInputElement).files![0];
     }
 
@@ -126,15 +122,29 @@ export class HistoricalIndautorComponent {
       this.file = file;
       this.fileName = file.name;
       this.form.patchValue({ file });
-
       this.sheetDataCache.clear();
 
       try {
         await this.loadExcelWorkbook();
-        console.log('Workbook cargado exitosamente');
-        console.log('Hojas disponibles:', this.availableSheets);
-
         await this.preloadAllSheets();
+
+        // 🔍 Detectar hojas válidas automáticamente
+        const detectedSheets = this.getPreviewableSheets();
+        this.form.patchValue({ year: 'Seleccionar todo' });
+
+        Swal.fire({
+          icon: 'info',
+          title: 'Hojas detectadas',
+          html: `
+            <div class="text-start">
+              <p>Se detectaron las siguientes hojas válidas:</p>
+              <ul>${detectedSheets.map(s => `<li><strong>${s}</strong></li>`).join('')}</ul>
+            </div>
+          `,
+          confirmButtonText: 'Continuar',
+        });
+
+        console.log('✅ Hojas válidas detectadas automáticamente:', detectedSheets);
 
       } catch (error) {
         console.error('Error al cargar el workbook:', error);
@@ -160,14 +170,9 @@ export class HistoricalIndautorComponent {
     );
   }
 
-  excelFileValidator(control: any): { [key: string]: boolean } | null {
+excelFileValidator(control: any): { [key: string]: boolean } | null {
     const file = control.value as File;
-    if (file) {
-      const allowedExtensions = /\.(xls|xlsx)$/i;
-      if (!allowedExtensions.test(file.name)) {
-        return { invalidFileType: true };
-      }
-    }
+    if (file && !/\.(xls|xlsx)$/i.test(file.name)) return { invalidFileType: true };
     return null;
   }
 
@@ -192,134 +197,94 @@ export class HistoricalIndautorComponent {
   }
 
   async loadExcelWorkbook(): Promise<void> {
-    if (!this.file) {
-      console.error('No hay archivo seleccionado');
-      return;
-    }
-
-    console.log('Cargando workbook del archivo:', this.file.name);
-
+    if (!this.file) return;
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = (e: any) => {
         try {
           const data = new Uint8Array(e.target.result);
-          console.log('Archivo leído, tamaño:', data.length, 'bytes');
-
-          this.workbook = XLSX.read(data, {
-            type: 'array',
-            cellDates: true,
-            cellNF: false,
-            cellText: false
-          });
-
+          this.workbook = XLSX.read(data, { type: 'array', cellDates: true });
           this.availableSheets = this.workbook.SheetNames;
-
-          console.log('Workbook cargado exitosamente');
-          console.log('Hojas disponibles:', this.availableSheets);
-
-          this.availableSheets.forEach(sheetName => {
-            const sheet = this.workbook!.Sheets[sheetName];
-            const range = XLSX.utils.decode_range(sheet['!ref'] || 'A1');
-            const rowCount = range.e.r - range.s.r + 1;
-            console.log(`Hoja "${sheetName}": ${rowCount} filas`);
-          });
-
           resolve();
         } catch (error) {
-          console.error('Error al cargar el workbook:', error);
           reject(error);
         }
       };
-      reader.onerror = (error) => {
-        console.error('Error en FileReader:', error);
-        reject(error);
-      };
+      reader.onerror = reject;
       reader.readAsArrayBuffer(this.file!);
     });
   }
 
   async preloadAllSheets(): Promise<void> {
     if (!this.workbook) return;
-
     for (const sheetName of this.availableSheets) {
       try {
         const { headers, data } = await this.readExcelSheet(sheetName);
         this.sheetDataCache.set(sheetName, { headers, data });
-      } catch (error) {
-        console.error(`Error pre-cargando hoja ${sheetName}:`, error);
-      }
+      } catch {}
     }
-  }
+  }async readExcelSheet(sheetName?: string): Promise<{ headers: string[], data: any[], sheetName: string }> {
+  if (!this.workbook) return { headers: [], data: [], sheetName: '' };
 
-  async readExcelSheet(sheetName?: string): Promise<{ headers: string[], data: any[], sheetName: string }> {
-    if (!this.workbook) {
-      return { headers: [], data: [], sheetName: '' };
+  try {
+    const targetSheetName = sheetName || this.workbook.SheetNames[0];
+
+    // Verifica que exista la hoja
+    const sheet = this.workbook.Sheets[targetSheetName];
+    if (!sheet) throw new Error(`La hoja "${targetSheetName}" no existe en el archivo`);
+
+    // Fila 6 (índice 5) para todas las hojas
+    const headerRow = 5;
+
+    // Leer el contenido crudo
+    const jsonData = XLSX.utils.sheet_to_json(sheet, {
+      header: 1,
+      defval: '',
+      blankrows: false,
+      range: headerRow
+    });
+
+    if (jsonData.length === 0) {
+      return { headers: [], data: [], sheetName: targetSheetName };
     }
 
-    try {
-      let targetSheetName = sheetName;
+    // 🔹 No usar slice(1): las columnas empiezan desde B, no desde A
+    // (openpyxl ignora las columnas vacías al inicio)
+    const headers = (jsonData[0] as any[])
+      .map(h => (h !== undefined && h !== null ? String(h).trim() : ''))
+      .filter(h => h !== '');
 
-      if (!targetSheetName) {
-        targetSheetName = this.workbook.SheetNames[0];
-      }
-
-      if (this.sheetDataCache.has(targetSheetName)) {
-        const cached = this.sheetDataCache.get(targetSheetName)!;
-        return {...cached, sheetName: targetSheetName};
-      }
-
-      if (!this.workbook.Sheets[targetSheetName]) {
-        throw new Error(`La hoja "${targetSheetName}" no existe en el archivo`);
-      }
-
-      const sheet = this.workbook.Sheets[targetSheetName];
-      const headerRow = 5; // Fila 6 (índice 5)
-      const jsonData = XLSX.utils.sheet_to_json(sheet, {
-        header: 1,
-        defval: '',
-        blankrows: false,
-        range: headerRow
-      });
-
-      if (jsonData.length === 0) {
-        return { headers: [], data: [], sheetName: targetSheetName };
-      }
-
-      const headers = (jsonData[0] as any[]).map((h, i) => {
-        if (i === 0) return null; // Omitir columna A
-        return h !== undefined && h !== null ? String(h).trim() : '';
-      }).filter(h => h !== null);
-
-      const rows = jsonData.slice(1).map(row => {
-        if (Array.isArray(row)) {
-          return row.slice(1).map(cell => {
-            if (typeof cell === 'number' && cell > 25569 && cell < 60000) {
-              try {
-                return this.formatExcelDate(cell);
-              } catch (e) {
-                return cell;
-              }
+    // 🔹 Ahora leer filas de datos, manteniendo todas las columnas de encabezado
+    const rows = jsonData.slice(1)
+      .map(row => (row as any[])
+        .map(cell => {
+          // convertir fechas Excel → texto legible
+          if (typeof cell === 'number' && cell > 25569 && cell < 60000) {
+            try {
+              const base = new Date(1900, 0, 1);
+              base.setDate(base.getDate() + cell - 2);
+              return base.toLocaleDateString('es-MX');
+            } catch {
+              return String(cell);
             }
-            return cell !== undefined && cell !== null ? String(cell).trim() : '';
-          });
-        }
-        return [];
-      }).filter(row => row.some(cell => cell !== ''));
+          }
+          return cell !== undefined && cell !== null ? String(cell).trim() : '';
+        })
+      )
+      .filter(r => r.some(c => c !== ''));
 
-      console.log(`Hoja "${targetSheetName}":`, {
-        totalHeaders: headers.length,
-        headers: headers.slice(0, 5),
-        totalDataRows: rows.length,
-        sampleRow: rows[0]?.slice(0, 5)
-      });
+    console.log(`✅ Hoja "${targetSheetName}" leída correctamente`);
+    console.log('Encabezados detectados:', headers);
+    console.log('Filas de datos:', rows.length);
 
-      return { headers, data: rows, sheetName: targetSheetName };
-    } catch (error) {
-      console.error(`Error leyendo hoja "${sheetName}":`, error);
-      throw error;
-    }
+    return { headers, data: rows, sheetName: targetSheetName };
+  } catch (error) {
+    console.error(`Error leyendo hoja ${sheetName}:`, error);
+    throw error;
   }
+}
+
+  
 
   formatExcelDate(serialDate: number): string {
     try {
@@ -331,11 +296,16 @@ export class HistoricalIndautorComponent {
     }
   }
 
-  getPreviewableSheets(): string[] {
-    return this.availableSheets.filter(sheet =>
-      !this.EXCLUDED_SHEETS.includes(sheet.toUpperCase())
-    );
-  }
+
+    getPreviewableSheets(): string[] {
+        return this.availableSheets.filter(sheet => {
+          const upper = sheet.toUpperCase().trim();
+          const isExcluded = this.EXCLUDED_SHEETS.includes(upper);
+          const isAuthorsSheet = upper === 'AUTORES';
+          const isYearSheet = /^[0-9]{4}$/.test(sheet.trim());
+          return !isExcluded && (isYearSheet || isAuthorsSheet);
+        });
+      }
 
   async previewExcel() {
     if (!this.workbook) {
@@ -503,169 +473,146 @@ export class HistoricalIndautorComponent {
     return div.innerHTML;
   }
 
-  async downloadTemplate() {
-    try {
-      const templateUrl = 'assets/Excel/INDAUTOR.xlsx';
-      const response = await fetch(templateUrl);
-
-      if (!response.ok) {
-        throw new Error('No se pudo cargar el archivo de plantilla.');
-      }
-
-      const blob = await response.blob();
+  downloadTemplate() {
+  this.cargaMasivaService.descargarPlantilla('indautor').subscribe({
+    next: (blob) => {
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'Plantilla_INDAUTOR.xlsx';
-      document.body.appendChild(link);
-      link.click();
-
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Plantilla_INDAUTOR.xlsx';
+      a.click();
       window.URL.revokeObjectURL(url);
-      document.body.removeChild(link);
-
-      Swal.fire({
-        icon: 'success',
-        title: 'Descarga iniciada',
-        text: 'La plantilla se está descargando.',
-        timer: 3000,
-        showConfirmButton: false,
-      });
-    } catch (error) {
-      console.error('Error al descargar la plantilla:', error);
+    },
+    error: (err) => {
+      console.error('Error al descargar plantilla:', err);
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'No se pudo descargar la plantilla. Por favor, inténtalo de nuevo.',
+        text: err.message || 'No se pudo descargar la plantilla IMPI',
       });
-    }
+    },
+  });
   }
 
+  // ✅ Coincidencia exacta con año numérico (no "Registro 2024")
   getSheetNameForYear(year: number | string): string | null {
-    if (typeof year === 'string') return null;
+    if (!this.availableSheets?.length) return null;
+    const yearStr = year.toString().trim();
     return this.availableSheets.find(name =>
-      name.includes(year.toString()) || name === year.toString()
+      name.trim() === yearStr && /^[0-9]{4}$/.test(name.trim())
     ) || null;
   }
 
+
   async submit() {
-    if (this.form.invalid || !this.file) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Formulario incompleto',
-        text: 'Por favor selecciona un año y un archivo válido',
-      });
-      return;
-    }
-
-    const selectedYear = this.form.get('year')?.value;
-
-    if (!this.workbook) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'No se ha cargado correctamente el archivo Excel',
-      });
-      return;
-    }
-
-    this.isUploading = true;
-
-    try {
-      let dataToUpload: any[] = [];
-      let recordCount = 0;
-      let sheetsInfo = '';
-
-      const isTemplateValid = await this.validateTemplateHeaders();
-      if (!isTemplateValid) {
-        this.isUploading = false;
-        return;
-      }
-
-      if (selectedYear === 'Seleccionar todo') {
-        const allData: any[] = [];
-        const processableSheets = this.getPreviewableSheets();
-
-        for (const sheetName of processableSheets) {
-          const { headers, data } = await this.readExcelSheet(sheetName);
-          allData.push({
-            sheetName,
-            headers,
-            data,
-            recordCount: data.length
-          });
-          recordCount += data.length;
-        }
-        dataToUpload = allData;
-        sheetsInfo = `Hojas procesadas (${processableSheets.length}): ${processableSheets.join(', ')}`;
-      } else {
-        const targetSheetName = this.getSheetNameForYear(selectedYear);
-        if (targetSheetName) {
-          const { headers, data } = await this.readExcelSheet(targetSheetName);
-          recordCount = data.length;
-          sheetsInfo = `Hoja: ${targetSheetName}`;
-          dataToUpload = [{
-            sheetName: targetSheetName,
-            headers,
-            data,
-            recordCount
-          }];
-        } else {
-          throw new Error(`No se encontró hoja para el año ${selectedYear}`);
-        }
-      }
-
-      const formData = {
-        year: selectedYear,
-        fileName: this.fileName,
-        totalRecords: recordCount,
-        sheetsInfo: sheetsInfo,
-        sheets: dataToUpload
-      };
-
-      console.log('Datos a enviar:', {
-        year: formData.year,
-        fileName: formData.fileName,
-        totalRecords: formData.totalRecords,
-        sheetsInfo: formData.sheetsInfo,
-        sheetsCount: formData.sheets.length
-      });
-
-      // Aquí llamada al servicio para enviar los datos
-      // await this.historicalIndautorService.uploadData(formData);
-
-      setTimeout(() => {
-        this.isUploading = false;
-        Swal.fire({
-          icon: 'success',
-          title: '¡Carga exitosa!',
-          html: `
-            <div class="text-start">
-              <p><strong>Archivo:</strong> ${this.fileName}</p>
-              <p><strong>Año:</strong> ${selectedYear}</p>
-              <p><strong>Registros procesados:</strong> ${recordCount.toLocaleString()}</p>
-              <p class="small text-muted mt-2">${sheetsInfo}</p>
-            </div>
-          `,
-          confirmButtonColor: '#28a745',
-        }).then(() => {
-          this.removeFile();
-          this.form.reset({
-            year: 'Seleccionar todo',
-            file: null,
-          });
-        });
-      }, 2000);
-
-    } catch (error) {
-      console.error('Error al procesar el archivo:', error);
-      this.isUploading = false;
-      Swal.fire({
-        icon: 'error',
-        title: 'Error al procesar',
-        text: error instanceof Error ? error.message : 'Ocurrió un error al procesar el archivo',
-      });
-    }
+  if (this.form.invalid || !this.file) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Formulario incompleto',
+      text: 'Por favor selecciona uno o más años y un archivo válido.',
+    });
+    return;
   }
+
+  const selectedYear = this.form.get('year')?.value;
+  if (!this.workbook) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'No se ha cargado correctamente el archivo Excel.',
+    });
+    return;
+  }
+
+  this.isUploading = true;
+  Swal.fire({
+    title: 'Subiendo archivo...',
+    text: 'Por favor espera mientras se valida y se envía la plantilla.',
+    allowOutsideClick: false,
+    didOpen: () => Swal.showLoading(),
+  });
+
+  try {
+    // 🔎 Validar encabezados del archivo
+    const isTemplateValid = await this.validateTemplateHeaders();
+    if (!isTemplateValid) {
+      this.isUploading = false;
+      Swal.close();
+      return;
+    }
+
+    // 🔹 Determinar las hojas que se procesarán
+    let targetSheets: string[] = [];
+
+    if (selectedYear === 'Seleccionar todo') {
+      targetSheets = this.getPreviewableSheets()
+        .filter((sheet) => !sheet.toLowerCase().includes('clasificaciones'));
+    } else if (Array.isArray(selectedYear)) {
+      // Si el form permite seleccionar varios años
+      targetSheets = selectedYear
+        .map((y: number | string) => this.getSheetNameForYear(y))
+        .filter((s: string | null) => s !== null) as string[];
+    } else {
+      const single = this.getSheetNameForYear(selectedYear);
+      if (single) targetSheets.push(single);
+    }
+
+    // Siempre incluir hoja AUTORES si existe
+    if (this.availableSheets.includes('AUTORES')) {
+      targetSheets.push('AUTORES');
+    }
+
+    // 🔹 Parámetros adicionales
+    const hojasSeleccionadas = targetSheets.join(',');
+    
+    console.log('📤 Enviando archivo completo con hojas:', hojasSeleccionadas);
+
+    // 🔹 Enviar al backend
+    console.log('Enviando archivo al backend para carga masiva INDAUTOR...');
+    console.log('Archivo:', this.fileName);
+    const response = await this.cargaMasivaService
+      .uploadExcel('indautor', this.file!,  hojasSeleccionadas)
+      .toPromise();
+
+    Swal.close();
+
+    // 🔹 Mostrar resultado
+    Swal.fire({
+      icon: 'success',
+      title: '¡Carga completada!',
+      html: `
+        <div class="text-start">
+          <p><strong>Archivo:</strong> ${this.fileName}</p>
+          <p><strong>Hojas procesadas:</strong> ${targetSheets.join(', ')}</p>
+          ${
+            response?.mensaje
+              ? `<p class="mt-2"><strong>Servidor:</strong> ${response.mensaje}</p>`
+              : ''
+          }
+          <p class="small text-muted mt-2">
+            El archivo completo se ha enviado correctamente al servidor.
+          </p>
+        </div>
+      `,
+      confirmButtonColor: '#28a745',
+    }).then(() => {
+      this.removeFile();
+      this.form.reset({ year: 'Seleccionar todo', file: null });
+    });
+
+  } catch (error: any) {
+    console.error('❌ Error al procesar el archivo:', error);
+    Swal.close();
+    Swal.fire({
+      icon: 'error',
+      title: 'Error en carga',
+      text: error?.message || 'Ocurrió un error al subir el archivo.',
+    });
+  } finally {
+    this.isUploading = false;
+  }
+}
+
 
   cancel() {
     this.removeFile();
@@ -703,13 +650,18 @@ export class HistoricalIndautorComponent {
       .map((h, i) => (i === 0 ? null : (h !== undefined && h !== null ? String(h).trim() : '')))
       .filter((h) => h !== null) as string[];
   }
+
   private normalizeHeader(header: string): string {
     return header
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Remover acentos
-      .replace(/\s+/g, ' ') // Espacios múltiples a uno
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\(.*?\)/g, '') // eliminar paréntesis
+      .replace(/[^a-zA-Z0-9\s]/g, '') // eliminar símbolos
+      .replace(/\s+/g, ' ')
       .trim()
       .toLowerCase();
   }
+
 
   private compareHeaders(expected: string[], actual: string[]) {
     const normalizeArray = (arr: string[]) => arr.map(h => this.normalizeHeader(h));
