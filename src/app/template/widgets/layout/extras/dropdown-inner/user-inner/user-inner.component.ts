@@ -6,6 +6,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlertOptions } from 'sweetalert2';
+//AGREGA: Importar el servicio de usuarios
+import { UsersService } from '../../../../../../../app/api/services/usuarios.service';
 
 interface LanguageFlag {
   lang: string;
@@ -31,13 +33,20 @@ export class UserInnerComponent implements OnInit, OnDestroy {
   language: LanguageFlag;
   langs: LanguageFlag[] = [];
   user$: Observable<CurrentUser | null>;
+  
+  //AGREGA: Propiedad para los datos del perfil
+  userProfile: any = null;
+  isLoading: boolean = true;
+  
   private unsubscribe: Subscription[] = [];
 
   constructor(
     private authS: AuthService,
     private translationService: TranslationService,
     private translate: TranslateService,
-    private router: Router
+    private router: Router,
+    //AGREGA: Inyectar el servicio de usuarios
+    private usersService: UsersService
   ) { }
 
   ngOnInit(): void {
@@ -46,6 +55,74 @@ export class UserInnerComponent implements OnInit, OnDestroy {
     this.setupSweetAlert();
     this.initializeLanguages();
     this.setLanguage(this.translationService.getSelectedLanguage());
+    
+    //AGREGA: Cargar el perfil del usuario
+    this.userProfile = this.authS.getUserProfile();
+    this.loadUserProfile();
+
+    if (!this.userProfile) {
+      this.loadUserProfile();
+    }
+  }
+
+  //AGREGA: Método para cargar el perfil
+  loadUserProfile(): void {
+    const currentUser = this.authS.currentUserValue;
+    this.isLoading = true;
+
+    if (currentUser && currentUser.email) {
+      this.usersService.getUserByEmail(currentUser.email).subscribe({
+        next: (apiUser) => {
+          if (apiUser) {
+            this.userProfile = this.mapUserDataFromAPI(apiUser, currentUser);
+          } else {
+            this.userProfile = this.mapUserDataFromAuth(currentUser);
+          }
+          this.isLoading = false;
+          this.authS.setUserProfile(this.userProfile);
+        },
+        error: (error) => {
+          console.error('Error loading user profile:', error);
+          this.userProfile = this.mapUserDataFromAuth(currentUser);
+          this.isLoading = false;
+        }
+      });
+    } else {
+      this.userProfile = this.getDefaultProfile();
+      this.isLoading = false;
+    }
+  }
+
+  // AGREGA: Mapear datos desde API
+  private mapUserDataFromAPI(apiUser: any, currentUser: any): any {
+    return {
+      name: `${apiUser.nombre || ''} ${apiUser.ape_pat || ''} ${apiUser.ape_mat || ''}`.trim() || 
+             currentUser.name || 'Usuario',
+      email: apiUser.correo || currentUser.email,
+      // FOTO REAL del usuario desde la API
+      profilePic: apiUser.url_foto || './assets/media/avatars/300-1.jpg',
+      roles: currentUser.roles
+    };
+  }
+
+  //AGREGA: Mapear datos desde Auth (fallback)
+  private mapUserDataFromAuth(currentUser: any): any {
+    return {
+      name: currentUser.name || 'Usuario',
+      email: currentUser.email,
+      profilePic: './assets/media/avatars/300-1.jpg', // Avatar por defecto
+      roles: currentUser.roles
+    };
+  }
+
+  //AGREGA: Perfil por defecto
+  private getDefaultProfile(): any {
+    return {
+      name: 'Usuario',
+      email: 'No especificado',
+      profilePic: './assets/media/avatars/300-1.jpg',
+      roles: [1]
+    };
   }
 
   getInitials(name?: string): string {
