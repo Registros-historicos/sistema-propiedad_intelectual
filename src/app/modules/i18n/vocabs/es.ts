@@ -1,4 +1,4 @@
-import { HISTORICAL_REGISTERS } from "src/app/pages/administrador/historical-register/constants/historical-register.constant";
+import { HISTORICAL_REGISTERS } from "src/app/pages/comun/historical-register/constants/historical-register.constant";
 
 // Spain
 export const locale = {
@@ -72,7 +72,7 @@ export const locale = {
       RECORDS_BY_SECTOR: 'Registros por sector',
       SECTORS: {
         PRIMARY: "Sector Primario",
-        SECONDARY: "Sector Secundario", 
+        SECONDARY: "Sector Secundario",
         TERTIARY: "Sector Terciario",
         QUATERNARY: "Sector Cuaternario",
         QUINARY: "Sector Quinario"
