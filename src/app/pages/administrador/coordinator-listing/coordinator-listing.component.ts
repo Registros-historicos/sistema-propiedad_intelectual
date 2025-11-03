@@ -426,15 +426,6 @@ export class CoordinatorListingComponent implements OnInit, OnDestroy {
       });
       return;
     }
-    const email = this.coordinadorModel.correo;
-    const updatedData = {
-      nombre: this.coordinadorModel.nombre,
-      ape_pat: this.coordinadorModel.ape_pat,
-      ape_mat: this.coordinadorModel.ape_mat,
-      telefono: this.coordinadorModel.telefono,
-      tipo_usuario_param: this.coordinadorModel.tipo_usuario_param,
-      estatus: this.coordinadorModel.estatus,
-    };
 
     const email = this.coordinadorModel.correo;
     const updatedData = {
