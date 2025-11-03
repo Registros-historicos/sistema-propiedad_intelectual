@@ -1215,7 +1215,7 @@ export const locale = {
       },
       LOGIN: {
         TITLE: 'Iniciar sesión',
-        CEPPI: 'Centro de Patentamiento de Propiedad Intelectual',
+        CEPPI: 'Sistema de Información del Patrimonio Intelectual del TECNM',
         BUTTON: 'Iniciar Sesión',
         ERROR: 'Credenciales incorrectas',
         EPASSWORD: 'Mínimo 6 caracteres',

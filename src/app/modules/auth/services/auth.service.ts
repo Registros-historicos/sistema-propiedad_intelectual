@@ -17,6 +17,17 @@ export interface LoginResponse {
     estatus: number | null;
     nombre: string | null;
   };
+  //AGREGA contexto a la interfaz
+  contexto?: {
+    id_usuario: number;
+    correo: string;
+    rol_id: number;
+    rol_nombre: string;
+    id_institucion: number;
+    institucion_nombre: string;
+    id_cepat: number;
+    cepat_nombre: string;
+  };
 }
 
 enum Rol {
@@ -41,6 +52,17 @@ export interface CurrentUser {
   exp?: string;
   refresh?: string; 
   refresh_exp?: string;
+// AGREGADO
+  contexto?: {
+    id_usuario: number;
+    correo: string;
+    rol_id: number;
+    rol_nombre: string;
+    id_institucion: number;
+    institucion_nombre: string;
+    id_cepat: number;
+    cepat_nombre: string;
+  };
 }
 
 @Injectable({
@@ -48,12 +70,21 @@ export interface CurrentUser {
 })
 export class AuthService {
   private currentUserSubject = new BehaviorSubject<CurrentUser | null>(null);
+  private userProfileSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
   private readonly STORAGE_KEY = 'auth.user';
 
   private _isLoading$ = new BehaviorSubject<boolean>(false);
   public  isLoading$  = this._isLoading$.asObservable();
+  
+  setUserProfile(profile: any) {
+  this.userProfileSubject.next(profile);
+}
+
+getUserProfile(): any {
+  return this.userProfileSubject.value;
+}
 
   constructor(
     private http: HttpClient,
@@ -68,34 +99,37 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
-  login(email: string, password: string): Observable<CurrentUser> {
-    const body = { correo: email, password };
-    this._isLoading$.next(true);
+login(email: string, password: string): Observable<CurrentUser> {
+  const body = { correo: email, password };
+  this._isLoading$.next(true);
 
-    return this.http.post<LoginResponse>('/api/usuarios/auth/login/', body).pipe(
-      map(res => {
-        const role = mapTipoUsuarioParamToRol(res.user.tipo_usuario_param);
-        const user: CurrentUser = {
-          id: res.user.id_usuario,
-          email: res.user.correo,
-          name: res.user.nombre ?? null,
-          roles: role ? [role] : [],
-          token: res.access,
-          exp: res.access_exp,
-          refresh: res.refresh,
-          refresh_exp: res.refresh_exp,
-        };
-        this.store.setLocal(this.STORAGE_KEY, user);
-        this.currentUserSubject.next(user);
-        return user;
-      }),
-      catchError(err => {
-        this.logout();
-        return throwError(() => err);
-      }),
-      finalize(() => this._isLoading$.next(false))
-    );
-  }
+  return this.http.post<LoginResponse>('/api/usuarios/auth/login/', body).pipe(
+    map(res => {
+      console.log('🔍 RESPUESTA COMPLETA DEL LOGIN:', res);
+      const role = mapTipoUsuarioParamToRol(res.user.tipo_usuario_param);
+      const user: CurrentUser = {
+        id: res.user.id_usuario,
+        email: res.user.correo,
+        name: res.user.nombre ?? null,
+        roles: role ? [role] : [],
+        token: res.access,
+        exp: res.access_exp,
+        refresh: res.refresh,
+        refresh_exp: res.refresh_exp,
+        // CORRECCIÓN: Usar res.contexto directamente 
+        contexto: res.contexto
+      };
+      this.store.setLocal(this.STORAGE_KEY, user);
+      this.currentUserSubject.next(user);
+      return user;
+    }),
+    catchError(err => {
+      this.logout();
+      return throwError(() => err);
+    }),
+    finalize(() => this._isLoading$.next(false))
+  );
+}
 
   getUserByToken(): Observable<CurrentUser | null> {
     const saved = this.store.getLocal(this.STORAGE_KEY);
