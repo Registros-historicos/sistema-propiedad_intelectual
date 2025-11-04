@@ -86,7 +86,8 @@
   <!-- Tablero por Año -->
   <div class="col-xl-6">
     <!-- Componente de Tabla o Gráfico -->
-    <app-registros-anio [anios]="anios" class="card card-xl-stretch mb-xl-8"></app-registros-anio>
+  <!-- No pasar datos mock desde este dashboard; dejar que el componente cargue datos reales en ngOnInit -->
+  <app-registros-anio class="card card-xl-stretch mb-xl-8"></app-registros-anio>
 
     <!-- end::Table -->
   </div>
