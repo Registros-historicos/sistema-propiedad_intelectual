@@ -109,20 +109,38 @@ export class CoordinatorFormComponent implements OnInit {
   createNewCoordinator(): void {
     const { id_estado, id_instituto, ...payload } = this.userModel;
 
-    this.coordinatorService
-      .createNewUserCoordinator(payload as CoordinatorPayload)
-      .subscribe({
-        next: () => {
-          this.coordinadorCreated = true;
-          this.cdr.detectChanges();
-          this.router.navigate(['/cepat/coordinador/list']);
-        },
-        error: (err) => {
+    this.coordinatorService.createNewUserCoordinator(payload).subscribe({
+      next: (newUser) => {
+        const idUsuario = newUser.id_usuario;
+        const idInstitucion = this.userModel.id_instituto;
+        
+        if (!idUsuario || !idInstitucion) {
           this.coordinadorCreated = false;
-          console.error('Error al crear el coordinador', err);
+          console.error('Falta idUsuario o idInstitucion');
           this.cdr.detectChanges();
-        },
-      });
+          return;
+        }
+        this.coordinatorService
+          .updateInstitutionByIdCoordinator(idInstitucion, idUsuario)
+          .subscribe({
+            next: () => {
+              this.coordinadorCreated = true;
+              this.cdr.detectChanges();
+              this.router.navigate(['/cepat/coordinador/list']);
+            },
+            error: (err) => {
+              this.coordinadorCreated = false;
+              console.error('Error al asignar institución al coordinador', err);
+              this.cdr.detectChanges();
+            },
+          });
+      },
+      error: (err) => {
+        this.coordinadorCreated = false;
+        console.error('Error al crear el coordinador', err);
+        this.cdr.detectChanges();
+      },
+    });
   }
 
   onSubmit(form: NgForm): void {
