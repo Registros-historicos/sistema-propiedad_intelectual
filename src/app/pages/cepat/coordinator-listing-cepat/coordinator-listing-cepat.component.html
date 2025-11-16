@@ -1,0 +1,188 @@
+<div class="card">
+  <div class="card-header border-0 pt-6">
+    <div class="card-title">
+      <div class="d-flex align-items-center position-relative my-1">
+        <app-keenicon name="magnifier" class="fs-3 position-absolute ms-5"></app-keenicon>
+        <input type="text" data-action="filter" class="form-control form-control-solid w-250px ps-12" [placeholder]="placeholder">
+      </div>
+      </div>
+    <div class="card-toolbar">
+      <div class="d-flex justify-content-end align-items-center">
+        <div class="d-flex align-items-center me-4">
+          <label class="form-label text-gray-600 me-3 mb-0 fw-semibold" translate="TABLE.PAGE_LENGTH.LABEL"></label>
+          <select class="form-select form-select-sm form-select-solid w-auto" (change)="onPageLengthChange($event)"
+                  [(ngModel)]="pageLength">
+            <option *ngFor="let length of lengthMenu" [value]="length">{{length}}</option>
+          </select>
+          <span class="text-gray-600 ms-2 fw-semibold" translate="TABLE.PAGE_LENGTH.RECORDS"></span>
+        </div>
+      </div>
+      </div>
+    </div>
+
+  <div class="card-body pt-0">
+    
+    <div *ngIf="isDataReady; else loadingTemplate">
+        <app-crud
+        [datatableConfig]="datatableConfig"
+        route="/cepat/coordinador/list"
+        (deleteEvent)="delete($event)"
+        (editEvent)="edit($event)"
+        [reload]="reloadEvent"
+        [modal]="editModal">
+      </app-crud>
+    </div>
+
+    <ng-template #loadingTemplate>
+      <div class="d-flex justify-content-center my-10">
+        <span class="spinner-border spinner-border-lg" role="status" aria-hidden="true"></span>
+        <span class="ms-3 fs-5 fw-semibold">Cargando datos...</span>
+      </div>
+    </ng-template>
+
+  </div>
+</div>
+
+<swal #noticeSwal [swalOptions]="swalOptions"></swal>
+
+<ng-template #editModal let-modal>
+  <div class="modal-header">
+    <h3 class="modal-title fw-bold text-gray-800 d-flex align-items-center">
+      <app-keenicon name="pencil" class="fs-2 me-2"></app-keenicon>
+      Editar Usuario
+    </h3>
+    <button type="button" class="btn-close" aria-label="Close" (click)="closeForm(modal)"></button>
+  </div>
+
+  <div class="modal-body py-6 px-8">
+    <div class="d-flex flex-column">
+      <!-- Información del usuario -->
+      <div class="notice d-flex bg-light-primary rounded border-primary border border-dashed mb-7 p-6">
+        <app-keenicon name="information-5" class="fs-2 text-primary me-4"></app-keenicon>
+        <div>
+          <h4 class="text-gray-900 fw-bold mb-2">Información del Usuario</h4>
+          <span class="text-gray-700" *ngIf="cepatName">Atiende al {{ cepatName }}</span>
+        </div>
+      </div>
+
+      <!-- Campos principales -->
+      <div class="row g-6 mb-6">
+        <div class="col-md-6">
+          <div class="fv-row mb-6">
+            <label class="fs-6 fw-semibold mb-2 required">Nombre</label>
+            <input type="text" class="form-control form-control-solid" [(ngModel)]="coordinadorModel.nombre" name="nombre">
+          </div>
+
+          <div class="fv-row mb-6">
+            <label class="fs-6 fw-semibold mb-2 required">Apellido Paterno</label>
+            <input type="text" class="form-control form-control-solid" [(ngModel)]="coordinadorModel.ape_pat" name="ape_pat">
+          </div>
+
+          <div class="fv-row mb-6">
+            <label class="fs-6 fw-semibold mb-2 required">Email</label>
+            <input type="email" class="form-control form-control-solid" [(ngModel)]="coordinadorModel.correo" name="correo">
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="fv-row mb-6">
+            <label class="fs-6 fw-semibold mb-2">Apellido Materno</label>
+            <input type="text" class="form-control form-control-solid" [(ngModel)]="coordinadorModel.ape_mat" name="ape_mat">
+          </div>
+
+          <div class="fv-row mb-6">
+            <label class="fs-6 fw-semibold mb-2">Teléfono</label>
+            <input type="tel" class="form-control form-control-solid" [(ngModel)]="coordinadorModel.telefono" name="telefono">
+          </div>
+
+          <div class="fv-row mb-6">
+            <label class="fs-6 fw-semibold mb-2">Estatus</label>
+            <select class="form-select form-select-solid" [(ngModel)]="coordinadorModel.estatus" name="estatus">
+              <option *ngFor="let estatus of estatusOptions" [value]="estatus.value">{{ estatus.label }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estados -->
+      <div class="mt-4 border-top pt-4">
+        <h5 class="fw-bold mb-3">Estados que atiende</h5>
+
+        <div *ngIf="estadosAsignados.length > 0; else sinEstados">
+          <ul class="list-group mb-5">
+            <li 
+              *ngFor="let estado of estadosAsignados" 
+              class="list-group-item d-flex justify-content-between align-items-center"
+            >
+              <span class="fw-semibold text-gray-800">
+                {{ estado.nombre_entidad }}
+              </span>
+              <button 
+                type="button" 
+                class="btn btn-sm btn-light-danger"
+                (click)="eliminarEstado(estado.id_entidad_federativa)"
+                aria-label="Eliminar estado asignado"
+              >
+                <i class="bi bi-trash"></i>
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <ng-template #sinEstados>
+          <!-- Mensaje de 'sin estados' removido para CEPAT. -->
+        </ng-template>
+
+        <!-- Mostrar institución actual si existe -->
+        <div *ngIf="selectedInstitutoId || coordinadorModel?.id_instituto || coordinadorModel?.id_institucion" class="mb-4">
+          <h5 class="fw-bold mb-2">Institución que atiende</h5>
+          <div class="text-muted">
+            <span *ngIf="selectedInstitutoName">{{ selectedInstitutoName }}</span>
+            <span *ngIf="!selectedInstitutoName">ID: {{ selectedInstitutoId || coordinadorModel?.id_instituto || coordinadorModel?.id_institucion }}</span>
+          </div>
+        </div>
+
+        <!-- Gestión de institución del coordinador: seleccionar estado -> instituciones -->
+        <h5 class="fw-bold mb-3">Administrar Institución</h5>
+
+        <div class="mb-4">
+          <label class="fw-semibold fs-6 mb-2">Seleccionar Estado:</label>
+          <select
+            class="form-select form-select-solid"
+            [(ngModel)]="selectedStateForInstitucion"
+            (change)="onEstadoChangeForInstitucion()"
+          >
+            <option value="" [ngValue]="null" disabled selected>-- Selecciona un estado --</option>
+            <option *ngFor="let estado of estados" [ngValue]="estado.id_entidad_federativa">
+              {{ estado.nombre_entidad }}
+            </option>
+          </select>
+        </div>
+
+        <div *ngIf="institutoList.length > 0" class="mb-3">
+          <label class="fw-semibold fs-6 mb-2">Seleccionar Institución:</label>
+          <select class="form-select form-select-solid" [(ngModel)]="selectedInstitutoId">
+            <option [ngValue]="null" disabled selected>-- Selecciona una institución --</option>
+            <option *ngFor="let inst of institutoList" [ngValue]="inst.id_institucion">{{ inst.nombre_institucion }}</option>
+          </select>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-primary" (click)="assignInstitucion()">Asignar institución</button>
+          <button type="button" class="btn btn-outline-danger" (click)="unassignInstitucion()">Quitar institución</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="modal-footer border-0 px-8 py-5">
+    <button type="button" class="btn btn-light me-3" (click)="closeForm(modal)">
+      Cancelar
+    </button>
+    <button type="button" class="btn btn-primary" (click)="saveChanges(modal)">
+      Guardar
+    </button>
+  </div>
+</ng-template>
+
