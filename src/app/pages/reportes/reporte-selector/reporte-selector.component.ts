@@ -57,6 +57,13 @@ export class ReporteSelectorComponent implements OnInit {
     private fb: FormBuilder,
   ) {}
 
+  private ENDPOINTS_POR_ROL: Record<string, string> = {
+    admin: 'v1/administrador/',
+    coordinador: 'v1/coordinador/',
+    solicitante: 'v1/solicitante/'
+  };
+
+
   ngOnInit(): void {
     // this.user$ = this.auth.currentUserSubject.asObservable();
     const url = this.router.url;
@@ -89,7 +96,7 @@ export class ReporteSelectorComponent implements OnInit {
       'reporte_it_federales',
       'reporte_it_descentralizados',
       'reporte_top10_instituciones',
-      'reporte_top10_entidades',
+      'topentidades',
       'reporte_registros_anio',
       'reporte_registros_sector',
       'reporte_registros_estatus',
@@ -111,8 +118,8 @@ export class ReporteSelectorComponent implements OnInit {
     switch (t) {
       case 'REPORTS.ADMIN.FEDERAL.TITLE':          return 'reporte_it_federales';
       case 'REPORTS.ADMIN.DECENTRALIZED.TITLE':    return 'reporte_it_descentralizados';
-      case 'REPORTS.ADMIN.TOP_INSTITUTIONS.TITLE': return 'reporte_top10_instituciones';
-      case 'REPORTS.ADMIN.TOP_STATES.TITLE':       return 'reporte_top10_entidades';
+      case 'REPORTS.ADMIN.TOP_INSTITUTIONS.TITLE': return 'topinstituciones';
+      case 'REPORTS.ADMIN.TOP_STATES.TITLE':       return 'topentidades';
       case 'REPORTS.ADMIN.YEAR.TITLE':             return 'reporte_registros_anio';
       case 'REPORTS.ADMIN.SECTOR.TITLE':           return 'reporte_registros_sector';
       case 'REPORTS.ADMIN.STATUS.TITLE':           return 'reporte_registros_estatus';
@@ -149,7 +156,7 @@ export class ReporteSelectorComponent implements OnInit {
     const payload = this.buildPayload(formValues);
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'x-api-key': environment.REPORTS_API_KEY
+      'x-api-key': environment.REPORTES_API_KEY
     });
 
     this.errorMsg = '';
@@ -158,7 +165,9 @@ export class ReporteSelectorComponent implements OnInit {
 
     const tipo = this.perfil;
 
-    this.http.post(environment.REPORTS_API_URL, payload, {
+    const endpoint = environment.REPORTES_API_URL+this.ENDPOINTS_POR_ROL[tipo]+this.currentKind;
+
+    this.http.post(endpoint, payload, {
       headers,
       responseType: 'blob',
       observe: 'response',
@@ -206,12 +215,8 @@ export class ReporteSelectorComponent implements OnInit {
     En este momento el API no usa los filtros y espera los datos a graficar, posteriormente esperará solo
     los filtros y hará las consultas internamente. */
     return {
-      kind,
-      fecha,
-      user: persona,
-      data: [
-        { institucion: 'TecNM / Instituto Tecnológico de Apizaco', tipo: 'Federal',        patentes: 0, da: 0, mu: 0, di: 0, mc: 0 },
-      ]
+      persona: persona,
+      cargo: "Apoderada Legal en la coordinación de la propiedad intelectual del Tecnológico Nacional de México"
     };
 
 }
