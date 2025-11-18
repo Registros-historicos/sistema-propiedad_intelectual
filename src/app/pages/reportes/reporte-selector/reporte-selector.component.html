@@ -37,11 +37,11 @@
     <!-- Parametros especificos para cada ventana modal. La solución aun debe ser pulida -->
 
     <!-- a) Federales -->
-    <ng-container *ngSwitchCase="'reporte_it_federales'">
+    <ng-container *ngSwitchCase="'federales'">
       <div class="form-row">
         <label>Entidad Federativa</label>
-        <select name="estadoId" ngModel required>
-          <option *ngFor="let e of entidades" [value]="e.id">{{ e.nombre }}</option>
+        <select name="entidad" ngModel required>
+          <option *ngFor="let e of entidades" [value]="e.nombre">{{ e.nombre }}</option>
         </select>
       </div>
       <div class="form-row"><label>Desde</label><input type="date" name="desde" ngModel required /></div>
@@ -49,11 +49,11 @@
     </ng-container>
 
     <!-- b) Descentralizados -->
-    <ng-container *ngSwitchCase="'reporte_it_descentralizados'">
+    <ng-container *ngSwitchCase="'descentralizados'">
       <div class="form-row">
-        <label>Entidad Federativa</label>
-        <select name="estadoId" ngModel required>
-          <option *ngFor="let e of entidades" [value]="e.id">{{ e.nombre }}</option>
+        <label>Entidad Federativas</label>
+        <select name="entidad" ngModel required>
+          <option *ngFor="let e of entidades" [value]="e.nombre">{{ e.nombre }}</option>
         </select>
       </div>
       <div class="form-row"><label>Desde</label><input type="date" name="desde" ngModel required /></div>
