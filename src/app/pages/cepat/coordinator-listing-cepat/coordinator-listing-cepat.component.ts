@@ -61,6 +61,7 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
   estatusOptions = ESTATUS_OPTIONS;
   isDataReady: boolean = false;
   private allCoordinators: any[] = [];
+  rawResponse: any = null;
   estadosAsignados: Estado[] = [];
   cepatName: string = '';
   estadosAEliminar: number[] = [];
@@ -187,15 +188,31 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     }
 
-    // Endpoint absoluto solicitado
-    const externalUrl = 'http://20.14.208.230:8000/api/usuarios/tipo/36/';
+    // Endpoint absoluto solicitado (actualizado a URL por estados CEPAT)
+    const externalUrl = 'http://20.14.208.230:8000/api/tableros/usuarios/por-estados-cepat/';
+
+    console.log('[DEBUG] CEPAT: requesting external URL ->', externalUrl);
+
+    // Mostrar estado de 'loading' en la UI para pruebas
+    this.rawResponse = { status: 'loading', url: externalUrl };
+    this.cdr.detectChanges();
 
     this.http.get<any[]>(externalUrl).subscribe({
       next: (data) => {
-        this.allCoordinators = data.map((coord: any) => ({
+        // Guardar la respuesta cruda para impresión en la UI
+        this.rawResponse = data;
+        console.log('[DEBUG] CEPAT: rawResponse saved, length =', Array.isArray(data) ? data.length : 'not-array');
+        console.log('[DEBUG] CEPAT: raw response length =', Array.isArray(data) ? data.length : 'not-array', 'firstItem =', Array.isArray(data) && data.length ? data[0] : data);
+        // Normalizar respuesta: mapear id y estatus (no filtrar, usar exactamente lo que devuelve el endpoint)
+        const transformed = (Array.isArray(data) ? data : []).map((coord: any) => ({
           ...coord,
           id: coord.id_usuario,
+          estatus: coord.estatus || coord.estatus_param || coord.status || null,
         }));
+
+        console.log('[DEBUG] CEPAT: transformed coordinators ->', transformed);
+
+        this.allCoordinators = transformed;
 
         if (isInitialLoad) {
           this.initializeDataTables(this.allCoordinators);
@@ -213,6 +230,15 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('Error cargando usuarios desde endpoint externo:', error);
+
+        // Mostrar el error en la UI (rawResponse) para facilitar pruebas
+        this.rawResponse = {
+          status: 'error',
+          message: error?.message || 'Error desconocido',
+          details: error,
+        };
+        this.cdr.detectChanges();
+
         this.showAlert({
           title: 'Error',
           text: 'No se pudieron cargar los datos desde el endpoint externo.',
@@ -472,28 +498,20 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
     console.log('[DEBUG] CEPAT: edit() called with id =', id);
     const cepat = this.allCoordinators.find((c) => c.id === Number(id));
     if (!cepat) return;
+
+    // Usar únicamente los datos ya provistos por el endpoint por-estados-cepat
     this.coordinadorModel = { ...cepat };
 
-    forkJoin({
-      cepatData: this.cepatService.getCepatByIdUser(id),
-      estados: this.cepatService.getStatesByUserId(id),
-    }).subscribe({
-      next: ({ cepatData, estados }) => {
-        console.log('[DEBUG] CEPAT: edit() endpoint responses -> cepatData:', cepatData, 'estados:', estados);
-        if (cepatData) {
-          this.coordinadorModel.id_cepat = cepatData.id_cepat;
-          this.cepatName = cepatData.nombre || '';
-          // intentar detectar id_institucion si viene en la respuesta
-          this.selectedInstitutoId = (cepatData as any).id_institucion || (cepatData as any).id_instituto || null;
-          this.selectedInstitutoName = (cepatData as any).nombre_institucion || (cepatData as any).institucion_nombre || null;
-        }
-        this.estadosAsignados = estados;
-        console.log('[DEBUG] CEPAT: coordinadorModel after edit():', this.coordinadorModel, 'selectedInstitutoId:', this.selectedInstitutoId, 'selectedInstitutoName:', this.selectedInstitutoName);
-      },
-      error: () => {
-        this.estadosAsignados = [];
-      },
-    });
+    // Intentar obtener estados asignados e información de institución desde el objeto de listado
+    this.estadosAsignados = (cepat as any).estados || (cepat as any).estados_asignados || (cepat as any).assigned_states || [];
+
+    this.coordinadorModel.id_cepat = (cepat as any).id_cepat || this.coordinadorModel.id_cepat || 0;
+    this.cepatName = (cepat as any).nombre_cepat || (cepat as any).nombre || this.cepatName;
+
+    this.selectedInstitutoId = (cepat as any).id_institucion || (cepat as any).id_instituto || null;
+    this.selectedInstitutoName = (cepat as any).nombre_institucion || (cepat as any).institucion_nombre || null;
+
+    console.log('[DEBUG] CEPAT: coordinadorModel populated from listing ->', this.coordinadorModel, 'estadosAsignados:', this.estadosAsignados);
   }
 
   eliminarEstado(idEstado: number): void {

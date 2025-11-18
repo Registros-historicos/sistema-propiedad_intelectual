@@ -21,9 +21,19 @@
     </div>
 
   <div class="card-body pt-0">
-    
+    <!-- Impresión del JSON crudo: siempre visible para pruebas -->
+    <div class="mb-4">
+      <h6 class="fw-semibold mb-2">Respuesta cruda del endpoint</h6>
+      <ng-container *ngIf="rawResponse; else rawLoading">
+        <pre style="max-height:300px; overflow:auto; background:#f8f9fa; padding:12px; border-radius:6px;">{{ rawResponse | json }}</pre>
+      </ng-container>
+      <ng-template #rawLoading>
+        <div class="text-muted">Respuesta pendiente...</div>
+      </ng-template>
+    </div>
+
     <div *ngIf="isDataReady; else loadingTemplate">
-        <app-crud
+      <app-crud
         [datatableConfig]="datatableConfig"
         route="/cepat/coordinador/list"
         (deleteEvent)="delete($event)"
