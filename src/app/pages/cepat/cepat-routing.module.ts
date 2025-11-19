@@ -43,7 +43,7 @@ const routes: Routes = [
       },
       {
         path: 'coordinador/list',
-        loadComponent: () => import('../administrador/coordinator-listing/coordinator-listing.component').then(m => m.CoordinatorListingComponent)
+        loadComponent: () => import('./coordinator-listing-cepat/coordinator-listing-cepat.component').then(m => m.CoordinatorListingCepatComponent)
       },
       {
         path: 'reportes',

@@ -9,6 +9,7 @@ import { DropdownMenusModule } from '../../template/widgets';
 import { TranslationModule } from '../../modules/i18n';
 import { TranslateModule } from '@ngx-translate/core';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { CoordinatorListingCepatComponent } from './coordinator-listing-cepat/coordinator-listing-cepat.component';
 import { CepatRoutingModule } from './cepat-routing.module';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import {MatIcon} from "@angular/material/icon";
@@ -25,6 +26,9 @@ import { TecnologicosDescentralizadosComponent } from '../../template/layout/com
         FormsModule,
         CepatRoutingModule,
         SharedModule,
+
+        // Standalone component import to allow using its selector in templates
+        CoordinatorListingCepatComponent,
 
         NgbCollapseModule,
         NgbTooltipModule,
