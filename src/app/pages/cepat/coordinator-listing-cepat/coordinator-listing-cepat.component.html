@@ -171,7 +171,7 @@
 
         <div *ngIf="institutoList.length > 0" class="mb-3">
           <label class="fw-semibold fs-6 mb-2">Seleccionar Institución:</label>
-          <select class="form-select form-select-solid" [(ngModel)]="selectedInstitutoId">
+          <select class="form-select form-select-solid" [(ngModel)]="selectedInstitutoId" (change)="onInstitutoSelect()">
             <option [ngValue]="null" disabled selected>-- Selecciona una institución --</option>
             <option *ngFor="let inst of institutoList" [ngValue]="inst.id_institucion">{{ inst.nombre_institucion }}</option>
           </select>

@@ -101,6 +101,7 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
       this.cepatService.getInstitucionesPorEstado(selectedStateId).subscribe({
         next: (instituciones) => {
           this.institutoList = instituciones;
+          console.log('[DEBUG] CEPAT: instituciones cargadas para estado', selectedStateId, 'count=', Array.isArray(instituciones) ? instituciones.length : 0);
           this.cdr.detectChanges();
         },
         error: () => {
@@ -109,6 +110,13 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
         },
       });
     }
+  }
+
+  onInstitutoSelect(): void {
+    // Log del id y nombre (si está disponible) cuando el usuario selecciona una institución
+    const id = this.selectedInstitutoId;
+    const seleccion = this.institutoList.find((i) => i.id_institucion === id as any);
+    console.log('[DEBUG] CEPAT: onInstitutoSelect -> selectedInstitutoId =', id, 'selectedInstitutoName =', seleccion?.nombre_institucion || null);
   }
 
   assignInstitucion(): void {
@@ -123,27 +131,39 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.coordinatorService
-      .updateInstitutionByIdCoordinator(idInstitucion, idUsuario)
-      .subscribe({
-        next: () => {
-          this.showAlert({
-            title: '¡Éxito!',
-            text: 'Institución asignada al coordinador correctamente.',
-            icon: 'success',
-          });
-          this.cdr.detectChanges();
-          this.loadCepats(false);
-        },
-        error: (err) => {
-          console.error('Error asignando institución:', err);
-          this.showAlert({
-            title: 'Error',
-            text: 'No se pudo asignar la institución.',
-            icon: 'error',
-          });
-        },
-      });
+    // Construir URL absoluto al endpoint indicado y enviar el body { id_coordinador }
+    const externalUrl = `http://20.14.208.230:8000/api/institucion/usuario/${idInstitucion}/`;
+    const body = { id_coordinador: idUsuario };
+    console.log('[DEBUG] CEPAT: assignInstitucion -> PUT', externalUrl, 'body=', body);
+
+    this.http.put<any>(externalUrl, body).subscribe({
+      next: (resp) => {
+        console.log('[DEBUG] CEPAT: assignInstitucion response =', resp);
+
+        // Actualizar UI si el backend devuelve la institución asignada
+        if (resp && typeof resp === 'object') {
+          this.selectedInstitutoId = resp.id_institucion || this.selectedInstitutoId || idInstitucion;
+          this.selectedInstitutoName = resp.nombre || resp.nombre_institucion || this.selectedInstitutoName;
+          this.coordinadorModel.id_institucion = this.selectedInstitutoId;
+        }
+
+        this.showAlert({
+          title: '¡Éxito!',
+          text: 'Institución asignada al coordinador correctamente.',
+          icon: 'success',
+        });
+        this.cdr.detectChanges();
+        this.loadCepats(false);
+      },
+      error: (err) => {
+        console.error('Error asignando institución:', err);
+        this.showAlert({
+          title: 'Error',
+          text: 'No se pudo asignar la institución.',
+          icon: 'error',
+        });
+      },
+    });
   }
 
   unassignInstitucion(): void {
