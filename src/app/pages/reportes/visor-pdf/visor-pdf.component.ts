@@ -26,8 +26,8 @@ export class VisorPdfComponent implements OnInit, OnDestroy {
       return;
     }
 
-    //this.rawUrl = url as string; // Usa  la URL del API generada
-    this.rawUrl = 'assets/reportes/admin/' + (filename as string); // Usa archivos locales para pruebas
+    this.rawUrl = url as string; // Usa  la URL del API generada
+    //this.rawUrl = 'assets/reportes/admin/' + (filename as string); // Usa archivos locales para pruebas
     this.filename = filename as string;
     this.tipo = tipo as string;
     this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.rawUrl);

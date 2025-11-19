@@ -1291,7 +1291,53 @@ export const locale = {
         },
         YEAR: {
           TITLE: 'Registros por Año',
-          DESCRIPTION: 'Solicitudes agrupadas por trimestre o rango de fecha, filtradas por tipo de registro.'
+          DESCRIPTION: 'Solicitudes agrupadas por rango de fecha y trimestre.'
+        },
+        SECTOR: {
+          TITLE: 'Registros por Sector',
+          DESCRIPTION: 'Solicitudes clasificadas por sector primario e institución, con opción de rango temporal.'
+        },
+        STATUS: {
+          TITLE: 'Registros por Estatus',
+          DESCRIPTION: 'Reporte de solicitudes por estatus (en revisión, concedida, rechazada o en mantenimiento).'
+        },
+        GENERAL: {
+          TITLE: 'Solicitudes Generales',
+          DESCRIPTION: 'Distribución porcentual de solicitudes por tipo, institución y sector.'
+        },
+        INSTITUTION: {
+          TITLE: 'Por Institución',
+          DESCRIPTION: 'Reporte filtrado por institución, sector y rango temporal.'
+        },
+        SEX: {
+          TITLE: 'Registros por Sexo',
+          DESCRIPTION: 'Reporte de solicitudes clasificadas por sexo de los solicitantes.'
+        },
+        CATEGORY: {
+          TITLE: 'Registros por Categoría',
+          DESCRIPTION: 'Reporte de solicitudes de docentes, administrativos o alumnos.'
+        }
+      },
+      CEPAT: {
+        FEDERAL: {
+          TITLE: 'Institutos Tecnológicos Federales',
+          DESCRIPTION: 'Reporte de instituciones federales por entidad federativa y rango temporal.'
+        },
+        DECENTRALIZED: {
+          TITLE: 'Institutos Tecnológicos Descentralizados',
+          DESCRIPTION: 'Reporte de instituciones descentralizadas por entidad federativa y rango temporal.'
+        },
+        TOP_INSTITUTIONS: {
+          TITLE: 'Top 10 Instituciones',
+          DESCRIPTION: 'Instituciones con mayor número de solicitudes registradas.'
+        },
+        TOP_STATES: {
+          TITLE: 'Top 10 Entidades Federativas',
+          DESCRIPTION: 'Estados con mayor número de solicitudes registradas.'
+        },
+        YEAR: {
+          TITLE: 'Registros por Año',
+          DESCRIPTION: 'Solicitudes agrupadas por rango de fecha y trimestre.'
         },
         SECTOR: {
           TITLE: 'Registros por Sector',
@@ -1319,6 +1365,22 @@ export const locale = {
         }
       },
       COORDINATOR: {
+        YEAR: {
+          TITLE: 'Registros por Año',
+          DESCRIPTION: 'Solicitudes agrupadas por rango de fecha y trimestre.'
+        },
+        STATUS: {
+          TITLE: 'Registros por Estatus',
+          DESCRIPTION: 'Reporte de solicitudes por estatus (en revisión, concedida, rechazada o en mantenimiento).'
+        },
+        SEX: {
+          TITLE: 'Registros por Sexo',
+          DESCRIPTION: 'Reporte de solicitudes clasificadas por sexo de los solicitantes.'
+        },
+        CATEGORY: {
+          TITLE: 'Registros por Categoría',
+          DESCRIPTION: 'Reporte de solicitudes de docentes, administrativos o alumnos.'
+        },
         DEPARTMENT: {
           TITLE: 'Departamento',
           DESCRIPTION: 'Reporte por departamento.'
@@ -1335,9 +1397,9 @@ export const locale = {
           TITLE: 'Programa Educativo',
           DESCRIPTION: 'Reporte de programa educativo.'
         },
-        DATE: {
-          TITLE: 'Fecha de Solicitud',
-          DESCRIPTION: 'Reporte por fecha de solicitud.'
+        ACADEMICOS: {
+          TITLE: 'Registros por Cuerpo Académico',
+          DESCRIPTION: 'Reporte de solicitudes por cuerpo académico.'
         }
       },
       GUEST: {
