@@ -35,58 +35,65 @@ export class PatentsService {
       error: (err) => console.error('Error cargando parametrizaciones:', err),
     });
   }
-public getPatents(tableParams: any): Observable<any> {
-  const page = Math.floor((tableParams.start || 0) / (tableParams.length || 10)) + 1;
-  const limit = tableParams.length || 10;
-  const searchValue = tableParams.search?.value || '';
+  public getPatents(tableParams: any, q?: string): Observable<any> {
+    const page = Math.floor((tableParams.start || 0) / (tableParams.length || 10)) + 1;
+    const limit = tableParams.length || 10;
+    const searchValue = q || '';
+    console.error('search: ' + searchValue)
 
-  let sortColumn = 'fec_solicitud';
-  let sortOrder = 'DESC';
+    let sortColumn = 'fec_solicitud';
+    let sortOrder = 'DESC';
 
-  if (tableParams.order && tableParams.order.length > 0) {
-    const orderInfo = tableParams.order[0];
-    const columnIndex = orderInfo.column;
-    const direction = orderInfo.dir.toUpperCase();
+    if (tableParams.order && tableParams.order.length > 0) {
+      const orderInfo = tableParams.order[0];
+      const columnIndex = orderInfo.column;
+      const direction = orderInfo.dir.toUpperCase();
 
-    
-    const columnMap: { [key: number]: string } = {
-      0: 'no_expediente',
-      1: 'id_registro',
-      2: 'rama_param',
-      3: 'titulo',
-      4: 'instituciones',
-      5: 'fec_solicitud'
-    };
 
-    if (columnMap[columnIndex]) {
-      sortColumn = columnMap[columnIndex];
-      sortOrder = direction;
+      const columnMap: { [key: number]: string } = {
+        0: 'no_expediente',
+        1: 'id_registro',
+        2: 'rama_param',
+        3: 'titulo',
+        4: 'instituciones',
+        5: 'fec_solicitud'
+      };
+
+      if (columnMap[columnIndex]) {
+        sortColumn = columnMap[columnIndex];
+        sortOrder = direction;
+      }
     }
+
+    // 🔹 Esperar a que los catálogos estén cargados antes de formatear las patentes
+    return this.paramService.getAll().pipe(
+      switchMap((cats) => {
+        this.catalogos = cats;
+
+        // 🔹 Elegir entre búsqueda o listado normal
+        if (searchValue && searchValue.trim() !== '') {
+          console.log('if')
+          const safeSortColumn = (['no_expediente', 'id_registro', 'rama_param', 'titulo', 'fec_solicitud'].includes(sortColumn))
+            ? sortColumn
+            : 'fec_solicitud';
+          return this.searchPatents(searchValue, page, limit, safeSortColumn, sortOrder);
+
+        }
+        console.log('else')
+        return this.listPatents(page, limit, sortColumn, sortOrder);
+      }),
+      map((response) => {
+        // 🔹 Ahora sí formatear con los catálogos ya cargados
+        const formatted = this.formatForDataTables(response, tableParams.draw);
+        console.log('✅ Catálogos aplicados, ejemplo de estatus:', formatted.data[0]?.estatus);
+        return formatted;
+      })
+    );
   }
 
-  // 🔹 Esperar a que los catálogos estén cargados antes de formatear las patentes
-  return this.paramService.getAll().pipe(
-    switchMap((cats) => {
-      this.catalogos = cats;
 
-      // 🔹 Elegir entre búsqueda o listado normal
-      if (searchValue && searchValue.trim() !== '') {
-        return this.searchPatents(searchValue, page, limit, sortColumn, sortOrder);
-      }
-      return this.listPatents(page, limit, sortColumn, sortOrder);
-    }),
-    map((response) => {
-      // 🔹 Ahora sí formatear con los catálogos ya cargados
-      const formatted = this.formatForDataTables(response, tableParams.draw);
-      console.log('✅ Catálogos aplicados, ejemplo de estatus:', formatted.data[0]?.estatus);
-      return formatted;
-    })
-  );
-}
-
-
-  private listPatents(page: number = 1, limit: number = 10, sortColumn: string = 'fec_solicitud', 
-  sortOrder: string = 'DESC'): Observable<IPaginatedPatentsResponse> {
+  private listPatents(page: number = 1, limit: number = 10, sortColumn: string = 'fec_solicitud',
+    sortOrder: string = 'DESC'): Observable<IPaginatedPatentsResponse> {
     const params = new HttpParams()
       .set('tipo', this.TIPO_PATENTE)
       .set('page', page.toString())
@@ -118,18 +125,18 @@ public getPatents(tableParams: any): Observable<any> {
           total = response.length;
           results = response;
         }
-        
+
         if (isNaN(total) || total < 0) {
           total = 0;
         }
-        
+
         return { total, page, limit, results };
       })
     );
   }
 
   private searchPatents(query: string, page: number = 1, limit: number = 10, sortColumn: string = 'fec_solicitud',
-  sortOrder: string = 'DESC'): Observable<IPaginatedPatentsResponse> {
+    sortOrder: string = 'DESC'): Observable<IPaginatedPatentsResponse> {
     const params = new HttpParams()
       .set('tipo', this.TIPO_PATENTE)
       .set('q', query)
@@ -138,7 +145,39 @@ public getPatents(tableParams: any): Observable<any> {
       .set('filter', sortColumn)
       .set('order', sortOrder);
 
-    return this.http.get<IPaginatedPatentsResponse>(`${this.apiUrl}/search/`, { params });
+    return this.http.get<any>(`${this.apiUrl}/search`, { params }).pipe(
+      map(response => {
+        console.log('response')
+        let total = 0;
+        let results = [];
+
+        if (response.total !== undefined) {
+          const totalValue = response.total;
+          if (typeof totalValue === 'string' && totalValue.includes(',')) {
+            const parts = totalValue.replace('(', '').replace(')', '').split(',');
+            const lastPart = parts[parts.length - 1].trim();
+            total = parseInt(lastPart, 10);
+          } else if (typeof totalValue === 'number') {
+            total = totalValue;
+          } else if (typeof totalValue === 'string') {
+            total = parseInt(totalValue, 10);
+          }
+          results = response.results || [];
+        } else if (response.count !== undefined) {
+          total = response.count;
+          results = response.results || [];
+        } else if (Array.isArray(response)) {
+          total = response.length;
+          results = response;
+        }
+
+        if (isNaN(total) || total < 0) {
+          total = 0;
+        }
+
+        return { total, page, limit, results };
+      })
+    );
   }
 
   private formatForDataTables(response: IPaginatedPatentsResponse, draw: number): any {
@@ -372,6 +411,7 @@ private mapBackendToFrontend(backendPatent: any): IPatentModel {
       map(response => response.results.map(p => this.mapBackendToFrontend(p)))
     );
   }
+
 
   public getPatentsStats(): Observable<any> {
     return this.getAllPatents().pipe(
