@@ -7,7 +7,7 @@ import moment from 'moment/moment';
 import { PatentsService } from '../../../../api/services/patents.service';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs';
-import { IPatentModel } from 'src/app/api/models/patent.model';
+import { IPatentModel, PatenteUIModel } from 'src/app/api/models/patent.model';
 import { FederalEntity } from 'src/app/api/models/entity.model';
 import { ENTIDADES_FEDERATIVAS_DATA } from 'src/app/api/data/entity.data';
 import { ENTIDADES_FEDERATIVAS_MAP } from 'src/app/api/data/entity-institucion.data';
@@ -19,7 +19,7 @@ type EstatusPatente = 'Registrada' | 'En trámite' | 'Trámite con observaciones
 interface Inventor {
   curp: string;
   nombreCompleto: string;
-  sexo: 'M' | 'F' | '';
+  sexo: string;
   tipoInvestigador: string;
   institucion: string;
   programaEducativo: string;
@@ -53,7 +53,7 @@ interface ImpiLocalItem {
   inventores?: Inventor[];
 }
 
-type PatenteUIModel = IPatentModel & {
+/* export type PatenteUIModel = IPatentModel & {
   // Campos adicionales de IMPI
   numeroExpediente?: string;
   numeroTitulo?: string;
@@ -70,7 +70,7 @@ type PatenteUIModel = IPatentModel & {
   archivo?: string;
   observaciones?: string;
   inventores?: Inventor[];
-};
+}; */
 
 interface ParametroItem {
   id: number;
@@ -129,7 +129,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     rama: "",
     medioIngreso: "",
     tecnologicoOrigen: "",
-    cePat: "",
+    cePat: "N/A",
     anioRenovacion: "",
     tipoSector: "",
     sector: "",
@@ -551,7 +551,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         },
         {
           title: 'No. de título',
-          data: 'numeroTitulo',
+          data: 'id_registro',
           orderable: true,
           render: (data) => {
             const strData = data ? String(data) : '—';
@@ -566,7 +566,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         },
         {
           title: this.translate.instant('TABLE.BRANCH'),
-          data: 'rama',
+          data: 'rama_param',
           orderable: true,
           render: (data, type, full) => {
             // Asegurar que sea string
@@ -843,11 +843,27 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         } as PatenteUIModel;
       }
     } else {
-      this.service.getPatent(id).subscribe((patente: IPatentModel) => {
-        this.patenteModel = { ...this.patenteModel, ...patente };
-        this.convertirNombresAIdsParaEdicion();
-        if (!this.patenteModel.denominacion) {
-          this.patenteModel.denominacion = this.patenteModel.nombrePatente;
+      console.log('[PatenteComponent] Solicitando registro real al backend para edición. ID:', id);
+
+      this.service.getPatent(id).subscribe({
+        next: (patente: IPatentModel) => {
+          console.log('[PatenteComponent] Respuesta del backend (detalle registro):', patente);
+
+          this.patenteModel = { ...this.patenteModel, ...patente };
+          console.log('[PatenteComponent] Modelo en edición después de merge:', this.patenteModel);
+          console.log('[PatenteComponent] Inventores recibidos desde backend:', this.patenteModel.inventores);
+
+          this.convertirNombresAIdsParaEdicion();
+          console.log('[PatenteComponent] Modelo en edición después de convertirNombresAIdsParaEdicion:', this.patenteModel);
+
+          if (!this.patenteModel.denominacion) {
+            this.patenteModel.denominacion = this.patenteModel.nombrePatente;
+          }
+
+          console.log('[PatenteComponent] Modelo final listo para el formulario de edición:', this.patenteModel);
+        },
+        error: (err) => {
+          console.error('[PatenteComponent] Error al cargar el registro para edición:', err);
         }
       });
     }
@@ -902,7 +918,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       modal.dismiss('saved');
       return;
     } else {
-      const payload: IPatentModel = {
+      const payload: PatenteUIModel = {
         id: this.patenteModel.id,
         solicitudId: this.patenteModel.solicitudId,
         nombrePatente: this.patenteModel.denominacion || this.patenteModel.nombrePatente,
