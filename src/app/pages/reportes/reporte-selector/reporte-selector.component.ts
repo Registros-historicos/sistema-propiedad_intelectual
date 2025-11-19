@@ -9,6 +9,8 @@ import { AuthService, CurrentUser } from 'src/app/modules/auth';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { HttpResponse } from '@angular/common/http';
 import { ENTIDADES_FEDERATIVAS_DATA } from 'src/app/api/data/entity.data';
+import { ENTIDADES_FEDERATIVAS_MAP } from 'src/app/api/data/entity-institucion.data';
+import { SECTORES_DATA, ESTATUS_DATA } from 'src/app/api/data/sectores.data';
 import { FederalEntity } from 'src/app/api/models/entity.model';
 import { UsersService } from 'src/app/api/services/usuarios.service';
 
@@ -37,6 +39,10 @@ export class ReporteSelectorComponent implements OnInit {
   currentKind = '';
   currentFields: FieldConfig[] = [];
   entidades: FederalEntity[] = ENTIDADES_FEDERATIVAS_DATA;
+  institutionesMap = ENTIDADES_FEDERATIVAS_MAP;
+  instituciones: { id: number; nombre: string }[] = [];
+  sectores: FederalEntity[] = SECTORES_DATA;
+  estatus: FederalEntity[] = ESTATUS_DATA;
 
   user$: Observable<CurrentUser | null>;
   modalOpen = false;
@@ -58,6 +64,7 @@ export class ReporteSelectorComponent implements OnInit {
 
   private ENDPOINTS_POR_ROL: Record<string, string> = {
     admin: 'v1/administrador/',
+    cepat: 'v1/cepat/',
     coordinador: 'v1/coordinador/',
     solicitante: 'v1/solicitante/'
   };
@@ -69,6 +76,7 @@ export class ReporteSelectorComponent implements OnInit {
     if (url.includes('/administrador/')) this.perfil = 'admin';
     else if (url.includes('/coordinador/')) this.perfil = 'coordinador';
     else if (url.includes('/solicitante/')) this.perfil = 'solicitante';
+    else if (url.includes('/cepat/')) this.perfil = 'cepat';
 
     this.reportes = REPORTES_POR_ROL[this.perfil];
 
@@ -77,6 +85,8 @@ export class ReporteSelectorComponent implements OnInit {
     );
 
     this.loadUserProfile();
+    this.instituciones = this.getAllInstitutes()
+    .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
   }
 
   private extractSimpleProfile(apiUser: any, currentUser: any): { fullname: string; occupation: string } {
@@ -163,14 +173,43 @@ export class ReporteSelectorComponent implements OnInit {
       case 'REPORTS.ADMIN.DECENTRALIZED.TITLE': return 'descentralizados';
       case 'REPORTS.ADMIN.TOP_INSTITUTIONS.TITLE': return 'topinstituciones';
       case 'REPORTS.ADMIN.TOP_STATES.TITLE': return 'topentidades';
-      case 'REPORTS.ADMIN.YEAR.TITLE': return 'reporte_registros_anio';
-      case 'REPORTS.ADMIN.SECTOR.TITLE': return 'reporte_registros_sector';
-      case 'REPORTS.ADMIN.STATUS.TITLE': return 'reporte_registros_estatus';
-      case 'REPORTS.ADMIN.GENERAL.TITLE': return 'reporte_solicitudes_general';
-      case 'REPORTS.ADMIN.INSTITUTION.TITLE': return 'reporte_por_institucion';
-      case 'REPORTS.ADMIN.SEX.TITLE': return 'reporte_registros_sexo';
-      case 'REPORTS.ADMIN.CATEGORY.TITLE': return 'reporte_registros_categoria';
-      case 'REPORTS.COORDINATOR.DEPARTMENT.TITLE': return 'reporte_registros_departamento';
+      case 'REPORTS.ADMIN.YEAR.TITLE': return 'anuales';
+      case 'REPORTS.ADMIN.SECTOR.TITLE': return 'sectoriales';
+      case 'REPORTS.ADMIN.STATUS.TITLE': return 'estatus';
+      case 'REPORTS.ADMIN.GENERAL.TITLE': return 'general';
+      case 'REPORTS.ADMIN.INSTITUTION.TITLE': return 'institucion';
+      case 'REPORTS.ADMIN.SEX.TITLE': return 'genero';
+      case 'REPORTS.ADMIN.CATEGORY.TITLE': return 'categoria';
+      case 'REPORTS.ADMIN.ACADEMICOS.TITLE': return 'cuerpos_academicos';
+      case 'REPORTS.ADMIN.DEPARTMENT.TITLE': return 'departamentos';
+      case 'REPORTS.ADMIN.PROGRAM.TITLE': return 'programas_educativos';
+      case 'REPORTS.ADMIN.RESEARCHER.TITLE': return 'investigadores';
+
+      case 'REPORTS.CEPAT.FEDERAL.TITLE': return 'federales';
+      case 'REPORTS.CEPAT.DECENTRALIZED.TITLE': return 'descentralizados';
+      case 'REPORTS.CEPAT.TOP_INSTITUTIONS.TITLE': return 'topinstituciones';
+      case 'REPORTS.CEPAT.TOP_STATES.TITLE': return 'topentidades';
+      case 'REPORTS.CEPAT.YEAR.TITLE': return 'anuales';
+      case 'REPORTS.CEPAT.SECTOR.TITLE': return 'sectoriales';
+      case 'REPORTS.CEPAT.STATUS.TITLE': return 'estatus';
+      case 'REPORTS.CEPAT.GENERAL.TITLE': return 'general';
+      case 'REPORTS.CEPAT.INSTITUTION.TITLE': return 'institucion';
+      case 'REPORTS.CEPAT.SEX.TITLE': return 'genero';
+      case 'REPORTS.CEPAT.CATEGORY.TITLE': return 'categoria';
+      case 'REPORTS.CEPAT.ACADEMICOS.TITLE': return 'cuerpos_academicos';
+      case 'REPORTS.CEPAT.DEPARTMENT.TITLE': return 'departamentos';
+      case 'REPORTS.CEPAT.PROGRAM.TITLE': return 'programas_educativos';
+      case 'REPORTS.CEPAT.RESEARCHER.TITLE': return 'investigadores';
+
+      case 'REPORTS.COORDINATOR.YEAR.TITLE': return 'anuales';
+      case 'REPORTS.COORDINATOR.STATUS.TITLE': return 'estatus';
+      case 'REPORTS.COORDINATOR.SEX.TITLE': return 'genero';
+      case 'REPORTS.COORDINATOR.CATEGORY.TITLE': return 'categoria';
+      case 'REPORTS.COORDINATOR.ACADEMICOS.TITLE': return 'cuerpos_academicos';
+      case 'REPORTS.COORDINATOR.DEPARTMENT.TITLE': return 'departamentos';
+      case 'REPORTS.COORDINATOR.PROGRAM.TITLE': return 'programas_educativos';
+      case 'REPORTS.COORDINATOR.RESEARCHER.TITLE': return 'investigadores';
+
       default:
         if (a.includes('entidad')) return 'reporte_it_federales';
         if (a.includes('clasificación')) return 'reporte_registros_estatus';
@@ -214,16 +253,18 @@ export class ReporteSelectorComponent implements OnInit {
     return {
       persona: this.userProfile?.fullname || "Usuario",
       cargo: this.userProfile?.occupation || "Usuario del Sistema",
-      institucion: "Instituto Tecnológico de Tizimín",
-      entidad: formValues?.entidad || "Veracruz",
-      anio_inicio: "2020",
-      anio_fin: "2025",
-      departamento: null,
-      cuerpo_academico: null,
-      programa_educativo: null,
-      categoria: null,
-      tipo: null,
-      sector: null
+      institucion: formValues?.institucion || null,
+      entidad: formValues?.entidad || null,
+      cuartil: formValues?.trimestre || null,
+      anio_inicio: formValues?.anio_inicio || null,
+      anio_fin: formValues?.anio_fin || null,
+      departamento: formValues?.departamento || null,
+      cuerpo_academico: formValues?.cuerpos_academicos || null,
+      programa_educativo: formValues?.programa_educativo || null,
+      categoria: formValues?.categoria || null,
+      genero: formValues?.sexo || null,
+      estatus: formValues?.estatus || null,
+      sector: formValues?.sector || null,
     };
   }
 
@@ -236,6 +277,7 @@ export class ReporteSelectorComponent implements OnInit {
   }
 
   onSubmit(formValues?: any): void {
+    
     if (!this.selectedReporte?.archivo) {
       this.errorMsg = 'No se encontró el archivo del reporte.';
       return;
@@ -284,4 +326,28 @@ export class ReporteSelectorComponent implements OnInit {
   trackByArchivo(_index: number, r: ReporteCard): string {
     return r.archivo;
   }
+
+  dateError: boolean = false;
+
+  validateDates(values: any): void {
+    if (values?.anio_fin && values?.anio_inicio) {
+      const desde = new Date(values.anio_inicio);
+      const hasta = new Date(values.anio_fin);
+
+      this.dateError = hasta < desde;
+    } else {
+      this.dateError = false;
+    }
+  }
+
+  getAllInstitutes(): { id: number; nombre: string }[] {
+    const all: { id: number; nombre: string }[] = [];
+
+    Object.values(this.institutionesMap).forEach(lista => {
+      all.push(...lista);
+    });
+
+    return all;
+  }
+
 }
