@@ -4,7 +4,7 @@
       <div class="d-flex align-items-center position-relative my-1">
         <app-keenicon name="magnifier" class="fs-3 position-absolute ms-5"></app-keenicon>
         <input type="text" data-action="filter" class="form-control form-control-solid w-250px ps-12"
-               [placeholder]="placeholder">
+          [placeholder]="placeholder" (keyup)="onFilter($event)">
       </div>
     </div>
 
@@ -266,7 +266,7 @@
         </div>
         <div class="fv-row col-md-6">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">N. de Título</label>
-          <input type="text" class="form-control" [(ngModel)]="patenteModel.numeroTitulo"/>
+          <input type="text" class="form-control" [(ngModel)]="patenteModel.id_registro"/>
         </div>
       </div>
 
@@ -277,7 +277,7 @@
         </div>
         <div class="fv-row col-md-6">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">Rama</label>
-          <input type="text" class="form-control" [(ngModel)]="patenteModel.rama"/>
+          <input type="text" class="form-control" [(ngModel)]="patenteModel.rama_param"/>
         </div>
       </div>
 
@@ -290,11 +290,20 @@
             <option value="Trámite con observaciones">Trámite con observaciones</option>
             <option value="Aprobada">Aprobada</option>
             <option value="Concluida">Concluida</option>
+            <option value="Confirmada">Confirmada</option>
+            <option value="Pendiente">Pendiente</option>
+            <option value="Con Observaciones">Con Observaciones</option>
+            <option value="Rechazada">Rechazada</option>
+            <option value="Finalizada">Finalizada</option>
+            <option value="Cancelada">Cancelada</option>
+            <option value="En pausa">En pausa</option>
+            <option value="En espera de validación">En espera de validación</option>
+            <option value="Notificada al Tecnológico">Notificada al Tecnológico</option>
           </select>
         </div>
         <div class="fv-row col-md-6">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">Medio de Ingreso</label>
-          <input type="text" class="form-control" [(ngModel)]="patenteModel.medioIngreso"/>
+          <input type="text" class="form-control" [(ngModel)]="patenteModel.medio_ingreso_param"/>
         </div>
       </div>
 

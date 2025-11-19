@@ -11,7 +11,7 @@
     </div>
   </ng-container>
 
-  <ng-container *ngIf="appSidebarDisplay">
+  <ng-container *ngIf="appSidebarDisplay"> 
     <!--begin::sidebar mobile toggle-->
     <div class="d-flex align-items-center d-lg-none ms-n2 me-2" title="Show sidebar menu">
       <div class="btn btn-icon btn-active-color-primary w-35px h-35px" id="kt_app_sidebar_mobile_toggle">
@@ -67,6 +67,12 @@
         data-kt-drawer-toggle="#kt_app_header_menu_toggle" data-kt-swapper="true"
         data-kt-swapper-mode="{default: 'append', lg: 'prepend'}"
         data-kt-swapper-parent="{default: '#kt_app_body', lg: '#kt_app_header_wrapper'}">
+        
+        <!-- CAMBIO: Mostrar user-inner en móviles cuando el menú principal está oculto -->
+        <div class="d-lg-none">
+          <app-user-inner></app-user-inner>
+        </div>
+        
         <ng-container>
           <app-page-title [appPageTitleDirection]="'column'" [appPageTitleBreadcrumb]="true"
             [appPageTitleDescription]="false"
@@ -76,9 +82,7 @@
       </div>
       <!--end::Menu wrapper-->
     </ng-container>
-    <!-- <ng-container *ngIf="appHeaderDefaultContent === 'page-title' && appPageTitleDisplay">
-      <app-page-title #ktPageTitle class="page-title d-flex"></app-page-title>
-    </ng-container> -->
+
     <app-navbar class="app-navbar flex-shrink-0" [appHeaderDefaulMenuDisplay]="appHeaderDefaulMenuDisplay"
       [isRtl]="false"></app-navbar>
   </div>

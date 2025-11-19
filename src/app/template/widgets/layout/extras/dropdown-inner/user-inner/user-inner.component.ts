@@ -139,13 +139,20 @@ export class UserInnerComponent implements OnInit, OnDestroy {
     };
   }
 
-  logout() {
-    this.deleteSwal.fire().then((clicked) => {
-      if (clicked.isConfirmed) {
-        this.authS.logout();
-      }
-    });
-  }
+logout() {
+  this.deleteSwal.fire().then((clicked) => {
+    if (clicked.isConfirmed) {
+      this.authS.logout();
+      
+      // FORZAR RECARGA COMPLETA DE LA PÁGINA
+      setTimeout(() => {
+        window.location.href = '/auth/login'; // o la ruta de tu login
+        // O alternativamente:
+        // window.location.reload();
+      }, 100);
+    }
+  });
+}
 
   initializeLanguages() {
     this.langs = [

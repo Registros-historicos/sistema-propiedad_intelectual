@@ -1,224 +1,164 @@
-import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { FormsModule, NgForm } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
-import { SwalComponent, SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
-import { Observable } from 'rxjs';
-import { SweetAlertOptions } from 'sweetalert2';
-import {NgbCollapse, NgbDatepicker, NgbInputDatepicker} from '@ng-bootstrap/ng-bootstrap';
-import { SharedModule } from '../../../template/shared/shared.module';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { FormsModule, NgForm } from '@angular/forms';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import {
-  CoordinatorService,
-  ICoordinatorModel,
-  IInstitucionModel,
-  ENTIDADES_FEDERATIVAS,
-  SEXO_OPTIONS,
-  InstitucionService
-} from '../shared-services';
-import { NgClass } from '@angular/common';
+  CepatService,
+  Estado,
+  Institucion,
+} from 'src/app/api/services/cepat.service';
+import { SharedModule } from '../../../template/shared/shared.module';
+import { CoordinatorHttpService } from 'src/app/api/services/coordinador.service';
+import { Router } from '@angular/router';
+
+interface UserModel {
+  nombre: string;
+  ape_pat: string;
+  ape_mat: string;
+  correo: string;
+  telefono: string;
+  password: string;
+  id_estado: number | null;
+  id_instituto: number | null;
+  estatus: number;
+  tipo_usuario_param: number;
+  url_foto: string;
+}
+interface CoordinatorPayload {
+  nombre: string;
+  ape_pat: string;
+  ape_mat: string;
+  url_foto: string;
+  correo: string;
+  password: string;
+  telefono: string;
+  tipo_usuario_param: number;
+  estatus: number;
+}
 
 @Component({
   selector: 'app-coordinator-form',
   templateUrl: './coordinator-form.component.html',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    NgbCollapse,
-    NgbDatepicker,
-    SharedModule,
-    SweetAlert2Module,
-    NgClass,
-    NgbInputDatepicker
-  ],
-  styleUrls: ['./coordinator-form.component.scss']
+  imports: [CommonModule, FormsModule, SharedModule, SweetAlert2Module],
+  styleUrls: ['./coordinator-form.component.scss'],
 })
 export class CoordinatorFormComponent implements OnInit {
-  isCollapsed1 = false;
-  isCollapsed2 = true;
-  isLoading = false;
-  isEdit = false;
-
-  coordinatorModel: ICoordinatorModel & { fecha_inicio_vigencia?: any } = {
-    id: 0,
+  coordinadorCreated: boolean = false;
+  userModel: UserModel = {
     nombre: '',
-    apellidos: '',
-    edad: 0,
-    entidad_federativa: '',
-    institucion_adscripcion: '',
-    sexo: '',
+    ape_pat: '',
+    ape_mat: '',
+    correo: '',
     telefono: '',
-    email: '',
-    rfc: '',
-    curp: '',
-    fecha_inicio_vigencia: null
+    password: '',
+    id_estado: null,
+    id_instituto: null,
+    estatus: 24, // 24 es un usuario habilitado
+    tipo_usuario_param: 36, // 36 es para coordinador.
+    url_foto: 'https://example.com/foto.png',
   };
+  confirmPassword: string = '';
+  passwordVisible: boolean = false;
+  confirmPasswordVisible: boolean = false;
 
-  @ViewChild('noticeSwal')
-  noticeSwal!: SwalComponent;
-
-  @ViewChild('oficioAsignacion')
-  oficioAsignacion: ElementRef;
-
-  @ViewChild('myForm')
-  myForm: NgForm;
-
-  swalOptions: SweetAlertOptions = {};
-
-  entidadesFederativas: string[] = ENTIDADES_FEDERATIVAS;
-  sexoOptions: string[] = SEXO_OPTIONS;
-
-  institucionesFiltradas: IInstitucionModel[] = [];
-  selectedFile: File | null = null;
+  institutoList: Institucion[] = [];
+  estados: Estado[] = [];
 
   constructor(
-    private coordinatorService: CoordinatorService,
-    private institucionService: InstitucionService,
+    private cepatService: CepatService,
     private cdr: ChangeDetectorRef,
-    private router: Router,
-    private route: ActivatedRoute
-  ) {
-    this.entidadesFederativas = ENTIDADES_FEDERATIVAS;
-    this.sexoOptions = SEXO_OPTIONS;
-  }
+    private coordinatorService: CoordinatorHttpService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    // Verificar si estamos en modo edición
-    this.route.paramMap.subscribe(params => {
-      const id = params.get('id');
-      if (id && id !== '0') {
-        this.isEdit = true;
-        this.loadCoordinator(+id);
-      }
-    });
+    this.loadStates();
   }
 
-  loadCoordinator(id: number): void {
-    this.coordinatorService.getCoordinator(id).subscribe((coordinator: ICoordinatorModel) => {
-      this.coordinatorModel = { ...coordinator };
-      this.onEntidadChange(); // Cargar instituciones de la entidad seleccionada
-    });
-  }
-
-  onEntidadChange() {
-    console.log('Entidad seleccionada:', this.coordinatorModel.entidad_federativa);
-    this.coordinatorModel.institucion_adscripcion = '';
-
-    this.institucionService.getInstitucionesByEntidad(this.coordinatorModel.entidad_federativa)
-      .subscribe(instituciones => {
-        this.institucionesFiltradas = instituciones;
-        console.log('Instituciones filtradas:', this.institucionesFiltradas);
+  loadStates(): void {
+    this.cepatService.getEstados().subscribe({
+      next: (data) => {
+        this.estados = data;
         this.cdr.detectChanges();
-      });
+      },
+      error: () => {
+        this.estados = [];
+      },
+    });
   }
 
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file && file.type === 'application/pdf') {
-      this.selectedFile = {
-        name: file.name,
-        size: file.size,
-        type: file.type
-      } as File;
-    } else if (file) {
-      // Mostrar error si no es PDF
-      const errorAlert: SweetAlertOptions = {
-        icon: 'error',
-        title: 'Error!',
-        text: 'Solo se permiten archivos PDF',
-      };
-      this.showAlert(errorAlert);
-      event.target.value = '';
+  onEstadoChange(): void {
+    const selectedStateId = this.userModel.id_estado;
+    this.userModel.id_instituto = null;
+    this.institutoList = [];
+    if (selectedStateId) {
+      this.cepatService.getInstitucionesPorEstado(selectedStateId).subscribe({
+        next: (instituciones) => {
+          this.institutoList = instituciones;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.institutoList = [];
+          this.cdr.detectChanges();
+        },
+      });
     }
   }
 
-  onSubmit(event: Event) {
-    if (this.myForm && this.myForm.invalid) {
+  createNewCoordinator(): void {
+    const { id_estado, id_instituto, ...payload } = this.userModel;
+
+    this.coordinatorService.createNewUserCoordinator(payload).subscribe({
+      next: (newUser) => {
+        const idUsuario = newUser.id_usuario;
+        const idInstitucion = this.userModel.id_instituto;
+        
+        if (!idUsuario || !idInstitucion) {
+          this.coordinadorCreated = false;
+          console.error('Falta idUsuario o idInstitucion');
+          this.cdr.detectChanges();
+          return;
+        }
+        this.coordinatorService
+          .updateInstitutionByIdCoordinator(idInstitucion, idUsuario)
+          .subscribe({
+            next: () => {
+              this.coordinadorCreated = true;
+              this.cdr.detectChanges();
+              this.router.navigate(['/cepat/coordinador/list']);
+            },
+            error: (err) => {
+              this.coordinadorCreated = false;
+              console.error('Error al asignar institución al coordinador', err);
+              this.cdr.detectChanges();
+            },
+          });
+      },
+      error: (err) => {
+        this.coordinadorCreated = false;
+        console.error('Error al crear el coordinador', err);
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  onSubmit(form: NgForm): void {
+    const f = form.form;
+    f.markAllAsTouched();
+    if (
+      f.invalid ||
+      this.userModel.password !== this.confirmPassword ||
+      !this.userModel.id_estado ||
+      !this.userModel.id_instituto
+    ) {
       return;
     }
-
-    this.isLoading = true;
-
-    const successAlert: SweetAlertOptions = {
-      icon: 'success',
-      title: 'Éxito!',
-      text: this.coordinatorModel.id > 0 ? 'Coordinador actualizado exitosamente!' : 'Coordinador registrado exitosamente!',
-    };
-    const errorAlert: SweetAlertOptions = {
-      icon: 'error',
-      title: 'Error!',
-      text: '',
-    };
-
-    const completeFn = () => {
-      this.isLoading = false;
-    };
-
-    if (this.coordinatorModel.id > 0) {
-      this.coordinatorService.updateCoordinator(this.coordinatorModel.id, this.coordinatorModel).subscribe({
-        next: () => {
-          this.showAlert(successAlert);
-          // Redirigir después de mostrar la alerta
-          setTimeout(() => this.router.navigate(['/administrador/coordinadores']), 1500);
-        },
-        error: (error) => {
-          errorAlert.text = this.extractText(error.error);
-          this.showAlert(errorAlert);
-          this.isLoading = false;
-        },
-        complete: completeFn,
-      });
-    } else {
-      this.coordinatorService.createCoordinator(this.coordinatorModel).subscribe({
-        next: () => {
-          this.showAlert(successAlert);
-          // Redirigir después de mostrar la alerta
-          setTimeout(() => this.router.navigate(['/administrador/coordinadores']), 1500);
-        },
-        error: (error) => {
-          errorAlert.text = this.extractText(error.error);
-          this.showAlert(errorAlert);
-          this.isLoading = false;
-        },
-        complete: completeFn,
-      });
-    }
+    this.createNewCoordinator();
   }
 
-  extractText(obj: any): string {
-    var textArray: string[] = [];
-
-    for (var key in obj) {
-      if (typeof obj[key] === 'string') {
-        textArray.push(obj[key]);
-      } else if (typeof obj[key] === 'object') {
-        textArray = textArray.concat(this.extractText(obj[key]));
-      }
-    }
-
-    var uniqueTextArray = Array.from(new Set(textArray));
-    var text = uniqueTextArray.join('\n');
-
-    return text;
-  }
-
-  showAlert(swalOptions: SweetAlertOptions) {
-    let style = swalOptions.icon?.toString() || 'success';
-    if (swalOptions.icon === 'error') {
-      style = 'danger';
-    }
-    this.swalOptions = Object.assign({
-      buttonsStyling: false,
-      confirmButtonText: "Ok, entendido!",
-      customClass: {
-        confirmButton: "btn btn-" + style
-      }
-    }, swalOptions);
-    this.cdr.detectChanges();
-    this.noticeSwal.fire();
-  }
-
-  cancel() {
-    this.router.navigate(['/administrador/registro']);
+  onCancel(): void {
+    console.log('Operación cancelada');
+    this.router.navigate(['/cepat/registro']);
   }
 }

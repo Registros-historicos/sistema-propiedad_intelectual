@@ -1,3 +1,16 @@
+export interface Inventor {
+  curp: string;
+  nombreCompleto: string;
+  sexo: 'M' | 'F' | '';
+  tipoInvestigador: string;
+  institucion: string;
+  programaEducativo: string;
+  cuerpoAcademico: string;
+  departamento: string;
+  fechaAfiliacion: string; // YYYY-MM-DD
+  fechaFin: string;        // YYYY-MM-DD
+}
+
 export interface IPatentModel {
   // ========================================
   // CAMPOS DEL BACKEND (PRIORITARIOS)
@@ -14,8 +27,6 @@ export interface IPatentModel {
   medio_ingreso_param?: string;
   tipo_registro_param?: string;
   fec_solicitud?: string;
-  descripcion?: string;
-  tipo_sector_param?: string;
   
   // ========================================
   // CAMPOS EXISTENTES (FRONTEND)
@@ -63,6 +74,33 @@ export interface IPatentModel {
   vigencia?: number;
   pagoMantenimiento?: boolean;
   proximoPago?: Date;
+}
+
+export type PatenteUIModel = IPatentModel & {
+  numeroExpediente?: string;
+  numeroTitulo?: string;
+  denominacion?: string; // alias de nombrePatente
+  rama?: string;
+  medioIngreso?: string;
+  tecnologicoOrigen?: string;
+  cePat?: string;
+  anioRenovacion?: string;
+  tipoSector?: string;
+  sector?: string;
+  subsector?: string;
+  fechaExpedicion?: string;
+  archivo?: string;
+  observaciones?: string;
+  descripcion?: string;
+  inventores?: Inventor[];
+};
+
+// Respuesta de paginación del backend
+export interface IPaginatedPatentsResponse {
+  total: number;
+  page: number;
+  limit: number;
+  results: IPatentModel[];
 }
 
 // Respuesta de paginación del backend

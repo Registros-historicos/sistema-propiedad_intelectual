@@ -7,7 +7,7 @@ import moment from 'moment/moment';
 import { PatentsService } from '../../../../api/services/patents.service';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs';
-import { IPatentModel } from 'src/app/api/models/patent.model';
+import { IPatentModel, PatenteUIModel } from 'src/app/api/models/patent.model';
 import { FederalEntity } from 'src/app/api/models/entity.model';
 import { ENTIDADES_FEDERATIVAS_DATA } from 'src/app/api/data/entity.data';
 import { ENTIDADES_FEDERATIVAS_MAP } from 'src/app/api/data/entity-institucion.data';
@@ -19,7 +19,7 @@ type EstatusPatente = 'Registrada' | 'En trámite' | 'Trámite con observaciones
 interface Inventor {
   curp: string;
   nombreCompleto: string;
-  sexo: 'M' | 'F' | '';
+  sexo: string;
   tipoInvestigador: string;
   institucion: string;
   programaEducativo: string;
@@ -53,7 +53,7 @@ interface ImpiLocalItem {
   inventores?: Inventor[];
 }
 
-type PatenteUIModel = IPatentModel & {
+/* export type PatenteUIModel = IPatentModel & {
   // Campos adicionales de IMPI
   numeroExpediente?: string;
   numeroTitulo?: string;
@@ -70,7 +70,7 @@ type PatenteUIModel = IPatentModel & {
   archivo?: string;
   observaciones?: string;
   inventores?: Inventor[];
-};
+}; */
 
 interface ParametroItem {
   id: number;
@@ -129,7 +129,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     rama: "",
     medioIngreso: "",
     tecnologicoOrigen: "",
-    cePat: "",
+    cePat: "N/A",
     anioRenovacion: "",
     tipoSector: "",
     sector: "",
@@ -169,6 +169,8 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   originalObservations: string = '';
   editingSelectKey: boolean = false;
   observacionesChanged: boolean = false;
+
+  search: string;
 
   private secuenciaEstados: { [key in EstatusPatente]?: EstatusPatente } = {
     'Registrada': 'En trámite',
@@ -466,7 +468,6 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       this.dtInstance.on('page', () => {
         const pageInfo = this.dtInstance.page.info();
         const currentPage = pageInfo.page;
-        console.log('New page:', currentPage);
         this.selectedPage = pageInfo.page;
       });
     }
@@ -475,12 +476,6 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.placeholder = this.translate.instant('TABLE.PLACEHOLDER_SEARCH')
     this.cargarCatalogos();
-    setTimeout(() => {
-      console.log('📚 Ramas disponibles:', this.ramasCatalogo);
-      console.log('📚 Estatus disponibles:', this.estatusCatalogo);
-      console.log('📚 Medios ingreso disponibles:', this.mediosIngresoCatalogo);
-      console.log('📚 Sectores disponibles:', this.tiposSectorCatalogo);
-    }, 2000);
 
 
     // Para mostrar el mismo arreglo y columnas que en INDAUTOR/local, usa el dataset local propio de este componente
@@ -490,7 +485,14 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       lengthMenu: this.lengthMenu,
       pageLength: this.pageLength,
       ordering: true,
+      orderMulti: false,
       order: [[5, 'desc']],
+      columnDefs: [
+        {
+          targets: '_all',
+          orderSequence: ['asc', 'desc']
+        }
+      ],
       language: {
         info: this.translate.instant('TABLE.PAG_INFO'),
         infoFiltered: this.translate.instant('TABLE.PAG_INFO_FILTERED'),
@@ -512,7 +514,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         }))
       } : {
         ajax: (dataTablesParameters: any, callback) => {
-          this.service.getPatents(dataTablesParameters).subscribe({
+          this.service.getPatents(dataTablesParameters, this.search).subscribe({
             next: (resp: any) => {
               callback(resp);
             },
@@ -549,7 +551,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         },
         {
           title: 'No. de título',
-          data: 'numeroTitulo',
+          data: 'id_registro',
           orderable: true,
           render: (data) => {
             const strData = data ? String(data) : '—';
@@ -564,7 +566,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         },
         {
           title: this.translate.instant('TABLE.BRANCH'),
-          data: 'rama',
+          data: 'rama_param',
           orderable: true,
           render: (data, type, full) => {
             // Asegurar que sea string
@@ -643,15 +645,11 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       initComplete: (settings, json) => {
         this.dtInstance = settings.oInstance.api()
-        console.log('DataTables initialized:', this.dtInstance);
-        console.log('Page info():', this.dtInstance.page.info());
         this.selectedPage = this.dtInstance.page.info().page;
-        console.log('Selected page:', this.selectedPage);
 
         this.dtInstance.on('page', () => {
           const pageInfo = this.dtInstance.page.info();
           const currentPage = pageInfo.page;
-          console.log('New page:', currentPage);
           this.selectedPage = pageInfo.page;
         });
 
@@ -659,6 +657,15 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     };
   }
+
+  onFilter(ev: any) {
+    this.search = ev.target.value?.trim() || '';
+    console.log('search: ' + this.search)
+    if (this.dtInstance) {
+      this.dtInstance.ajax.reload(); // fuerza server-side con q=this.search
+    }
+  }
+
 
   onPageLengthChange(event: any): void {
     const newLength = parseInt(event.target.value);
@@ -725,7 +732,6 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       this.service.deletePatent(id).subscribe({
         next: () => {
-          console.log('✅ Registro deshabilitado correctamente');
           this.reloadEvent.emit(true);
 
           // Opcional: Mostrar alerta de éxito
@@ -788,10 +794,6 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
           ...patente,
           denominacion: patente.nombrePatente || this.patenteModel.denominacion,
         };
-        console.log('📊 Datos de la patente recibidos:', patente);
-        console.log('🔢 Valor de rama:', this.patenteModel.rama);
-        console.log('🔢 Tipo de rama:', typeof this.patenteModel.rama);
-        console.log('✅ Resultado de getRamaNombre:', this.getRamaNombre(this.patenteModel.rama));
         this.inicializarSeleccionesDesdePatente();
       });
     }
@@ -841,11 +843,27 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         } as PatenteUIModel;
       }
     } else {
-      this.service.getPatent(id).subscribe((patente: IPatentModel) => {
-        this.patenteModel = { ...this.patenteModel, ...patente };
-        this.convertirNombresAIdsParaEdicion();
-        if (!this.patenteModel.denominacion) {
-          this.patenteModel.denominacion = this.patenteModel.nombrePatente;
+      console.log('[PatenteComponent] Solicitando registro real al backend para edición. ID:', id);
+
+      this.service.getPatent(id).subscribe({
+        next: (patente: IPatentModel) => {
+          console.log('[PatenteComponent] Respuesta del backend (detalle registro):', patente);
+
+          this.patenteModel = { ...this.patenteModel, ...patente };
+          console.log('[PatenteComponent] Modelo en edición después de merge:', this.patenteModel);
+          console.log('[PatenteComponent] Inventores recibidos desde backend:', this.patenteModel.inventores);
+
+          this.convertirNombresAIdsParaEdicion();
+          console.log('[PatenteComponent] Modelo en edición después de convertirNombresAIdsParaEdicion:', this.patenteModel);
+
+          if (!this.patenteModel.denominacion) {
+            this.patenteModel.denominacion = this.patenteModel.nombrePatente;
+          }
+
+          console.log('[PatenteComponent] Modelo final listo para el formulario de edición:', this.patenteModel);
+        },
+        error: (err) => {
+          console.error('[PatenteComponent] Error al cargar el registro para edición:', err);
         }
       });
     }
@@ -900,7 +918,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       modal.dismiss('saved');
       return;
     } else {
-      const payload: IPatentModel = {
+      const payload: PatenteUIModel = {
         id: this.patenteModel.id,
         solicitudId: this.patenteModel.solicitudId,
         nombrePatente: this.patenteModel.denominacion || this.patenteModel.nombrePatente,
@@ -951,7 +969,6 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       if (ramaEncontrada) {
         // Guardar el ID en una propiedad temporal para el select
         (this.patenteModel as any).ramaIdTemp = ramaEncontrada.id;
-        console.log(`✅ Rama convertida: "${this.patenteModel.rama}" → ID ${ramaEncontrada.id}`);
       } else {
         console.warn(`⚠️ No se encontró rama con nombre: "${this.patenteModel.rama}"`);
       }
@@ -1339,7 +1356,6 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   private cargarCatalogos(): void {
     this.parametrizacionesServices.getAll().subscribe({
       next: (catalogos: Catalogos) => {
-        console.log('✅ Catálogos completos cargados:', catalogos);
 
         // 🔹 Cargar Ramas (id_tema = 3)
         if (catalogos[3]?.lista) {
@@ -1347,7 +1363,6 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
             id: r.id_param,
             nombre: r.nombre
           }));
-          console.log('✅ Ramas cargadas:', this.ramasCatalogo);
         }
 
         // 🔹 Cargar Medios de Ingreso (id_tema = 8)
@@ -1356,7 +1371,6 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
             id: m.id_param,
             nombre: m.nombre
           }));
-          console.log('✅ Medios de ingreso cargados:', this.mediosIngresoCatalogo);
         }
 
         // 🔹 Cargar Tipos de Sector (id_tema = 2)
@@ -1365,7 +1379,6 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
             id: s.id_param,
             nombre: s.nombre
           }));
-          console.log('✅ Tipos de sector cargados:', this.tiposSectorCatalogo);
         }
 
         // 🔹 Cargar Estatus (id_tema = 5)
@@ -1374,7 +1387,6 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
             id: e.id_param,
             nombre: e.nombre
           }));
-          console.log('✅ Estatus cargados:', this.estatusCatalogo);
         }
       },
       error: (err) => console.error('❌ Error al cargar catálogos:', err)

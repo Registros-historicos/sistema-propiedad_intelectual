@@ -1,25 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-investigadores',
   templateUrl: './investigadores.component.html',
   styleUrl: './investigadores.component.scss'
 })
-export class InvestigadoresComponent {
-  investigadores = [
-    { nombre: 'Dr. Carlos Méndez', departamento: 'Sistemas', solicitudes: 15 },
-    { nombre: 'Dra. Ana Ruiz', departamento: 'Industrial', solicitudes: 22 },
-    { nombre: 'Dr. Roberto Sánchez', departamento: 'Química', solicitudes: 28 },
-    { nombre: 'Dra. María Torres', departamento: 'Mecánica', solicitudes: 12 },
-    { nombre: 'Dr. José Hernández', departamento: 'Electrónica', solicitudes: 18 },
-    { nombre: 'Dra. Patricia López', departamento: 'Civil', solicitudes: 14 },
-    { nombre: 'Dr. Luis Ramírez', departamento: 'Bioquímica', solicitudes: 20 },
-    { nombre: 'Dra. Sofía Martínez', departamento: 'Ambiental', solicitudes: 11 },
-    { nombre: 'Dr. Mario Gómez', departamento: 'Administración', solicitudes: 17 },
-    { nombre: 'Dra. Laura Torres', departamento: 'Gestión Empresarial', solicitudes: 13 },
-    { nombre: 'Dr. Juan Pérez', departamento: 'Materiales', solicitudes: 16 },
-    { nombre: 'Dra. Elena García', departamento: 'Alimentos', solicitudes: 10 }
-  ];
+export class InvestigadoresComponent implements OnInit {
+  investigadores: Array<{ nombre: string; departamento: string; solicitudes: number }> = [];
+
+  constructor(private http: HttpClient) {}
 
   filtroNombre: string = '';
   get investigadoresFiltrados() {
@@ -27,7 +17,22 @@ export class InvestigadoresComponent {
     return this.investigadores.filter(i => i.nombre.toLowerCase().includes(this.filtroNombre.toLowerCase()));
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    const url = 'http://20.14.208.230:8000/api/tableros/investigadores/por-coordinador/';
+    this.http.get<any[]>(url).subscribe({
+      next: (data) => {
+        // Suponemos que el endpoint devuelve un array de objetos con la forma proporcionada
+        this.investigadores = (Array.isArray(data) ? data : []).map((it: any) => ({
+          nombre: it.nombre || 'Sin nombre',
+          departamento: it.departamento || 'Sin departamento',
+          solicitudes: Number(it.solicitudes) || 0,
+        }));
+      },
+      error: (err) => {
+        console.error('Error cargando investigadores por coordinador:', err);
+      },
+    });
+  }
 
   exportToExcel(): void {
     alert('Funcionalidad pendiente');
