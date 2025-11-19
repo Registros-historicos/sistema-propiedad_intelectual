@@ -22,7 +22,7 @@
 
   <div class="card-body pt-0">
     <!-- Impresión del JSON crudo: siempre visible para pruebas -->
-    <div class="mb-4">
+    <!--  <div class="mb-4">
       <h6 class="fw-semibold mb-2">Respuesta cruda del endpoint</h6>
       <ng-container *ngIf="rawResponse; else rawLoading">
         <pre style="max-height:300px; overflow:auto; background:#f8f9fa; padding:12px; border-radius:6px;">{{ rawResponse | json }}</pre>
@@ -30,7 +30,7 @@
       <ng-template #rawLoading>
         <div class="text-muted">Respuesta pendiente...</div>
       </ng-template>
-    </div>
+    </div>-->
 
     <div *ngIf="isDataReady; else loadingTemplate">
       <app-crud
@@ -143,13 +143,31 @@
           <!-- Mensaje de 'sin estados' removido para CEPAT. -->
         </ng-template>
 
-        <!-- Mostrar institución actual si existe -->
+        <!-- Mostrar institución actual si existe  -->
         <div *ngIf="selectedInstitutoId || coordinadorModel?.id_instituto || coordinadorModel?.id_institucion" class="mb-4">
           <h5 class="fw-bold mb-2">Institución que atiende</h5>
-          <div class="text-muted">
-            <span *ngIf="selectedInstitutoName">{{ selectedInstitutoName }}</span>
-            <span *ngIf="!selectedInstitutoName">ID: {{ selectedInstitutoId || coordinadorModel?.id_instituto || coordinadorModel?.id_institucion }}</span>
+
+          <div *ngIf="selectedInstitutoName || coordinadorModel?.id_institucion; else noInstitucion">
+            <ul class="list-group mb-5">
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span class="fw-semibold text-gray-800">
+                  {{ selectedInstitutoName || ('ID: ' + (selectedInstitutoId || coordinadorModel?.id_institucion)) }}
+                </span>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-light-danger"
+                  (click)="unassignInstitucion()"
+                  aria-label="Eliminar institución asignada"
+                >
+                  <i class="bi bi-trash"></i>
+                </button>
+              </li>
+            </ul>
           </div>
+
+          <ng-template #noInstitucion>
+            <div class="text-muted">No hay institución asignada.</div>
+          </ng-template>
         </div>
 
         <!-- Gestión de institución del coordinador: seleccionar estado -> instituciones -->
