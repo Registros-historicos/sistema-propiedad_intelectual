@@ -3,7 +3,7 @@ import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
-import { IPatentModel } from 'src/app/api/models/patent.model';
+import { IPatentModel, PatenteUIModel } from 'src/app/api/models/patent.model';
 import { PatentsService } from 'src/app/api/services/patents.service';
 import { ENTIDADES_FEDERATIVAS_DATA, ENTIDADES_FEDERATIVAS_MAP } from 'src/app/pages/administrador/shared-services';
 import { SweetAlertOptions } from 'sweetalert2';
@@ -22,7 +22,7 @@ export class PatenteFormComponent implements OnInit {
 
   allSelectedFiles: any[] = [];
 
-  patenteModel: IPatentModel = {
+  patenteModel: PatenteUIModel = {
     id: 0,
     solicitudId: '',
     nombrePatente: '',
