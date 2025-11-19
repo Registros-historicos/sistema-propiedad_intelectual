@@ -17,6 +17,9 @@ export const environment = {
   appPreviewChangelogUrl: 'https://preview.keenthemes.com/metronic8/angular/docs/changelog',
   REPORTS_API_KEY: 'secret-key',
   REPORTS_API_URL: 'http://20.14.208.230:8000/',
+  
+  REPORTES_API_KEY: 'uKSryfJz+EZQkINd56LCswKDIigFff4nc8q4oJZOkBw8Vwgtp2ExMYkfNBSFfTZS/6Sm0Dok97JfSb4SpA1bXg==',
+  REPORTES_API_URL: 'http://localhost:8080/',
 
 
   appDemos: {
