@@ -208,8 +208,8 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     }
 
-    // Endpoint absoluto solicitado (actualizado a URL por estados CEPAT)
-    const externalUrl = 'http://20.14.208.230:8000/api/tableros/usuarios/por-estados-cepat/';
+    // Endpoint absoluto solicitado (coordinadores por CEPAT)
+    const externalUrl = 'http://20.14.208.230:8000/api/tableros/coordinadores/por-cepat/';
 
     console.log('[DEBUG] CEPAT: requesting external URL ->', externalUrl);
 
