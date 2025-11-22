@@ -1,8 +1,5 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter} from '@angular/core';
 import { Top10Instituciones } from 'src/app/api/services/tableros.service';
-
-
-
 @Component({
   selector: 'app-tablero-top10-instituciones',
   templateUrl: './tablero-top10-instituciones.component.html',
@@ -10,12 +7,13 @@ import { Top10Instituciones } from 'src/app/api/services/tableros.service';
 })
 export class TableroTop10InstitucionesComponent {
   @Input() instituciones: Top10Instituciones[] = [];
+  @Output() exportExcel = new EventEmitter<void>();
 
   trackByInstitution(index: number, item: Top10Instituciones) {
     return item.id_institucion;
   }
 
   onExportExcel() {
-    console.log('Exportando a Excel...');
+    this.exportExcel.emit();
   }
 }

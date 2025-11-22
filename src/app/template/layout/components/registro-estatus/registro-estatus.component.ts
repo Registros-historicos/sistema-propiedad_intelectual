@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { ChartComponent } from 'ng-apexcharts';
 import { TablerosService } from 'src/app/api/services/tableros.service';
 
@@ -14,6 +14,11 @@ interface IRegisterStatus {
 })
 export class RegistroEstatusComponent implements OnInit {
   @ViewChild('chart') chart?: ChartComponent;
+  @Output() exportExcel = new EventEmitter<void>();
+    
+  onExportExcel(): void {
+    this.exportExcel.emit();
+  }
 
   chartOptions: any;
   data: IRegisterStatus[] = [];

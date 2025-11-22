@@ -14,10 +14,10 @@ interface Instituto {
 })
 export class TableroInstitutosGeneralComponent implements OnInit {
   @Input() titulo: string = '';
-  @Input() tipoInstitucion?: number; // 122 Descentralizado, 123 Federal
+  @Input() tipoInstitucion?: number;
   @Input() data:Instituto[] = [];
-
   @Output() retry = new EventEmitter<void>();
+  @Output() exportExcel = new EventEmitter<void>();
 
   loading: boolean = true;
   error: boolean = false;
@@ -51,4 +51,9 @@ export class TableroInstitutosGeneralComponent implements OnInit {
       this.totalRegistros = 0;
     }
   }
+
+  onExportExcel(): void {
+  this.exportExcel.emit();
+  }
+
 }
