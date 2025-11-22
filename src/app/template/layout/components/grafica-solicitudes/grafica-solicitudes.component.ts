@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { TablerosService } from 'src/app/api/services/tableros.service';
 import { getCSSVariableValue } from 'src/app/template/kt/_utils';
 import ApexCharts from 'apexcharts'; 
@@ -15,8 +15,13 @@ interface Solicitudes {
   styleUrls: ['./grafica-solicitudes.component.scss']
 })
 export class GraficaSolicitudesComponent implements OnInit {
+  @Output() exportExcel = new EventEmitter<void>();
 
   tiposSolicitudes: Solicitudes[] = [];
+
+  onExportExcel(): void {
+  this.exportExcel.emit();
+  }
 
   chartOptions: any = {
     series: [],

@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges, HostListener, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, HostListener, ElementRef, ChangeDetectorRef, Output, EventEmitter} from '@angular/core';
 import { getCSSVariableValue } from 'src/app/template/kt/_utils';
 import { TablerosService } from 'src/app/api/services/tableros.service';
 
@@ -17,6 +17,16 @@ export class RegistrosAnioComponent implements OnChanges {
   @Input() anios: Data[] = [];
   // Opcional: año para filtrar desde el backend
   @Input() year?: number | null;
+  @Output() exportExcel = new EventEmitter<number>();
+
+  onExportExcelByYear() {
+  if (this.year) {
+    this.exportExcel.emit(this.year);
+  } else {
+    console.warn('No hay año seleccionado');
+  }
+}
+
 
   chartOptions: any;
   today: any;
