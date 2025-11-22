@@ -1,5 +1,4 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef, Component, Output, EventEmitter} from '@angular/core';
 import { TablerosService } from 'src/app/api/services/tableros.service';
 
 
@@ -15,7 +14,7 @@ interface Sector {
   styleUrl: './grafica-sector.component.scss'
 })
 export class GraficaSectorComponent {
-
+  @Output() exportExcel = new EventEmitter<void>();
   sectoresList: Sector[];
 
   constructor(
@@ -37,5 +36,9 @@ export class GraficaSectorComponent {
         console.error('ERROR:', error);
       }
     });
+  }
+
+  onExportExcel(): void {
+  this.exportExcel.emit();
   }
 }

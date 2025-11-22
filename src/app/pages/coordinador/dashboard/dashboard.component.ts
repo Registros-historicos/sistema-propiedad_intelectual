@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { TablerosService, CategoriaInvestigador } from 'src/app/api/services/tableros.service';
 import { getCSSVariableValue } from '../../../template/kt/_utils';
 import { TranslateService } from '@ngx-translate/core';
+import { ExportExcelService } from 'src/app/api/services/export-excel.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -17,8 +18,28 @@ export class DashboardComponent implements OnInit {
   @Input() chartLine: number = 11;
   @Input() chartRotate?: number = 145;
 
+  constructor(
+    private translate: TranslateService, 
+    private tablerosService: TablerosService,
+    private exportExcelService: ExportExcelService
+  ) { }
+  
+  // Método para exportar el reporte de registros por categoría
+  exportExcelRegisterByCategory() {
+    this.exportExcelService.downloadExcelReport('/excel/registros/categorias');
+  }
 
+  exportExcelReportByYear(year: number) {
+  this.exportExcelService.downloadExcelReport(`/excel/registros/mes/?anio=${year}`);
+  }
 
+  exportExcelRegisterByStatus() {
+    this.exportExcelService.downloadExcelReport('/excel/registros/estatus');
+  }
+
+  exportExcelRegisterByGender() {
+    this.exportExcelService.downloadExcelReport('/excel/registros/sexo');
+  }
 
 
   onFilterChange(): void {
@@ -303,7 +324,7 @@ export class DashboardComponent implements OnInit {
 
   categorias: { categoria: string; value: number }[] = [];
 
-  constructor(private translate: TranslateService, private tablerosService: TablerosService) { }
+
 
   ngOnInit(): void {
     // Lógica original

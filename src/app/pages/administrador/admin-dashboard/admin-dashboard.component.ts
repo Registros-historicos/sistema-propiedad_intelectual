@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { of } from 'rxjs';
 import { getCSSVariableValue } from 'src/app/template/kt/_utils';
 import { CategoriaInvestigador, TablerosService, Top10Instituciones } from 'src/app/api/services/tableros.service';
+import { ExportExcelService } from 'src/app/api/services/export-excel.service';
 
 // INTERFAZ
 export interface CardItem {
@@ -50,7 +51,8 @@ export class AdminDashboardComponent implements OnInit {
 
   constructor(
     private tablerosService: TablerosService,
-    private cdRef: ChangeDetectorRef
+    private cdRef: ChangeDetectorRef,
+    private exportExcelService: ExportExcelService
   ) {}
 
   ngOnInit(): void {
@@ -294,9 +296,57 @@ private loadTopEntities(): void {
         this.cdRef.detectChanges();
       },
       error: (error: any) => {
-        console.error('ERROR:', error);
         return of<Instituto[]>([]);
       }
     });
   }
+
+  exportExcelFederalInstitutes() {
+    this.exportExcelService.downloadExcelReport('/excel/institutos/federales');
+  }
+
+  exportExcelDecentralizedInstitutes() {
+    this.exportExcelService.downloadExcelReport('/excel/institutos/descentralizados');
+  }
+
+  exportExcelTop10Institutions() {
+    this.exportExcelService.downloadExcelReport('/excel/institutos/top10');
+  }
+
+  exportExcelAllInstitutions() {
+    this.exportExcelService.downloadExcelReport('/excel/institutos/todos');
+  }
+
+  exportExcelTop10States() {
+    this.exportExcelService.downloadExcelReport('/excel/entidades/top10');
+  }
+
+  exportExcelSector() {
+    this.exportExcelService.downloadExcelReport('/excel/sectores/economicos');
+  }
+
+  exportExcelRegisterImpi() {
+    this.exportExcelService.downloadExcelReport('/excel/registros/impi');
+  }
+
+  exportExcelRegisterIndautor() {
+    this.exportExcelService.downloadExcelReport('/excel/registros/indautor');
+  }
+
+  exportExcelRegisterByCategory() {
+    this.exportExcelService.downloadExcelReport('/excel/registros/categorias');
+  }
+  
+  exportExcelRegisterByGender() {
+    this.exportExcelService.downloadExcelReport('/excel/registros/sexo');
+  }
+
+  exportExcelRegisterByStatus() {
+    this.exportExcelService.downloadExcelReport('/excel/registros/estatus');
+  }
+
+  exportExcelReportByYear(year: number) {
+  this.exportExcelService.downloadExcelReport(`/excel/registros/mes/?anio=${year}`);
+  }
+
 }

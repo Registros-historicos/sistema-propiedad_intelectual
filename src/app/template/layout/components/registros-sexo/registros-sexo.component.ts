@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, ViewChild, OnInit, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 import { ChartComponent } from 'ng-apexcharts';
 import { getCSSVariableValue } from 'src/app/template/kt/_utils';
 import { TablerosService } from 'src/app/api/services/tableros.service';
@@ -9,6 +9,11 @@ import { TablerosService } from 'src/app/api/services/tableros.service';
 })
 export class RegistrosSexoComponent implements OnInit {
   @ViewChild('chart') chart: ChartComponent;
+  @Output() exportExcel = new EventEmitter<void>();
+
+  onExportExcel(): void {
+  this.exportExcel.emit();
+  }
 
   // NUEVA: Propiedades para manejar estados
   isChartReady = false;
