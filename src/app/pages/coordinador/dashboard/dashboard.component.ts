@@ -84,6 +84,11 @@ export class DashboardComponent implements OnInit {
     this.exportExcelService.downloadExcelReport('/excel/registros/programa/educativo');
   }
 
+  exportExcelInvestigadores() {
+    console.log('Exportando reporte de investigadores a Excel...');
+    // Descomentar cuando el servicio esté implementado
+    // this.exportExcelService.downloadExcelReport('/excel/investigadores/por-coordinador');
+  }
 
   onFilterChange(): void {
     this.chartOptions = this.getChartOptions(350);
