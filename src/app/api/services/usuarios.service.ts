@@ -20,6 +20,7 @@ export interface Users {
 })
 export class UsersService {
   private baseUrl: string = '/api/usuarios/';
+
   constructor(private http: HttpClient) {}
 
   getAllUsers(): Observable<Users[]> {
@@ -31,31 +32,28 @@ export class UsersService {
     );
   }
 
-getUserByEmail(email: string): Observable<Users | null> {
-  // Cambió query param por endpoint específico
-  const url = `${this.baseUrl}${encodeURIComponent(email)}/`;
-  console.log('📡 Llamando a endpoint corregido:', url);
-  
-  return this.http.get<Users>(url).pipe(
-    map((user) => user),
-    catchError((error) => {
-      console.error('❌ Error obteniendo usuario:', error);
-      return of(null);
-    })
-  );
-}
-//AGREGADO
-getMyProfileCompleto(): Observable<any> {
-  const url = `${this.baseUrl}me/profile/`;
-  console.log('📡 Llamando a endpoint de mi perfil completo:', url);
-  
-  return this.http.get<any>(url).pipe(
-    catchError((error) => {
-      console.error('❌ Error obteniendo perfil completo:', error);
-      return of(null);
-    })
-  );
-}
+  getUserByEmail(email: string): Observable<Users | null> {
+    const url = `${this.baseUrl}${encodeURIComponent(email)}/`;
+
+    return this.http.get<Users>(url).pipe(
+      map((user) => user),
+      catchError((error) => {
+        console.error('Error obteniendo usuario:', error);
+        return of(null);
+      })
+    );
+  }
+
+  //en OverviewComponent
+  getMyProfileCompleto(): Observable<any> {
+    const url = `${this.baseUrl}me/profile/`;
+    return this.http.get<any>(url).pipe(
+      catchError((error) => {
+        console.error('Error obteniendo perfil completo:', error);
+        return of(null);
+      })
+    );
+  }
 
   updateUserByEmail(email: string, updatedUser: Partial<Users>): Observable<Users> {
     return this.http.put<Users>(`${this.baseUrl}${email}/`, updatedUser).pipe(

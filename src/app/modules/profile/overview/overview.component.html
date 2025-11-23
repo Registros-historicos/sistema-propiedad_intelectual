@@ -13,33 +13,32 @@
             <tbody>
               <tr>
                 <td class="fw-bolder text-muted">Nombre completo</td>
-                <td class="text-dark fw-bolder text-hover-primary fs-6">{{userProfile.fullname}}</td>
+                <td class="text-dark fw-bolder text-hover-primary fs-6">{{userProfile?.fullname}}</td>
               </tr>
               <tr>
                 <td class="fw-bolder text-muted">Email</td>
-                <td class="text-dark fw-bolder text-hover-primary fs-6">{{userProfile.email}}</td>
+                <td class="text-dark fw-bolder text-hover-primary fs-6">{{userProfile?.email}}</td>
               </tr>
               <tr>
                 <td class="fw-bolder text-muted">Teléfono</td>
-                <td class="text-dark fw-bolder text-hover-primary fs-6">{{userProfile.phone}}</td>
+                <td class="text-dark fw-bolder text-hover-primary fs-6">{{userProfile?.phone}}</td>
               </tr>
               <tr>
                 <td class="fw-bolder text-muted">Ocupación</td>
-                <td class="text-dark fw-bolder text-hover-primary fs-6">{{userProfile.occupation}}</td>
+                <td class="text-dark fw-bolder text-hover-primary fs-6">{{userProfile?.occupation}}</td>
               </tr>
               <tr>
-                <td class="fw-bolder text-muted">Empresa</td>
-                <td class="text-dark fw-bolder text-hover-primary fs-6">{{userProfile.companyName}}</td>
+                <td class="fw-bolder text-muted">Institución</td>
+                <td class="text-dark fw-bolder text-hover-primary fs-6">{{userProfile?.companyName}}</td>
               </tr>
-              
             </tbody>
           </table>
         </div>
       </div>
-  </div>
-  <!-- /card: Información Personal -->
+    </div>
+    <!-- /card: Información Personal -->
 
-  <div class="card mb-5 mb-xxl-8">
+    <div class="card mb-5 mb-xxl-8">
       <div class="card-header border-0 pt-5">
         <h3 class="card-title align-items-start flex-column">
           <span class="card-label fw-bolder fs-3 mb-1">Dirección</span>
@@ -51,9 +50,13 @@
           <app-keenicon name="geolocation" class="fs-2tx text-primary me-4"></app-keenicon>
           <div class="d-flex flex-stack flex-grow-1">
             <div class="fw-bold">
-              <div class="fs-6 text-gray-700">{{userProfile.address?.addressLine}}</div>
-              <div class="fs-6 text-gray-700">{{userProfile.address?.city}}, {{userProfile.address?.state}}</div>
-              <div class="fs-6 text-gray-700">Código postal: {{userProfile.address?.postCode}}</div>
+              <div class="fs-6 text-gray-700">{{userProfile?.address?.addressLine}}</div>
+              <div class="fs-6 text-gray-700">
+                {{userProfile?.address?.city}}, {{userProfile?.address?.state}}
+              </div>
+              <div class="fs-6 text-gray-700">
+                Código postal: {{userProfile?.address?.postCode}}
+              </div>
             </div>
           </div>
         </div>
@@ -76,30 +79,35 @@
             <tbody>
               <tr>
                 <td class="fw-bolder text-muted">Idioma</td>
-                <td class="text-dark fw-bolder text-hover-primary fs-6">{{userProfile.language?.toUpperCase()}}</td>
+                <td class="text-dark fw-bolder text-hover-primary fs-6">
+                  {{userProfile?.language?.toUpperCase()}}
+                </td>
               </tr>
               <tr>
                 <td class="fw-bolder text-muted">Zona horaria</td>
-                <td class="text-dark fw-bolder text-hover-primary fs-6">{{userProfile.timeZone}}</td>
+                <td class="text-dark fw-bolder text-hover-primary fs-6">{{userProfile?.timeZone}}</td>
               </tr>
               <tr>
                 <td class="fw-bolder text-muted">Email habilitado</td>
                 <td>
-                  <span [class]="userProfile.communication?.email ? 'badge badge-light-success' : 'badge badge-light-danger'">
-                    {{userProfile.communication?.email ? 'Sí' : 'No'}}
+                  <span
+                    [class]="
+                      userProfile?.communication?.email
+                        ? 'badge badge-light-success'
+                        : 'badge badge-light-danger'
+                    "
+                  >
+                    {{ userProfile?.communication?.email ? 'Sí' : 'No' }}
                   </span>
                 </td>
               </tr>
-              
+
             </tbody>
           </table>
         </div>
       </div>
-  </div>
-  <!-- /card: Configuración -->
-
-
-    <!-- /card: Redes Sociales -->
+    </div>
+    <!-- /card: Configuración -->
   </div>
 </div>
 <!-- /row -->
