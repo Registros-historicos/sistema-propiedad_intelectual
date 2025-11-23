@@ -148,7 +148,7 @@ export class PatentsService {
     return undefined;
   }
 
-  private getSectorChainFromSubsector(idSubsector: any): {
+  getSectorChainFromSubsector(idSubsector: any): {
     tipoSector: string;
     sector: string;
     subsector: string;
@@ -355,9 +355,21 @@ export class PatentsService {
         ? backendPatent.institucion.nombre
         : backendPatent.institucion) || '';
 
-    const rama_nombre =
-      backendPatent.rama_param ? backendPatent.rama_param.nombre
-        : '';
+    // 👇 Antes de usar rama_nombre en el result
+    let rama_nombre = '';
+
+    if (backendPatent.rama_param) {
+      if (typeof backendPatent.rama_param === 'object') {
+        // Caso cuando ya viene como objeto de catálogo { id_param, nombre, ... }
+        rama_nombre = backendPatent.rama_param.nombre || '';
+      } else {
+        // Caso como string o id (ej: "Programa de computación" o 3)
+        const fromCatalog = this.getNombreByIdParam(backendPatent.rama_param);
+        rama_nombre = fromCatalog || String(backendPatent.rama_param);
+      }
+    }
+
+    console.log('rama_param backend:', backendPatent.rama_param, '→ rama_nombre:', rama_nombre);
 
     const estatus_nombre =
       (backendPatent.estatus_param && typeof backendPatent.estatus_param === 'object'
@@ -447,6 +459,7 @@ export class PatentsService {
         ? String(backendPatent.anio_renovacion)
         : 'N/A',
 
+      rama: rama_nombre,
       tipoSector: tipo_sector_nombre,
       sector: backendPatent.sector || '',
       subsector: subsector_nombre,
@@ -510,47 +523,81 @@ export class PatentsService {
       return date;
     };
 
-    const rama_param_backend =
-      patent.rama_param && /^\d+$/.test(String(patent.rama_param))
-        ? String(patent.rama_param)
-        : this.mapRamaToBackend(patent.rama_param || patent.rama || 'Invención');
+    const ramaParam = patent.rama_param != null
+      ? String(patent.rama_param)
+      : this.mapRamaToBackend(patent.rama);
 
-    const medio_ingreso_param_backend =
-      patent.medio_ingreso_param && /^\d+$/.test(String(patent.medio_ingreso_param))
-        ? String(patent.medio_ingreso_param)
-        : this.mapMedioIngresoToBackend(patent.medio_ingreso_param || patent.medioIngreso || 'Ventanilla');
+    const medioIngresoParam = patent.medio_ingreso_param != null
+      ? String(patent.medio_ingreso_param)
+      : this.mapMedioIngresoToBackend(patent.medioIngreso);
 
-    const tipo_sector_param_backend =
-      patent.tipo_sector_param && /^\d+$/.test(String(patent.tipo_sector_param))
-        ? String(patent.tipo_sector_param)
-        : this.mapSectorToBackend(patent.tipoSector || 'Quinario');
+    const tipoSectorParam = patent.tipo_sector_param != null
+      ? String(patent.tipo_sector_param)
+      : this.mapTipoSectorToBackend(patent.tipoSector);
 
-    const id_subsector_backend =
-      patent.subsector && /^\d+$/.test(String(patent.subsector))
-        ? Number(patent.subsector)
-        : null;
+    const estatusParam = patent.estatus_param != null
+      ? String(patent.estatus_param)
+      : this.mapEstatusToBackend(patent.estatus);
+
+    const idSubsector = patent.id_subsector ?? null;
+
+    // id_usuario: tomamos el solicitante del payload si viene
+    const idUsuario = patent.solicitante
+      ? parseInt(patent.solicitante, 10)
+      : (patent.id_usuario || 0);
+
+    // tipo_ingreso_param: si no viene, asumimos IMPI (ajusta según tu BD)
+    const tipoIngresoParam = (() => {
+      if (typeof patent.tipo_ingreso_param === 'number') return String(patent.tipo_ingreso_param);
+      if (typeof patent.tipo_ingreso_param === 'string' && patent.tipo_ingreso_param.trim() !== '') {
+        return patent.tipo_ingreso_param;
+      }
+      // Valor por defecto según parametrización (ej. 44 = IMPI)
+      return '44';
+    })();
 
     return {
-      no_expediente: patent.solicitudId || patent.numeroExpediente || patent.no_expediente || '',
-      titulo: patent.nombrePatente || patent.denominacion || patent.titulo || '',
+      no_expediente: patent.no_expediente || patent.solicitudId || patent.numeroExpediente || '',
+      titulo: patent.titulo || patent.denominacion || patent.nombrePatente || '',
       descripcion: patent.descripcion || '',
-      tipo_ingreso_param: '2',
-      id_usuario: Number(patent.solicitante) || 1,
-
-      rama_param: rama_param_backend,
-      medio_ingreso_param: medio_ingreso_param_backend,
-      tipo_sector_param: tipo_sector_param_backend,
-
-      tipo_registro_param: this.TIPO_PATENTE,
-      estatus_param: this.mapEstatusToBackend(patent.estatus || 'En trámite'),
-
-      fec_solicitud: formatDate(patent.fechaSolicitud || patent.fec_solicitud),
+      tipo_ingreso_param: tipoIngresoParam,
+      id_usuario: idUsuario,
+      rama_param: ramaParam,
       fec_expedicion: formatDateOrNull(patent.fechaExpedicion || patent.fec_expedicion),
-      archivo: patent.archivo || (patent.documentos?.[0]) || '',
-      observaciones: patent.observaciones || 'Sin observaciones',
-
-      id_subsector: id_subsector_backend,
+      observaciones: patent.observaciones || '',
+      archivo: patent.archivo || (Array.isArray(patent.documentos) ? patent.documentos[0] : ''),
+      estatus_param: estatusParam,
+      medio_ingreso_param: medioIngresoParam,
+      tipo_sector_param: tipoSectorParam,
+      tipo_registro_param: this.TIPO_PATENTE,
+      fec_solicitud: formatDate(patent.fechaSolicitud),
+      tecnologico_origen: patent.tecnologicoOrigen || null,
+      anio_renovacion: patent.anioRenovacion || null,
+      id_subsector: idSubsector,
     };
+  }
+
+  private mapTipoSectorToBackend(tipoSector: string): string {
+    const normalize = (value: string) => (value || '').trim().toUpperCase();
+
+    const tipoSectorMap: { [key: string]: string } = {
+      'PRIMARIO': '1',
+      'SECUNDARIO': '2',
+      'TERCIARIO': '3',
+      'CUATERNARIO': '4',
+      'QUINARIO': '5',
+      // si tu parametrización tiene más, agrégalos aquí
+    };
+
+    const key = normalize(tipoSector);
+    const direct = tipoSectorMap[key];
+
+    if (direct) {
+      return direct;
+    }
+
+    // Fallback: Terciario (ajusta si tu default debe ser otro)
+    return tipoSectorMap['TERCIARIO'];
   }
 
   private mapRamaToBackend(rama: string): string {

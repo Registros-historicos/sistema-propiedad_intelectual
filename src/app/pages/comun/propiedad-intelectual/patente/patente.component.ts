@@ -77,6 +77,13 @@ interface ParametroItem {
   nombre: string;
 }
 
+interface SubsectorItem {
+  id: number;
+  nombre: string;
+  sector: string;
+  tipoSector: string;
+}
+
 @Component({
   selector: 'app-patente',
   templateUrl: './patente.component.html',
@@ -85,10 +92,39 @@ interface ParametroItem {
 export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   isCollapsed1 = false;
   isCollapsed2 = true;
-  ramasCatalogo: ParametroItem[] = [];
-  mediosIngresoCatalogo: ParametroItem[] = [];
-  tiposSectorCatalogo: ParametroItem[] = [];
-  estatusCatalogo: ParametroItem[] = [];
+  ramasCatalogo: Parametrizacion[] = [];
+  mediosIngresoCatalogo: Parametrizacion[] = [];
+  tiposSectorCatalogo: Parametrizacion[] = [];
+  estatusCatalogo: Parametrizacion[] = [];
+  // 🔹 Catálogo de subsectores (para el <select> de subsector)
+  subsectoresCatalogo: Parametrizacion[] = [];
+
+  // 🔹 Catálogos fijos para Tecnológico de Origen y CePat
+  tecnologicosOrigenCatalogo: string[] = [
+    '-',
+    'TecNM / Instituto Tecnológico de Orizaba',
+    'TecNM / Instituto Tecnológico de Morelia',
+    'TecNM / Instituto Tecnológico de Ciudad Juárez',
+    'Centro Nacional de Investigación y Desarrollo Tecnológico (CENIDET)'
+  ];
+
+  cePatCatalogo: string[] = [
+    'N/A',
+    'CePat Centro',
+    'CePat Noreste',
+    'CePat Noroeste',
+    'CePat Sur-Sureste'
+  ];
+
+  // 🔹 Años de renovación: año actual ± 30
+  aniosRenovacion: number[] = [];
+
+  // 🔹 Catálogos completos para poder resolver subsector → sector / tipo sector
+  private catalogosAll: Catalogos | null = null;
+
+  // 🔹 Id de subsector seleccionado en el modal
+  subsectorIdSeleccionado: number | null = null;
+
   pageLength: number = 10;
   dtInstance: any;
   selectedPage: number = 0;
@@ -169,6 +205,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   originalObservations: string = '';
   editingSelectKey: boolean = false;
   observacionesChanged: boolean = false;
+
 
   search: string;
 
@@ -704,20 +741,43 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private inicializarSeleccionesDesdePatente(): void {
-    if (this.patenteModel.institucion) {
-      for (const [estadoId, instituciones] of Object.entries(ENTIDADES_FEDERATIVAS_MAP)) {
-        const institucionEncontrada = instituciones.find((inst: {
-          nombre: string;
-        }) => inst.nombre === this.patenteModel.institucion);
-        if (institucionEncontrada) {
-          this.estadoSeleccionado = Number(estadoId);
-          this.institucionesFiltradas = instituciones;
-          this.institucionSeleccionada = institucionEncontrada.id;
-          break;
-        }
+    // 🔹 Rama: el backend manda el nombre en rama_param
+    if ((this.patenteModel as any).rama_param && !this.patenteModel.rama) {
+      this.patenteModel.rama = (this.patenteModel as any).rama_param as string;
+    }
+
+    // 🔹 Medio de ingreso: idem, backend manda el nombre en medio_ingreso_param
+    if ((this.patenteModel as any).medio_ingreso_param && !this.patenteModel.medioIngreso) {
+      this.patenteModel.medioIngreso = (this.patenteModel as any).medio_ingreso_param as string;
+    }
+
+    // 🔹 Años de renovación: regeneramos la lista y respetamos el valor existente
+    this.generarAniosRenovacion();
+
+    // 🔹 Subsector: usar id_subsector (si viene) o el nombre para seleccionar en el combo
+    if (this.catalogosAll && this.subsectoresCatalogo?.length) {
+      const valorSubsector =
+        (this.patenteModel as any).id_subsector ??
+        this.patenteModel.subsector ??
+        '';
+
+      const porId = this.subsectoresCatalogo.find(
+        s => String(s.id_param) === String(valorSubsector)
+      );
+      const porNombre = this.subsectoresCatalogo.find(
+        s => s.nombre === valorSubsector
+      );
+
+      const subEncontrado = porId || porNombre || null;
+
+      this.subsectorIdSeleccionado = subEncontrado ? subEncontrado.id_param : null;
+
+      if (this.subsectorIdSeleccionado) {
+        this.actualizarSectorDesdeSubsector(this.subsectorIdSeleccionado);
       }
     }
   }
+
 
   resetFormularioInstitucion(): void {
     this.estadoSeleccionado = null;
@@ -850,11 +910,18 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
 
           this.patenteModel = { ...this.patenteModel, ...patente };
 
-          this.convertirNombresAIdsParaEdicion();
+          /* this.convertirNombresAIdsParaEdicion();
 
           if (!this.patenteModel.denominacion) {
             this.patenteModel.denominacion = this.patenteModel.nombrePatente;
+          } */
+          // Si no hay denominación, usamos el nombrePatente
+          if (!this.patenteModel.denominacion) {
+            this.patenteModel.denominacion = this.patenteModel.nombrePatente;
           }
+
+          // ⬇️ Llenar selects con la info correspondiente de catálogos
+          this.inicializarSeleccionesDesdePatente();
 
         },
         error: (err) => {
@@ -865,7 +932,6 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   saveEdit(modal: any) {
-    console.log(modal)
     if (!this.patenteModel) {
       const alertaError: SweetAlertOptions = {
         icon: 'error',
@@ -876,6 +942,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
+    // Identificador del registro (viene como id_registro o id)
     const id =
       (this.patenteModel as any).id_registro ??
       (this.patenteModel as any).id;
@@ -890,6 +957,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
+    // Validación mínima de campos obligatorios
     if (!this.patenteModel.denominacion || !this.patenteModel.denominacion.trim()) {
       const alertaError: SweetAlertOptions = {
         icon: 'warning',
@@ -900,56 +968,103 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    if ((this.patenteModel as any).rama_param && !this.patenteModel.rama) {
-      this.patenteModel.rama = (this.patenteModel as any).rama_param;
-    }
-
-    if ((this.patenteModel as any).medio_ingreso_param && !this.patenteModel.medioIngreso) {
-      this.patenteModel.medioIngreso = (this.patenteModel as any).medio_ingreso_param;
-    }
-
     this.isSaving = true;
 
-    console.log("id a acttualizar:", id)
-    console.log("datos:", this.patenteModel)
+    // --- Mapeo de catálogos (Rama, Medio de ingreso, Subsector) ---
 
-    const payload: PatenteUIModel = {
-      ...this.patenteModel,
+    // 1) Rama: buscamos el id_param a partir del nombre elegido en el <select>
+    const ramaSeleccionada = this.ramasCatalogo.find(
+      r => r.nombre === this.patenteModel.rama
+    );
+    const ramaParamId = ramaSeleccionada?.id_param;
 
+    // 2) Medio de ingreso
+    const medioSeleccionado = this.mediosIngresoCatalogo.find(
+      m => m.nombre === this.patenteModel.medioIngreso
+    );
+    const medioIngresoParamId = medioSeleccionado?.id_param;
+
+    // 3) Subsector: id y nombre (el nombre lo mostramos en UI / reporte)
+    let subsectorId: number | string | null = null;
+    let subsectorNombre: string | null = null;
+
+    if (this.subsectorIdSeleccionado) {
+      const subsector = this.subsectoresCatalogo.find(
+        s => s.id_param === this.subsectorIdSeleccionado
+      );
+      subsectorId = subsector?.id_param ?? null;
+      subsectorNombre = subsector?.nombre ?? null;
+    } else if (this.patenteModel.subsector) {
+      // En registros antiguos, subsector viene como id en string (ej. "282")
+      subsectorId = this.patenteModel.subsector;
+      subsectorNombre = this.obtenerNombreSubsectorPorId(this.patenteModel.subsector);
+    }
+
+    if (this.subsectorIdSeleccionado) {
+      this.patenteModel.subsector = String(this.subsectorIdSeleccionado);
+    }
+    // Si a partir del subsector ya actualizaste tipoSector y sector
+    // en el método actualizarSectorDesdeSubsector(), aquí solo los respetamos.
+
+    // --- Construimos el payload explícito que se mandará al servicio ---
+
+    const payload: any = {
       // Identificadores y títulos
       id,
-      solicitudId: this.patenteModel.solicitudId || this.patenteModel.numeroExpediente || '',
-      numeroExpediente: this.patenteModel.numeroExpediente || this.patenteModel.solicitudId,
-      nombrePatente: this.patenteModel.denominacion.trim(),
-      denominacion: this.patenteModel.denominacion.trim(),
+      id_registro: id,
+      solicitudId: this.patenteModel.solicitudId || this.patenteModel.no_expediente || this.patenteModel.numeroExpediente,
+      no_expediente: this.patenteModel.no_expediente || this.patenteModel.solicitudId || this.patenteModel.numeroExpediente,
+      numeroExpediente: this.patenteModel.numeroExpediente || this.patenteModel.no_expediente,
+      titulo: this.patenteModel.titulo || this.patenteModel.denominacion || this.patenteModel.nombrePatente,
+      nombrePatente: this.patenteModel.denominacion || this.patenteModel.nombrePatente,
+      denominacion: this.patenteModel.denominacion,
 
-      // Fechas (en formato YYYY-MM-DD)
+      // Datos de solicitud (usuario, institución, correo)
+      solicitante: this.patenteModel.solicitante,
+      institucion: this.patenteModel.institucion,
+      correo: this.patenteModel.correo,
+
+      // Fechas (se mandan como string YYYY-MM-DD, el servicio las normaliza)
       fechaSolicitud: this.patenteModel.fechaSolicitud,
-      fechaExpedicion: this.patenteModel.fechaExpedicion,
+      fechaExpedicion: this.patenteModel.fechaExpedicion || null,
 
-      // 🔹 Rama (lo que editas en el modal es `rama_param`)
-      //    Lo copiamos a `rama`, que es lo que usa el service para mapear al backend
-      rama: (this.patenteModel as any).rama_param || this.patenteModel.rama,
+      // Descripción y observaciones
+      descripcion: this.patenteModel.descripcion,
+      observaciones: this.patenteModel.observaciones,
 
-      // 🔹 Medio de ingreso (del modal: `medio_ingreso_param`)
-      medioIngreso: (this.patenteModel as any).medio_ingreso_param || this.patenteModel.medioIngreso,
+      // Estatus (texto, el servicio lo mapea a id)
+      estatus: this.patenteModel.estatus,
 
-      // 🔹 Subsector: aquí tu modelo ya trae el id_subsector como string ("260")
-      subsector: this.patenteModel.subsector,
-
-      // 🔹 Tipo de sector, tecnológico de origen, año de renovación
-      tipoSector: this.patenteModel.tipoSector,
+      // Rama, Medio de ingreso, Tecnológico de origen, CePat, Año de renovación
+      rama: this.patenteModel.rama,
+      medioIngreso: this.patenteModel.medioIngreso,
       tecnologicoOrigen: this.patenteModel.tecnologicoOrigen,
+      cePat: this.patenteModel.cePat,
       anioRenovacion: this.patenteModel.anioRenovacion,
 
-      // 🔹 Estatus / observaciones / archivo / descripción
-      estatus: this.patenteModel.estatus,
-      observaciones: this.patenteModel.observaciones,
-      descripcion: this.patenteModel.descripcion,
-      archivo: this.patenteModel.archivo || this.patenteModel.documentos?.[0] || '',
+      // Sector / Tipo de sector (texto calculado a partir del subsector)
+      tipoSector: this.patenteModel.tipoSector,
+      sector: this.patenteModel.sector,
+
+      // Subsector como texto para UI/reportes
+      subsector: subsectorNombre || this.patenteModel.subsector,
+
+      // Documento
+      archivo: this.patenteModel.archivo || (this.patenteModel.documentos?.[0] ?? ''),
+
+      // Inventores
+      inventores: this.patenteModel.inventores || [],
+
+      // Hints explícitos para el backend (id de parametrización):
+      // se usarán en mapFrontendToBackend si existen
+      rama_param: ramaParamId ?? (this.patenteModel as any).rama_param,
+      medio_ingreso_param: medioIngresoParamId ?? (this.patenteModel as any).medio_ingreso_param,
+      tipo_sector_param: (this.patenteModel as any).tipo_sector_param, // si lo estás manejando por id
+      id_subsector: subsectorId,
+      tipo_ingreso_param: (this.patenteModel as any).tipo_ingreso_param, // ej. IMPI = 44
     };
 
-    console.log('payload', payload)
+    console.log('[PatenteComponent] Payload a enviar en update:', payload);
 
     this.service.updatePatent(id, payload).subscribe({
       next: () => {
@@ -962,7 +1077,6 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         };
         this.showAlert(alertaExito);
 
-        // Cerramos el modal y notificamos al padre que recargue la tabla
         modal.close();
         this.reloadEvent.emit(true);
       },
@@ -979,6 +1093,21 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  private obtenerNombreSubsectorPorId(idSubsector: string | number): string {
+    if (!this.subsectoresCatalogo || !this.subsectoresCatalogo.length) {
+      return 'N/A';
+    }
+
+    // Normalizamos el id a número
+    const id = typeof idSubsector === 'string' ? parseInt(idSubsector, 10) : idSubsector;
+    if (isNaN(id)) {
+      return 'N/A';
+    }
+
+    // Buscamos en el catálogo de subsectores por id_param
+    const subsector = this.subsectoresCatalogo.find(s => s.id_param === id);
+    return subsector ? subsector.nombre : 'N/A';
+  }
 
 
   private convertirNombresAIdsParaEdicion(): void {
@@ -988,7 +1117,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       );
       if (ramaEncontrada) {
         // Guardar el ID en una propiedad temporal para el select
-        (this.patenteModel as any).ramaIdTemp = ramaEncontrada.id;
+        (this.patenteModel as any).ramaIdTemp = ramaEncontrada.id_param;
       } else {
         console.warn(`⚠️ No se encontró rama con nombre: "${this.patenteModel.rama}"`);
       }
@@ -1375,70 +1504,117 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private cargarCatalogos(): void {
     this.parametrizacionesServices.getAll().subscribe({
-      next: (catalogos: Catalogos) => {
+      next: (catalogos) => {
+        this.catalogosAll = catalogos;
 
-        // 🔹 Cargar Ramas (id_tema = 3)
-        if (catalogos[3]?.lista) {
-          this.ramasCatalogo = catalogos[3].lista.map((r: Parametrizacion) => ({
-            id: r.id_param,
-            nombre: r.nombre
-          }));
-        }
+        // id_tema según tu backend:
+        this.ramasCatalogo = catalogos[3]?.lista ?? []; // rama_param
+        this.mediosIngresoCatalogo = catalogos[8]?.lista ?? []; // medio_ingreso_param
+        this.tiposSectorCatalogo = catalogos[2]?.lista ?? []; // tipo_sector_param
+        this.estatusCatalogo = catalogos[7]?.lista ?? []; // estatus_param
+        this.subsectoresCatalogo = catalogos[17]?.lista ?? []; // subsectores/actividades
 
-        // 🔹 Cargar Medios de Ingreso (id_tema = 8)
-        if (catalogos[8]?.lista) {
-          this.mediosIngresoCatalogo = catalogos[8].lista.map((m: Parametrizacion) => ({
-            id: m.id_param,
-            nombre: m.nombre
-          }));
-        }
-
-        // 🔹 Cargar Tipos de Sector (id_tema = 2)
-        if (catalogos[2]?.lista) {
-          this.tiposSectorCatalogo = catalogos[2].lista.map((s: Parametrizacion) => ({
-            id: s.id_param,
-            nombre: s.nombre
-          }));
-        }
-
-        // 🔹 Cargar Estatus (id_tema = 5)
-        if (catalogos[5]?.lista) {
-          this.estatusCatalogo = catalogos[5].lista.map((e: Parametrizacion) => ({
-            id: e.id_param,
-            nombre: e.nombre
-          }));
-        }
+        this.generarAniosRenovacion();
       },
-      error: (err) => console.error('❌ Error al cargar catálogos:', err)
+      error: (err) => {
+        console.error('[PatenteComponent] Error al cargar catálogos:', err);
+      },
     });
   }
 
 
+  private generarAniosRenovacion(): void {
+    const currentYear = new Date().getFullYear();
+    const start = currentYear - 30;
+    const end = currentYear + 30;
+
+    this.aniosRenovacion = [];
+    for (let y = start; y <= end; y++) {
+      this.aniosRenovacion.push(y);
+    }
+
+    // Si ya hay un año de renovación en el modelo y no está en el rango, lo agregamos
+    if (this.patenteModel.anioRenovacion && this.patenteModel.anioRenovacion !== 'N/A') {
+      const asNumber = Number(this.patenteModel.anioRenovacion);
+      if (!isNaN(asNumber) && !this.aniosRenovacion.includes(asNumber)) {
+        this.aniosRenovacion.push(asNumber);
+        this.aniosRenovacion.sort((a, b) => a - b);
+      }
+    }
+  }
+
+  private findParamById(idParam: number): Parametrizacion | undefined {
+    if (!this.catalogosAll) {
+      return undefined;
+    }
+
+    // Recorre todos los temas hasta encontrar el id_param
+    for (const temaIdStr of Object.keys(this.catalogosAll)) {
+      const tema = this.catalogosAll[Number(temaIdStr)];
+      const encontrado = tema?.mapa[idParam];
+      if (encontrado) {
+        return encontrado;
+      }
+    }
+    return undefined;
+  }
+
+  private actualizarSectorDesdeSubsector(idSubsector: number | null): void {
+    if (!idSubsector || !this.catalogosAll) {
+      this.patenteModel.sector = '';
+      this.patenteModel.tipoSector = '';
+      this.patenteModel.subsector = 'N/A';
+      return;
+    }
+
+    const temaSubsectores = this.catalogosAll[17];
+    const subsector = temaSubsectores?.mapa[idSubsector];
+
+    if (!subsector) {
+      console.warn('⚠️ Subsector no encontrado para id', idSubsector);
+      return;
+    }
+
+    // Guardar el id en el modelo (este campo es el que viaja al backend)
+    this.patenteModel.subsector = String(subsector.id_param);
+
+    const chain = this.service.getSectorChainFromSubsector(idSubsector);
+
+    this.patenteModel.tipoSector = chain.tipoSector;
+    this.patenteModel.sector = chain.sector;
+  }
+
+  onSubsectorChange(event: any): void {
+    const value = (event.target as HTMLSelectElement).value;
+    this.subsectorIdSeleccionado = value ? Number(value) : null;
+    this.actualizarSectorDesdeSubsector(this.subsectorIdSeleccionado);
+  }
+
   getRamaNombre(ramaId: string | number | undefined): string {
     if (!ramaId) return 'N/A';
     const id = typeof ramaId === 'string' ? parseInt(ramaId) : ramaId;
-    const rama = this.ramasCatalogo.find(r => r.id === id);
+    const rama = this.ramasCatalogo.find(r => r.id_param === id);
     return rama ? rama.nombre : 'N/A';
   }
 
   getMedioIngresoNombre(medioId: string | number | undefined): string {
     if (!medioId) return 'N/A';
     const id = typeof medioId === 'string' ? parseInt(medioId) : medioId;
-    const medio = this.mediosIngresoCatalogo.find(m => m.id === id);
+    const medio = this.mediosIngresoCatalogo.find(m => m.id_param === id);
     return medio ? medio.nombre : 'N/A';
   }
 
   getTipoSectorNombre(sectorId: string | number | undefined): string {
     if (!sectorId) return 'N/A';
     const id = typeof sectorId === 'string' ? parseInt(sectorId) : sectorId;
-    const sector = this.tiposSectorCatalogo.find(s => s.id === id);
+    const sector = this.tiposSectorCatalogo.find(s => s.id_param === id);
     return sector ? sector.nombre : 'N/A';
   }
 
   getEstatusNombre(estatusId: string | number | undefined): string {
     if (!estatusId) return 'N/A';
     const id = typeof estatusId === 'string' ? parseInt(estatusId) : estatusId;
-    const estatus = this.estatusCatalogo.find(e => e.id === id);
+    const estatus = this.estatusCatalogo.find(e => e.id_param === id);
     return estatus ? estatus.nombre : 'N/A';
   }
 
