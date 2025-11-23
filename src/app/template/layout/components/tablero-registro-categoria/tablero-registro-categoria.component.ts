@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, ChangeDetectorRef} from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, ChangeDetectorRef, Output, EventEmitter} from '@angular/core';
 import { getCSSVariableValue } from 'src/app/template/kt/_utils';
 
 @Component({
@@ -11,6 +11,11 @@ export class TableroCategoriasComponent implements OnInit, OnChanges {
   @Input() titulo: string = '';
   @Input() subtitulo: string = '';
   @Input() height: number = 350;
+  @Output() exportExcel = new EventEmitter<void>();
+
+  onExportExcel() {
+    this.exportExcel.emit();
+  }
 
   chartOptions: any;
   // NUEVA

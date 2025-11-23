@@ -1,8 +1,9 @@
 import {
-  ChangeDetectionStrategy,
+  EventEmitter,
   Component,
   Input,
   OnInit,
+  Output,
 } from '@angular/core';
 import {
   Institutions,
@@ -17,6 +18,7 @@ import { take } from 'rxjs/operators';
 })
 export class TableroAllInstitutionsComponent implements OnInit {
   @Input() titulo: string = '';
+  @Output() exportExcel = new EventEmitter<void>();
 
   data: Institutions[] = [];
   loading: boolean = true;
@@ -29,29 +31,6 @@ export class TableroAllInstitutionsComponent implements OnInit {
   ngOnInit(): void {
     this.loadData();
   }
-
-  // private loadData(): void {
-  //   this.loading = true;
-  //   this.error = false;
-  //   this.errorMessage = '';
-  //   const observable = this.tablerosService.getAllInstitutions();
-
-  //   observable.subscribe({
-  //     next: (data) => {
-  //       this.data = Array.isArray(data) ? data : [];
-  //       this.loading = false;
-  //       this.totalInstitutes = this.data.length;
-  //     },
-  //     error: (error) => {
-  //       console.error('❌ ERROR cargando instituciones:', error);
-  //       this.loading = false;
-  //       this.error = true;
-  //       this.errorMessage = 'Error al cargar los datos';
-  //       this.data = [];
-  //       this.totalInstitutes = this.data.length;
-  //     },
-  //   });
-  // }
 
   private loadData(): void {
     this.loading = true;
@@ -68,7 +47,6 @@ export class TableroAllInstitutionsComponent implements OnInit {
           this.totalInstitutes = this.data.length;
         },
         error: (error) => {
-          console.error('❌ ERROR cargando instituciones:', error);
           this.loading = false;
           this.error = true;
           this.errorMessage = 'Error al cargar los datos';
@@ -85,4 +63,9 @@ export class TableroAllInstitutionsComponent implements OnInit {
   trackByInstitutionId(index: number, item: Institutions): number {
     return item.id_institucion;
   }
+
+  onExportExcel(): void {
+  this.exportExcel.emit();
+  }
+  
 }

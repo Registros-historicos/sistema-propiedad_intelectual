@@ -55,7 +55,6 @@ export class ParametrizacionesService {
     if (!this.cache$) {
       this.cache$ = this.http.get<Parametrizacion[]>(this.apiUrl).pipe(
         map((rows) => {
-          console.log('📥 Parametrizaciones recibidas:', rows.length);
           
           const grouped: Catalogos = {};
 
@@ -83,7 +82,6 @@ export class ParametrizacionesService {
             }
           }
 
-          console.log('📋 Catálogo tema 7 (estatus):', grouped[7]?.lista);
           return grouped;
         }),
         shareReplay(1)
@@ -117,7 +115,6 @@ convertirRegistroConObjetos(registro: any, catalogos: Catalogos): any {
 
           if (objeto) {
             result[key] = objeto;
-            console.log('✅ Convertido:', key, '→', objeto.nombre);
           } else {
             if (key === 'estatus_param' && this.ESTATUS_FALLBACK[idNum]) {
               result[key] = {
@@ -126,7 +123,6 @@ convertirRegistroConObjetos(registro: any, catalogos: Catalogos): any {
                 id_tema: tema,
                 id_param_padre: null
               };
-              console.warn('⚠️ Usando fallback para estatus:', this.ESTATUS_FALLBACK[idNum]);
             } else {
               console.warn('❌ No encontrado:', key, 'id:', idNum, 'tema:', tema);
             }

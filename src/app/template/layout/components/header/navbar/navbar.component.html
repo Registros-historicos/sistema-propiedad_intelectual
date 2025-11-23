@@ -1,21 +1,12 @@
-<!--begin::Theme mode-->
-<!-- ❌ COMENTADO: Cambio de tema deshabilitado -->
-<!--
-<div class="app-navbar-item" [ngClass]="itemClass">
-  <app-theme-mode-switcher [toggleBtnClass]="btnClass" toggleBtnClass="{`btn-active-light-primary btn-custom ${toolbarButtonHeightClass}`}"></app-theme-mode-switcher>
-</div>
--->
-<!--end::Theme mode-->
-
 <!-- NUEVO: Saludo personalizado con fecha -->
 <div class="app-navbar-item me-3" [ngClass]="itemClass">
   <div *ngIf="user$ | async as user" class="d-flex align-items-center">
     <div class="d-flex flex-column text-end me-3">
       <span class="text-gray-800 fw-bold fs-7">
-        Hola, {{ user.name || 'Usuario' }}! 👋
+        Hola, {{ user.name || "Usuario" }}! 👋
       </span>
       <span class="text-muted fs-8">
-        {{ currentDate | date:'dd-MM-yyyy' }}
+        {{ currentDate | date : "dd-MM-yyyy" }}
       </span>
     </div>
   </div>
@@ -23,23 +14,31 @@
 <!-- end::Saludo personalizado -->
 
 <!--begin::User menu-->
-<div class="app-navbar-item" [ngClass]="itemClass">
-  <!--begin::Menu wrapper-->
-  <div *ngIf="user$ | async as _user" class="cursor-pointer symbol" [ngClass]="userAvatarClass" data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
-    <!-- <img [src]="_user.pic" /> -->
-    <span class="fw-bold text-gray-700">{{ getInitials(_user.name || '') }}</span>
+<div
+  class="app-navbar-item"
+  [ngClass]="itemClass"
+  style="
+    background-color: #d7e8ff;
+    margin-top: 10px;
+    height: 45px;
+    width: 45px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  "
+>
+  <div
+    *ngIf="user$ | async as _user"
+    class="cursor-pointer symbol"
+    [ngClass]="userAvatarClass"
+    data-kt-menu-trigger="{default: 'click', lg: 'hover'}"
+    data-kt-menu-attach="parent"
+    data-kt-menu-placement="bottom-end"
+  >
+    <span class="fw-bold" style="color: #1a85fe !important; font-size: 1.5rem">
+      {{ getInitials(_user.name || "") }}
+    </span>
   </div>
-  <app-user-inner data-kt-menu='true'></app-user-inner>
-  <!--end::Menu wrapper-->
+  <app-user-inner data-kt-menu="true"></app-user-inner>
 </div>
-<!--end::User menu-->
-
-<!--begin::Header menu toggle-->
-<ng-container *ngIf="appHeaderDefaulMenuDisplay">
-  <div class="app-navbar-item d-lg-none ms-2 me-n3" title="Show header menu">
-    <div class="btn btn-icon btn-active-color-primary w-35px h-35px" id="kt_app_header_menu_toggle">
-      <app-keenicon name="element-4" class="fs-1" [ngClass]="btnIconClass"></app-keenicon>
-    </div>
-  </div>
-</ng-container>
-<!--end::Header menu toggle-->

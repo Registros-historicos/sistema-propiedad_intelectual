@@ -6,6 +6,7 @@
       [tipoInstitucion]="123"
       [data]="dataFederalInstitutes"
       (retry)="loadRegisterInstitutes(123)"
+      (exportExcel)="exportExcelFederalInstitutes()"
     ></app-tablero-institutos-general>
   </div>
 
@@ -16,6 +17,7 @@
       [tipoInstitucion]="122"
       [data]="dataDecentralizedInstitutes"
       (retry)="loadRegisterInstitutes(122)"
+      (exportExcel)="exportExcelDecentralizedInstitutes()"
     ></app-tablero-institutos-general>
   </div>
 </div>
@@ -23,14 +25,19 @@
 <div class="row g-5 g-xl-8">
   <!-- Tablero top 10 institutos -->
   <div class="col-xl-6">
-        <app-tablero-top10-instituciones [instituciones]="dataTop10Institutions"></app-tablero-top10-instituciones> 
-    <!-- <app-tablero-instituciones></app-tablero-instituciones> -->
+        <app-tablero-top10-instituciones 
+        [instituciones]="dataTop10Institutions"
+        (exportExcel)="exportExcelTop10Institutions()"
+        ></app-tablero-top10-instituciones> 
   
   </div>
 
   <!-- Todas las Instituciones -->
   <div class="col-xl-6">
-    <app-tablero-all-institutions titulo="Todas las Instituciones"></app-tablero-all-institutions>
+    <app-tablero-all-institutions 
+    titulo="Todas las Instituciones"
+    (exportExcel)="exportExcelAllInstitutions()"
+    ></app-tablero-all-institutions>
   </div>
 </div>
 
@@ -54,6 +61,7 @@
           <!-- begin::Button-->
           <div
             class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary tooltip-css"
+            (click)="exportExcelTop10States()"
           >
             <mat-icon style="color: #1d6f42">description</mat-icon>
             <span class="tooltip-text" translate="BUTTON.EXPORT_EXCEL"></span>
@@ -121,17 +129,17 @@
   </div>
 
   <div class="col-xl-6">
-    <app-grafica-sector></app-grafica-sector>
+    <app-grafica-sector (exportExcel)="exportExcelSector()"></app-grafica-sector>
   </div>
 </div>
 
 <!-- Resto del dashboard -->
 <div class="row g-5 g-xl-8">
   <div class="col-xl-6">
-    <app-grafica-solicitudes></app-grafica-solicitudes>
+    <app-grafica-solicitudes (exportExcel)="exportExcelRegisterImpi()"></app-grafica-solicitudes>
   </div>
   <div class="col-xl-6">
-    <app-grafica-solicitudes-in></app-grafica-solicitudes-in>
+    <app-grafica-solicitudes-in (exportExcel)="exportExcelRegisterIndautor()"></app-grafica-solicitudes-in>
   </div>
 </div>
 
@@ -141,18 +149,25 @@
       [data]="categorias"
       titulo="GRAPHICS.TITLES.REGISTERS_BY_CATEGORY"
       [height]="400"
+      (exportExcel)="exportExcelRegisterByCategory()"
     ></app-tablero-registro-categoria>
   </div>
   <div class="col-xl-6">
-    <app-registros-sexo class="card card-xl-stretch mb-xl-8"></app-registros-sexo>
+    <app-registros-sexo class="card card-xl-stretch mb-xl-8"
+    (exportExcel)="exportExcelRegisterByGender()"
+    ></app-registros-sexo>
   </div>
 </div>
 
 <div class="row g-5 g-xl-8">
   <div class="col-xl-6">
-    <app-registros-anio  class="card card-xl-stretch mb-xl-8"></app-registros-anio>
+    <app-registros-anio  class="card card-xl-stretch mb-xl-8"
+    (exportExcel)="exportExcelReportByYear($event)"
+    ></app-registros-anio>
   </div>
   <div class="col-xl-6">
-    <app-registro-estatus class="card card-xl-stretch mb-xl-8"></app-registro-estatus>
+    <app-registro-estatus class="card card-xl-stretch mb-xl-8"
+    (exportExcel)="exportExcelRegisterByStatus()"
+    ></app-registro-estatus>
   </div>
 </div>

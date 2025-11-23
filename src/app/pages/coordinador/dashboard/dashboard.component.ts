@@ -1,7 +1,8 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { TablerosService, CategoriaInvestigador } from 'src/app/api/services/tableros.service';
+import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { TablerosService, CategoriaInvestigador, ProgramaEducativo } from 'src/app/api/services/tableros.service';
 import { getCSSVariableValue } from '../../../template/kt/_utils';
 import { TranslateService } from '@ngx-translate/core';
+import { ExportExcelService } from 'src/app/api/services/export-excel.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -11,15 +12,83 @@ export class DashboardComponent implements OnInit {
   chartOptions: any = {};
   chartOptionsRound: any = {};
   selectedFilter: string = '1';
+  programasEducativos: ProgramaEducativo[] = [];
 
   @Input() cssClass: string = '';
   @Input() chartSize: number = 70;
   @Input() chartLine: number = 11;
   @Input() chartRotate?: number = 145;
 
+  constructor(
+    private translate: TranslateService, 
+    private tablerosService: TablerosService,
+    private exportExcelService: ExportExcelService,
+    private cdRef: ChangeDetectorRef,
+  ) { }
 
+  private loadProgramasEducativos(): void {
+    this.tablerosService.getProgramasEducativos().subscribe({
+      next: (data) => {
+        this.programasEducativos = data;
+        this.cdRef.detectChanges();
+      },
+      error: () => {
+        this.programasEducativos = [];
+        this.cdRef.detectChanges();
+      }
+    });
+ }
 
+  ngOnInit(): void {
+    this.loadProgramasEducativos();
+    // Lógica original
+    this.chartOptions = this.getChartOptions(350);
+    setTimeout(() => {
+      initChart(this.chartSize, this.chartLine, this.chartRotate);
+    }, 10);
 
+    // Cargar categorias de investigadores desde el endpoint real
+    this.tablerosService.getCategoriasInvestigadores().subscribe({
+      next: (resp: CategoriaInvestigador[]) => {
+        console.log('[DEBUG] Respuesta categorias investigadores:', resp);
+        this.categorias = (resp || []).map(it => ({
+          categoria: it.categoria,
+          value: Number(it.total)
+        }));
+        console.log('[DEBUG] Categorias mapeadas:', this.categorias);
+      },
+      error: (err) => {
+        console.error('[DEBUG] Error cargando categorias de investigadores desde backend', err);
+      }
+    });
+}
+  
+  // Método para exportar el reporte de registros por categoría
+  exportExcelRegisterByCategory() {
+    this.exportExcelService.downloadExcelReport('/excel/registros/categorias');
+  }
+
+  exportExcelReportByYear(year: number) {
+  this.exportExcelService.downloadExcelReport(`/excel/registros/mes/?anio=${year}`);
+  }
+
+  exportExcelRegisterByStatus() {
+    this.exportExcelService.downloadExcelReport('/excel/registros/estatus');
+  }
+
+  exportExcelRegisterByGender() {
+    this.exportExcelService.downloadExcelReport('/excel/registros/sexo');
+  }
+
+  exportExcelProgramasEducativos() {
+    this.exportExcelService.downloadExcelReport('/excel/registros/programa/educativo');
+  }
+
+  exportExcelInvestigadores() {
+    console.log('Exportando reporte de investigadores a Excel...');
+    // Descomentar cuando el servicio esté implementado
+    // this.exportExcelService.downloadExcelReport('/excel/investigadores/por-coordinador');
+  }
 
   onFilterChange(): void {
     this.chartOptions = this.getChartOptions(350);
@@ -303,30 +372,7 @@ export class DashboardComponent implements OnInit {
 
   categorias: { categoria: string; value: number }[] = [];
 
-  constructor(private translate: TranslateService, private tablerosService: TablerosService) { }
 
-  ngOnInit(): void {
-    // Lógica original
-    this.chartOptions = this.getChartOptions(350);
-    setTimeout(() => {
-      initChart(this.chartSize, this.chartLine, this.chartRotate);
-    }, 10);
-
-    // Cargar categorias de investigadores desde el endpoint real
-    this.tablerosService.getCategoriasInvestigadores().subscribe({
-      next: (resp: CategoriaInvestigador[]) => {
-        console.log('[DEBUG] Respuesta categorias investigadores:', resp);
-        this.categorias = (resp || []).map(it => ({
-          categoria: it.categoria,
-          value: Number(it.total)
-        }));
-        console.log('[DEBUG] Categorias mapeadas:', this.categorias);
-      },
-      error: (err) => {
-        console.error('[DEBUG] Error cargando categorias de investigadores desde backend', err);
-      }
-    });
-  }
 
 }
 

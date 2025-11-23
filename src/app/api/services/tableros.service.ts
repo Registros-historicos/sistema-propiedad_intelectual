@@ -42,6 +42,10 @@ export interface Top10Instituciones {
   institucion_nombre: string
   total: number
 }
+export interface ProgramaEducativo {
+  programa_educativo: string;
+  total_registros: number;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -52,6 +56,14 @@ export class TablerosService {
   getTopEntities(): Observable<Top10Instituciones[]> {
     return this.http.get<Top10Instituciones[]>('/api/tableros/entidades/top10').pipe(
       catchError(error => {
+        return of([]);
+      })
+    );
+  }
+
+  getProgramasEducativos(): Observable<ProgramaEducativo[]> {
+    return this.http.get<ProgramaEducativo[]>('/api/tableros/registros/por-programa/').pipe(
+      catchError(() => {
         return of([]);
       })
     );
