@@ -1,34 +1,90 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { TablerosService, Departamento } from 'src/app/api/services/tableros.service';
+
+interface DepartamentoDisplay {
+  icono: string;
+  nombre: string;
+  totalSolicitudes: number;
+}
 
 @Component({
   selector: 'app-departamentos',
   templateUrl: './departamentos.component.html',
   styleUrl: './departamentos.component.scss'
 })
-export class DepartamentosComponent {
-departamentos = [
-    { icono: 'computer', nombre: 'Sistemas', totalSolicitudes: 120, estado: 'activo' },
-    { icono: 'precision_manufacturing', nombre: 'Industrial', totalSolicitudes: 95, estado: 'activo' },
-    { icono: 'science', nombre: 'Química', totalSolicitudes: 80, estado: 'activo' },
-    { icono: 'engineering', nombre: 'Mecánica', totalSolicitudes: 60, estado: 'activo' },
-    { icono: 'memory', nombre: 'Electrónica', totalSolicitudes: 110, estado: 'activo' },
-    { icono: 'architecture', nombre: 'Civil', totalSolicitudes: 70, estado: 'activo' },
-    { icono: 'biotech', nombre: 'Bioquímica', totalSolicitudes: 55, estado: 'activo' },
-    { icono: 'eco', nombre: 'Ambiental', totalSolicitudes: 40, estado: 'activo' },
-    { icono: 'business_center', nombre: 'Administración', totalSolicitudes: 85, estado: 'activo' },
-    { icono: 'groups', nombre: 'Gestión Empresarial', totalSolicitudes: 65, estado: 'activo' },
-    { icono: 'category', nombre: 'Materiales', totalSolicitudes: 50, estado: 'activo' },
-    { icono: 'restaurant', nombre: 'Alimentos', totalSolicitudes: 35, estado: 'activo' },
-    { icono: 'functions', nombre: 'Ciencias Básicas', totalSolicitudes: 74, estado: 'activo' },
-    { icono: 'school', nombre: 'División de Estudios Profesionales', totalSolicitudes: 58, estado: 'activo' },
-    { icono: 'account_balance', nombre: 'División de Estudios de Posgrado', totalSolicitudes: 91, estado: 'activo' },
-    { icono: 'bolt', nombre: 'Ingeniería Eléctrica', totalSolicitudes: 67, estado: 'activo' },
-    { icono: 'build', nombre: 'Ingeniería Metalmecánica', totalSolicitudes: 43, estado: 'activo' },
-    { icono: 'request_quote', nombre: 'Ciencias Económico Administrativas', totalSolicitudes: 86, estado: 'activo' }
-  ];
+export class DepartamentosComponent implements OnInit {
+  departamentos: DepartamentoDisplay[] = [];
+  isLoading: boolean = true;
 
+  // Mapeo de iconos por palabras clave en el nombre del departamento
+  private iconosPorDepartamento: { [key: string]: string } = {
+    'Sistemas': 'computer',
+    'Computación': 'computer',
+    'Industrial': 'precision_manufacturing',
+    'Química': 'science',
+    'Mecánica': 'engineering',
+    'Electrónica': 'memory',
+    'Civil': 'architecture',
+    'Bioquímica': 'biotech',
+    'Ambiental': 'eco',
+    'Administración': 'business_center',
+    'Gestión': 'groups',
+    'Materiales': 'category',
+    'Alimentos': 'restaurant',
+    'Alimentarias': 'restaurant',
+    'Básicas': 'functions',
+    'Ciencias': 'functions',
+    'Profesionales': 'school',
+    'Posgrado': 'account_balance',
+    'Eléctrica': 'bolt',
+    'Metalmecánica': 'build',
+    'Económico': 'request_quote',
+    'Económicas': 'request_quote'
+  };
 
-  ngOnInit(): void {}
+  constructor(private tablerosService: TablerosService) {}
+
+  ngOnInit(): void {
+    this.cargarDepartamentos();
+  }
+
+  cargarDepartamentos(): void {
+    this.isLoading = true;
+    
+    this.tablerosService.getDepartamentos().subscribe({
+      next: (data: Departamento[]) => {
+        console.log('✅ Departamentos desde backend:', data);
+        
+        // Mapear datos del backend al formato del componente
+        this.departamentos = data.map(depto => ({
+          icono: this.obtenerIcono(depto.nombre_departamento),
+          nombre: depto.nombre_departamento,
+          totalSolicitudes: depto.total
+        }));
+      },
+      error: (error: any) => {
+        this.isLoading = false;
+        
+        // Opcional: Mantener datos mock como fallback
+        this.departamentos = [];
+      }
+    });
+  }
+
+  /**
+   * Obtiene el icono adecuado basándose en palabras clave en el nombre del departamento
+   */
+  private obtenerIcono(nombreDepartamento: string): string {
+    // Buscar coincidencia con palabras clave
+    for (const [keyword, icono] of Object.entries(this.iconosPorDepartamento)) {
+      if (nombreDepartamento.includes(keyword)) {
+        return icono;
+      }
+    }
+    
+    // Icono por defecto si no hay coincidencia
+    return 'school';
+  }
 
   exportToExcel(): void {
     alert('Funcionalidad pendiente');
