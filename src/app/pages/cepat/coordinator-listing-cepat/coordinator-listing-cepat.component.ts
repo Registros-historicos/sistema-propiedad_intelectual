@@ -57,7 +57,6 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
   selectedStateForInstitucion: number | null = null;
   selectedInstitutoId: number | null = null;
   selectedInstitutoName: string | null = null;
-  showAddInstitucion: boolean = false;
 
   estatusOptions = ESTATUS_OPTIONS;
   isDataReady: boolean = false;
@@ -153,12 +152,6 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
           text: 'Institución asignada al coordinador correctamente.',
           icon: 'success',
         });
-        // Limpiar los controles de selección (pero conservar la institución asignada en el modelo/visualización)
-        this.selectedStateForInstitucion = null;
-        this.institutoList = [];
-        // dejar selectedInstitutoName para mostrar la institución asignada; limpiar el dropdown seleccionado
-        this.selectedInstitutoId = null;
-        this.showAddInstitucion = false;
         this.cdr.detectChanges();
         this.loadCepats(false);
       },
@@ -193,11 +186,6 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
             text: 'Institución desvinculada correctamente.',
             icon: 'success',
           });
-          // Limpiar selección local y actualizar listado
-          this.selectedInstitutoId = null;
-          this.selectedInstitutoName = null;
-          this.selectedStateForInstitucion = null;
-          this.institutoList = [];
           this.cdr.detectChanges();
           this.loadCepats(false);
         },
@@ -220,8 +208,8 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     }
 
-    // Endpoint absoluto solicitado (coordinadores por CEPAT)
-    const externalUrl = 'http://20.14.208.230:8000/api/tableros/coordinadores/por-cepat/';
+    // Endpoint absoluto solicitado (actualizado a URL por estados CEPAT)
+    const externalUrl = 'http://20.14.208.230:8000/api/tableros/usuarios/por-estados-cepat/';
 
     console.log('[DEBUG] CEPAT: requesting external URL ->', externalUrl);
 
@@ -571,22 +559,6 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
     };
     this.estadosAsignados = [];
     this.estadosSeleccionados = [];
-    this.showAddInstitucion = false;
-    // Limpieza de selects/internos para evitar valores residuales
-    this.selectedStateForInstitucion = null;
-    this.institutoList = [];
-    this.selectedInstitutoId = null;
-    // No tocar selectedInstitutoName aquí: si se cerró el modal queremos conservar la visualización hasta reload
-  }
-
-  toggleAddInstitucion(): void {
-    // Si estamos cerrando el panel, limpiar los selects para evitar que queden opciones seleccionadas
-    if (this.showAddInstitucion) {
-      this.selectedStateForInstitucion = null;
-      this.institutoList = [];
-      this.selectedInstitutoId = null;
-    }
-    this.showAddInstitucion = !this.showAddInstitucion;
   }
 
   saveChanges(modal: any) {
