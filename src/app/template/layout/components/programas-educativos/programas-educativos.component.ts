@@ -1,36 +1,97 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { TablerosService, ProgramaEducativo } from 'src/app/api/services/tableros.service';
+
+interface ProgramaEducativoDisplay {
+  icono: string;
+  nombre: string;
+  solicitudes: number;
+}
 
 @Component({
   selector: 'app-programas-educativos',
   templateUrl: './programas-educativos.component.html',
   styleUrl: './programas-educativos.component.scss'
 })
-export class ProgramasEducativosComponent {
-programasEducativos = [
-  { icono: 'computer', nombre: 'Ingeniería en Sistemas Computacionales', solicitudes: 1247 },
-  { icono: 'precision_manufacturing', nombre: 'Ingeniería Industrial', solicitudes: 968 },
-  { icono: 'engineering', nombre: 'Ingeniería Electromecánica', solicitudes: 756 },
-  { icono: 'groups', nombre: 'Ingeniería en Gestión Empresarial', solicitudes: 892 },
-  { icono: 'architecture', nombre: 'Ingeniería Civil', solicitudes: 634 },
-  { icono: 'science', nombre: 'Ingeniería Química', solicitudes: 523 },
-  { icono: 'build', nombre: 'Ingeniería Mecánica', solicitudes: 678 },
-  { icono: 'router', nombre: 'Ingeniería en Tecnologías de la Información y Comunicaciones', solicitudes: 1156 },
-  { icono: 'memory', nombre: 'Ingeniería Electrónica', solicitudes: 445 },
-  { icono: 'solar_power', nombre: 'Ingeniería en Energías Renovables', solicitudes: 387 },
-  { icono: 'biotech', nombre: 'Ingeniería Bioquímica', solicitudes: 312 },
-  { icono: 'category', nombre: 'Ingeniería en Materiales', solicitudes: 289 },
-  { icono: 'eco', nombre: 'Ingeniería Ambiental', solicitudes: 567 },
-  { icono: 'smart_toy', nombre: 'Ingeniería Mecatrónica', solicitudes: 723 },
-  { icono: 'local_shipping', nombre: 'Ingeniería en Logística', solicitudes: 434 },
-  { icono: 'oil_barrel', nombre: 'Ingeniería Petrolera', solicitudes: 198 },
-  { icono: 'diversity_3', nombre: 'Ingeniería en Desarrollo Comunitario', solicitudes: 276 },
-  { icono: 'park', nombre: 'Ingeniería Forestal', solicitudes: 156 },
-  { icono: 'restaurant', nombre: 'Ingeniería en Industrias Alimentarias', solicitudes: 345 },
-  { icono: 'agriculture', nombre: 'Ingeniería Agroindustrial', solicitudes: 412 },
-  { icono: 'blur_on', nombre: 'Ingeniería en Nanotecnología', solicitudes: 234 },
-  { icono: 'calculate', nombre: 'Contador Público', solicitudes: 678 },
-  { icono: 'business_center', nombre: 'Licenciatura en Administración', solicitudes: 534 },
-  { icono: 'domain', nombre: 'Arquitectura', solicitudes: 467 },
-  { icono: 'movie', nombre: 'Ingeniería en Animación Digital y Efectos Visuales', solicitudes: 389 }
-];
+export class ProgramasEducativosComponent implements OnInit {
+  programasEducativos: ProgramaEducativoDisplay[] = [];
+  isLoading: boolean = true;
+
+  // Mapeo de iconos por palabras clave en el nombre del programa
+  private iconosPorPrograma: { [key: string]: string } = {
+    'Sistemas': 'computer',
+    'Industrial': 'precision_manufacturing',
+    'Electromecánica': 'engineering',
+    'Gestión': 'groups',
+    'Civil': 'architecture',
+    'Química': 'science',
+    'Mecánica': 'build',
+    'Información': 'router',
+    'Comunicaciones': 'router',
+    'Electrónica': 'memory',
+    'Renovables': 'solar_power',
+    'Bioquímica': 'biotech',
+    'Materiales': 'category',
+    'Ambiental': 'eco',
+    'Mecatrónica': 'smart_toy',
+    'Logística': 'local_shipping',
+    'Petrolera': 'oil_barrel',
+    'Comunitario': 'diversity_3',
+    'Forestal': 'park',
+    'Alimentarias': 'restaurant',
+    'Agroindustrial': 'agriculture',
+    'Nanotecnología': 'blur_on',
+    'Contador': 'calculate',
+    'Administración': 'business_center',
+    'Arquitectura': 'domain',
+    'Animación': 'movie',
+    'Tecnologías': 'router'
+  };
+
+  constructor(private tablerosService: TablerosService) {}
+
+  ngOnInit(): void {
+    this.cargarProgramasEducativos();
+  }
+
+  cargarProgramasEducativos(): void {
+    this.isLoading = true;
+    
+    this.tablerosService.getRegistrosPorProgramaEducativo().subscribe({
+      next: (data: ProgramaEducativo[]) => {
+        console.log('✅ Programas educativos desde backend:', data);
+        
+        // Mapear datos del backend al formato del componente
+        this.programasEducativos = data.map(programa => ({
+          icono: this.obtenerIcono(programa.nombre_programa_educativo),
+          nombre: programa.nombre_programa_educativo,
+          solicitudes: programa.total
+        }));
+        
+        console.log('✅ Programas educativos mapeados:', this.programasEducativos);
+        this.isLoading = false;
+      },
+      error: (error: any) => {
+        console.error('❌ Error al cargar programas educativos:', error);
+        this.isLoading = false;
+        
+        // Opcional: Mantener datos mock como fallback
+        // this.programasEducativos = this.getMockData();
+      }
+    });
+  }
+
+  /**
+   * Obtiene el icono adecuado basándose en palabras clave en el nombre del programa
+   */
+  private obtenerIcono(nombrePrograma: string): string {
+    // Buscar coincidencia con palabras clave
+    for (const [keyword, icono] of Object.entries(this.iconosPorPrograma)) {
+      if (nombrePrograma.includes(keyword)) {
+        return icono;
+      }
+    }
+    
+    // Icono por defecto si no hay coincidencia
+    return 'school';
+  }
 }
