@@ -47,6 +47,12 @@ export interface ProgramaEducativo {
   total_registros: number;
 }
 
+export interface Departamento {
+  departamento_param: number;
+  nombre_departamento: string;
+  total: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -276,5 +282,17 @@ export class TablerosService {
   const url = `/api/tableros/registros/periodo/?inicio=${inicio}&fin=${fin}`;
   return this.http.get<{ mes: number; total: number }[]>(url);
 }
+  getDepartamentos(): Observable<Departamento[]> {
+    return this.http.get<Departamento[]>('/api/tableros/departamentos/').pipe(
+      map(data => {
+        console.log('✅ Departamentos desde backend:', data);
+        return data;
+      }),
+      catchError(error => {
+        console.error('❌ Error en getDepartamentos:', error);
+        return of([]);
+      })
+    );
+  }
 
 }
