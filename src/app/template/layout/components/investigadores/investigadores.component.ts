@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
@@ -8,6 +8,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class InvestigadoresComponent implements OnInit {
   investigadores: Array<{ nombre: string; departamento: string; solicitudes: number }> = [];
+  @Output() exportExcel = new EventEmitter<void>();
 
   constructor(private http: HttpClient) {}
 
@@ -35,7 +36,7 @@ export class InvestigadoresComponent implements OnInit {
   }
 
   exportToExcel(): void {
-    alert('Funcionalidad pendiente');
+     this.exportExcel.emit();
   }
 
   generatePDF(): void {
