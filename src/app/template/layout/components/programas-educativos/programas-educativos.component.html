@@ -2,7 +2,8 @@
     <div class="card-header border-0 pt-5">
         <h3 class="card-title fw-bold fs-3">Programas educativos</h3>
         <div class="d-flex align-items-center gap-2">
-            <div class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary tooltip-css">
+            <div class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary tooltip-css" 
+                (click)="onExportExcel()">
                 <mat-icon style="color: #1D6F42;">description</mat-icon>
                 <span class="tooltip-text">Exportar a Excel</span>
             </div>
@@ -20,42 +21,45 @@
          <div *ngIf="!isLoading" class="table-responsive flex-grow-1" style="max-height: 400px; overflow-y: auto;">
             <!-- begin::Table -->
             <table class="table align-middle gs-0 gy-5">
-                <!-- begin::Table head -->
                 <thead class="sticky-top bg-white">
                     <tr>
                         <th class="p-0 min-w-250px"></th>
                         <th class="p-0 min-w-150px"></th>
                     </tr>
                 </thead>
-                <!-- end::Table head -->
-                <!-- begin::Table body -->
                 <tbody>
-                    <tr *ngFor="let pe of programasEducativos">
-                    <td class="text-start">
-                    <div class="d-flex align-items-center gap-2">
-                            <mat-icon *ngIf="pe.icono" style="color: rgb(1, 8, 49); flex-shrink: 0;">
-                            {{ pe.icono }}
-                            </mat-icon>
-                            <span class="text-gray-900 fw-bold mb-1 fs-5" 
-                            style="white-space: normal; word-break: break-word; text-align: left;">
-                            {{ pe.nombre }}
-                            </span>
-                        </div>
+                    <tr *ngFor="let item of datos">
+                        <td class="text-start">
+                            <div class="d-flex align-items-center gap-2">
+                                <mat-icon style="color: rgb(1, 8, 49); flex-shrink: 0;">
+                                    {{ getIcono(item.programa_educativo) }}
+                                </mat-icon>
+                                
+                                <span class="text-gray-900 fw-bold mb-1 fs-5" 
+                                style="white-space: normal; word-break: break-word; text-align: left;">
+                                    {{ item.programa_educativo }}
+                                </span>
+                            </div>
                         </td>
 
                         <td class="text-end">
-                            <span class="badge badge-light-warning fw-bold fs-7">{{pe.solicitudes}} Solicitudes</span>
+                            <span class="badge badge-light-warning fw-bold fs-7">
+                                {{ item.total_registros }} Solicitudes
+                            </span>
                         </td>
                     </tr>
                 </tbody>
-                <!-- end::Table body -->
             </table>
-            <!-- end::Table -->
+            </div>
+        
+        <div *ngIf="datos.length === 0" class="text-center p-5 text-muted">
+            No hay programas educativos para mostrar.
         </div>
     </div>
 </div>
 
 <style>
+    /* Tus estilos se mantienen igual */
     .tooltip-css {
         position: relative;
         display: inline-block;

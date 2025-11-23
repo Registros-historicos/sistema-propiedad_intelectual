@@ -10,7 +10,7 @@ interface ProgramaEducativoDisplay {
 @Component({
   selector: 'app-programas-educativos',
   templateUrl: './programas-educativos.component.html',
-  styleUrl: './programas-educativos.component.scss'
+  styleUrl: './programas-educativos.component.scss',
 })
 export class ProgramasEducativosComponent implements OnInit {
   programasEducativos: ProgramaEducativoDisplay[] = [];
