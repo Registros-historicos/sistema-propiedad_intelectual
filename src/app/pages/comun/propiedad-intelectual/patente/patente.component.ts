@@ -843,24 +843,19 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         } as PatenteUIModel;
       }
     } else {
-      console.log('[PatenteComponent] Solicitando registro real al backend para edición. ID:', id);
 
       this.service.getPatent(id).subscribe({
-        next: (patente: IPatentModel) => {
-          console.log('[PatenteComponent] Respuesta del backend (detalle registro):', patente);
+        next: (patente: any) => {
+          console.log('dato receive:', patente)
 
           this.patenteModel = { ...this.patenteModel, ...patente };
-          console.log('[PatenteComponent] Modelo en edición después de merge:', this.patenteModel);
-          console.log('[PatenteComponent] Inventores recibidos desde backend:', this.patenteModel.inventores);
 
           this.convertirNombresAIdsParaEdicion();
-          console.log('[PatenteComponent] Modelo en edición después de convertirNombresAIdsParaEdicion:', this.patenteModel);
 
           if (!this.patenteModel.denominacion) {
             this.patenteModel.denominacion = this.patenteModel.nombrePatente;
           }
 
-          console.log('[PatenteComponent] Modelo final listo para el formulario de edición:', this.patenteModel);
         },
         error: (err) => {
           console.error('[PatenteComponent] Error al cargar el registro para edición:', err);
@@ -870,95 +865,120 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   saveEdit(modal: any) {
-    if (this.useLocalFakeData) {
-      const idx = this.FAKE_IMPI_DATA_LOCAL.findIndex(x => x.id === this.patenteModel.id);
-      if (idx > -1) {
-        // Actualizar todos los campos del modal en el arreglo local
-        const target = this.FAKE_IMPI_DATA_LOCAL[idx];
-        target.titulo = this.patenteModel.denominacion || this.patenteModel.nombrePatente || '';
-        target.rama = this.patenteModel.rama || '';
-        target.institucion = this.patenteModel.institucion || target.institucion || '';
-        target.fechaSolicitud = this.patenteModel.fechaSolicitud || '';
-        target.numeroExpediente = this.patenteModel.numeroExpediente || '';
-        target.numeroCertificado = this.patenteModel.numeroTitulo || '';
-        target.estatus = (this.patenteModel.estatus as EstatusPatente) || target.estatus;
-        target.medioIngreso = this.patenteModel.medioIngreso || '';
-        target.tecnologicoOrigen = this.patenteModel.tecnologicoOrigen || '';
-        target.cePat = this.patenteModel.cePat || '';
-        target.anioRenovacion = this.patenteModel.anioRenovacion || '';
-        target.tipoSector = this.patenteModel.tipoSector || '';
-        target.sector = this.patenteModel.sector || '';
-        target.subsector = this.patenteModel.subsector || '';
-        target.fechaExpedicion = this.patenteModel.fechaExpedicion || '';
-        target.archivo = this.patenteModel.archivo || '';
-        target.observaciones = this.patenteModel.observaciones || '';
-        target.descripcion = this.patenteModel.descripcion || '';
-        target.inventores = (this.patenteModel.inventores || []).map(i => ({ ...i }));
-
-        if (this.dtInstance) {
-          const updatedRow = {
-            id: this.FAKE_IMPI_DATA_LOCAL[idx].id,
-            rama: this.FAKE_IMPI_DATA_LOCAL[idx].rama,
-            nombrePatente: this.FAKE_IMPI_DATA_LOCAL[idx].titulo,
-            institucion: this.FAKE_IMPI_DATA_LOCAL[idx].institucion,
-            fechaSolicitud: this.FAKE_IMPI_DATA_LOCAL[idx].fechaSolicitud,
-            numeroExpediente: this.FAKE_IMPI_DATA_LOCAL[idx].numeroExpediente,
-            numeroTitulo: this.FAKE_IMPI_DATA_LOCAL[idx].numeroCertificado,
-          };
-          const row = this.dtInstance.row((i: number, data: any) => data.id === updatedRow.id);
-          if (row && row.data) {
-            row.data(updatedRow).draw(false);
-          } else {
-            this.dtInstance.rows().draw(false);
-          }
-        }
-      }
-      this.showAlert({ icon: 'success', title: 'Actualizado', text: 'El registro fue actualizado correctamente.' });
-      this.isViewMode = true;
-      modal.dismiss('saved');
-      return;
-    } else {
-      const payload: PatenteUIModel = {
-        id: this.patenteModel.id,
-        solicitudId: this.patenteModel.solicitudId,
-        nombrePatente: this.patenteModel.denominacion || this.patenteModel.nombrePatente,
-        solicitante: this.patenteModel.solicitante,
-        fechaSolicitud: this.patenteModel.fechaSolicitud,
-        rama_param: (this.patenteModel as any).ramaIdTemp as any,
-        estatus: this.patenteModel.estatus as IPatentModel['estatus'],
-        descripcion: this.patenteModel.descripcion || '',
-        institucion: this.patenteModel.institucion || '',
-        correo: this.patenteModel.correo || '',
-        documentos: this.patenteModel.documentos || [],
-        observaciones: this.patenteModel.observaciones || '',
+    console.log(modal)
+    if (!this.patenteModel) {
+      const alertaError: SweetAlertOptions = {
+        icon: 'error',
+        title: 'Error',
+        text: 'No se encontró la información del registro a editar.',
       };
-
-      this.service.updatePatent(this.patenteModel.id, payload).subscribe({
-        next: (updated) => {
-          this.showAlert({
-            icon: 'success',
-            title: 'Actualizado',
-            text: 'El registro fue actualizado correctamente.'
-          });
-          this.reloadEvent.emit(true);
-          this.isViewMode = true;
-          modal.dismiss('saved');
-        },
-        error: (err) => {
-          console.error('❌ Error completo al actualizar patente:', err);
-          console.error('❌ Error details:', err.error);
-          console.error('❌ Error status:', err.status);
-          console.error('❌ Error message:', err.message);
-          console.error('Error al actualizar patente', err);
-          this.showAlert({
-            icon: 'error',
-            title: 'Error',
-            text: 'No se pudo actualizar el registro.'
-          });
-        }
-      });
+      this.showAlert(alertaError);
+      return;
     }
+
+    const id =
+      (this.patenteModel as any).id_registro ??
+      (this.patenteModel as any).id;
+
+    if (!id) {
+      const alertaError: SweetAlertOptions = {
+        icon: 'error',
+        title: 'Error',
+        text: 'No se encontró el identificador del registro a editar.',
+      };
+      this.showAlert(alertaError);
+      return;
+    }
+
+    if (!this.patenteModel.denominacion || !this.patenteModel.denominacion.trim()) {
+      const alertaError: SweetAlertOptions = {
+        icon: 'warning',
+        title: 'Campos obligatorios',
+        text: 'La denominación no puede estar vacía.',
+      };
+      this.showAlert(alertaError);
+      return;
+    }
+
+    if ((this.patenteModel as any).rama_param && !this.patenteModel.rama) {
+      this.patenteModel.rama = (this.patenteModel as any).rama_param;
+    }
+
+    if ((this.patenteModel as any).medio_ingreso_param && !this.patenteModel.medioIngreso) {
+      this.patenteModel.medioIngreso = (this.patenteModel as any).medio_ingreso_param;
+    }
+
+    this.isSaving = true;
+
+    console.log("id a acttualizar:", id)
+    console.log("datos:", this.patenteModel)
+
+    const payload: PatenteUIModel = {
+      ...this.patenteModel,
+
+      // Identificadores y títulos
+      id,
+      solicitudId: this.patenteModel.solicitudId || this.patenteModel.numeroExpediente || '',
+      numeroExpediente: this.patenteModel.numeroExpediente || this.patenteModel.solicitudId,
+      nombrePatente: this.patenteModel.denominacion.trim(),
+      denominacion: this.patenteModel.denominacion.trim(),
+
+      // Fechas (en formato YYYY-MM-DD)
+      fechaSolicitud: this.patenteModel.fechaSolicitud,
+      fechaExpedicion: this.patenteModel.fechaExpedicion,
+
+      // 🔹 Rama (lo que editas en el modal es `rama_param`)
+      //    Lo copiamos a `rama`, que es lo que usa el service para mapear al backend
+      rama: (this.patenteModel as any).rama_param || this.patenteModel.rama,
+
+      // 🔹 Medio de ingreso (del modal: `medio_ingreso_param`)
+      medioIngreso: (this.patenteModel as any).medio_ingreso_param || this.patenteModel.medioIngreso,
+
+      // 🔹 Subsector: aquí tu modelo ya trae el id_subsector como string ("260")
+      subsector: this.patenteModel.subsector,
+
+      // 🔹 Tipo de sector, tecnológico de origen, año de renovación
+      tipoSector: this.patenteModel.tipoSector,
+      tecnologicoOrigen: this.patenteModel.tecnologicoOrigen,
+      anioRenovacion: this.patenteModel.anioRenovacion,
+
+      // 🔹 Estatus / observaciones / archivo / descripción
+      estatus: this.patenteModel.estatus,
+      observaciones: this.patenteModel.observaciones,
+      descripcion: this.patenteModel.descripcion,
+      archivo: this.patenteModel.archivo || this.patenteModel.documentos?.[0] || '',
+    };
+
+    console.log('payload', payload)
+
+    this.service.updatePatent(id, payload).subscribe({
+      next: () => {
+        this.isSaving = false;
+
+        const alertaExito: SweetAlertOptions = {
+          icon: 'success',
+          title: 'Registro actualizado',
+          text: 'La patente se actualizó correctamente.',
+        };
+        this.showAlert(alertaExito);
+
+        // Cerramos el modal y notificamos al padre que recargue la tabla
+        modal.close();
+        this.reloadEvent.emit(true);
+      },
+      error: (error) => {
+        this.isSaving = false;
+        console.error('Error al actualizar patente:', error);
+        const alertaError: SweetAlertOptions = {
+          icon: 'error',
+          title: 'Error',
+          text: 'Ocurrió un problema al actualizar la patente. Inténtalo de nuevo.',
+        };
+        this.showAlert(alertaError);
+      },
+    });
   }
+
 
 
   private convertirNombresAIdsParaEdicion(): void {

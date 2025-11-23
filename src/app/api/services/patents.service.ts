@@ -40,7 +40,6 @@ export class PatentsService {
     const page = Math.floor((tableParams.start || 0) / (tableParams.length || 10)) + 1;
     const limit = tableParams.length || 10;
     const searchValue = q || '';
-    console.error('search: ' + searchValue)
 
     let sortColumn = 'fec_solicitud';
     let sortOrder = 'DESC';
@@ -73,20 +72,17 @@ export class PatentsService {
 
         // 🔹 Elegir entre búsqueda o listado normal
         if (searchValue && searchValue.trim() !== '') {
-          console.log('if')
           const safeSortColumn = (['no_expediente', 'id_registro', 'rama_param', 'titulo', 'fec_solicitud'].includes(sortColumn))
             ? sortColumn
             : 'fec_solicitud';
           return this.searchPatents(searchValue, page, limit, safeSortColumn, sortOrder);
 
         }
-        console.log('else')
         return this.listPatents(page, limit, sortColumn, sortOrder);
       }),
       map((response) => {
         // 🔹 Ahora sí formatear con los catálogos ya cargados
         const formatted = this.formatForDataTables(response, tableParams.draw);
-        console.log('✅ Catálogos aplicados, ejemplo de estatus:', formatted.data[0]?.estatus);
         return formatted;
       })
     );
@@ -207,7 +203,6 @@ export class PatentsService {
 
     return this.http.get<any>(`${this.apiUrl}/search`, { params }).pipe(
       map(response => {
-        console.log('response')
         let total = 0;
         let results = [];
 
@@ -248,10 +243,6 @@ export class PatentsService {
       data: (response.results || []).map(patent => {
         const uiPatent = this.mapBackendToFrontend(patent);
 
-        // 🔹 2. Lo imprimes para depuración
-        console.log('Patente mapeada para DataTables:', uiPatent);
-
-        // 🔹 3. Lo regresas para que el array `data` contenga objetos válidos
         return uiPatent;
       })
     };
@@ -368,8 +359,6 @@ export class PatentsService {
       backendPatent.rama_param ? backendPatent.rama_param.nombre
         : '';
 
-    console.log(backendPatent.rama_param)
-
     const estatus_nombre =
       (backendPatent.estatus_param && typeof backendPatent.estatus_param === 'object'
         ? backendPatent.estatus_param.nombre
@@ -409,8 +398,6 @@ export class PatentsService {
         subsector_nombre = chain.subsector;
       }
     }
-
-    console.log(backendPatent.id_subsector)
 
     const result: PatenteUIModel = {
       // ========================================
@@ -468,7 +455,6 @@ export class PatentsService {
       inventores,
     };
 
-    console.log(result)
     return result;
   }
 
@@ -485,7 +471,7 @@ export class PatentsService {
     );
   }
 
-  public updatePatent(id: number, patent: IPatentModel): Observable<IPatentModel> {
+  public updatePatent(id: number, patent: any): Observable<IPatentModel> {
     const backendData = this.mapFrontendToBackend(patent);
     return this.http.put<any>(`${this.apiUrl}/${id}/`, backendData).pipe(
       map(response => this.mapBackendToFrontend(response))
@@ -510,44 +496,130 @@ export class PatentsService {
       return date;
     };
 
+    const formatDateOrNull = (date: string | null | undefined): string | null => {
+      if (!date || date === 'Pendiente') {
+        // Aquí NO ponemos la fecha actual, dejamos null
+        return null;
+      }
+      if (date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        return date;
+      }
+      if (date.includes('T')) {
+        return date.split('T')[0];
+      }
+      return date;
+    };
+
+    const rama_param_backend =
+      patent.rama_param && /^\d+$/.test(String(patent.rama_param))
+        ? String(patent.rama_param)
+        : this.mapRamaToBackend(patent.rama_param || patent.rama || 'Invención');
+
+    const medio_ingreso_param_backend =
+      patent.medio_ingreso_param && /^\d+$/.test(String(patent.medio_ingreso_param))
+        ? String(patent.medio_ingreso_param)
+        : this.mapMedioIngresoToBackend(patent.medio_ingreso_param || patent.medioIngreso || 'Ventanilla');
+
+    const tipo_sector_param_backend =
+      patent.tipo_sector_param && /^\d+$/.test(String(patent.tipo_sector_param))
+        ? String(patent.tipo_sector_param)
+        : this.mapSectorToBackend(patent.tipoSector || 'Quinario');
+
+    const id_subsector_backend =
+      patent.subsector && /^\d+$/.test(String(patent.subsector))
+        ? Number(patent.subsector)
+        : null;
+
     return {
-      no_expediente: patent.solicitudId || patent.numeroExpediente || '',
-      titulo: patent.nombrePatente || patent.denominacion || '',
+      no_expediente: patent.solicitudId || patent.numeroExpediente || patent.no_expediente || '',
+      titulo: patent.nombrePatente || patent.denominacion || patent.titulo || '',
       descripcion: patent.descripcion || '',
       tipo_ingreso_param: '2',
-      id_usuario: 1,
-      rama_param: this.mapRamaToBackend(patent.rama || 'Invención'),
-      medio_ingreso_param: this.mapMedioIngresoToBackend(patent.medioIngreso || 'Ventanilla'),
-      tipo_sector_param: this.mapSectorToBackend(patent.tipoSector || 'Quinario'),
+      id_usuario: Number(patent.solicitante) || 1,
+
+      rama_param: rama_param_backend,
+      medio_ingreso_param: medio_ingreso_param_backend,
+      tipo_sector_param: tipo_sector_param_backend,
+
       tipo_registro_param: this.TIPO_PATENTE,
       estatus_param: this.mapEstatusToBackend(patent.estatus || 'En trámite'),
-      fec_solicitud: formatDate(patent.fechaSolicitud),
-      fec_expedicion: formatDate(patent.fechaExpedicion),
+
+      fec_solicitud: formatDate(patent.fechaSolicitud || patent.fec_solicitud),
+      fec_expedicion: formatDateOrNull(patent.fechaExpedicion || patent.fec_expedicion),
       archivo: patent.archivo || (patent.documentos?.[0]) || '',
       observaciones: patent.observaciones || 'Sin observaciones',
+
+      id_subsector: id_subsector_backend,
     };
   }
 
   private mapRamaToBackend(rama: string): string {
+    const raw = rama != null ? String(rama).trim() : '';
+
+    if (/^\d+$/.test(raw)) {
+      return raw;
+    }
+
+    const normalized = raw.toLowerCase();
+
     const ramaMap: { [key: string]: string } = {
-      'Invención': '1',
-      'Modelo de utilidad': '2',
-      'Diseño Industrial': '3',
-      'Diseño industrial': '3',
-      'Marca': '4'
+      'invención': '177',
+      'Marca': '4',
+      'patente': '177',
+      'marca': '178',              // id_param = 178
+      'aviso comercial': '179',    // id_param = 179
+      'diseño industrial': '180',  // id_param = 180
+      'diseno industrial': '180',  // alias sin acento
+      'modelo de utilidad': '181',
+      'audiovisual': '8',                              // id_param = 8
+      'copilación de datos (base de datos)': '9',      // id_param = 9
+      'copilacion de datos (base de datos)': '9',
+      'dibujo': '10',                                  // id_param = 10
+      'isbn': '11',                                    // id_param = 11
+      'issn': '12',                                    // id_param = 12
+      'literaria': '13',                               // id_param = 13
+      'literaria (arte digital por analogía)': '14',   // id_param = 14
+      'literaria (arte digital por analogia)': '14',
+      'programa de computación': '15',                 // id_param = 15
+      'programa de computacion': '15',
+      'programa de computación (app por analogía)': '16', // id_param = 16
+      'programa de computacion (app por analogia)': '16',
+      'reserva de derechos': '17',                     // id_param = 17
+      'trazado de circuito': '176',
+      'N/A': '1'
     };
-    return ramaMap[rama] || '1';
+
+    return ramaMap[normalized] || '1';
   }
 
   private mapMedioIngresoToBackend(medioIngreso: string): string {
+    const raw = medioIngreso != null ? String(medioIngreso).trim() : '';
+
+    if (/^\d+$/.test(raw)) {
+      return raw;
+    }
+
+    const normalized = raw.toUpperCase();
     const medioMap: { [key: string]: string } = {
-      'VENTANILLA': '1',
-      'Indautor': '2',
-      'Cuenta Pase IMPI': '3',
-      'EN LÍNEA': '2',
-      'N/A': '1'
+      'INDAUTOR': '38',                               // id_param = 38
+      'ISBN': '39',                                   // id_param = 39
+      'INDAINDAUTOR - CENTRO NACIONAL DE ISSN UTOR': '40', // id_param = 40 (texto tal como está en la BD)
+      'VENTANILLA': '41',                             // id_param = 41
+      'INDAUTOR - CENTRO NACIONAL DE ISSN': '42',     // id_param = 42
+      'INDARELIN': '43',                              // id_param = 43
+
+      // ----- Alias que tú usas en el front (opcional) -----
+      // Asumo que "Cuenta Pase IMPI" y "EN LÍNEA" son medios en línea,
+      // los mapeo al mismo id que "Indarelin" (43). Si en tu modelo
+      // deberían ir a otro id_param, solo cambia estos valores.
+      'CUENTA PASE IMPI': '43',
+      'EN LÍNEA': '43',
+      'EN LINEA': '43',
+
+      // Si pones "N/A" en el front, lo mandamos a "VENTANILLA" como neutro
+      'N/A': '1',
     };
-    return medioMap[medioIngreso] || '1';
+    return medioMap[normalized] || '1';
   }
 
   private mapSectorToBackend(tipoSector: string): string {
@@ -562,17 +634,42 @@ export class PatentsService {
     return sectorMap[tipoSector] || '5';
   }
 
-  private mapEstatusToBackend(estatus: string): string {
+  private mapEstatusToBackend(estatus: string | null | undefined): string {
+    // 1) Normalizamos a texto “seguro”
+    const raw = (estatus || '').trim();
+    const normalized = raw.toLowerCase();
+
+    // 2) Mapa de texto (front) → id_param (tabla parametrizacion, id_tema = 7)
     const estatusMap: { [key: string]: string } = {
-      'Registrada': '1',
-      'En trámite': '2',
-      'Trámite con observaciones': '3',
-      'Aprobada': '4',
-      'Concluida': '5',
-      'En espera de validación': '2'
+      // == Estados que manejas en el front ==
+      'registrada': '34',                   // Notificada al Tecnológico
+      'en trámite': '27',                   // Pendiente
+      'en tramite': '27',
+      'trámite con observaciones': '28',    // Con Observaciones
+      'tramite con observaciones': '28',
+      'aprobada': '26',                     // Confirmada
+      'concluida': '30',                    // Finalizada
+
+      // == Otros estados que también pueden venir desde el back/front ==
+      'cancelada': '31',                    // Cancelada
+      'en pausa': '32',                     // En pausa
+      'en espera de validación': '33',      // En espera de validación
+      'en espera de validacion': '33',
+
+      // == Nombres tal cual aparecen en parametrizacion ==
+      'confirmada': '26',
+      'pendiente': '27',
+      'con observaciones': '28',
+      'rechazada': '29',
+      'finalizada': '30',
+      'notificada al tecnológico': '34',
+      'notificada al tecnologico': '34'
     };
-    return estatusMap[estatus] || '2';
+
+    // 3) Si no lo encontramos, devolvemos '27' (Pendiente) como estado neutro
+    return estatusMap[normalized] || '27';
   }
+
 
   public updatePatentStatus(patentId: number, newStatus: IPatentModel['estatus']): Observable<any> {
     return this.updatePatent(patentId, { estatus: newStatus } as IPatentModel);
