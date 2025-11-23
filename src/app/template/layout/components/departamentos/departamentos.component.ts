@@ -61,9 +61,10 @@ export class DepartamentosComponent implements OnInit {
           nombre: depto.nombre_departamento,
           totalSolicitudes: depto.total
         }));
+        this.isLoading = false;
       },
       error: (error: any) => {
-        this.isLoading = false;
+        this.isLoading = true;
         
         // Opcional: Mantener datos mock como fallback
         this.departamentos = [];
