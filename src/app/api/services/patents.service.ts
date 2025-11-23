@@ -369,8 +369,6 @@ export class PatentsService {
       }
     }
 
-    console.log('rama_param backend:', backendPatent.rama_param, '→ rama_nombre:', rama_nombre);
-
     const estatus_nombre =
       (backendPatent.estatus_param && typeof backendPatent.estatus_param === 'object'
         ? backendPatent.estatus_param.nombre
