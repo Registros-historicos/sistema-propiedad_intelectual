@@ -25,35 +25,30 @@ export class DashboardComponent implements OnInit{
     this.loadRegisterInstitutes(122);
   }
 
+  // Método invocado por el evento (retry) en la plantilla para recargar datos
   loadRegisterInstitutes(tipo: number): void {
-  console.log(`🔍 Cargando instituciones tipo: ${tipo}`);
-  
-  this.tablerosService.getInstitucionesFiltradas(tipo).subscribe({
-    next: (data) => {
-      console.log(`✅ Datos recibidos para tipo ${tipo}:`, data);
-      
-      if (tipo === 122) {
-        this.dataDecentralizedInstitutes = [...data];
-        console.log('📊 Descentralizadas:', this.dataDecentralizedInstitutes);
-      } else {
-        this.dataFederalInstitutes = [...data];
-        console.log('📊 Federales:', this.dataFederalInstitutes);
+    // Llama al servicio para obtener las instituciones filtradas (mismo comportamiento que AdminDashboard)
+    this.tablerosService.getNewInstitucionesFiltradas(tipo ?? 0).subscribe({
+      next: (data) => {
+        if (tipo === 122) {
+          this.dataDecentralizedInstitutes = [...data];
+        } else {
+          this.dataFederalInstitutes = [...data];
+        }
+        this.cdRef.detectChanges();
+      },
+      error: (error: any) => {
+        console.error('ERROR cargando instituciones filtradas:', error);
+        // fallback a datos estáticos si el endpoint falla
+        if (tipo === 122) {
+          this.dataDecentralizedInstitutes = [];
+        } else {
+          this.dataFederalInstitutes = [];
+        }
+        this.cdRef.detectChanges();
       }
-      this.cdRef.detectChanges();
-    },
-    error: (error: any) => {
-      console.error(`❌ ERROR cargando instituciones tipo ${tipo}:`, error);
-      
-      if (tipo === 122) {
-        this.dataDecentralizedInstitutes = [];
-      } else {
-        this.dataFederalInstitutes = [];
-      }
-      this.cdRef.detectChanges();
-    }
-  });
-}
-
+    });
+  }
 
   private loadTop10Institutions(): void {
   this.tablerosService.getTopInstitutions().subscribe({

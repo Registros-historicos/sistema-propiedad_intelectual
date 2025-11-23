@@ -47,12 +47,6 @@ export interface ProgramaEducativo {
   total_registros: number;
 }
 
-export interface ProgramaEducativo {
-  programa_educativo_param: number;
-  nombre_programa_educativo: string;
-  total: number;
-}
-
 @Injectable({
   providedIn: 'root'
 })
@@ -156,43 +150,20 @@ export class TablerosService {
     return this.http.get<any[]>('/api/tableros/investigadores/sexo');
   }
 
-getInstitucionesFiltradas(tipoInstitucion: number): Observable<Instituto[]> {
-  if (tipoInstitucion !== 122 && tipoInstitucion !== 123) {
-    console.warn('⚠️ Tipo de institución inválido:', tipoInstitucion);
-    return of<Instituto[]>([]);
+  getInstitucionesFiltradas(tipoInstitucion: number): Observable<Instituto[]> {
+    let params = new HttpParams();
+    if (tipoInstitucion) {
+      params = params.set('tipo_institucion', tipoInstitucion.toString());
+    }
+    return this.http.get<any[]>('/api/tableros/instituciones/filtradas/', { params }).pipe(
+      map(data => this.normalizeInstitutoData(data, tipoInstitucion)),
+      catchError(error => {
+        console.error('Error en getInstitucionesFiltradas:', error);
+        return of([]);
+      })
+    );
   }
 
-  const params = new HttpParams().set('tipo_institucion', String(tipoInstitucion));
-
-  return this.http.get<any[]>('/api/tableros/instituciones/filtradas/', { params }).pipe(
-    map(data => {
-      console.log(`✅ Datos recibidos del backend (tipo ${tipoInstitucion}):`, data);
-      
-      if (!Array.isArray(data)) {
-        console.error('❌ La respuesta no es un array:', data);
-        return [];
-      }
-
-      const mapped = data.map(item => ({
-        tipo_institucion_param: tipoInstitucion,
-        nombre_tipo_institucion: this.getTipoInstitucion(tipoInstitucion),
-        nombre_institucion: item.institucion_nombre || 'Sin nombre',
-        total_registros: item.total || 0,
-        // Campos adicionales para compatibilidad
-        total: item.total || 0,
-        registros: item.total || 0,
-        count: item.total || 0
-      } as Instituto));
-
-      console.log(`✅ Datos mapeados (${mapped.length} items):`, mapped);
-      return mapped;
-    }),
-    catchError(error => {
-      console.error('❌ Error en getInstitucionesFiltradas:', error);
-      return of<Instituto[]>([]);
-    })
-  );
-}
   getNewInstitucionesFiltradas(tipoInstitucion: number): Observable<Institute[]> {
     if (tipoInstitucion !== 122 && tipoInstitucion !== 123) {
       return of<Institute[]>([]);
@@ -305,14 +276,5 @@ getInstitucionesFiltradas(tipoInstitucion: number): Observable<Instituto[]> {
   const url = `/api/tableros/registros/periodo/?inicio=${inicio}&fin=${fin}`;
   return this.http.get<{ mes: number; total: number }[]>(url);
 }
-
-getRegistrosPorProgramaEducativo(): Observable<ProgramaEducativo[]> {
-    return this.http.get<ProgramaEducativo[]>('/api/tableros/programas-educativos/').pipe(
-      catchError(error => {
-        console.error('Error en getRegistrosPorProgramaEducativo:', error);
-        return of([]);
-      })
-    );
-  }
 
 }
