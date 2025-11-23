@@ -321,21 +321,26 @@
       <div class="row g-9 mb-7">
         <div class="row g-9 mb-7">
           <div class="fv-row col-md-6">
-            <label class="fw-semibold fs-6 mb-2 text-gray-600">Tecnológico de Origen</label>
-            <select class="form-select form-select-sm" id="tecnologicoOrigen" name="tecnologicoOrigen"
-              [(ngModel)]="patenteModel.tecnologicoOrigen">
-              <option [ngValue]="null">Seleccione un tecnológico</option>
-              <option *ngFor="let t of tecnologicosOrigenCatalogo" [ngValue]="t">
-                {{ t }}
+            <label class="fw-semibold fs-6 mb-2 text-gray-600">CePat</label>
+            <select id="cePat" class="form-select" name="cePat" [(ngModel)]="selectedCepatId"
+              (ngModelChange)="onCepatChange($event)">
+              <option [ngValue]="null" disabled>Seleccione un CEPA</option>
+              <option *ngFor="let ce of cepatList" [ngValue]="ce.id_cepat">
+                {{ ce.nombre }}
               </option>
             </select>
+
           </div>
           <div class="fv-row col-md-6">
-            <label class="fw-semibold fs-6 mb-2 text-gray-600">CePat</label>
-            <select class="form-select form-select-sm" id="cePat" name="cePat" [(ngModel)]="patenteModel.cePat">
-              <option [ngValue]="null">Seleccione un CePat</option>
-              <option *ngFor="let c of cePatCatalogo" [ngValue]="c">
-                {{ c }}
+            <label class="fw-semibold fs-6 mb-2 text-gray-600">Tecnológico de Origen</label>
+            <select id="tecnologicoOrigen" class="form-select" name="tecnologicoOrigen" [disabled]="!selectedCepatId"
+              [(ngModel)]="institucionSeleccionadaCepat" (ngModelChange)="onInstitucionCepatChange($event)">
+              <option [ngValue]="null" disabled>
+                {{ !selectedCepatId ? 'Seleccione primero un CEPA' : 'Seleccione una institución' }}
+              </option>
+
+              <option *ngFor="let inst of institucionesCepat" [ngValue]="inst.id_institucion">
+                {{ inst.nombre }}
               </option>
             </select>
           </div>

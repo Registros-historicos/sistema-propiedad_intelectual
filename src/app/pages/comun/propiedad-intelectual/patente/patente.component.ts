@@ -13,6 +13,8 @@ import { ENTIDADES_FEDERATIVAS_DATA } from 'src/app/api/data/entity.data';
 import { ENTIDADES_FEDERATIVAS_MAP } from 'src/app/api/data/entity-institucion.data';
 import { ImpiRegistriesService } from '../../../../api/services/impi.service';
 import { ParametrizacionesService, Catalogos, Parametrizacion, } from '../../../../api/services/parametrizaciones.service';
+import { CepatService, Cepat } from 'src/app/api/services/cepat.service';
+import { InstitucionesService, Institucion } from 'src/app/api/services/insttituciones.service';
 
 type EstatusPatente = 'Registrada' | 'En trámite' | 'Trámite con observaciones' | 'Aprobada' | 'Concluida';
 
@@ -90,6 +92,13 @@ interface SubsectorItem {
   styleUrl: './patente.component.scss'
 })
 export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
+  // Lista de CEPA(t) e instituciones para los selects
+  cepatList: Cepat[] = [];
+  institucionesCepat: Institucion[] = [];
+
+  // Selecciones actuales
+  selectedCepatId: number | null = null;
+  institucionSeleccionadaCepat: number | null = null;
   isCollapsed1 = false;
   isCollapsed2 = true;
   ramasCatalogo: Parametrizacion[] = [];
@@ -459,8 +468,9 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private translate: TranslateService,
     private impiService: ImpiRegistriesService,
-    private parametrizacionesServices: ParametrizacionesService // ← AGREGAR ESTO
-
+    private parametrizacionesServices: ParametrizacionesService,
+    private cepatService: CepatService,
+    private institucionesService: InstitucionesService,
   ) {
     this.tranlatesPlaceholders = {
       METHOD_SUBMISSION: this.translate.instant('FORMS.PLACEHOLDERS.METHOD_SUBMISSION'),
@@ -513,7 +523,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.placeholder = this.translate.instant('TABLE.PLACEHOLDER_SEARCH')
     this.cargarCatalogos();
-
+    this.cargarCepats();
 
     // Para mostrar el mismo arreglo y columnas que en INDAUTOR/local, usa el dataset local propio de este componente
 
@@ -697,12 +707,72 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onFilter(ev: any) {
     this.search = ev.target.value?.trim() || '';
-    console.log('search: ' + this.search)
     if (this.dtInstance) {
       this.dtInstance.ajax.reload(); // fuerza server-side con q=this.search
     }
   }
 
+  private cargarCepats(): void {
+    this.cepatService.getAllCepat().subscribe(cepats => {
+      this.cepatList = cepats;
+    });
+  }
+
+  onCepatChange(cepatId: number | null): void {
+    // 1) Normalizamos el valor a número
+    const id = cepatId !== null ? Number(cepatId) : NaN;
+
+    // 2) Si es inválido, limpiamos todo y salimos
+    if (Number.isNaN(id)) {
+      this.selectedCepatId = null;
+      this.institucionesCepat = [];
+      this.institucionSeleccionadaCepat = null;
+      this.patenteModel.tecnologicoOrigen = '';
+      this.patenteModel.cePat = '';
+      return;
+    }
+
+    // 3) Guardamos el CEPA seleccionado
+    this.selectedCepatId = id;
+    this.institucionesCepat = [];
+    this.institucionSeleccionadaCepat = null;
+    this.patenteModel.tecnologicoOrigen = '';
+
+    // 4) Opcional: guardamos el nombre del CEPA en el modelo
+    const cepatSeleccionado = this.cepatList.find(c => c.id_cepat === id);
+    this.patenteModel.cePat = cepatSeleccionado ? cepatSeleccionado.nombre : '';
+
+    // 5) Pedimos al backend las instituciones asociadas a ese CEPA
+    this.institucionesService.getByCepat(id).subscribe({
+      next: (instituciones: any) => {
+        console.log('[instituciones] ', instituciones);
+        this.institucionesCepat = instituciones || [];
+      },
+      error: (err: any) => {
+        console.error('Error al cargar instituciones por CEPA:', err);
+        this.institucionesCepat = [];
+      }
+    });
+  }
+
+  onInstitucionCepatChange(institucionIdValue: number | null): void {
+    const id = institucionIdValue !== null ? Number(institucionIdValue) : NaN;
+
+    if (Number.isNaN(id)) {
+      this.institucionSeleccionadaCepat = null;
+      this.patenteModel.tecnologicoOrigen = '';
+      return;
+    }
+
+    this.institucionSeleccionadaCepat = id;
+
+    const institucion = this.institucionesCepat.find(inst => inst.id_institucion === id);
+    if (institucion) {
+      this.patenteModel.tecnologicoOrigen = institucion.nombre;
+    } else {
+      this.patenteModel.tecnologicoOrigen = '';
+    }
+  }
 
   onPageLengthChange(event: any): void {
     const newLength = parseInt(event.target.value);
@@ -906,7 +976,6 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
 
       this.service.getPatent(id).subscribe({
         next: (patente: any) => {
-          console.log('dato receive:', patente)
 
           this.patenteModel = { ...this.patenteModel, ...patente };
 
@@ -1063,8 +1132,6 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       id_subsector: subsectorId,
       tipo_ingreso_param: (this.patenteModel as any).tipo_ingreso_param, // ej. IMPI = 44
     };
-
-    console.log('[PatenteComponent] Payload a enviar en update:', payload);
 
     this.service.updatePatent(id, payload).subscribe({
       next: () => {
