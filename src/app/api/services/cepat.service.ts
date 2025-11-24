@@ -36,7 +36,7 @@ export interface Institucion {
   providedIn: 'root',
 })
 export class CepatService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   createNewUserCepat(usuario: UserCepat): Observable<UserCepat> {
     return this.http.post<UserCepat>('/api/usuarios/', usuario).pipe(
@@ -72,13 +72,32 @@ export class CepatService {
   getAllCepat(): Observable<Cepat[]> {
     return this.http.get<Cepat[]>('/api/cepat/').pipe(
       map((data) => {
-        return data;
+        console.log('[cepats crudos] ', data);
+
+        const mapaPorNombre = new Map<string, Cepat>();
+
+        for (const item of data) {
+          const existente = mapaPorNombre.get(item.nombre);
+
+          if (!existente) {
+            mapaPorNombre.set(item.nombre, item);
+          } else {
+            if (!existente.id_usuario && item.id_usuario) {
+              mapaPorNombre.set(item.nombre, item);
+            }
+          }
+        }
+
+        const resultado = Array.from(mapaPorNombre.values());
+        console.log('[cepats únicos] ', resultado);
+        return resultado;
       }),
       catchError(() => {
         return of([]);
       })
     );
   }
+
 
   getEstados(): Observable<Estado[]> {
     return this.http.get<Estado[]>('api/parametrizaciones/estados/').pipe(
