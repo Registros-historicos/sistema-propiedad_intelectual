@@ -10,7 +10,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { HttpResponse } from '@angular/common/http';
 import { ENTIDADES_FEDERATIVAS_DATA } from 'src/app/api/data/entity.data';
 import { ENTIDADES_FEDERATIVAS_MAP } from 'src/app/api/data/entity-institucion.data';
-import { SECTORES_DATA, ESTATUS_DATA } from 'src/app/api/data/sectores.data';
+import { SECTORES_DATA, ESTATUS_DATA, CUERPOS_ACADEMICOS_DATA, DEPARTAMENTOS_DATA, PROGRAMAS_EDUCATIVOS_DATA } from 'src/app/api/data/sectores.data';
 import { FederalEntity } from 'src/app/api/models/entity.model';
 import { UsersService } from 'src/app/api/services/usuarios.service';
 
@@ -43,6 +43,9 @@ export class ReporteSelectorComponent implements OnInit {
   instituciones: { id: number; nombre: string }[] = [];
   sectores: FederalEntity[] = SECTORES_DATA;
   estatus: FederalEntity[] = ESTATUS_DATA;
+  cuerposAcademicos: FederalEntity[] = CUERPOS_ACADEMICOS_DATA;
+  departamentos: FederalEntity[] = DEPARTAMENTOS_DATA;
+  programasEducativos: FederalEntity[] = PROGRAMAS_EDUCATIVOS_DATA;
 
   user$: Observable<CurrentUser | null>;
   modalOpen = false;
@@ -51,6 +54,8 @@ export class ReporteSelectorComponent implements OnInit {
   userProfile: any = null;
 
   errorMsg = '';
+
+  isCoordinador = false;
 
   constructor(
     private router: Router,
@@ -78,6 +83,8 @@ export class ReporteSelectorComponent implements OnInit {
     else if (url.includes('/solicitante/')) this.perfil = 'solicitante';
     else if (url.includes('/cepat/')) this.perfil = 'cepat';
 
+    this.isCoordinador = this.perfil === 'coordinador';
+
     this.reportes = REPORTES_POR_ROL[this.perfil];
 
     this.entidades = [...ENTIDADES_FEDERATIVAS_DATA].sort(
@@ -87,9 +94,10 @@ export class ReporteSelectorComponent implements OnInit {
     this.loadUserProfile();
     this.instituciones = this.getAllInstitutes()
     .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+    
   }
 
-  private extractSimpleProfile(apiUser: any, currentUser: any): { fullname: string; occupation: string } {
+  private extractSimpleProfile(apiUser: any, currentUser: any): { fullname: string; occupation: string, companyName: string } {
     const contexto = currentUser?.contexto;
 
     const fullnameFromApi = [
@@ -107,14 +115,16 @@ export class ReporteSelectorComponent implements OnInit {
     if (contexto?.rol_nombre && contexto?.institucion_nombre) {
       return {
         fullname,
-        occupation: `${contexto.rol_nombre} - ${contexto.institucion_nombre}`
+        occupation: `${contexto.rol_nombre} - ${contexto.institucion_nombre}`,
+        companyName: this.getSpecificCompanyName(contexto)
       };
     }
 
     if (contexto?.rol_nombre && contexto?.cepat_nombre) {
       return {
         fullname,
-        occupation: `${contexto.rol_nombre} - ${contexto.cepat_nombre}`
+        occupation: `${contexto.rol_nombre} - ${contexto.cepat_nombre}`,
+        companyName: this.getSpecificCompanyName(contexto)
       };
     }
 
@@ -132,7 +142,7 @@ export class ReporteSelectorComponent implements OnInit {
       basicRoleMap[currentUser?.roles?.[0] as keyof typeof basicRoleMap] ||
       "Usuario";
 
-    return { fullname, occupation: roleName };
+    return { fullname, occupation: roleName, companyName: this.getSpecificCompanyName(contexto) };
   }
 
   // ======================================================
@@ -231,40 +241,141 @@ export class ReporteSelectorComponent implements OnInit {
     const currentUser = this.auth.currentUserValue;
     this.isLoading = true;
 
+    if (!currentUser) {
+      this.userProfile = { fullname: "Usuario", occupation: "Usuario del Sistema", companyName: null };
+      this.isLoading = false;
+      return;
+    }
+
+    // NUEVO: intentar primero /me/profile/
+    this.usersService.getMyProfileCompleto().subscribe({
+      next: (perfilCompleto) => {
+        if (perfilCompleto) {
+          this.userProfile = this.mapUserDataFromProfile(perfilCompleto, currentUser);
+          this.isLoading = false;
+          return;
+        }
+        this.loadUserProfileFallback(currentUser);
+      },
+      error: () => {
+        this.loadUserProfileFallback(currentUser);
+      }
+    });
+  }
+
+  private loadUserProfileFallback(currentUser: any): void {
     if (currentUser && currentUser.email) {
       this.usersService.getUserByEmail(currentUser.email).subscribe({
         next: (apiUser) => {
-          this.userProfile = this.extractSimpleProfile(apiUser, currentUser);
+          this.userProfile = this.mapUserData(apiUser, currentUser);
           this.isLoading = false;
-          this.auth.setUserProfile(this.userProfile);
         },
         error: () => {
-          this.userProfile = this.extractSimpleProfile(null, currentUser);
+          this.userProfile = this.mapUserDataFromAuth(currentUser);
           this.isLoading = false;
         }
       });
     } else {
-      this.userProfile = { fullname: "Usuario", occupation: "Usuario del Sistema" };
+      this.userProfile = this.mapUserDataFromAuth(currentUser);
       this.isLoading = false;
     }
   }
 
-  private buildPayload(formValues?: any): any {
+  private mapUserDataFromProfile(apiProfile: any, currentUser: any): any {
+    const contexto = apiProfile?.contexto || currentUser?.contexto;
+    const perfil = apiProfile?.perfil || {};
+
+    return {
+      fullname:
+        perfil.nombre_completo ||
+        `${apiProfile.nombre || ''} ${apiProfile.ape_pat || ''} ${apiProfile.ape_mat || ''}`.trim() ||
+        currentUser.name ||
+        "Usuario",
+
+      occupation:
+        perfil.ocupacion ||
+        contexto?.rol_nombre ||
+        "Usuario",
+
+      companyName:
+        perfil.empresa ||
+        contexto?.institucion_nombre ||
+        contexto?.cepat_nombre ||
+        null
+    };
+  }
+
+  private mapUserData(apiUser: any, currentUser: any): any {
+    const contexto = currentUser?.contexto;
+
+    return {
+      fullname:
+        `${apiUser?.nombre || ''} ${apiUser?.ape_pat || ''} ${apiUser?.ape_mat || ''}`.trim() ||
+        currentUser?.name ||
+        "Usuario",
+
+      occupation:
+        contexto?.rol_nombre ||
+        this.getRoleName(currentUser?.roles?.[0]),
+
+      companyName:
+        contexto?.institucion_nombre ||
+        contexto?.cepat_nombre ||
+        null
+    };
+  }
+
+  private mapUserDataFromAuth(currentUser: any): any {
+    const contexto = currentUser?.contexto;
+
+    return {
+      fullname: currentUser?.name || "Usuario",
+      occupation: contexto?.rol_nombre || this.getRoleName(currentUser?.roles?.[0]),
+      companyName:
+        contexto?.institucion_nombre ||
+        contexto?.cepat_nombre ||
+        null
+    };
+  }
+
+  private getRoleName(roleId: number): string {
+    const roleMap: any = {
+      1: "Administrador",
+      2: "Coordinador",
+      4: "CEPAT",
+      35: "Administrador",
+      36: "Coordinador",
+      37: "CEPAT"
+    };
+
+    return roleMap[roleId] || "Usuario";
+  }
+
+   private buildPayload(formValues?: any): any {
+
+    const esCoordinador = this.perfil === 'coordinador';
+
+    const institucionUsuario = esCoordinador
+      ? this.userProfile?.companyName || 'sus'      // 👈 Forzado por rol
+      : formValues?.institucion || null;
+
     return {
       persona: this.userProfile?.fullname || "Usuario",
       cargo: this.userProfile?.occupation || "Usuario del Sistema",
-      institucion: formValues?.institucion || null,
+
+      institucion: institucionUsuario, // 👈 YA FUNCIONA SIEMPRE
+
       entidad: formValues?.entidad || null,
       cuartil: formValues?.trimestre || null,
       anio_inicio: formValues?.anio_inicio || null,
       anio_fin: formValues?.anio_fin || null,
-      departamento: formValues?.departamento || null,
+      departamento: formValues?.departamentos || null,
       cuerpo_academico: formValues?.cuerpos_academicos || null,
-      programa_educativo: formValues?.programa_educativo || null,
+      programa_educativo: formValues?.programas_educativos || null,
       categoria: formValues?.categoria || null,
       genero: formValues?.sexo || null,
       estatus: formValues?.estatus || null,
-      sector: formValues?.sector || null,
+      sector: formValues?.sector || null
     };
   }
 
@@ -350,4 +461,9 @@ export class ReporteSelectorComponent implements OnInit {
     return all;
   }
 
+  // Método para empresa específica
+  private getSpecificCompanyName(contexto: any): string {
+    // Priorizar la información específica del contexto
+    return contexto?.institucion_nombre || contexto?.cepat_nombre || 'Instituto Tecnológico de Tizimín';
+  }
 }
