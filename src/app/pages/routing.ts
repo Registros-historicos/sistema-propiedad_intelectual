@@ -137,7 +137,7 @@ const Routing: Routes = [
   path: 'visor-pdf',
   component: VisorPdfComponent,
   canActivate: [RoleGuard], // opcional
-  data: { roles: ['administrador','coordinador','solicitante'] }
+  data: { roles: ['administrador','coordinador','solicitante', 'cepat'] }
   },
   {
     path: '',

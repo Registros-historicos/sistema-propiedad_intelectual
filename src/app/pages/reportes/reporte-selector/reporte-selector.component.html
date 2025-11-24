@@ -191,9 +191,9 @@
           <option *ngFor="let e of estatus" [value]="e.id">{{ e.nombre }}</option>
         </select>
       </div>
-      <div class="form-row">
+      <div class="form-row" *ngIf="!isCoordinador">
         <label>Institución</label>
-        <select name="institucion" ngModel required>
+        <select name="institucion" ngModel>
           <option value="">Seleccione un instituto</option>
           <option *ngFor="let inst of instituciones" [value]="inst.nombre">
             {{ inst.nombre }}
@@ -312,9 +312,9 @@
           <option value="Femenino">Femenino</option>
         </select>
       </div>
-      <div class="form-row">
+      <div class="form-row" *ngIf="!isCoordinador">
         <label>Institución</label>
-        <select name="institucion" ngModel required>
+        <select name="institucion" ngModel>
           <option value="">Seleccione un instituto</option>
           <option *ngFor="let inst of instituciones" [value]="inst.nombre">
             {{ inst.nombre }}
@@ -351,9 +351,9 @@
           <option value="">Todos</option><option>Docente</option><option>Administrativo</option><option>Alumno</option>
         </select>
       </div>
-      <div class="form-row">
+      <div class="form-row" *ngIf="!isCoordinador">
         <label>Institución</label>
-        <select name="institucion" ngModel required>
+        <select name="institucion" ngModel>
           <option value="">Seleccione un instituto</option>
           <option *ngFor="let inst of instituciones" [value]="inst.nombre">
             {{ inst.nombre }}
@@ -386,13 +386,9 @@
     <ng-container *ngSwitchCase="'departamentos'">
       <div class="form-row">
         <label>Departamento</label>
-        <input type="text" name="departamento" ngModel />
-      </div>
-      <div class="form-row">
-        <label>Institución</label>
-        <select name="institucion" ngModel required>
-          <option value="">Seleccione un instituto</option>
-          <option *ngFor="let inst of instituciones" [value]="inst.nombre">
+        <select name="departamentos" ngModel required>
+          <option value="">Todos</option>
+          <option *ngFor="let inst of departamentos" [value]="inst.nombre">
             {{ inst.nombre }}
           </option>
         </select>
@@ -423,13 +419,9 @@
     <ng-container *ngSwitchCase="'cuerpos_academicos'">
       <div class="form-row">
         <label>Cuerpo Académico</label>
-        <input type="text" name="cuerpos_academicos" ngModel />
-      </div>
-      <div class="form-row">
-        <label>Institución</label>
-        <select name="institucion" ngModel required>
-          <option value="">Seleccione un instituto</option>
-          <option *ngFor="let inst of instituciones" [value]="inst.nombre">
+        <select name="cuerpos_academicos" ngModel>
+          <option value="">Todos</option>
+          <option *ngFor="let inst of cuerposAcademicos" [value]="inst.nombre">
             {{ inst.nombre }}
           </option>
         </select>
@@ -459,14 +451,10 @@
     <!-- M) Por programa educativo -->
     <ng-container *ngSwitchCase="'programas_educativos'">
       <div class="form-row">
-        <label>Programa Educativo</label>
-        <input type="text" name="programa_educativo" ngModel />
-      </div>
-      <div class="form-row">
-        <label>Institución</label>
-        <select name="institucion" ngModel required>
-          <option value="">Seleccione un instituto</option>
-          <option *ngFor="let inst of instituciones" [value]="inst.nombre">
+        <label>Programas Educativos</label>
+        <select name="programas_educativos" ngModel required>
+          <option value="">Seleccione un programa educativo</option>
+          <option *ngFor="let inst of programasEducativos" [value]="inst.nombre">
             {{ inst.nombre }}
           </option>
         </select>
@@ -495,15 +483,6 @@
 
     <!-- Ñ) Por investigadores -->
     <ng-container *ngSwitchCase="'investigadores'">
-      <div class="form-row">
-        <label>Institución</label>
-        <select name="institucion" ngModel required>
-          <option value="">Seleccione un instituto</option>
-          <option *ngFor="let inst of instituciones" [value]="inst.nombre">
-            {{ inst.nombre }}
-          </option>
-        </select>
-      </div>
       <div class="form-row">
         <label>Sector</label>
         <select name="sector" ngModel>
