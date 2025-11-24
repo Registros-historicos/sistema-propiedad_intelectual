@@ -248,6 +248,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   editingSelectKey: boolean = false;
   observacionesChanged: boolean = false;
 
+
   search: string;
 
   private secuenciaEstados: { [key in EstatusPatente]?: EstatusPatente } = {
