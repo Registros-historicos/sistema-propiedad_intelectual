@@ -47,6 +47,11 @@ export interface ProgramaEducativo {
   total_registros: number;
 }
 
+export interface CuerpoAcademico {
+  nombre_cuerpo_academico: string;
+  total_registros: number;
+}
+
 export interface Departamento {
   departamento_param: number;
   nombre_departamento: string;
@@ -70,6 +75,17 @@ export class TablerosService {
   getProgramasEducativos(): Observable<ProgramaEducativo[]> {
     return this.http.get<ProgramaEducativo[]>('/api/tableros/registros/por-programa/').pipe(
       catchError(() => {
+        return of([]);
+      })
+    );
+  }
+
+  getCuerposAcademicos(): Observable<CuerpoAcademico[]> {
+  return this.http
+    .get<CuerpoAcademico[]>('/api/tableros/registros/por-cuerpo-academico/')
+    .pipe(
+      catchError(error => {
+        console.error('Error en getCuerposAcademicos:', error);
         return of([]);
       })
     );
