@@ -102,16 +102,21 @@ export class ParametrizacionesService {
   }
 
 convertirRegistroConObjetos(registro: any, catalogos: Catalogos): any {
+  console.log(registro)
     const result = { ...registro };
 
     Object.keys(result).forEach((key) => {
       if (key.endsWith('_param') || key === 'institucion') {
         const id = result[key];
+        console.log(id)
         const tema = this.getTemaPorCampo(key);
+        console.log(tema)
 
         if (tema && id && !isNaN(Number(id))) {
+          console.log('if')
           const idNum = Number(id);
           const objeto = this.getObjeto(catalogos, tema, idNum);
+          console.log(objeto)
 
           if (objeto) {
             result[key] = objeto;

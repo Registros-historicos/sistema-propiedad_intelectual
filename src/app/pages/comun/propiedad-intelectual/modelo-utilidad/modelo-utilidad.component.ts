@@ -10,23 +10,23 @@ import {
 import { SweetAlertOptions } from 'sweetalert2';
 import { Config } from 'datatables.net';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
-import { UtilityModelsService } from '../../../../api/services/utility-models.service';
 import moment from 'moment';
-import { switchMap } from 'rxjs';
-import { IModUtilModel } from 'src/app/api/models/mod-util.model';
 import { TranslateService } from '@ngx-translate/core';
 import {
   ParametrizacionesService,
   Catalogos,
   Parametrizacion,
 } from '../../../../api/services/parametrizaciones.service';
+import { IntellectualPropertyService } from '../../../../api/services/intellectual-property.service';
+import { PatenteUIModel } from 'src/app/api/models/patent.model';
+import { CepatService, Cepat } from 'src/app/api/services/cepat.service';
+import { InstitucionesService, Institucion } from 'src/app/api/services/insttituciones.service';
+import { FileUploadService } from '../../../../api/services/file-upload.service';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 declare const $: any;
 
-// 👉 Lo flexibilizamos a string para no perder selección si el catálogo no trae el nombre exacto
-type EstatusModUtil = string;
-
-interface IndInventor {
+interface Inventor {
   curp: string;
   nombreCompleto: string;
   sexo: 'M' | 'F' | '';
@@ -35,38 +35,18 @@ interface IndInventor {
   programaEducativo: string;
   cuerpoAcademico: string;
   departamento: string;
-  fechaAfiliacion: string; // YYYY-MM-DD
-  fechaFin: string; // YYYY-MM-DD
+  fechaAfiliacion: string;
+  fechaFin: string;
 }
-
-type IndautorUIModel = {
-  id: number;
-  titulo: string;
-
-  rama: string;
-  medioIngreso: string;
-  tipoSector: string;
-
-  institucion: string;
-  fechaSolicitud: string;
-  numeroExpediente: string;
-
-  estatus: EstatusModUtil | '';
-  fechaExpedicion: string;
-  archivo: string;
-  observaciones: string;
-  descripcion: string;
-  inventores: IndInventor[];
-};
 
 @Component({
   selector: 'app-modelo-utilidad',
   templateUrl: './modelo-utilidad.component.html',
   styleUrl: './modelo-utilidad.component.scss',
 })
-export class ModeloUtilidadComponent
-  implements OnInit, AfterViewInit, OnDestroy
-{
+export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy {
+  private readonly TIPO_INDAUTOR = '45';
+
   pageLength = 10;
   dtInstance: any;
   lengthMenu: number[] = [5, 10, 15, 20];
@@ -78,78 +58,128 @@ export class ModeloUtilidadComponent
   @ViewChild('noticeSwal')
   noticeSwal!: SwalComponent;
 
+  @ViewChild('archivoInput')
+  archivoInput: any;
+
   swalOptions: SweetAlertOptions = {};
   placeholder = '';
 
   // ====== Catálogos ======
-  ramasCatalogo: Parametrizacion[] = [];          // tema 3
-  mediosIngresoCatalogo: Parametrizacion[] = [];  // tema 8
-  tiposSectorCatalogo: Parametrizacion[] = [];    // tema 2
-  estatusCatalogo: Parametrizacion[] = [];        // tema 7
+  ramasCatalogo: Parametrizacion[] = [];
+  mediosIngresoCatalogo: Parametrizacion[] = [];
+  tiposSectorCatalogo: Parametrizacion[] = [];
+  estatusCatalogo: Parametrizacion[] = [];
+  subsectoresCatalogo: Parametrizacion[] = [];
+  sectoresCatalogo: Parametrizacion[] = [];
 
-  // Base de opciones visibles
-  estatusOptions: EstatusModUtil[] = [
-    'Registrada',
-    'En trámite',
-    'Trámite con observaciones',
-    'Aprobada',
-    'Concluida',
-  ];
+  // Listas filtradas
+  sectoresFiltrados: Parametrizacion[] = [];
+  subsectoresFiltrados: Parametrizacion[] = [];
 
-  selectedRamaId: number | null = null;
-  selectedMedioIngresoId: number | null = null;
-  selectedTipoSectorId: number | null = null;
+  // CePat e Instituciones
+  cepatList: Cepat[] = [];
+  institucionesCepat: Institucion[] = [];
+  todasInstituciones: Institucion[] = [];
 
-  private rawIdsForSave = {
-    ramaId: '' as string | number | null,
-    medioIngresoId: '' as string | number | null,
-    tipoSectorId: '' as string | number | null,
-    estatusId: '' as string | number | null,
-  };
+  private mapaCepatInstituciones: { [idCepat: number]: Institucion[] } = {};
+  private mapaInstitucionACepatPorId: { [idInstitucion: number]: number } = {};
+  private mapaInstitucionACepatPorNombre: Map<string, number> = new Map<string, number>();
 
-  indautorModel: IndautorUIModel = {
+  selectedCepatId: number | null = null;
+  institucionSeleccionadaCepat: number | null = null;
+  tipoSectorSeleccionadoId: number | null = null;
+  sectorSeleccionadoId: number | null = null;
+  subsectorIdSeleccionado: number | null = null;
+
+  // Años de renovación
+  aniosRenovacion: number[] = [];
+
+  private catalogosAll: Catalogos | null = null;
+  private isInicializandoDesdeRegistro = false;
+
+  indautorModel: PatenteUIModel = {
     id: 0,
-    titulo: '',
+    solicitudId: '',
+    nombrePatente: '',
+    solicitante: '',
+    fechaSolicitud: '',
+    estatus: 'En trámite',
+    descripcion: '',
+    institucion: '',
+    correo: '',
+    documentos: [''],
+    numeroExpediente: '',
+    numeroTitulo: '',
+    denominacion: '',
     rama: '',
     medioIngreso: '',
+    tecnologicoOrigen: '',
+    cePat: 'N/A',
+    anioRenovacion: (new Date().getFullYear() + 1).toString(),
     tipoSector: '',
-    institucion: '',
-    fechaSolicitud: '',
-    numeroExpediente: '',
-    estatus: 'En trámite',
+    sector: '',
+    subsector: '',
     fechaExpedicion: '',
     archivo: '',
     observaciones: '',
-    descripcion: '',
-    inventores: [],
+    inventores: [
+      {
+        curp: '',
+        nombreCompleto: '',
+        sexo: '',
+        tipoInvestigador: '',
+        institucion: '',
+        programaEducativo: '',
+        cuerpoAcademico: '',
+        departamento: '',
+        fechaAfiliacion: '',
+        fechaFin: '',
+      },
+    ],
   };
 
+  selectedFile: File | null = null;
+  filePreviewUrl: string | null = null;
   isViewMode = true;
+  isEditingStatus = false;
   isSaving = false;
 
-  private tableData: any[] = [];
+  search: string = '';
 
   constructor(
-    private service: UtilityModelsService,
+    private service: IntellectualPropertyService,
     private cdr: ChangeDetectorRef,
     private translate: TranslateService,
-    private paramService: ParametrizacionesService
+    private paramService: ParametrizacionesService,
+    private cepatService: CepatService,
+    private institucionesService: InstitucionesService,
+    private fileUploadService: FileUploadService,
+    private sanitizer: DomSanitizer
   ) {}
 
-  ngAfterViewInit(): void {}
+  ngAfterViewInit(): void {
+    if (this.dtInstance) {
+      this.dtInstance.on('page', () => {
+        this.dtInstance.page.info();
+      });
+    }
+  }
 
   ngOnInit(): void {
     this.placeholder = this.translate.instant('TABLE.PLACEHOLDER_SEARCH');
     this.cargarCatalogos();
+    this.cargarCepats();
+    this.cargarTodasInstituciones();
+    this.generarAniosRenovacion();
 
     this.datatableConfig = {
-      serverSide: false,
+      serverSide: true,
       processing: true,
       searching: true,
       deferRender: true,
       ordering: true,
       orderMulti: true,
-      order: [[0, 'asc']],
+      order: [[5, 'desc']],
       rowId: 'id',
       columnDefs: [{ targets: -1, orderable: false }],
       lengthMenu: this.lengthMenu,
@@ -162,63 +192,92 @@ export class ModeloUtilidadComponent
         infoEmpty: this.translate.instant('TABLE.PAG_INFO_EMPTY'),
         zeroRecords: this.translate.instant('TABLE.ZERO_RECORDS'),
       },
-      data: [],
+      ajax: (dataTablesParameters: any, callback) => {
+        this.service.getRegistros(this.TIPO_INDAUTOR, dataTablesParameters, this.search).subscribe({
+          next: (resp: any) => {
+            callback(resp);
+          },
+          error: (error: any) => {
+            console.error('❌ Error al cargar registros INDAUTOR:', error);
+            callback({
+              draw: dataTablesParameters.draw,
+              recordsTotal: 0,
+              recordsFiltered: 0,
+              data: []
+            });
+          }
+        });
+      },
       columns: [
-        { title: 'ID', data: 'id', className: 'text-gray-700 fw-semibold',
-          render: (d: any, t: string) => t !== 'display' ? d ?? '' : `<span class="fw-semibold">${d ?? ''}</span>` },
         {
-          title: 'N.º DE EXPEDIENTE',
-          data: 'solicitudId',
-          render: (data: any, type: string) => {
-            if (type !== 'display') return data ?? '';
-            const val = (data ?? '') !== '' ? String(data) : '—';
-            return `<span class="fw-semibold text-gray-600"
-                    style="display:inline-block;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                    ${val}</span>`;
+          title: 'No. de expediente',
+          data: 'numeroExpediente',
+          orderable: true,
+          render: (data) => {
+            const strData = data ? String(data) : '—';
+            return `<span class="fw-semibold text-gray-600" style="display: inline-block; max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">EXP-<br>${strData}</span>`;
+          },
+        },
+        {
+          title: 'No. de título',
+          data: 'id_registro',
+          orderable: true,
+          render: (data) => {
+            const strData = data ? String(data) : '—';
+            return `<span class="fw-semibold text-gray-600" style="display: inline-block; max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">CERT-<br>${strData}</span>`;
           },
         },
         {
           title: this.translate.instant('TABLE.BRANCH') || 'RAMA',
-          data: 'ramaLabel',
-          render: (data: any, type: string, full: any) => {
-            const label = (data ?? full?.rama ?? '—').toString();
-            if (type !== 'display') return label;
-            const id = full?.id ?? '';
-            const initials = label && label.length > 1 ? (label[0] + (label[1] || '')).toUpperCase() : 'IN';
+          data: 'rama_param',
+          orderable: true,
+          render: (data: any, _type: any, full: any) => {
+            const safeData = (data !== undefined && data !== null) ? String(data) : 'Modelo de Utilidad';
             const colorClasses = ['success', 'info', 'warning', 'danger'];
             const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
+
+            const nameParts = safeData.split(' ').filter((part: string) => part.length > 0 && !part.endsWith('.'));
+            let initials = '';
+            if (nameParts.length >= 2) {
+              initials = (nameParts[0][0] + nameParts[1][0]).toUpperCase();
+            } else if (nameParts.length === 1 && nameParts[0].length >= 2) {
+              initials = (nameParts[0][0] + nameParts[0][1]).toUpperCase();
+            } else {
+              initials = 'MU';
+            }
+
             return `
               <div class="d-flex align-items-center">
-                <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" data-action="view" data-id="${id}">
+                <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" data-action="view" data-id="${full.id}">
                   <a href="javascript:;">
                     <div class="symbol-label fs-3 bg-light-${randomColorClass} text-${randomColorClass}">
                       ${initials}
                     </div>
                   </a>
                 </div>
-                <div class="d-flex flex-column" data-action="view" data-id="${id}">
-                  <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${label}</a>
+                <div class="d-flex flex-column" data-action="view" data-id="${full.id}">
+                  <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${safeData}</a>
                 </div>
               </div>`;
           },
         },
         {
           title: this.translate.instant('TABLE.WORK_TITLE') || 'TÍTULO',
-          data: 'nombreModUtil',
-          render: (data: string, type: string) =>
-            type !== 'display' ? data || '' : `<span class="fw-bold fs-6 text-gray-800">${data || ''}</span>`,
+          data: 'nombrePatente',
+          orderable: true,
+          render: (data: string) => `<span class="fw-bold fs-6 text-gray-800">${data || ''}</span>`,
         },
         {
           title: this.translate.instant('TABLE.INSTITUTION') || 'INSTITUCIÓN',
           data: 'institucion',
-          render: (data: string, type: string) =>
-            type !== 'display' ? data || '' : `<span class="fw-semibold text-gray-600">${data || '—'}</span>`,
+          orderable: true,
+          render: (data: string) => `<span class="fw-semibold text-gray-600">${data || '—'}</span>`,
         },
         {
           title: this.translate.instant('TABLE.DATE') || 'FECHA DE SOLICITUD',
           data: 'fechaSolicitud',
-          render: (data: string, type: string) =>
-            type !== 'display' ? data || '' : `<span class="fw-semibold text-gray-600">${data ? moment(data).format('DD-MM-YYYY') : ''}</span>`,
+          orderable: true,
+          render: (data: string) => `<span class="fw-semibold text-gray-600">${data ? moment(data).format('DD-MM-YYYY') : ''}</span>`,
         },
       ],
       createdRow: (row: any, data: any) => {
@@ -229,66 +288,281 @@ export class ModeloUtilidadComponent
       },
       initComplete: (settings: any) => {
         this.dtInstance = settings.oInstance.api();
-        this.refreshTableData();
         this.cdr.detectChanges();
       },
     } as Config;
   }
 
+  private generarAniosRenovacion(): void {
+    const currentYear = new Date().getFullYear();
+    this.aniosRenovacion = [];
+    for (let i = currentYear - 30; i <= currentYear + 30; i++) {
+      this.aniosRenovacion.push(i);
+    }
+  }
+
   private cargarCatalogos(): void {
     this.paramService.getAll().subscribe({
       next: (cats: Catalogos) => {
+        this.catalogosAll = cats;
         this.ramasCatalogo = (cats[3]?.lista || []) as Parametrizacion[];
         this.mediosIngresoCatalogo = (cats[8]?.lista || []) as Parametrizacion[];
         this.tiposSectorCatalogo = (cats[2]?.lista || []) as Parametrizacion[];
         this.estatusCatalogo = (cats[7]?.lista || []) as Parametrizacion[];
+        this.subsectoresCatalogo = (cats[17]?.lista || []) as Parametrizacion[];
 
-        // Si vienen nombres en tema 7, usamos los que coinciden con los 5 principales, manteniendo orden
-        const fromCat = (this.estatusCatalogo || []).map(e => e?.nombre).filter(Boolean) as string[];
-        const orden: EstatusModUtil[] = [
-          'Registrada','En trámite','Trámite con observaciones','Aprobada','Concluida'
-        ];
-        if (fromCat.length) {
-          this.estatusOptions = orden.filter(n => fromCat.includes(n));
-          // Si el catálogo no trae alguno, conserva el resto para no perder selección previa
-          if (!this.estatusOptions.length) this.estatusOptions = orden;
-        }
+        const sectoresSet = new Set<number>();
+        this.subsectoresCatalogo.forEach(sub => {
+          if (sub.id_param_padre) {
+            sectoresSet.add(sub.id_param_padre);
+          }
+        });
+
+        this.sectoresCatalogo = Array.from(sectoresSet)
+          .map(id => this.findParamById(id))
+          .filter(Boolean) as Parametrizacion[];
       },
       error: (e) => console.error('❌ Error cargando catálogos', e),
     });
   }
 
-  private refreshTableData(): void {
-    this.service.getModUtiles({ start: 0, length: 100000 }).subscribe({
-      next: (res) => {
-        const rows = (res?.data || []).map((r: any) => ({
-          id: r.id,
-          solicitudId: r.solicitudId,
-          ramaLabel: r.ramaLabel ?? r.rama ?? '',
-          nombreModUtil: r.nombreModUtil,
-          institucion: r.institucion,
-          fechaSolicitud: r.fechaSolicitud,
-        }));
+  private findParamById(idParam: number): Parametrizacion | undefined {
+    if (!this.catalogosAll) return undefined;
 
-        this.tableData = rows;
+    for (const temaIdStr of Object.keys(this.catalogosAll)) {
+      const tema = this.catalogosAll[Number(temaIdStr)];
+      const encontrado = tema?.mapa[idParam];
+      if (encontrado) {
+        return encontrado;
+      }
+    }
+    return undefined;
+  }
 
-        if (this.dtInstance) {
-          this.dtInstance.clear();
-          this.dtInstance.rows.add(this.tableData);
-          this.dtInstance.draw(false);
-        } else {
-          this.datatableConfig.data = this.tableData;
+  private cargarTodasInstituciones(): void {
+    this.institucionesService.getAll().subscribe({
+      next: (instituciones) => {
+        this.todasInstituciones = instituciones || [];
+        this.reconstruirMapaInstitucionCepat();
+        this.reconstruirMapaCepatInstituciones();
+
+        if (this.indautorModel && (this.indautorModel as any).id_registro && this.cepatList?.length) {
+          this.preseleccionarCepatEInstitucionDesdeRegistro();
         }
       },
-      error: () => {
-        this.tableData = [];
-        if (this.dtInstance) {
-          this.dtInstance.clear().draw(false);
-        } else {
-          this.datatableConfig.data = [];
-        }
-      },
+      error: (err) => {
+        console.error('Error al cargar instituciones:', err);
+        this.todasInstituciones = [];
+      }
     });
+  }
+
+  private cargarCepats(): void {
+    this.cepatService.getAllCepat().subscribe({
+      next: (data: any) => {
+        this.cepatList = data || [];
+        this.reconstruirMapaCepatInstituciones();
+
+        if (this.indautorModel && (this.indautorModel as any).id_registro && this.todasInstituciones?.length) {
+          this.preseleccionarCepatEInstitucionDesdeRegistro();
+        }
+      },
+      error: (err: any) => {
+        console.error('Error al cargar CEPA:', err);
+        this.cepatList = [];
+      }
+    });
+  }
+
+  private reconstruirMapaCepatInstituciones(): void {
+    if (!this.cepatList?.length || !this.todasInstituciones?.length) {
+      return;
+    }
+
+    const mapa: { [idCepat: number]: Institucion[] } = {};
+
+    for (const ce of this.cepatList) {
+      if (ce && ce.id_cepat != null) {
+        mapa[ce.id_cepat] = [];
+      }
+    }
+
+    for (const inst of this.todasInstituciones) {
+      const idCepat = inst.id_cepat;
+      if (idCepat != null) {
+        if (!mapa[idCepat]) {
+          mapa[idCepat] = [];
+        }
+        mapa[idCepat].push(inst);
+      }
+    }
+
+    this.mapaCepatInstituciones = mapa;
+  }
+
+  private reconstruirMapaInstitucionCepat(): void {
+    this.mapaInstitucionACepatPorId = {};
+    this.mapaInstitucionACepatPorNombre = new Map<string, number>();
+
+    if (!this.todasInstituciones?.length) {
+      return;
+    }
+
+    const normalizar = (s: string) =>
+      s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
+
+    for (const inst of this.todasInstituciones) {
+      if (!inst || inst.id_cepat == null) {
+        continue;
+      }
+
+      if (inst.id_institucion != null) {
+        this.mapaInstitucionACepatPorId[inst.id_institucion] = inst.id_cepat;
+      }
+
+      const nombreNorm = normalizar(inst.nombre || '');
+      if (nombreNorm && !this.mapaInstitucionACepatPorNombre.has(nombreNorm)) {
+        this.mapaInstitucionACepatPorNombre.set(nombreNorm, inst.id_cepat);
+      }
+    }
+  }
+
+  private preseleccionarCepatEInstitucionDesdeRegistro(): void {
+    const idInstitucion = this.indautorModel.id_institucion;
+    const nombreInstitucion = this.indautorModel.tecnologicoOrigen;
+
+    let cepatDeducido: number | null = null;
+
+    if (idInstitucion) {
+      cepatDeducido = this.mapaInstitucionACepatPorId[idInstitucion] ?? null;
+    }
+
+    if (!cepatDeducido && nombreInstitucion) {
+      const normalizar = (s: string) =>
+        s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
+      const nombreNorm = normalizar(nombreInstitucion);
+      cepatDeducido = this.mapaInstitucionACepatPorNombre.get(nombreNorm) ?? null;
+    }
+
+    if (cepatDeducido) {
+      this.isInicializandoDesdeRegistro = true;
+      this.selectedCepatId = cepatDeducido;
+
+      if (this.mapaCepatInstituciones && this.mapaCepatInstituciones[cepatDeducido]) {
+        this.institucionesCepat = [...this.mapaCepatInstituciones[cepatDeducido]];
+      }
+
+      if (idInstitucion) {
+        this.institucionSeleccionadaCepat = idInstitucion;
+      }
+
+      setTimeout(() => {
+        this.isInicializandoDesdeRegistro = false;
+      }, 0);
+    }
+  }
+
+  onCepatChange(cepatId: number | null): void {
+    const id = cepatId !== null ? Number(cepatId) : NaN;
+
+    if (Number.isNaN(id)) {
+      this.selectedCepatId = null;
+      this.institucionesCepat = [];
+
+      if (!this.isInicializandoDesdeRegistro) {
+        this.institucionSeleccionadaCepat = null;
+        this.indautorModel.tecnologicoOrigen = '';
+        this.indautorModel.cePat = 'N/A';
+      }
+      return;
+    }
+
+    this.selectedCepatId = id;
+
+    const cepatSeleccionado = this.cepatList.find(c => c.id_cepat === id);
+    if (cepatSeleccionado) {
+      this.indautorModel.cePat = cepatSeleccionado.nombre;
+    }
+
+    if (this.isInicializandoDesdeRegistro) {
+      return;
+    }
+
+    if (this.mapaCepatInstituciones && this.mapaCepatInstituciones[id]) {
+      this.institucionesCepat = [...this.mapaCepatInstituciones[id]];
+    } else {
+      this.institucionesCepat = [];
+    }
+
+    this.institucionSeleccionadaCepat = null;
+    this.indautorModel.tecnologicoOrigen = '';
+  }
+
+  onInstitucionCepatChange(institucionIdValue: number | null): void {
+    const id = institucionIdValue !== null ? Number(institucionIdValue) : NaN;
+
+    if (Number.isNaN(id)) {
+      this.institucionSeleccionadaCepat = null;
+      this.indautorModel.tecnologicoOrigen = '';
+      return;
+    }
+
+    this.institucionSeleccionadaCepat = id;
+
+    const institucion = this.institucionesCepat.find(inst => inst.id_institucion === id);
+    if (institucion) {
+      this.indautorModel.tecnologicoOrigen = institucion.nombre;
+    } else {
+      this.indautorModel.tecnologicoOrigen = '';
+    }
+  }
+
+  onTipoSectorChange(event: any): void {
+    const id = event?.target?.value;
+    this.tipoSectorSeleccionadoId = id ? Number(id) : null;
+
+    if (!this.tipoSectorSeleccionadoId) {
+      this.sectoresFiltrados = [];
+      this.subsectoresFiltrados = [];
+      this.sectorSeleccionadoId = null;
+      this.subsectorIdSeleccionado = null;
+      return;
+    }
+
+    this.sectoresFiltrados = this.sectoresCatalogo.filter(
+      s => s.id_param_padre === this.tipoSectorSeleccionadoId
+    );
+    this.subsectoresFiltrados = [];
+    this.sectorSeleccionadoId = null;
+    this.subsectorIdSeleccionado = null;
+  }
+
+  onSectorChange(event: any): void {
+    const id = event?.target?.value;
+    this.sectorSeleccionadoId = id ? Number(id) : null;
+
+    if (!this.sectorSeleccionadoId) {
+      this.subsectoresFiltrados = [];
+      this.subsectorIdSeleccionado = null;
+      return;
+    }
+
+    this.subsectoresFiltrados = this.subsectoresCatalogo.filter(
+      sub => sub.id_param_padre === this.sectorSeleccionadoId
+    );
+    this.subsectorIdSeleccionado = null;
+  }
+
+  onSubsectorChange(event: any): void {
+    const id = event?.target?.value;
+    this.subsectorIdSeleccionado = id ? Number(id) : null;
+  }
+
+  onFilter(ev: any): void {
+    this.search = ev.target.value?.trim() || '';
+    if (this.dtInstance) {
+      this.dtInstance.ajax.reload();
+    }
   }
 
   onPageLengthChange(event: any): void {
@@ -298,110 +572,14 @@ export class ModeloUtilidadComponent
     else this.reloadEvent.emit(true);
   }
 
-  // ===== Helpers =====
-  private asId(v: any): string | number | null {
-    if (v === null || v === undefined) return null;
-    if (typeof v === 'object') {
-      if ('id_param' in v) return (v.id_param as number) ?? null;
-      if ('id' in v) return (v.id as number) ?? null;
-      return null;
-    }
-    return v as string | number;
-  }
-  private asName(v: any, alt?: string, fallback: string = ''): string {
-    if (v && typeof v === 'object' && 'nombre' in v) return v.nombre as string;
-    return (alt ?? fallback) || '';
-  }
-  private findIdByName(catalog: Parametrizacion[], nombre: string): number | null {
-    if (!nombre) return null;
-    const found = catalog.find(
-      (x) => x?.nombre?.toLowerCase().trim() === String(nombre).toLowerCase().trim()
-    );
-    return found?.id_param ?? null;
-  }
-  private s(v: any): string {
-    return v === undefined || v === null ? '' : String(v);
-  }
-  private sid(v: any): string {
-    if (v === undefined || v === null || v === '') return '';
-    return String(v);
-  }
-
-  private ensureEstatusOption(name: string) {
-    if (!name) return;
-    if (!this.estatusOptions.includes(name)) {
-      // lo agregamos para que el select quede preseleccionado como antes
-      this.estatusOptions = [...this.estatusOptions, name];
-    }
-  }
-
-  private resolveEstatusNombre(extra: any, current: any): EstatusModUtil | '' {
-    const fromObj =
-      extra?.estatus_param &&
-      typeof extra.estatus_param === 'object' &&
-      'nombre' in extra.estatus_param
-        ? (extra.estatus_param.nombre as string)
-        : '';
-
-    let fromId = '';
-    const maybeId = this.asId(extra?.estatus_param);
-    if (typeof maybeId === 'number') {
-      const match = this.estatusCatalogo.find((x) => x.id_param === maybeId);
-      fromId = match?.nombre || '';
-    }
-
-    const name = (current as string) || fromObj || fromId || '';
-    // No forzamos a los 5; permitimos cualquier string para preservar selección previa
-    return (name || 'En trámite') as EstatusModUtil;
-  }
-
-  // ===== Modales =====
   view(id: number): void {
     this.isViewMode = true;
     this.cdr.detectChanges();
 
-    this.service.getModUtil(id).subscribe({
-      next: (modUtil: IModUtilModel) => {
-        const extra: any = modUtil as any;
-
-        const ramaTxt   = (modUtil as any).rama ?? this.asName(extra.rama_param) ?? '';
-        const medioTxt  = (modUtil as any).medioIngreso ?? this.asName(extra.medio_ingreso_param) ?? '';
-        const sectorTxt = (modUtil as any).tipoSector ?? this.asName(extra.tipo_sector_param) ?? '';
-        const estatusNombre = this.resolveEstatusNombre(extra, (modUtil as any).estatus);
-
-        // Asegura que el estatus actual esté en las opciones (preselección igual que antes)
-        this.ensureEstatusOption(estatusNombre);
-
-        this.rawIdsForSave = {
-          ramaId: this.asId(extra.rama_param),
-          medioIngresoId: this.asId(extra.medio_ingreso_param),
-          tipoSectorId: this.asId(extra.tipo_sector_param),
-          estatusId: this.asId(extra.estatus_param),
-        };
-
-        this.selectedRamaId =
-          (this.rawIdsForSave.ramaId as number) ?? this.findIdByName(this.ramasCatalogo, ramaTxt);
-        this.selectedMedioIngresoId =
-          (this.rawIdsForSave.medioIngresoId as number) ?? this.findIdByName(this.mediosIngresoCatalogo, medioTxt);
-        this.selectedTipoSectorId =
-          (this.rawIdsForSave.tipoSectorId as number) ?? this.findIdByName(this.tiposSectorCatalogo, sectorTxt);
-
-        this.indautorModel = {
-          id: modUtil.id,
-          titulo: (modUtil as any).nombreModUtil || '',
-          rama: ramaTxt,
-          medioIngreso: medioTxt,
-          tipoSector: sectorTxt,
-          institucion: modUtil.institucion || '',
-          fechaSolicitud: (modUtil as any).fechaSolicitud || '',
-          numeroExpediente: (modUtil as any).solicitudId || '',
-          estatus: estatusNombre,
-          fechaExpedicion: (extra?.fechaExpedicion as string) || '',
-          archivo: (Array.isArray(modUtil.documentos) && modUtil.documentos[0]) || '',
-          observaciones: (modUtil as any).observaciones || '',
-          descripcion: (modUtil as any).descripcion || '',
-          inventores: [],
-        };
+    this.service.getRegistro(id).subscribe({
+      next: (registro: PatenteUIModel) => {
+        this.indautorModel = { ...registro };
+        this.preseleccionarCepatEInstitucionDesdeRegistro();
       },
       error: () => {
         this.showAlert({ icon: 'error', title: 'Error', text: 'No se pudo cargar el detalle.' });
@@ -413,48 +591,11 @@ export class ModeloUtilidadComponent
     this.isViewMode = false;
     this.cdr.detectChanges();
 
-    this.service.getModUtil(id).subscribe({
-      next: (modUtil: IModUtilModel) => {
-        const extra: any = modUtil as any;
-
-        const ramaTxt   = (modUtil as any).rama ?? this.asName(extra.rama_param) ?? '';
-        const medioTxt  = (modUtil as any).medioIngreso ?? this.asName(extra.medio_ingreso_param) ?? '';
-        const sectorTxt = (modUtil as any).tipoSector ?? this.asName(extra.tipo_sector_param) ?? '';
-        const estatusNombre = this.resolveEstatusNombre(extra, (modUtil as any).estatus);
-
-        // Asegura que el estatus actual esté en las opciones (preselección igual que antes)
-        this.ensureEstatusOption(estatusNombre);
-
-        this.rawIdsForSave = {
-          ramaId: this.asId(extra.rama_param),
-          medioIngresoId: this.asId(extra.medio_ingreso_param),
-          tipoSectorId: this.asId(extra.tipo_sector_param),
-          estatusId: this.asId(extra.estatus_param),
-        };
-
-        this.selectedRamaId =
-          (this.rawIdsForSave.ramaId as number) ?? this.findIdByName(this.ramasCatalogo, ramaTxt);
-        this.selectedMedioIngresoId =
-          (this.rawIdsForSave.medioIngresoId as number) ?? this.findIdByName(this.mediosIngresoCatalogo, medioTxt);
-        this.selectedTipoSectorId =
-          (this.rawIdsForSave.tipoSectorId as number) ?? this.findIdByName(this.tiposSectorCatalogo, sectorTxt);
-
-        this.indautorModel = {
-          id: modUtil.id,
-          titulo: (modUtil as any).nombreModUtil || '',
-          rama: ramaTxt,
-          medioIngreso: medioTxt,
-          tipoSector: sectorTxt,
-          institucion: modUtil.institucion || '',
-          fechaSolicitud: (modUtil as any).fechaSolicitud || '',
-          numeroExpediente: (modUtil as any).solicitudId || '',
-          estatus: estatusNombre, // ← sigue preseleccionado
-          fechaExpedicion: (extra?.fechaExpedicion as string) || '',
-          archivo: (Array.isArray(modUtil.documentos) && modUtil.documentos[0]) || '',
-          observaciones: (modUtil as any).observaciones || '',
-          descripcion: (modUtil as any).descripcion || '',
-          inventores: [],
-        };
+    this.service.getRegistro(id).subscribe({
+      next: (registro: PatenteUIModel) => {
+        this.indautorModel = { ...registro };
+        this.preseleccionarCepatEInstitucionDesdeRegistro();
+        this.inicializarSeleccionesDesdeRegistro();
       },
       error: () => {
         this.showAlert({ icon: 'error', title: 'Error', text: 'No se pudo cargar el detalle para edición.' });
@@ -462,8 +603,63 @@ export class ModeloUtilidadComponent
     });
   }
 
+  private inicializarSeleccionesDesdeRegistro(): void {
+    if (this.indautorModel.tipo_sector_param) {
+      this.tipoSectorSeleccionadoId = typeof this.indautorModel.tipo_sector_param === 'number'
+        ? this.indautorModel.tipo_sector_param
+        : Number(this.indautorModel.tipo_sector_param);
+      this.sectoresFiltrados = this.sectoresCatalogo.filter(
+        s => s.id_param_padre === this.tipoSectorSeleccionadoId
+      );
+    }
+
+    if (this.indautorModel.sector_param) {
+      this.sectorSeleccionadoId = typeof this.indautorModel.sector_param === 'number'
+        ? this.indautorModel.sector_param
+        : Number(this.indautorModel.sector_param);
+      this.subsectoresFiltrados = this.subsectoresCatalogo.filter(
+        sub => sub.id_param_padre === this.sectorSeleccionadoId
+      );
+    }
+
+    if (this.indautorModel.id_subsector) {
+      this.subsectorIdSeleccionado = this.indautorModel.id_subsector;
+    }
+  }
+
+  onArchivoSelected(event: any): void {
+    const file = event.target?.files?.[0];
+    if (!file) {
+      this.selectedFile = null;
+      this.filePreviewUrl = null;
+      return;
+    }
+
+    if (file.type !== 'application/pdf') {
+      this.showAlert({
+        icon: 'error',
+        title: 'Archivo no válido',
+        text: 'Solo se permiten archivos PDF.'
+      });
+      this.selectedFile = null;
+      this.filePreviewUrl = null;
+      if (this.archivoInput) {
+        this.archivoInput.nativeElement.value = '';
+      }
+      return;
+    }
+
+    this.selectedFile = file;
+    const objectUrl = URL.createObjectURL(file);
+    this.filePreviewUrl = objectUrl;
+  }
+
+  getSafeUrl(url: string): SafeUrl {
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
+
   saveEdit(modal: any): void {
-    if (!this.indautorModel.titulo?.trim()) {
+    if (!this.indautorModel.nombrePatente?.trim()) {
       this.showAlert({ icon: 'error', title: 'Validación', text: 'El título es obligatorio.' });
       return;
     }
@@ -471,124 +667,75 @@ export class ModeloUtilidadComponent
     const id = this.indautorModel.id;
     this.isSaving = true;
 
-    const ramaId =
-      this.selectedRamaId ??
-      (typeof this.rawIdsForSave.ramaId === 'number'
-        ? this.rawIdsForSave.ramaId
-        : this.findIdByName(this.ramasCatalogo, this.indautorModel.rama));
-
-    const medioId =
-      this.selectedMedioIngresoId ??
-      (typeof this.rawIdsForSave.medioIngresoId === 'number'
-        ? this.rawIdsForSave.medioIngresoId
-        : this.findIdByName(this.mediosIngresoCatalogo, this.indautorModel.medioIngreso));
-
-    const sectorId =
-      this.selectedTipoSectorId ??
-      (typeof this.rawIdsForSave.tipoSectorId === 'number'
-        ? this.rawIdsForSave.tipoSectorId
-        : this.findIdByName(this.tiposSectorCatalogo, this.indautorModel.tipoSector));
-
-    // nombre → id (tema 7). Si no existe, cae al id crudo detectado.
-    const estatusIdByName = this.findIdByName(this.estatusCatalogo, this.indautorModel.estatus as string);
-    const estatusId =
-      estatusIdByName ??
-      (typeof this.rawIdsForSave.estatusId === 'number' ? this.rawIdsForSave.estatusId : null);
-
-    this.service
-      .getRegistroRaw(id)
-      .pipe(
-        switchMap((raw) => {
-          const dto = {
-            no_expediente: this.s(this.indautorModel.numeroExpediente || raw.no_expediente),
-            titulo: this.s(this.indautorModel.titulo || raw.titulo),
-            tipo_ingreso_param: this.sid(raw.tipo_ingreso_param ?? '45'),
-            id_usuario: Number((raw as any).id_usuario ?? 0),
-            rama_param: this.sid(ramaId ?? raw.rama_param),
-            fec_expedicion: this.s(this.indautorModel.fechaExpedicion || (raw as any).fec_expedicion || ''),
-            observaciones: this.s(this.indautorModel.observaciones ?? raw.observaciones),
-            archivo: this.s(this.indautorModel.archivo ?? raw.archivo),
-            estatus_param: this.sid(estatusId ?? raw.estatus_param),
-            medio_ingreso_param: this.sid(medioId ?? raw.medio_ingreso_param),
-            tipo_registro_param: this.sid(raw.tipo_registro_param ?? '45'),
-            fec_solicitud: this.s(this.indautorModel.fechaSolicitud ?? raw.fec_solicitud),
-            descripcion: this.s(this.indautorModel.descripcion ?? raw.descripcion),
-            tipo_sector_param: this.sid(sectorId ?? raw.tipo_sector_param),
-          };
-
-          return this.service.updateRegistro(id, dto as any);
-        })
-      )
-      .subscribe({
-        next: () => {
-          this.isSaving = false;
-          this.isViewMode = true;
-
-          this.patchRowInTable(id, {
-            solicitudId: this.indautorModel.numeroExpediente,
-            nombreModUtil: this.indautorModel.titulo,
-            institucion: this.indautorModel.institucion,
-            fechaSolicitud: this.indautorModel.fechaSolicitud,
-            ramaLabel: this.getNombreDeCatalogo(this.ramasCatalogo, this.selectedRamaId) || this.indautorModel.rama,
-          });
-
-          this.showAlert({
-            icon: 'success',
-            title: '¡Guardado!',
-            text: 'Los cambios se guardaron correctamente.',
-            timer: 1800,
-            showConfirmButton: false,
-          });
-
-          this.refreshTableData();
-          modal?.dismiss?.('saved');
+    if (this.selectedFile) {
+      this.fileUploadService.uploadFile(this.selectedFile, 'indautor').subscribe({
+        next: (uploadResp) => {
+          this.indautorModel.archivo = uploadResp.filename;
+          this.actualizarRegistro(id, modal);
         },
         error: (err) => {
-          this.isSaving = false;
+          console.error('Error al subir archivo:', err);
           this.showAlert({
             icon: 'error',
-            title: 'Error al guardar',
-            text: 'Revisa que los *_param se envíen como strings (IDs) y que id_usuario sea numérico.',
+            title: 'Error',
+            text: 'No se pudo subir el archivo. Guardando sin archivo.'
           });
-          console.error('PUT /api/registros/{id}/ error:', err);
-        },
+          this.actualizarRegistro(id, modal);
+        }
       });
+    } else {
+      this.actualizarRegistro(id, modal);
+    }
   }
 
-  private getNombreDeCatalogo(cat: Parametrizacion[], id?: number | null): string {
-    if (!id) return '';
-    const r = cat.find((x) => x.id_param === id);
-    return r?.nombre ?? '';
-  }
+  private actualizarRegistro(id: number, modal: any): void {
+    const payload = {
+      ...this.indautorModel,
+      id_institucion: this.institucionSeleccionadaCepat,
+      id_cepat: this.selectedCepatId,
+      tipo_sector_param: this.tipoSectorSeleccionadoId,
+      sector_param: this.sectorSeleccionadoId,
+      id_subsector: this.subsectorIdSeleccionado,
+    };
 
-  private patchRowInTable(id: number, patch: Partial<any>): void {
-    if (!this.dtInstance) return;
+    this.service.updateRegistro(id, payload, this.TIPO_INDAUTOR).subscribe({
+      next: () => {
+        this.isSaving = false;
+        this.isViewMode = true;
+        this.selectedFile = null;
+        this.filePreviewUrl = null;
 
-    const i = this.tableData.findIndex((x) => Number(x.id) === Number(id));
-    if (i > -1) this.tableData[i] = { ...this.tableData[i], ...patch };
+        this.showAlert({
+          icon: 'success',
+          title: '¡Guardado!',
+          text: 'Los cambios se guardaron correctamente.',
+          timer: 1800,
+          showConfirmButton: false,
+        });
 
-    let row = this.dtInstance.row(`#${id}`);
-    if (!row || !row.data || !row.data()) {
-      row = this.dtInstance.row((idx: number, data: any) => Number(data?.id) === Number(id));
-    }
-    if (row && row.data) {
-      const current = row.data();
-      const merged = { ...current, ...patch };
-      if (patch.ramaLabel === undefined && current?.ramaLabel) {
-        merged.ramaLabel = current.ramaLabel;
-      }
-      row.data(merged).draw(false);
-    }
+        if (this.dtInstance) {
+          this.dtInstance.ajax.reload(null, false);
+        }
+
+        modal?.dismiss?.('saved');
+      },
+      error: (err) => {
+        this.isSaving = false;
+        this.showAlert({
+          icon: 'error',
+          title: 'Error al guardar',
+          text: 'Ocurrió un error al guardar los cambios.'
+        });
+        console.error('Error al actualizar registro:', err);
+      },
+    });
   }
 
   delete(id: number): void {
-    this.service.deleteModUtil(id).subscribe({
+    this.service.deleteRegistro(id).subscribe({
       next: () => {
         if (this.dtInstance) {
-          this.dtInstance
-            .rows((idx: number, data: any) => Number(data?.id) === Number(id))
-            .remove()
-            .draw(false);
+          this.dtInstance.ajax.reload(null, false);
         }
         this.showAlert({ icon: 'success', title: 'Deshabilitado', text: 'El registro fue deshabilitado.' });
       },
@@ -614,40 +761,79 @@ export class ModeloUtilidadComponent
     });
   }
 
-  get inventoresVisibles(): IndInventor[] {
+  removeInventor(index: number): void {
+    if (!this.indautorModel.inventores) return;
+    if (index > 0 && index < this.indautorModel.inventores.length) {
+      this.indautorModel.inventores.splice(index, 1);
+    }
+  }
+
+  get inventoresVisibles(): Inventor[] {
     const invs = this.indautorModel.inventores || [];
     return invs.filter((i) => !!(i && (i.curp || i.nombreCompleto || i.institucion)));
   }
 
   downloadDocument(documentName: string): void {
-    console.log('Descargando documento:', documentName);
+    if (!documentName) {
+      this.showAlert({ icon: 'warning', title: 'Sin archivo', text: 'No hay archivo disponible.' });
+      return;
+    }
+
+    this.fileUploadService.downloadFile(documentName, 'indautor').subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = documentName;
+        link.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        console.error('Error al descargar documento:', err);
+        this.showAlert({ icon: 'error', title: 'Error', text: 'No se pudo descargar el archivo.' });
+      }
+    });
   }
 
   closeForm(modal: any): void {
     modal.dismiss('cancel');
     this.isViewMode = true;
+    this.selectedFile = null;
+    this.filePreviewUrl = null;
 
     this.indautorModel = {
       id: 0,
-      titulo: '',
+      solicitudId: '',
+      nombrePatente: '',
+      solicitante: '',
+      fechaSolicitud: '',
+      estatus: 'En trámite',
+      descripcion: '',
+      institucion: '',
+      correo: '',
+      documentos: [''],
+      numeroExpediente: '',
+      numeroTitulo: '',
+      denominacion: '',
       rama: '',
       medioIngreso: '',
+      tecnologicoOrigen: '',
+      cePat: 'N/A',
+      anioRenovacion: '',
       tipoSector: '',
-      institucion: '',
-      fechaSolicitud: '',
-      numeroExpediente: '',
-      estatus: 'En trámite',
+      sector: '',
+      subsector: '',
       fechaExpedicion: '',
       archivo: '',
       observaciones: '',
-      descripcion: '',
       inventores: [],
     };
 
-    this.rawIdsForSave = { ramaId: null, medioIngresoId: null, tipoSectorId: null, estatusId: null };
-    this.selectedRamaId = null;
-    this.selectedMedioIngresoId = null;
-    this.selectedTipoSectorId = null;
+    this.selectedCepatId = null;
+    this.institucionSeleccionadaCepat = null;
+    this.tipoSectorSeleccionadoId = null;
+    this.sectorSeleccionadoId = null;
+    this.subsectorIdSeleccionado = null;
   }
 
   showAlert(swalOptions: SweetAlertOptions): void {
@@ -668,7 +854,8 @@ export class ModeloUtilidadComponent
 
   ngOnDestroy(): void {
     this.reloadEvent.unsubscribe();
+    if (this.filePreviewUrl) {
+      URL.revokeObjectURL(this.filePreviewUrl);
+    }
   }
 }
-
-
