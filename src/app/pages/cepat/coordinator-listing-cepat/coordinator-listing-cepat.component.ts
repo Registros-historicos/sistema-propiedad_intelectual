@@ -131,46 +131,73 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
       });
       return;
     }
+    // Si el coordinador ya estaba asignado a otra institución, primero desasignarla enviando id_coordinador = 0
+    const previousInstitucionId = this.coordinadorModel?.id_institucion || null;
 
-    // Construir URL absoluto al endpoint indicado y enviar el body { id_coordinador }
-    const externalUrl = `http://20.14.208.230:8000/api/institucion/usuario/${idInstitucion}/`;
-    const body = { id_coordinador: idUsuario };
-    console.log('[DEBUG] CEPAT: assignInstitucion -> PUT', externalUrl, 'body=', body);
+    const doAssignNew = () => {
+      // Construir URL absoluto al endpoint indicado y enviar el body { id_coordinador }
+      const externalUrl = `http://20.14.208.230:8000/api/institucion/usuario/${idInstitucion}/`;
+      const body = { id_coordinador: idUsuario };
+      console.log('[DEBUG] CEPAT: assignInstitucion -> PUT', externalUrl, 'body=', body);
 
-    this.http.put<any>(externalUrl, body).subscribe({
-      next: (resp) => {
-        console.log('[DEBUG] CEPAT: assignInstitucion response =', resp);
+      this.http.put<any>(externalUrl, body).subscribe({
+        next: (resp) => {
+          console.log('[DEBUG] CEPAT: assignInstitucion response =', resp);
 
-        // Actualizar UI si el backend devuelve la institución asignada
-        if (resp && typeof resp === 'object') {
-          this.selectedInstitutoId = resp.id_institucion || this.selectedInstitutoId || idInstitucion;
-          this.selectedInstitutoName = resp.nombre || resp.nombre_institucion || this.selectedInstitutoName;
-          this.coordinadorModel.id_institucion = this.selectedInstitutoId;
-        }
+          // Actualizar UI si el backend devuelve la institución asignada
+          if (resp && typeof resp === 'object') {
+            this.selectedInstitutoId = resp.id_institucion || this.selectedInstitutoId || idInstitucion;
+            this.selectedInstitutoName = resp.nombre || resp.nombre_institucion || this.selectedInstitutoName;
+            this.coordinadorModel.id_institucion = this.selectedInstitutoId;
+          } else {
+            // Si no devuelve objeto, usar los valores locales
+            this.coordinadorModel.id_institucion = idInstitucion;
+          }
 
-        this.showAlert({
-          title: '¡Éxito!',
-          text: 'Institución asignada al coordinador correctamente.',
-          icon: 'success',
-        });
-        // Limpiar los controles de selección (pero conservar la institución asignada en el modelo/visualización)
-        this.selectedStateForInstitucion = null;
-        this.institutoList = [];
-        // dejar selectedInstitutoName para mostrar la institución asignada; limpiar el dropdown seleccionado
-        this.selectedInstitutoId = null;
-        this.showAddInstitucion = false;
-        this.cdr.detectChanges();
-        this.loadCepats(false);
-      },
-      error: (err) => {
-        console.error('Error asignando institución:', err);
-        this.showAlert({
-          title: 'Error',
-          text: 'No se pudo asignar la institución.',
-          icon: 'error',
-        });
-      },
-    });
+          this.showAlert({
+            title: '¡Éxito!',
+            text: 'Institución asignada al coordinador correctamente.',
+            icon: 'success',
+          });
+          // Limpiar los controles de selección (pero conservar la institución asignada en el modelo/visualización)
+          this.selectedStateForInstitucion = null;
+          this.institutoList = [];
+          // dejar selectedInstitutoName para mostrar la institución asignada; limpiar el dropdown seleccionado
+          this.selectedInstitutoId = null;
+          this.showAddInstitucion = false;
+          this.cdr.detectChanges();
+          this.loadCepats(false);
+        },
+        error: (err) => {
+          console.error('Error asignando institución:', err);
+          this.showAlert({
+            title: 'Error',
+            text: 'No se pudo asignar la institución.',
+            icon: 'error',
+          });
+        },
+      });
+    };
+
+    if (previousInstitucionId && previousInstitucionId !== idInstitucion) {
+      console.log('[DEBUG] CEPAT: previous institution detected, clearing it first ->', previousInstitucionId);
+      // Llamada al servicio relativo (usa proxy y agrega auth si corresponde)
+      // Usar null para desasignar (backend espera null para quitar id_coordinador)
+      this.coordinatorService.updateInstitutionByIdCoordinator(previousInstitucionId, null).subscribe({
+        next: () => {
+          console.log('[DEBUG] CEPAT: previous institution cleared (id_coordinador = 0) for', previousInstitucionId);
+          // Continuar con la asignación a la nueva institución
+          doAssignNew();
+        },
+        error: (err) => {
+          console.error('Error limpiando institución previa:', err);
+          // Aun si falla, intentamos asignar la nueva institución para no bloquear al usuario
+          doAssignNew();
+        },
+      });
+    } else {
+      doAssignNew();
+    }
   }
 
   unassignInstitucion(): void {
