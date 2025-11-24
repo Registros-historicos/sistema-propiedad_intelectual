@@ -3,11 +3,12 @@
   <div class="col-xl-6">
     <app-departamentos></app-departamentos>
   </div>
-  <!-- Tablero por Cuerpos Académicos -->
+<!-- Tablero por Cuerpos Académicos -->
   <div class="col-xl-6">
-    <app-cuerpos-academicos></app-cuerpos-academicos>
+    <app-cuerpos-academicos
+      [datos]="cuerposAcademicosDatos"
+    ></app-cuerpos-academicos>
   </div>
-</div>
 
 <div class="row g-5 g-xl-8">
   <!-- Tablero por Programas Educativos -->

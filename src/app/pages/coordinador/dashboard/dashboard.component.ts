@@ -1,8 +1,10 @@
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
-import { TablerosService, CategoriaInvestigador, ProgramaEducativo } from 'src/app/api/services/tableros.service';
+import { TablerosService, CategoriaInvestigador, ProgramaEducativo, CuerpoAcademico } from 'src/app/api/services/tableros.service';
 import { getCSSVariableValue } from '../../../template/kt/_utils';
 import { TranslateService } from '@ngx-translate/core';
 import { ExportExcelService } from 'src/app/api/services/export-excel.service';
+
+
 
 @Component({
   selector: 'app-dashboard',
@@ -13,6 +15,8 @@ export class DashboardComponent implements OnInit {
   chartOptionsRound: any = {};
   selectedFilter: string = '1';
   programasEducativos: ProgramaEducativo[] = [];
+  cuerposAcademicosDatos: CuerpoAcademico[] = [];
+
 
   @Input() cssClass: string = '';
   @Input() chartSize: number = 70;
@@ -39,8 +43,23 @@ export class DashboardComponent implements OnInit {
     });
  }
 
+ private loadCuerposAcademicos(): void {
+  this.tablerosService.getCuerposAcademicos().subscribe({
+    next: (data: CuerpoAcademico[]) => {
+      this.cuerposAcademicosDatos = data;
+      this.cdRef.detectChanges();
+    },
+    error: (err) => {
+      console.error('Error al cargar cuerpos academicos', err);
+      this.cuerposAcademicosDatos = [];
+      this.cdRef.detectChanges();
+    }
+  });
+}
+
   ngOnInit(): void {
     this.loadProgramasEducativos();
+    this.loadCuerposAcademicos();
     // Lógica original
     this.chartOptions = this.getChartOptions(350);
     setTimeout(() => {
