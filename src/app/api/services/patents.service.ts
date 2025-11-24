@@ -81,6 +81,7 @@ export class PatentsService {
         return this.listPatents(page, limit, sortColumn, sortOrder);
       }),
       map((response) => {
+        console.log(response)
         // 🔹 Ahora sí formatear con los catálogos ya cargados
         const formatted = this.formatForDataTables(response, tableParams.draw);
         return formatted;
@@ -100,6 +101,7 @@ export class PatentsService {
 
     return this.http.get<any>(this.apiUrl, { params }).pipe(
       map(response => {
+        console.log(response)
         let total = 0;
         let results = [];
 
@@ -152,41 +154,49 @@ export class PatentsService {
     tipoSector: string;
     sector: string;
     subsector: string;
+    tipoSectorId: number | null;
+    sectorId: number | null;
   } {
     if (!this.catalogos) {
-      return { tipoSector: 'N/A', sector: 'N/A', subsector: 'N/A' };
+      return { tipoSector: 'N/A', sector: 'N/A', subsector: 'N/A', tipoSectorId: null, sectorId: null };
     }
 
     const id = Number(idSubsector);
     if (isNaN(id)) {
-      return { tipoSector: 'N/A', sector: 'N/A', subsector: 'N/A' };
+      return { tipoSector: 'N/A', sector: 'N/A', subsector: 'N/A', tipoSectorId: null, sectorId: null };
     }
 
     const catalogoSubsectores = this.catalogos[17];
     const sub = catalogoSubsectores?.mapa[id];
 
     if (!sub) {
-      return { tipoSector: 'N/A', sector: 'N/A', subsector: 'N/A' };
+      return { tipoSector: 'N/A', sector: 'N/A', subsector: 'N/A', tipoSectorId: null, sectorId: null };
     }
 
     const subsectorNombre = sub.nombre;
+    let sectorId: number | null = null;
+    let tipoSectorId: number | null = null;
 
     const sectorParam = sub.id_param_padre
       ? this.findParamById(sub.id_param_padre)
       : undefined;
 
+    sectorId = sectorParam?.id_param ?? null;
     const sectorNombre = sectorParam?.nombre ?? 'N/A';
 
     const tipoSectorParam = sectorParam?.id_param_padre
       ? this.findParamById(sectorParam.id_param_padre)
       : undefined;
 
+    tipoSectorId = tipoSectorParam?.id_param ?? null;
     const tipoSectorNombre = tipoSectorParam?.nombre ?? 'N/A';
 
     return {
       tipoSector: tipoSectorNombre,
       sector: sectorNombre,
       subsector: subsectorNombre,
+      tipoSectorId,
+      sectorId,
     };
   }
 
@@ -336,11 +346,18 @@ export class PatentsService {
         : [];
 
     // 🔹 Extraer institución y usuario principal (si existen)
-    const institucion =
-      backendPatent.instituciones?.[0]?.nombre ||
-      backendPatent.instituciones?.[0] ||
-      backendPatent.institucion ||
-      'N/A';
+    // IMPORTANTE: Siempre usar el PRIMER elemento [0] de los arrays
+    const institucion_nombre =
+      (Array.isArray(backendPatent.instituciones) && backendPatent.instituciones.length > 0)
+        ? (typeof backendPatent.instituciones[0] === 'string'
+            ? backendPatent.instituciones[0]
+            : backendPatent.instituciones[0]?.nombre)
+        : backendPatent.institucion || 'N/A';
+
+    const id_institucion =
+      (Array.isArray(backendPatent.id_instituciones) && backendPatent.id_instituciones.length > 0)
+        ? backendPatent.id_instituciones[0]
+        : backendPatent.id_institucion || null;
 
     const usuario =
       backendPatent.id_usuarios?.[0] ||
@@ -349,11 +366,6 @@ export class PatentsService {
 
     const fec_solicitud_backend = backendPatent.fec_solicitud;
     const fec_expedicion_backend = backendPatent.fec_expedicion;
-
-    const institucion_nombre =
-      (backendPatent.institucion && typeof backendPatent.institucion === 'object'
-        ? backendPatent.institucion.nombre
-        : backendPatent.institucion) || '';
 
     // 👇 Antes de usar rama_nombre en el result
     let rama_nombre = '';
@@ -383,25 +395,47 @@ export class PatentsService {
       (backendPatent.tipo_sector_param && typeof backendPatent.tipo_sector_param === 'object'
         ? backendPatent.tipo_sector_param.nombre
         : '') || 'N/A';
+    let tipo_sector_param_id =
+      backendPatent.tipo_sector_param && typeof backendPatent.tipo_sector_param === 'object'
+        ? backendPatent.tipo_sector_param.id_param
+        : backendPatent.tipo_sector_param ?? null;
+
+    const id_subsector =
+      backendPatent.id_subsector ??
+      (backendPatent.id_subsector_obj?.id_param ?? null);
+
+    let sector_param_id: number | null = null;
+    if (backendPatent.sector_param) {
+      sector_param_id =
+        typeof backendPatent.sector_param === 'object'
+          ? backendPatent.sector_param.id_param ?? null
+          : Number(backendPatent.sector_param) || null;
+    }
 
     // Subsector actual (si viene ya resuelto), si no, lo deducimos
     let subsector_nombre =
       backendPatent.id_subsector_obj
         ? backendPatent.id_subsector_obj.nombre
-        : backendPatent.id_subsector
-          ? String(backendPatent.id_subsector)
+        : id_subsector
+          ? String(id_subsector)
           : 'N/A';
 
-    if (backendPatent.id_subsector) {
-      const chain = this.getSectorChainFromSubsector(backendPatent.id_subsector);
+    if (id_subsector) {
+      const chain = this.getSectorChainFromSubsector(id_subsector);
 
       // Solo sobreescribir si estaban vacíos/N/A
       if (!tipo_sector_nombre || tipo_sector_nombre === 'N/A') {
         tipo_sector_nombre = chain.tipoSector;
       }
+      if (!tipo_sector_param_id && chain.tipoSectorId) {
+        tipo_sector_param_id = chain.tipoSectorId;
+      }
 
       if (!backendPatent.sector || backendPatent.sector === '') {
         backendPatent.sector = chain.sector;
+      }
+      if (!sector_param_id && chain.sectorId) {
+        sector_param_id = chain.sectorId;
       }
 
       if (!subsector_nombre || subsector_nombre === 'N/A') {
@@ -421,7 +455,7 @@ export class PatentsService {
         ? fec_solicitud_backend.split('T')[0]
         : '',
       estatus: estatus_nombre as IPatentModel['estatus'],                 // 'Registrada', 'En trámite', etc.
-      institucion: institucion_nombre || institucion || 'N/A',               // nombre de institución legible
+      institucion: institucion_nombre,                                    // nombre de institución legible
       correo: backendPatent.correo || '',                                 // si viene del backend
       documentos: backendPatent.archivo ? [backendPatent.archivo] : [],   // array de archivos para la tabla
 
@@ -451,7 +485,9 @@ export class PatentsService {
       fechaExpedicion: fec_expedicion_backend
         ? fec_expedicion_backend.split('T')[0]
         : '',
-      tecnologicoOrigen: institucion || 'N/A',
+      tecnologicoOrigen: institucion_nombre,
+      id_institucion: id_institucion,  // ID de la institucion para edicion
+      id_cepat: backendPatent.id_cepat || null,  // ID del CePat para edicion
       cePat: backendPatent.cepat || 'N/A',
       anioRenovacion: backendPatent.anio_renovacion
         ? String(backendPatent.anio_renovacion)
@@ -461,6 +497,9 @@ export class PatentsService {
       tipoSector: tipo_sector_nombre,
       sector: backendPatent.sector || '',
       subsector: subsector_nombre,
+      tipo_sector_param: tipo_sector_param_id ?? null,
+      sector_param: sector_param_id,
+      id_subsector: id_subsector ? Number(id_subsector) : null,
 
       // Inventores ya mapeados
       inventores,
@@ -529,7 +568,7 @@ export class PatentsService {
       ? String(patent.medio_ingreso_param)
       : this.mapMedioIngresoToBackend(patent.medioIngreso);
 
-    const tipoSectorParam = patent.tipo_sector_param != null
+    let tipoSectorParam = patent.tipo_sector_param != null
       ? String(patent.tipo_sector_param)
       : this.mapTipoSectorToBackend(patent.tipoSector);
 
@@ -537,7 +576,15 @@ export class PatentsService {
       ? String(patent.estatus_param)
       : this.mapEstatusToBackend(patent.estatus);
 
-    const idSubsector = patent.id_subsector ?? null;
+    const idSubsector = patent.id_subsector != null ? Number(patent.id_subsector) : null;
+
+    // Si viene solo el id del subsector y no el tipo de sector, lo deducimos del catálogo
+    if ((!tipoSectorParam || tipoSectorParam.trim() === '') && idSubsector) {
+      const chain = this.getSectorChainFromSubsector(idSubsector);
+      if (chain.tipoSectorId) {
+        tipoSectorParam = String(chain.tipoSectorId);
+      }
+    }
 
     // id_usuario: tomamos el solicitante del payload si viene
     const idUsuario = patent.solicitante

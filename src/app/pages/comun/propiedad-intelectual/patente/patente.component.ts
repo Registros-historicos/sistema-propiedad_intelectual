@@ -15,6 +15,7 @@ import { ImpiRegistriesService } from '../../../../api/services/impi.service';
 import { ParametrizacionesService, Catalogos, Parametrizacion, } from '../../../../api/services/parametrizaciones.service';
 import { CepatService, Cepat } from 'src/app/api/services/cepat.service';
 import { InstitucionesService, Institucion } from 'src/app/api/services/insttituciones.service';
+import { FileUploadService } from '../../../../api/services/file-upload.service';
 
 type EstatusPatente = 'Registrada' | 'En trámite' | 'Trámite con observaciones' | 'Aprobada' | 'Concluida';
 
@@ -92,13 +93,26 @@ interface SubsectorItem {
   styleUrl: './patente.component.scss'
 })
 export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
-  // Lista de CEPA(t) e instituciones para los selects
   cepatList: Cepat[] = [];
+
+  // 🔹 Subconjunto filtrado por CEPA seleccionado
   institucionesCepat: Institucion[] = [];
+
+  // 🔹 Todas las instituciones que devuelve el backend
+  todasInstituciones: Institucion[] = [];
+
+  // 🔹 Mapa auxiliar: id_cepat -> lista de instituciones
+  private mapaCepatInstituciones: { [idCepat: number]: Institucion[] } = {};
+  // 🔹 Mapas auxiliares para buscar CEPA a partir de una institución
+  private mapaInstitucionACepatPorId: { [idInstitucion: number]: number } = {};
+  private mapaInstitucionACepatPorNombre: Map<string, number> = new Map<string, number>();
+
 
   // Selecciones actuales
   selectedCepatId: number | null = null;
   institucionSeleccionadaCepat: number | null = null;
+
+  // Selecciones actuales
   isCollapsed1 = false;
   isCollapsed2 = true;
   ramasCatalogo: Parametrizacion[] = [];
@@ -107,6 +121,16 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   estatusCatalogo: Parametrizacion[] = [];
   // 🔹 Catálogo de subsectores (para el <select> de subsector)
   subsectoresCatalogo: Parametrizacion[] = [];
+  // 🔹 Catálogo de sectores (deducidos de los subsectores)
+  sectoresCatalogo: Parametrizacion[] = [];
+
+  // 🔹 Listas filtradas según lo que selecciona el usuario
+  sectoresFiltrados: Parametrizacion[] = [];
+  subsectoresFiltrados: Parametrizacion[] = [];
+
+  // 🔹 Selecciones actuales de tipo de sector y sector
+  tipoSectorSeleccionadoId: number | null = null;
+  sectorSeleccionadoId: number | null = null;
 
   // 🔹 Catálogos fijos para Tecnológico de Origen y CePat
   tecnologicosOrigenCatalogo: string[] = [
@@ -151,9 +175,14 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('noticeSwal')
   noticeSwal!: SwalComponent;
 
+  @ViewChild('archivoInput')
+  archivoInput: any;
+
   swalOptions: SweetAlertOptions = {};
 
   placeholder: string = '';
+
+  private isInicializandoDesdeRegistro = false;
 
   aPatente: Observable<IPatentModel>
   patenteModel: PatenteUIModel = {
@@ -198,12 +227,16 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     ],
   };
 
+  // Referencia a la institución que viene del registro actual
+  private institucionEnEdicion: Institucion | null = null;
+
   entidadesFederativas: FederalEntity[] = ENTIDADES_FEDERATIVAS_DATA
   institucionesFiltradas: any[] = []
   estadoSeleccionado: number | null = null
   institucionSeleccionada: number | null = null
 
   selectedFile: File | null = null;
+  filePreviewUrl: string | null = null;
   isViewMode: boolean = true;
   isEditingStatus: boolean = false;
   isSaving: boolean = false;
@@ -471,6 +504,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     private parametrizacionesServices: ParametrizacionesService,
     private cepatService: CepatService,
     private institucionesService: InstitucionesService,
+    private fileUploadService: FileUploadService,
   ) {
     this.tranlatesPlaceholders = {
       METHOD_SUBMISSION: this.translate.instant('FORMS.PLACEHOLDERS.METHOD_SUBMISSION'),
@@ -483,6 +517,56 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       ACADEMIC_PROGRAM: this.translate.instant('FORMS.PLACEHOLDERS.ACADEMIC_PROGRAM'),
       ACADEMIC_RESEARCH: this.translate.instant('FORMS.PLACEHOLDERS.ACADEMIC_RESEARCH'),
       DEPARTMENT: this.translate.instant('FORMS.PLACEHOLDERS.DEPARTMENT'),
+    }
+  }
+
+  /**
+ * 🔹 Reconstruye el mapa id_cepat -> instituciones
+ *    usando this.cepatList y this.todasInstituciones.
+ */
+  private reconstruirMapaCepatInstituciones(): void {
+    console.log('[reconstruirMapaCepatInstituciones] Iniciando construcción del mapa');
+    console.log('  - cepatList.length:', this.cepatList?.length || 0);
+    console.log('  - todasInstituciones.length:', this.todasInstituciones?.length || 0);
+
+    // Si aún no tengo alguno de los dos catálogos, no hago nada
+    if (!this.cepatList?.length || !this.todasInstituciones?.length) {
+      console.log('[reconstruirMapaCepatInstituciones] Faltan catálogos, se omite construcción');
+      return;
+    }
+
+    const mapa: { [idCepat: number]: Institucion[] } = {};
+
+    // Inicializamos las llaves con los CEPat existentes
+    for (const ce of this.cepatList) {
+      if (ce && ce.id_cepat != null) {
+        mapa[ce.id_cepat] = [];
+      }
+    }
+
+    // Agrupamos las instituciones por su id_cepat
+    for (const inst of this.todasInstituciones) {
+      const idCepat = inst.id_cepat;
+
+      if (idCepat != null) {
+        if (!mapa[idCepat]) {
+          mapa[idCepat] = [];
+        }
+        mapa[idCepat].push(inst);
+      }
+    }
+
+    // Opcional: podrías guardar también las instituciones sin CEPat
+    // const sinCepat = this.todasInstituciones.filter(i => i.id_cepat == null);
+    // if (sinCepat.length) {
+    //   mapa[0] = sinCepat; // ejemplo, 0 para "sin CEPat"
+    // }
+
+    this.mapaCepatInstituciones = mapa;
+
+    console.log('[reconstruirMapaCepatInstituciones] Mapa construido:');
+    for (const [idCepat, instituciones] of Object.entries(mapa)) {
+      console.log(`  - CEPat ${idCepat}: ${instituciones.length} instituciones`);
     }
   }
 
@@ -524,6 +608,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     this.placeholder = this.translate.instant('TABLE.PLACEHOLDER_SEARCH')
     this.cargarCatalogos();
     this.cargarCepats();
+    this.cargarTodasInstituciones();
 
     // Para mostrar el mismo arreglo y columnas que en INDAUTOR/local, usa el dataset local propio de este componente
 
@@ -563,6 +648,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         ajax: (dataTablesParameters: any, callback) => {
           this.service.getPatents(dataTablesParameters, this.search).subscribe({
             next: (resp: any) => {
+              console.log(resp)
               callback(resp);
             },
             error: (error: any) => {
@@ -712,48 +798,168 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  /**
+ * Construye los mapas:
+ *  - id_institucion  -> id_cepat
+ *  - nombre_normalizado -> id_cepat
+ * Solo toma en cuenta instituciones que YA tienen id_cepat ≠ null.
+ */
+  private reconstruirMapaInstitucionCepat(): void {
+    this.mapaInstitucionACepatPorId = {};
+    this.mapaInstitucionACepatPorNombre = new Map<string, number>();
+
+    if (!this.todasInstituciones?.length) {
+      return;
+    }
+
+    const normalizar = (s: string) =>
+      s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
+
+    for (const inst of this.todasInstituciones) {
+      if (!inst || inst.id_cepat == null) {
+        // Si la institución no tiene id_cepat en BD, aquí no nos sirve
+        continue;
+      }
+
+      // 🔹 Mapa por id_institucion
+      if (inst.id_institucion != null) {
+        this.mapaInstitucionACepatPorId[inst.id_institucion] = inst.id_cepat;
+      }
+
+      // 🔹 Mapa por nombre normalizado (evitamos sobrescribir si hay ambigüedad)
+      const nombreNorm = normalizar(inst.nombre || '');
+      if (nombreNorm && !this.mapaInstitucionACepatPorNombre.has(nombreNorm)) {
+        this.mapaInstitucionACepatPorNombre.set(nombreNorm, inst.id_cepat);
+      }
+    }
+
+    console.log('[mapaInstitucionACepatPorId]', this.mapaInstitucionACepatPorId);
+    console.log('[mapaInstitucionACepatPorNombre]', this.mapaInstitucionACepatPorNombre);
+  }
+
+  private cargarTodasInstituciones(): void {
+    this.institucionesService.getAll().subscribe({
+      next: (instituciones) => {
+        this.todasInstituciones = instituciones || [];
+
+        // 🔹 Construir los mapas de institución -> CEPA
+        this.reconstruirMapaInstitucionCepat();
+
+        // 🔹 Construir mapa de CEPA -> instituciones
+        this.reconstruirMapaCepatInstituciones();
+
+        // 🔹 Intentar preseleccionar solo si ya tenemos ambos catálogos cargados
+        if (this.patenteModel && (this.patenteModel as any).id_registro && this.cepatList?.length) {
+          this.preseleccionarCepatEInstitucionDesdeRegistro();
+        }
+      },
+      error: (err) => {
+        console.error('Error al cargar instituciones:', err);
+        this.todasInstituciones = [];
+      }
+    });
+  }
+
+
+
+
   private cargarCepats(): void {
-    this.cepatService.getAllCepat().subscribe(cepats => {
-      this.cepatList = cepats;
+    this.cepatService.getAllCepat().subscribe({
+      next: (data: any) => {
+        this.cepatList = data || [];
+
+        // 🔹 Intentar construir el mapa (si ya hay instituciones cargadas)
+        this.reconstruirMapaCepatInstituciones();
+
+        // 🔹 Intentar preseleccionar solo si ya tenemos ambos catálogos cargados
+        if (this.patenteModel && (this.patenteModel as any).id_registro && this.todasInstituciones?.length) {
+          this.preseleccionarCepatEInstitucionDesdeRegistro();
+        }
+      },
+      error: (err: any) => {
+        console.error('Error al cargar CEPA:', err);
+        this.cepatList = [];
+      }
+    });
+  }
+
+
+
+  /**
+   * 🔹 Carga TODAS las instituciones desde el backend.
+   */
+  private cargarInstitucionesCepat(): void {
+    this.institucionesService.getAll().subscribe({
+      next: (data: Institucion[]) => {
+        this.todasInstituciones = data || [];
+        console.log("[intitutciones]", data)
+
+        // Igual que con CEPat, si ya hay patente para edición,
+        // intentamos inicializar los selects (ahora sí tenemos instituciones)
+        if (this.patenteModel && (this.patenteModel as any).id_registro) {
+          this.inicializarSeleccionesDesdePatente();
+        }
+      },
+      error: (err: any) => {
+        console.error('Error al cargar instituciones:', err);
+        this.todasInstituciones = [];
+      }
     });
   }
 
   onCepatChange(cepatId: number | null): void {
-    // 1) Normalizamos el valor a número
+    console.log('[onCepatChange] cepatId:', cepatId, 'isInicializandoDesdeRegistro:', this.isInicializandoDesdeRegistro);
+
     const id = cepatId !== null ? Number(cepatId) : NaN;
 
-    // 2) Si es inválido, limpiamos todo y salimos
     if (Number.isNaN(id)) {
       this.selectedCepatId = null;
       this.institucionesCepat = [];
-      this.institucionSeleccionadaCepat = null;
-      this.patenteModel.tecnologicoOrigen = '';
-      this.patenteModel.cePat = '';
+
+      if (!this.isInicializandoDesdeRegistro) {
+        // Solo cuando el cambio viene del usuario limpiamos completamente
+        this.institucionSeleccionadaCepat = null;
+        this.patenteModel.tecnologicoOrigen = '';
+        this.patenteModel.cePat = 'N/A';
+      }
+
       return;
     }
 
-    // 3) Guardamos el CEPA seleccionado
     this.selectedCepatId = id;
-    this.institucionesCepat = [];
+
+    // Nombre visible del CEPat
+    const cepatSeleccionado = this.cepatList.find(c => c.id_cepat === id);
+    if (cepatSeleccionado) {
+      this.patenteModel.cePat = cepatSeleccionado.nombre;
+      console.log('[onCepatChange] CEPat seleccionado:', cepatSeleccionado.nombre);
+    }
+
+    // 🔹 Si estamos en inicialización desde el modelo,
+    //     NO tocamos la lista de instituciones ni la selección:
+    //     eso ya lo hizo preseleccionarCepatEInstitucionDesdeRegistro()
+    if (this.isInicializandoDesdeRegistro) {
+      console.log('[onCepatChange] En inicialización, no se modifica la lista de instituciones');
+      return;
+    }
+
+    // 🔹 Cambio hecho por el usuario: ahora sí filtramos normalmente
+    if (this.mapaCepatInstituciones && this.mapaCepatInstituciones[id]) {
+      // Clonamos el arreglo para no compartir referencia
+      this.institucionesCepat = [...this.mapaCepatInstituciones[id]];
+      console.log('[onCepatChange] Instituciones filtradas:', this.institucionesCepat.length);
+    } else {
+      this.institucionesCepat = [];
+      console.log('[onCepatChange] No hay instituciones para este CEPat');
+    }
+
+
+    // Y limpiamos la institución seleccionada, para que el usuario elija una
     this.institucionSeleccionadaCepat = null;
     this.patenteModel.tecnologicoOrigen = '';
-
-    // 4) Opcional: guardamos el nombre del CEPA en el modelo
-    const cepatSeleccionado = this.cepatList.find(c => c.id_cepat === id);
-    this.patenteModel.cePat = cepatSeleccionado ? cepatSeleccionado.nombre : '';
-
-    // 5) Pedimos al backend las instituciones asociadas a ese CEPA
-    this.institucionesService.getByCepat(id).subscribe({
-      next: (instituciones: any) => {
-        console.log('[instituciones] ', instituciones);
-        this.institucionesCepat = instituciones || [];
-      },
-      error: (err: any) => {
-        console.error('Error al cargar instituciones por CEPA:', err);
-        this.institucionesCepat = [];
-      }
-    });
   }
+
+
 
   onInstitucionCepatChange(institucionIdValue: number | null): void {
     const id = institucionIdValue !== null ? Number(institucionIdValue) : NaN;
@@ -773,6 +979,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       this.patenteModel.tecnologicoOrigen = '';
     }
   }
+
 
   onPageLengthChange(event: any): void {
     const newLength = parseInt(event.target.value);
@@ -811,25 +1018,29 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private inicializarSeleccionesDesdePatente(): void {
+    console.log('[inicializarSeleccionesDesdePatente] Iniciando...', this.patenteModel);
+
     // 🔹 Rama: el backend manda el nombre en rama_param
     if ((this.patenteModel as any).rama_param && !this.patenteModel.rama) {
       this.patenteModel.rama = (this.patenteModel as any).rama_param as string;
     }
 
-    // 🔹 Medio de ingreso: idem, backend manda el nombre en medio_ingreso_param
+    // 🔹 Medio de ingreso
     if ((this.patenteModel as any).medio_ingreso_param && !this.patenteModel.medioIngreso) {
       this.patenteModel.medioIngreso = (this.patenteModel as any).medio_ingreso_param as string;
     }
 
-    // 🔹 Años de renovación: regeneramos la lista y respetamos el valor existente
+    // 🔹 Años de renovación
     this.generarAniosRenovacion();
 
-    // 🔹 Subsector: usar id_subsector (si viene) o el nombre para seleccionar en el combo
+    // 🔹 Subsector
     if (this.catalogosAll && this.subsectoresCatalogo?.length) {
       const valorSubsector =
         (this.patenteModel as any).id_subsector ??
         this.patenteModel.subsector ??
         '';
+
+      console.log('[inicializarSeleccionesDesdePatente] Buscando subsector con valor:', valorSubsector);
 
       const porId = this.subsectoresCatalogo.find(
         s => String(s.id_param) === String(valorSubsector)
@@ -840,13 +1051,243 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
 
       const subEncontrado = porId || porNombre || null;
 
+      console.log('[inicializarSeleccionesDesdePatente] Subsector encontrado:', subEncontrado);
+
       this.subsectorIdSeleccionado = subEncontrado ? subEncontrado.id_param : null;
 
       if (this.subsectorIdSeleccionado) {
+        console.log('[inicializarSeleccionesDesdePatente] Llamando a actualizarSectorDesdeSubsector con:', this.subsectorIdSeleccionado);
         this.actualizarSectorDesdeSubsector(this.subsectorIdSeleccionado);
       }
     }
+
+    // 🔹 CEPat + institución (usando la institución del registro)
+    this.preseleccionarCepatEInstitucionDesdeRegistro();
   }
+
+  private preseleccionarCepatEInstitucionDesdeRegistro(): void {
+    console.log('[preseleccionarCepatEInstitucionDesdeRegistro] Iniciando...');
+
+    // 🔹 Activamos el flag para evitar que onCepatChange limpie los valores
+    this.isInicializandoDesdeRegistro = true;
+
+    // 0) Limpiar estado previo, para no arrastrar datos de otro registro
+    this.selectedCepatId = null;
+    this.institucionSeleccionadaCepat = null;
+    this.institucionesCepat = [];
+
+    if (!this.patenteModel) {
+      this.isInicializandoDesdeRegistro = false;
+      return;
+    }
+
+    // 1️⃣ Obtener el id de institución asociado al registro
+    const idInstitucion = (this.patenteModel as any).id_institucion ??
+      (this.patenteModel as any).idInstitucion ??
+      null;
+
+    const nombreTec = (this.patenteModel.tecnologicoOrigen || '').trim();
+
+    console.log('[preseleccionarCepatEInstitucionDesdeRegistro] id_institucion:', idInstitucion, 'nombreTec:', nombreTec);
+
+    // 2️⃣ Buscar la institución primero por id; si no, por nombre
+    let institucion: Institucion | undefined;
+
+    if (idInstitucion && this.todasInstituciones?.length) {
+      institucion = this.todasInstituciones.find(
+        inst => inst.id_institucion === Number(idInstitucion)
+      );
+      console.log('[preseleccionarCepatEInstitucionDesdeRegistro] Institución encontrada por ID:', institucion);
+    }
+
+    if (!institucion && nombreTec && this.todasInstituciones?.length) {
+      const normalizar = (s: string) =>
+        s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
+
+      const nombreNormalizado = normalizar(nombreTec);
+
+      // 🔹 Primero, intentamos búsqueda exacta
+      institucion = this.todasInstituciones.find(inst => {
+        const nombreInst = normalizar(inst.nombre || '');
+        return nombreInst === nombreNormalizado;
+      });
+
+      // 🔹 Si no se encontró con búsqueda exacta, intentamos con variaciones
+      if (!institucion) {
+        // Remover palabras comunes que pueden causar confusión
+        const removerPalabrasComunes = (texto: string) => {
+          return texto
+            .replace(/\btecnm\b/g, '')
+            .replace(/\b\/\b/g, '')
+            .replace(/\binstituto\b/g, '')
+            .replace(/\btecnologico\b/g, '')
+            .replace(/\bde\b/g, '')
+            .replace(/\bdel\b/g, '')
+            .replace(/\bla\b/g, '')
+            .replace(/\bel\b/g, '')
+            .replace(/\s+/g, ' ')
+            .trim();
+        };
+
+        const nombreLimpio = removerPalabrasComunes(nombreNormalizado);
+
+        // Buscar instituciones cuyo nombre limpio sea exactamente igual
+        institucion = this.todasInstituciones.find(inst => {
+          const nombreInstLimpio = removerPalabrasComunes(normalizar(inst.nombre || ''));
+          return nombreInstLimpio === nombreLimpio;
+        });
+
+        // 🔹 Si aún no se encuentra, intentamos buscar por la parte más distintiva
+        if (!institucion && nombreLimpio.length > 3) {
+          institucion = this.todasInstituciones.find(inst => {
+            const nombreInstLimpio = removerPalabrasComunes(normalizar(inst.nombre || ''));
+
+            // Solo coincide si el nombre limpio está completamente contenido
+            // y tiene una longitud similar (para evitar falsos positivos)
+            const lengthDiff = Math.abs(nombreInstLimpio.length - nombreLimpio.length);
+
+            return (nombreInstLimpio === nombreLimpio ||
+              (nombreInstLimpio.includes(nombreLimpio) && lengthDiff <= 10) ||
+              (nombreLimpio.includes(nombreInstLimpio) && lengthDiff <= 10));
+          });
+        }
+      }
+
+      console.log('[preseleccionarCepatEInstitucionDesdeRegistro] Búsqueda por nombre:');
+      console.log('  - Nombre buscado:', nombreTec);
+      console.log('  - Institución encontrada:', institucion);
+    }
+
+    if (!institucion) {
+      console.warn('[PatenteComponent] No se encontró institución para el registro', this.patenteModel);
+      this.patenteModel.cePat = 'N/A';
+      this.isInicializandoDesdeRegistro = false;
+      return;
+    }
+
+    // 3️⃣ Preseleccionar la institución en el combo "Tecnológico de Origen"
+    this.institucionSeleccionadaCepat = institucion.id_institucion;
+    this.patenteModel.tecnologicoOrigen = institucion.nombre;
+
+    // 4️⃣ Intentar determinar el CEPat
+
+    // 4.1) Primero, el id_cepat que ya pueda tener la tabla institucion
+    let cepatId: number | null = institucion.id_cepat ?? null;
+    console.log('[preseleccionarCepatEInstitucionDesdeRegistro] id_cepat de la institución:', cepatId);
+
+    // 4.2) Si la institución no tiene id_cepat, intentamos deducirlo por el texto cePat del registro
+    if (!cepatId) {
+      const cePatNombre = (this.patenteModel.cePat || '').trim();
+
+      if (cePatNombre && cePatNombre.toLowerCase() !== 'n/a') {
+        const normalizar = (s: string) =>
+          s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
+
+        const cePatNormalizado = normalizar(cePatNombre);
+
+        const cepatEncontrado = this.cepatList.find(c => {
+          const nombreCepat = normalizar(c.nombre || '');
+          return nombreCepat === cePatNormalizado ||
+            nombreCepat.includes(cePatNormalizado) ||
+            cePatNormalizado.includes(nombreCepat);
+        });
+
+        if (cepatEncontrado) {
+          cepatId = cepatEncontrado.id_cepat;
+          console.log('[preseleccionarCepatEInstitucionDesdeRegistro] CEPat encontrado por nombre del registro:', cepatId);
+        }
+      }
+    }
+
+    // 4.3) Si seguimos sin CEPat, intentamos deducirlo usando los mapas
+    if (!cepatId && institucion) {
+      const normalizar = (s: string) =>
+        s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
+
+      // 4.3.1) Buscar por id_institucion
+      if (
+        institucion.id_institucion != null &&
+        this.mapaInstitucionACepatPorId[institucion.id_institucion]
+      ) {
+        cepatId = this.mapaInstitucionACepatPorId[institucion.id_institucion];
+        console.log('[preseleccionarCepatEInstitucionDesdeRegistro] CEPat encontrado en mapa por ID:', cepatId);
+      }
+
+      // 4.3.2) Si aún no hay CEPat, intentamos por nombre normalizado de la institución
+      if (!cepatId) {
+        const nombreInstNorm = normalizar(institucion.nombre || '');
+        const idPorNombre = this.mapaInstitucionACepatPorNombre.get(nombreInstNorm);
+
+        if (idPorNombre) {
+          cepatId = idPorNombre;
+          console.log('[preseleccionarCepatEInstitucionDesdeRegistro] CEPat encontrado en mapa por nombre:', cepatId);
+        }
+      }
+    }
+
+    // 4.4) Si aun así no se pudo determinar CEPat, dejamos la institución seleccionada
+    //      y el CEPat en 'N/A', pero llenamos el combo de instituciones.
+    if (!cepatId) {
+      console.warn('[PatenteComponent] No se pudo determinar CEPat para la institución', institucion);
+
+      // No hay CEPat preseleccionado
+      this.selectedCepatId = null;
+      this.patenteModel.cePat = 'N/A';
+
+      // 🔹 Aseguramos que el combo de Tecnológico de Origen tenga al menos la institución del registro
+      this.institucionesCepat = institucion ? [institucion] : [];
+
+      // 🔹 Mantenemos la institución seleccionada en el modelo
+      this.institucionSeleccionadaCepat = institucion?.id_institucion ?? null;
+
+      this.isInicializandoDesdeRegistro = false;
+      return;
+    }
+
+    // 5️⃣ Con un id_cepat válido, llenamos los selects dependientes
+    this.selectedCepatId = cepatId;
+    console.log('[preseleccionarCepatEInstitucionDesdeRegistro] Preseleccionando CEPat:', cepatId);
+
+    // Filtrar instituciones de ese CEPat usando el mapa
+    if (this.mapaCepatInstituciones && this.mapaCepatInstituciones[cepatId]) {
+      // Clonamos el arreglo de instituciones del mapa
+      this.institucionesCepat = [...this.mapaCepatInstituciones[cepatId]];
+      console.log('[preseleccionarCepatEInstitucionDesdeRegistro] Instituciones filtradas del mapa:', this.institucionesCepat.length);
+    } else {
+      // Fallback: filtrar directo de todas las instituciones
+      this.institucionesCepat = this.todasInstituciones.filter(
+        inst => inst.id_cepat === cepatId
+      );
+      console.log('[preseleccionarCepatEInstitucionDesdeRegistro] Instituciones filtradas directo:', this.institucionesCepat.length);
+    }
+
+    // Asegurar que la institución actual esté en la lista
+    if (!this.institucionesCepat.some(inst => inst.id_institucion === institucion.id_institucion)) {
+      this.institucionesCepat = [...this.institucionesCepat, institucion];
+      console.log('[preseleccionarCepatEInstitucionDesdeRegistro] Institución agregada a la lista');
+    }
+
+    // Ajustar el nombre del CEPat visible en el modelo
+    const cepat = this.cepatList.find(c => c.id_cepat === cepatId);
+    if (cepat) {
+      this.patenteModel.cePat = cepat.nombre;
+      console.log('[preseleccionarCepatEInstitucionDesdeRegistro] Nombre CEPat actualizado:', this.patenteModel.cePat);
+    }
+
+    // La institución sigue seleccionada
+    this.institucionSeleccionadaCepat = institucion.id_institucion;
+
+    console.log('[preseleccionarCepatEInstitucionDesdeRegistro] Estado final:');
+    console.log('  - selectedCepatId:', this.selectedCepatId);
+    console.log('  - institucionSeleccionadaCepat:', this.institucionSeleccionadaCepat);
+    console.log('  - institucionesCepat.length:', this.institucionesCepat.length);
+
+    // 🔹 Desactivamos el flag al finalizar
+    this.isInicializandoDesdeRegistro = false;
+  }
+
+
+
 
 
   resetFormularioInstitucion(): void {
@@ -942,6 +1383,19 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   edit(id: number) {
     this.isViewMode = false;
+
+    // Limpiar archivo seleccionado y previsualización al abrir un nuevo registro
+    if (this.filePreviewUrl) {
+      URL.revokeObjectURL(this.filePreviewUrl);
+      this.filePreviewUrl = null;
+    }
+    this.selectedFile = null;
+
+    // Limpiar el input de archivo
+    if (this.archivoInput && this.archivoInput.nativeElement) {
+      this.archivoInput.nativeElement.value = '';
+    }
+
     this.cdr.detectChanges();
     if (this.useLocalFakeData) {
       const numericId = Number(id);
@@ -976,6 +1430,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
 
       this.service.getPatent(id).subscribe({
         next: (patente: any) => {
+          console.log("patente", patente)
 
           this.patenteModel = { ...this.patenteModel, ...patente };
 
@@ -1039,6 +1494,44 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.isSaving = true;
 
+    // 🔹 Si hay un archivo seleccionado, primero lo subimos al servidor
+    if (this.selectedFile) {
+      this.fileUploadService.uploadFile(this.selectedFile, 'patentes').subscribe({
+        next: (response) => {
+          if (response.success) {
+            // Actualizar el nombre del archivo con el devuelto por el servidor
+            this.patenteModel.archivo = response.filename;
+            // Continuar con el guardado del registro
+            this.performSaveEdit(modal, id);
+          } else {
+            this.isSaving = false;
+            const alertaError: SweetAlertOptions = {
+              icon: 'error',
+              title: 'Error al subir archivo',
+              text: response.message || 'No se pudo subir el archivo.',
+            };
+            this.showAlert(alertaError);
+          }
+        },
+        error: (error) => {
+          this.isSaving = false;
+          console.error('Error al subir archivo:', error);
+          const alertaError: SweetAlertOptions = {
+            icon: 'error',
+            title: 'Error al subir archivo',
+            text: 'Ocurrió un error al intentar subir el archivo.',
+          };
+          this.showAlert(alertaError);
+        }
+      });
+    } else {
+      // Si no hay archivo nuevo, continuar con el guardado normal
+      this.performSaveEdit(modal, id);
+    }
+  }
+
+  private performSaveEdit(modal: any, id: number) {
+
     // --- Mapeo de catálogos (Rama, Medio de ingreso, Subsector) ---
 
     // 1) Rama: buscamos el id_param a partir del nombre elegido en el <select>
@@ -1093,6 +1586,10 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       institucion: this.patenteModel.institucion,
       correo: this.patenteModel.correo,
 
+      // 🔹 IDs para CEPat e Institución (crítico para poder recuperar después)
+      id_institucion: this.institucionSeleccionadaCepat,
+      id_cepat: this.selectedCepatId,
+
       // Fechas (se mandan como string YYYY-MM-DD, el servicio las normaliza)
       fechaSolicitud: this.patenteModel.fechaSolicitud,
       fechaExpedicion: this.patenteModel.fechaExpedicion || null,
@@ -1128,7 +1625,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       // se usarán en mapFrontendToBackend si existen
       rama_param: ramaParamId ?? (this.patenteModel as any).rama_param,
       medio_ingreso_param: medioIngresoParamId ?? (this.patenteModel as any).medio_ingreso_param,
-      tipo_sector_param: (this.patenteModel as any).tipo_sector_param, // si lo estás manejando por id
+      tipo_sector_param: this.tipoSectorSeleccionadoId ?? (this.patenteModel as any).tipo_sector_param,
       id_subsector: subsectorId,
       tipo_ingreso_param: (this.patenteModel as any).tipo_ingreso_param, // ej. IMPI = 44
     };
@@ -1143,6 +1640,16 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
           text: 'La patente se actualizó correctamente.',
         };
         this.showAlert(alertaExito);
+
+        // Limpiar previsualización y archivo seleccionado después de guardar
+        if (this.filePreviewUrl) {
+          URL.revokeObjectURL(this.filePreviewUrl);
+          this.filePreviewUrl = null;
+        }
+        this.selectedFile = null;
+        if (this.archivoInput && this.archivoInput.nativeElement) {
+          this.archivoInput.nativeElement.value = '';
+        }
 
         modal.close();
         this.reloadEvent.emit(true);
@@ -1497,12 +2004,88 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  onArchivoSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      if (file.type === 'application/pdf') {
+        // Limpiar URL previa si existe
+        if (this.filePreviewUrl) {
+          URL.revokeObjectURL(this.filePreviewUrl);
+        }
+
+        // Guardar el archivo seleccionado
+        this.selectedFile = file;
+        // Guardar el nombre del archivo en el modelo
+        this.patenteModel.archivo = file.name;
+
+        // Generar URL de previsualización
+        this.filePreviewUrl = URL.createObjectURL(file);
+      } else {
+        const errorAlert: SweetAlertOptions = {
+          icon: 'error',
+          title: 'Error!',
+          text: 'Solo se permiten archivos PDF',
+        };
+        this.showAlert(errorAlert);
+        event.target.value = '';
+        this.selectedFile = null;
+        this.patenteModel.archivo = '';
+        this.filePreviewUrl = null;
+      }
+    }
+  }
+
   downloadDocument(documentName: string): void {
-    console.log('Descargando documento:', documentName);
+    if (!documentName) {
+      const alertaError: SweetAlertOptions = {
+        icon: 'error',
+        title: 'Error',
+        text: 'No hay un archivo disponible para descargar.',
+      };
+      this.showAlert(alertaError);
+      return;
+    }
+
+    this.fileUploadService.downloadFile(documentName, 'patentes').subscribe({
+      next: (blob) => {
+        // Crear una URL temporal para el blob
+        const url = window.URL.createObjectURL(blob);
+
+        // Abrir el PDF en una nueva pestaña para visualización
+        window.open(url, '_blank');
+
+        // Opcional: Si se quiere descargar en lugar de visualizar, usar esto:
+        // const link = document.createElement('a');
+        // link.href = url;
+        // link.download = documentName;
+        // link.click();
+        // window.URL.revokeObjectURL(url);
+      },
+      error: (error) => {
+        console.error('Error al descargar documento:', error);
+        const alertaError: SweetAlertOptions = {
+          icon: 'error',
+          title: 'Error al descargar',
+          text: 'No se pudo descargar el archivo. Por favor, inténtalo de nuevo.',
+        };
+        this.showAlert(alertaError);
+      }
+    });
   }
 
   closeForm(modal: any) {
     modal.dismiss('cancel');
+
+    // Limpiar URL de previsualización
+    if (this.filePreviewUrl) {
+      URL.revokeObjectURL(this.filePreviewUrl);
+      this.filePreviewUrl = null;
+    }
+
+    // Limpiar el input de archivo
+    if (this.archivoInput && this.archivoInput.nativeElement) {
+      this.archivoInput.nativeElement.value = '';
+    }
 
     this.patenteModel = {
       id: 0,
@@ -1520,6 +2103,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     this.estadoSeleccionado = 0;
     this.institucionSeleccionada = 0;
     this.institucionesFiltradas = [];
+    this.selectedFile = null;
   }
 
   getStatusOrder(status: string): number {
@@ -1570,22 +2154,155 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private cargarCatalogos(): void {
+    console.log('[cargarCatalogos] Iniciando carga de catálogos...');
+
     this.parametrizacionesServices.getAll().subscribe({
       next: (catalogos) => {
+        console.log('[cargarCatalogos] Catálogos recibidos:', catalogos);
         this.catalogosAll = catalogos;
 
         // id_tema según tu backend:
-        this.ramasCatalogo = catalogos[3]?.lista ?? []; // rama_param
+        this.ramasCatalogo = catalogos[3]?.lista ?? [];  // rama_param
         this.mediosIngresoCatalogo = catalogos[8]?.lista ?? []; // medio_ingreso_param
-        this.tiposSectorCatalogo = catalogos[2]?.lista ?? []; // tipo_sector_param
-        this.estatusCatalogo = catalogos[7]?.lista ?? []; // estatus_param
+        this.tiposSectorCatalogo = catalogos[2]?.lista ?? [];  // tipo_sector_param
+        this.estatusCatalogo = catalogos[7]?.lista ?? [];      // estatus_param
         this.subsectoresCatalogo = catalogos[17]?.lista ?? []; // subsectores/actividades
+
+        console.log('[cargarCatalogos] Tipos de sector cargados:', this.tiposSectorCatalogo.length);
+        console.log('[cargarCatalogos] Subsectores cargados:', this.subsectoresCatalogo.length);
+
+        // 🔹 Construimos catálogo de SECTORES a partir de los subsectores
+        const sectoresMap = new Map<number, Parametrizacion>();
+        const temaSubsectores = catalogos[17];
+
+        if (temaSubsectores?.lista) {
+          for (const sub of temaSubsectores.lista) {
+            if (sub.id_param_padre) {
+              const sector = this.findParamById(sub.id_param_padre);
+              if (sector && !sectoresMap.has(sector.id_param)) {
+                sectoresMap.set(sector.id_param, sector);
+              }
+            }
+          }
+        }
+
+        this.sectoresCatalogo = Array.from(sectoresMap.values());
+        console.log('[cargarCatalogos] Sectores construidos:', this.sectoresCatalogo.length);
+        console.log('[cargarCatalogos] Detalle de sectores construidos:', this.sectoresCatalogo.map(s => ({
+          id: s.id_param,
+          nombre: s.nombre,
+          padre: s.id_param_padre
+        })));
+
+        // 🔹 Ajustamos las listas filtradas según la selección actual (si ya hay datos)
+        this.actualizarListasDesdeSeleccionActual();
 
         this.generarAniosRenovacion();
       },
       error: (err) => {
         console.error('[PatenteComponent] Error al cargar catálogos:', err);
       },
+    });
+  }
+
+  private actualizarListasDesdeSeleccionActual(): void {
+    console.log('[actualizarListasDesdeSeleccionActual] Estado inicial:', {
+      tipoSectorSeleccionadoId: this.tipoSectorSeleccionadoId,
+      sectorSeleccionadoId: this.sectorSeleccionadoId,
+      subsectorIdSeleccionado: this.subsectorIdSeleccionado
+    });
+
+    if (!this.subsectoresCatalogo || !this.subsectoresCatalogo.length) {
+      console.warn('[Sector] No hay subsectores disponibles (catálogos aún no cargados).');
+      return;
+    }
+
+    // Aseguramos sectoresCatalogo por si aún no se ha llenado
+    if (!this.sectoresCatalogo || !this.sectoresCatalogo.length) {
+      const sectoresSet = new Map<number, Parametrizacion>();
+      for (const sub of this.subsectoresCatalogo) {
+        const sector = this.findParamById(sub.id_param_padre || 0);
+        if (sector && !sectoresSet.has(sector.id_param)) {
+          sectoresSet.set(sector.id_param, sector);
+        }
+      }
+      this.sectoresCatalogo = Array.from(sectoresSet.values());
+    }
+
+    const tipoId = this.tipoSectorSeleccionadoId != null ? Number(this.tipoSectorSeleccionadoId) : null;
+    const sectorId = this.sectorSeleccionadoId != null ? Number(this.sectorSeleccionadoId) : null;
+
+    // 1) Filtramos sectores según el tipo de sector (si está seleccionado)
+    if (tipoId !== null) {
+      console.log('[DEBUG] Filtrando sectores para tipo sector ID:', tipoId);
+      console.log('[DEBUG] Total sectores en catálogo:', this.sectoresCatalogo.length);
+      console.log('[DEBUG] Detalle de sectores:', this.sectoresCatalogo.map(s => ({
+        id: s.id_param,
+        nombre: s.nombre,
+        padre: s.id_param_padre
+      })));
+
+      this.sectoresFiltrados = this.sectoresCatalogo.filter(sec => {
+        const padre = sec.id_param_padre != null ? Number(sec.id_param_padre) : null;
+        return padre !== null && padre === tipoId;
+      });
+
+      console.log('[DEBUG] Sectores filtrados encontrados:', this.sectoresFiltrados.length);
+      console.log('[DEBUG] Detalle sectores filtrados:', this.sectoresFiltrados.map(s => ({
+        id: s.id_param,
+        nombre: s.nombre,
+        padre: s.id_param_padre
+      })));
+    } else {
+      this.sectoresFiltrados = [...this.sectoresCatalogo];
+    }
+
+    // 2) Si tenemos subsector seleccionado, alineamos sector y tipo
+    if (this.subsectorIdSeleccionado) {
+      const subsector = this.subsectoresCatalogo.find(
+        s => s.id_param === this.subsectorIdSeleccionado
+      );
+      if (subsector) {
+        const sectorFromSubsector = this.findParamById(subsector.id_param_padre || 0);
+        if (sectorFromSubsector) {
+          this.sectorSeleccionadoId = sectorFromSubsector.id_param;
+          if (!this.tipoSectorSeleccionadoId && sectorFromSubsector.id_param_padre) {
+            this.tipoSectorSeleccionadoId = sectorFromSubsector.id_param_padre;
+          }
+        }
+      }
+    }
+
+    // 3) Filtramos subsectores según sector / tipo
+    if (sectorId !== null) {
+      this.subsectoresFiltrados = this.subsectoresCatalogo.filter(sub => {
+        const padre = sub.id_param_padre != null ? Number(sub.id_param_padre) : null;
+        return padre !== null && padre === sectorId;
+      });
+    } else if (tipoId !== null) {
+      const sectoresOfTipo = this.sectoresFiltrados.length
+        ? this.sectoresFiltrados
+        : this.sectoresCatalogo.filter(sec => {
+            const padre = sec.id_param_padre != null ? Number(sec.id_param_padre) : null;
+            return padre !== null && padre === tipoId;
+          });
+
+      const sectorIdsOfTipo = new Set(sectoresOfTipo.map(s => Number(s.id_param)));
+
+      this.subsectoresFiltrados = this.subsectoresCatalogo.filter(sub => {
+        const padre = sub.id_param_padre != null ? Number(sub.id_param_padre) : null;
+        return padre !== null && sectorIdsOfTipo.has(padre);
+      });
+    } else {
+      this.subsectoresFiltrados = [...this.subsectoresCatalogo];
+    }
+
+    console.log('[actualizarListasDesdeSeleccionActual] Estado final:', {
+      tipoSectorSeleccionadoId: this.tipoSectorSeleccionadoId,
+      sectorSeleccionadoId: this.sectorSeleccionadoId,
+      subsectorIdSeleccionado: this.subsectorIdSeleccionado,
+      sectoresFiltrados: this.sectoresFiltrados,
+      subsectoresFiltrados: this.subsectoresFiltrados
     });
   }
 
@@ -1627,35 +2344,121 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private actualizarSectorDesdeSubsector(idSubsector: number | null): void {
-    if (!idSubsector || !this.catalogosAll) {
-      this.patenteModel.sector = '';
+  console.log('[actualizarSectorDesdeSubsector] idSubsector:', idSubsector);
+
+  if (!idSubsector || !this.catalogosAll) {
+    this.patenteModel.sector = '';
+    this.patenteModel.tipoSector = '';
+    this.patenteModel.subsector = 'N/A';
+    this.tipoSectorSeleccionadoId = null;
+    this.sectorSeleccionadoId = null;
+    return;
+  }
+
+  // Subsector
+  const subsector = this.subsectoresCatalogo.find(s => s.id_param === idSubsector);
+  if (!subsector) {
+    console.warn('[actualizarSectorDesdeSubsector] Subsector no encontrado para id', idSubsector);
+    return;
+  }
+
+  this.subsectorIdSeleccionado = subsector.id_param;
+  this.patenteModel.subsector = subsector.nombre || String(subsector.id_param);
+
+  // Sector (padre del subsector)
+  const sectorParam = subsector.id_param_padre
+    ? this.findParamById(subsector.id_param_padre)
+    : undefined;
+
+  // Tipo de sector (padre del sector)
+  const tipoSectorParam = sectorParam?.id_param_padre
+    ? this.findParamById(sectorParam.id_param_padre)
+    : undefined;
+
+  this.sectorSeleccionadoId = sectorParam?.id_param ?? null;
+  this.tipoSectorSeleccionadoId = tipoSectorParam?.id_param ?? null;
+
+  this.patenteModel.sector = sectorParam?.nombre || '';
+  this.patenteModel.tipoSector = tipoSectorParam?.nombre || '';
+
+  this.actualizarListasDesdeSeleccionActual();
+}
+
+
+  onTipoSectorChange(event: any): void {
+    console.log(event.target)
+    const prevalue = (event.target as HTMLSelectElement).value;
+    const value = prevalue.split(':')[1]
+    this.tipoSectorSeleccionadoId = value ? Number(value) : null;
+
+    // Limpia niveles inferiores
+    this.sectorSeleccionadoId = null;
+    this.subsectorIdSeleccionado = null;
+    this.patenteModel.sector = '';
+    this.patenteModel.subsector = 'N/A';
+
+    if (!this.tipoSectorSeleccionadoId) {
       this.patenteModel.tipoSector = '';
+      this.sectoresFiltrados = [];
+      this.subsectoresFiltrados = [];
+      return;
+    }
+
+    const tipo = this.tiposSectorCatalogo.find(
+      t => t.id_param === this.tipoSectorSeleccionadoId
+    );
+    this.patenteModel.tipoSector = tipo?.nombre ?? '';
+
+    this.actualizarListasDesdeSeleccionActual();
+  }
+
+
+  onSectorChange(event: any): void {
+    const prevalue = (event.target as HTMLSelectElement).value;
+    const value = prevalue.split(':')[1]
+    this.sectorSeleccionadoId = value ? Number(value) : null;
+
+    this.subsectorIdSeleccionado = null;
+    this.patenteModel.subsector = 'N/A';
+
+    if (!this.sectorSeleccionadoId) {
+      this.patenteModel.sector = '';
+      this.subsectoresFiltrados = [];
+      return;
+    }
+
+    const sector = this.sectoresCatalogo.find(
+      s => s.id_param === this.sectorSeleccionadoId
+    );
+    this.patenteModel.sector = sector?.nombre ?? '';
+
+    // Si el sector tiene padre, actualizamos también el tipo de sector
+    if (sector?.id_param_padre) {
+      this.tipoSectorSeleccionadoId = sector.id_param_padre;
+      const tipo = this.tiposSectorCatalogo.find(
+        t => t.id_param === this.tipoSectorSeleccionadoId
+      );
+      this.patenteModel.tipoSector = tipo?.nombre ?? '';
+    }
+
+    this.actualizarListasDesdeSeleccionActual();
+  }
+
+
+  onSubsectorChange(event: any): void {
+    const prevalue = (event.target as HTMLSelectElement).value;
+    const value = prevalue.split(':')[1]
+    this.subsectorIdSeleccionado = value ? Number(value) : null;
+
+    if (!this.subsectorIdSeleccionado) {
       this.patenteModel.subsector = 'N/A';
       return;
     }
 
-    const temaSubsectores = this.catalogosAll[17];
-    const subsector = temaSubsectores?.mapa[idSubsector];
-
-    if (!subsector) {
-      console.warn('⚠️ Subsector no encontrado para id', idSubsector);
-      return;
-    }
-
-    // Guardar el id en el modelo (este campo es el que viaja al backend)
-    this.patenteModel.subsector = String(subsector.id_param);
-
-    const chain = this.service.getSectorChainFromSubsector(idSubsector);
-
-    this.patenteModel.tipoSector = chain.tipoSector;
-    this.patenteModel.sector = chain.sector;
-  }
-
-  onSubsectorChange(event: any): void {
-    const value = (event.target as HTMLSelectElement).value;
-    this.subsectorIdSeleccionado = value ? Number(value) : null;
     this.actualizarSectorDesdeSubsector(this.subsectorIdSeleccionado);
   }
+
+
 
   getRamaNombre(ramaId: string | number | undefined): string {
     if (!ramaId) return 'N/A';
