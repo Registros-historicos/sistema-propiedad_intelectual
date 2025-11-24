@@ -115,7 +115,7 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
     medioIngreso: '',
     tecnologicoOrigen: '',
     cePat: 'N/A',
-    anioRenovacion: '',
+    anioRenovacion: (new Date().getFullYear() + 1).toString(),
     tipoSector: '',
     sector: '',
     subsector: '',
