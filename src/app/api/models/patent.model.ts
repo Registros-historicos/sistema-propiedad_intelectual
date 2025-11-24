@@ -11,6 +11,19 @@ export interface Inventor {
   fechaFin: string;        // YYYY-MM-DD
 }
 
+export interface Inventor {
+  curp: string;
+  nombreCompleto: string;
+  sexo: 'M' | 'F' | '';
+  tipoInvestigador: string;
+  institucion: string;
+  programaEducativo: string;
+  cuerpoAcademico: string;
+  departamento: string;
+  fechaAfiliacion: string; // YYYY-MM-DD
+  fechaFin: string;        // YYYY-MM-DD
+}
+
 export interface IPatentModel {
   // ========================================
   // CAMPOS DEL BACKEND (PRIORITARIOS)
