@@ -185,6 +185,8 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   private isInicializandoDesdeRegistro = false;
 
   aPatente: Observable<IPatentModel>
+  CURRENT_YEAR = new Date().getFullYear().toString();
+
   patenteModel: PatenteUIModel = {
     id: 0,
     solicitudId: "",
@@ -204,7 +206,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     medioIngreso: "",
     tecnologicoOrigen: "",
     cePat: "N/A",
-    anioRenovacion: (new Date().getFullYear() + 1).toString(),
+    anioRenovacion: this.CURRENT_YEAR,
     tipoSector: "",
     sector: "",
     subsector: "",
@@ -1415,7 +1417,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
           medioIngreso: item.medioIngreso || 'Cuenta Pase IMPI',
           tecnologicoOrigen: item.tecnologicoOrigen || 'Instituto Tecnológico de Morelia',
           cePat: item.cePat || 'Centro Nacional de Investigación y Desarrollo Tecnológico (CENIDET)',
-          anioRenovacion: item.anioRenovacion || '2029',
+          anioRenovacion: item.anioRenovacion != 'N/A' ? item.anioRenovacion : 2029,
           tipoSector: item.tipoSector || 'Primario',
           sector: item.sector || 'Agricultura',
           subsector: item.subsector || 'Cultivo de granos y cereales (maíz, trigo, sorgo, arroz, avena, cebada)',
@@ -2097,6 +2099,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       institucion: '',
       estatus: 'En trámite',
       descripcion: '',
+      anioRenovacion: (new Date().getFullYear() + 1).toString(),
       documentos: []
     };
 

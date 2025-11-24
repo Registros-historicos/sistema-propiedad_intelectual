@@ -364,7 +364,6 @@
             <label class="fw-semibold fs-6 mb-2 text-gray-600">Año Renovación</label>
             <select class="form-select form-select-sm" id="anioRenovacion" name="anioRenovacion"
               [(ngModel)]="patenteModel.anioRenovacion">
-              <option [ngValue]="'N/A'">N/A</option>
               <option *ngFor="let anio of aniosRenovacion" [ngValue]="anio.toString()">
                 {{ anio }}
               </option>
