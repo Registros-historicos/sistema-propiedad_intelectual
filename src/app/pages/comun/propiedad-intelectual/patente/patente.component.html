@@ -66,7 +66,7 @@
 
         <div class="fv-row col-md-6">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">N. de Título</label>
-          <input type="text" class="form-control form-control-solid bg-light" [value]="patenteModel.numeroTitulo"
+          <input type="text" class="form-control form-control-solid bg-light" [value]="patenteModel.id_registro"
             readonly />
         </div>
       </div>
@@ -162,7 +162,17 @@
       <div class="row g-9 mb-7">
         <div class="fv-row col-md-6">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">Archivo</label>
-          <input type="text" class="form-control form-control-solid bg-light" [value]="patenteModel.archivo" readonly />
+          <div class="form-control form-control-solid bg-light d-flex align-items-center justify-content-between">
+            <span *ngIf="patenteModel.archivo">
+              <app-keenicon name="document" class="fs-5 me-2"></app-keenicon>
+              {{ patenteModel.archivo }}
+            </span>
+            <span *ngIf="!patenteModel.archivo" class="text-muted">Sin archivo</span>
+            <button *ngIf="patenteModel.archivo" type="button" class="btn btn-sm btn-light-primary"
+                    (click)="downloadDocument(patenteModel.archivo)">
+              <app-keenicon name="download" class="fs-5">Ver</app-keenicon>
+            </button>
+          </div>
         </div>
         <div class="fv-row col-md-6">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">Observaciones</label>
@@ -333,8 +343,9 @@
           </div>
           <div class="fv-row col-md-6">
             <label class="fw-semibold fs-6 mb-2 text-gray-600">Tecnológico de Origen</label>
-            <select id="tecnologicoOrigen" class="form-select" name="tecnologicoOrigen" [disabled]="!selectedCepatId"
-              [(ngModel)]="institucionSeleccionadaCepat" (ngModelChange)="onInstitucionCepatChange($event)">
+            <select id="tecnologicoOrigen" class="form-select" name="tecnologicoOrigen"
+              [disabled]="!selectedCepatId && !institucionSeleccionadaCepat" [(ngModel)]="institucionSeleccionadaCepat"
+              (ngModelChange)="onInstitucionCepatChange($event)">
               <option [ngValue]="null" disabled>
                 {{ !selectedCepatId ? 'Seleccione primero un CEPA' : 'Seleccione una institución' }}
               </option>
@@ -361,7 +372,13 @@
           </div>
           <div class="fv-row col-md-6">
             <label class="fw-semibold fs-6 mb-2 text-gray-600">Tipo de Sector</label>
-            <input type="text" class="form-control" [(ngModel)]="patenteModel.tipoSector" readonly />
+            <select class="form-select" id="tipoSector" name="tipoSector" [(ngModel)]="tipoSectorSeleccionadoId"
+              (change)="onTipoSectorChange($event)" [disabled]="isEditingStatus">
+              <option [ngValue]="null">Seleccione un tipo de sector</option>
+              <option *ngFor="let tipo of tiposSectorCatalogo" [ngValue]="tipo.id_param">
+                {{ tipo.nombre }}
+              </option>
+            </select>
           </div>
         </div>
       </div>
@@ -370,14 +387,20 @@
         <div class="row g-9 mb-7">
           <div class="fv-row col-md-6">
             <label class="fw-semibold fs-6 mb-2 text-gray-600">Sector</label>
-            <input type="text" class="form-control" [(ngModel)]="patenteModel.sector" readonly />
+            <select class="form-select" id="sector" name="sector" [(ngModel)]="sectorSeleccionadoId"
+              (change)="onSectorChange($event)" [disabled]="isEditingStatus || !tipoSectorSeleccionadoId">
+              <option [ngValue]="null">{{ !tipoSectorSeleccionadoId ? 'Seleccione primero un tipo de sector' : 'Seleccione un sector' }}</option>
+              <option *ngFor="let s of sectoresFiltrados" [ngValue]="s.id_param">
+                {{ s.nombre }}
+              </option>
+            </select>
           </div>
           <div class="fv-row col-md-6">
             <label class="fw-semibold fs-6 mb-2 text-gray-600">Subsector</label>
-            <select class="form-select form-select-sm" id="subsector" name="subsector" [disabled]="isEditingStatus"
-              [(ngModel)]="subsectorIdSeleccionado" (change)="onSubsectorChange($event)">
-              <option [ngValue]="null">Seleccione un subsector</option>
-              <option *ngFor="let sub of subsectoresCatalogo" [ngValue]="sub.id_param">
+            <select class="form-select" id="subsector" name="subsector" [(ngModel)]="subsectorIdSeleccionado"
+              (change)="onSubsectorChange($event)" [disabled]="isEditingStatus || !sectorSeleccionadoId">
+              <option [ngValue]="null">{{ !sectorSeleccionadoId ? 'Seleccione primero un sector' : 'Seleccione un subsector' }}</option>
+              <option *ngFor="let sub of subsectoresFiltrados" [ngValue]="sub.id_param">
                 {{ sub.nombre }}
               </option>
             </select>
@@ -399,11 +422,50 @@
       <div class="row g-9 mb-7">
         <div class="fv-row col-md-6">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">Archivo</label>
-          <input type="text" class="form-control" [(ngModel)]="patenteModel.archivo" />
+          <input type="file" class="form-control" accept=".pdf" (change)="onArchivoSelected($event)" #archivoInput />
+
+          <!-- Información del archivo actual -->
+          <div *ngIf="patenteModel.archivo && !filePreviewUrl" class="mt-2 d-flex align-items-center justify-content-between p-2 bg-light rounded">
+            <small class="text-muted d-flex align-items-center">
+              <app-keenicon name="document" class="fs-5 me-2"></app-keenicon>
+              <span>Archivo actual: <strong>{{ patenteModel.archivo }}</strong></span>
+            </small>
+            <button type="button" class="btn btn-sm btn-light-primary ms-2"
+                    (click)="downloadDocument(patenteModel.archivo)">
+              <app-keenicon name="download" class="fs-5">Ver</app-keenicon>
+            </button>
+          </div>
+
+          <!-- Sin archivo -->
+          <div *ngIf="!patenteModel.archivo" class="mt-2">
+            <small class="text-muted">
+              <app-keenicon name="information" class="fs-5 me-1"></app-keenicon>
+              Sin archivo
+            </small>
+          </div>
         </div>
         <div class="fv-row col-md-6">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">Observaciones</label>
           <textarea class="form-control" rows="3" [(ngModel)]="patenteModel.observaciones"></textarea>
+        </div>
+      </div>
+
+      <!-- Previsualización del archivo PDF -->
+      <div class="row g-9 mb-7" *ngIf="filePreviewUrl">
+        <div class="fv-row col-md-12">
+          <label class="fw-semibold fs-6 mb-2 text-gray-600">
+            <app-keenicon name="eye" class="fs-5 me-1"></app-keenicon>
+            Previsualización del PDF
+          </label>
+          <div class="card">
+            <div class="card-body p-0">
+              <iframe [src]="filePreviewUrl | safeUrl"
+                      width="100%"
+                      height="500px"
+                      style="border: none;">
+              </iframe>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -412,7 +474,7 @@
         <textarea class="form-control" rows="3" [(ngModel)]="patenteModel.descripcion"></textarea>
       </div>
 
-      <div class="separator separator-dashed my-7"></div>
+      <!-- <div class="separator separator-dashed my-7"></div>
       <div class="d-flex align-items-center justify-content-between mb-4">
         <div class="fw-bold fs-4">Inventores</div>
         <button type="button" class="btn btn-sm btn-primary" (click)="addInventor()">Agregar autor</button>
@@ -472,7 +534,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 

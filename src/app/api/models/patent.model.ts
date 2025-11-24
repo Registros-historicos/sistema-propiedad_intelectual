@@ -93,6 +93,11 @@ export type PatenteUIModel = IPatentModel & {
   observaciones?: string;
   descripcion?: string;
   inventores?: Inventor[];
+  id_institucion?: number | null;  // ID de la institucion (para edicion)
+  id_cepat?: number | null;        // ID del CePat (para edicion)
+  id_subsector?: number | null;    // ID del subsector (para cascada de sectores)
+  sector_param?: number | null;    // ID de sector (si se recibe desde el backend)
+  tipo_sector_param?: number | string | null; // ID de tipo de sector
 };
 
 // Respuesta de paginación del backend
