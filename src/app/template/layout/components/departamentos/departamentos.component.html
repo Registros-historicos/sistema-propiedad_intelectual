@@ -9,15 +9,6 @@
     </div>
   </div>
   <div class="card-body h-100">
-
-    <!-- <div *ngFor="let departamento of departamentos" class="mb-4 border-bottom pb-2"
-      style="max-height:400px; overflow-y: auto;">
-      <div class="d-flex justify-content-between align-items-center">
-        <span class="fw-bold">{{departamento.nombre}}</span>
-        <span class="badge bg-success">{{departamento.totalSolicitudes}} solicitudes</span>
-      </div>
-
-    </div> -->
      <div *ngIf="isLoading" class="d-flex flex-column align-items-center justify-content-center py-10">
       <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
         <span class="visually-hidden">Cargando...</span>

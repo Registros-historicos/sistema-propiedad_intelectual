@@ -104,9 +104,15 @@ export class DashboardComponent implements OnInit {
   }
 
   exportExcelInvestigadores() {
-    console.log('Exportando reporte de investigadores a Excel...');
-    // Descomentar cuando el servicio esté implementado
-    // this.exportExcelService.downloadExcelReport('/excel/investigadores/por-coordinador');
+    this.exportExcelService.downloadExcelReport('/excel/registros/investigadores');
+  }
+
+  exportExcelCuerposAcademicos() {
+    this.exportExcelService.downloadExcelReport('/excel/registros/cuerpo/academico');
+  }
+
+  exportExcelDepartamentos() {
+    this.exportExcelService.downloadExcelReport('/excel/registros/departamentos');
   }
 
   onFilterChange(): void {
