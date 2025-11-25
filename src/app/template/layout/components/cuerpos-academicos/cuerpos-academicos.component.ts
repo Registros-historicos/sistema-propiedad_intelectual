@@ -19,8 +19,6 @@ interface CuerpoAcademicoView {
 export class CuerposAcademicosComponent implements OnChanges {
 
   @Input() datos: CuerpoAcademicoAPI[] = [];
-
-  // Evento para que el padre dispare la descarga de Excel
   @Output() exportExcel = new EventEmitter<void>();
 
   cuerposAcademicos: CuerpoAcademicoView[] = [];
@@ -89,9 +87,5 @@ export class CuerposAcademicosComponent implements OnChanges {
 
   exportToExcel(): void {
     this.exportExcel.emit();
-  }
-
-  generatePDF(): void {
-    alert('Funcionalidad pendiente');
   }
 }

@@ -1,12 +1,15 @@
 <div class="row g-5 g-xl-8">
   <!-- Tablero por Departamentos -->
   <div class="col-xl-6">
-    <app-departamentos></app-departamentos>
+    <app-departamentos
+    (exportExcel)="exportExcelDepartamentos()"
+    ></app-departamentos>
   </div>
 <!-- Tablero por Cuerpos Académicos -->
   <div class="col-xl-6">
     <app-cuerpos-academicos
       [datos]="cuerposAcademicosDatos"
+      (exportExcel) ="exportExcelCuerposAcademicos()"
     ></app-cuerpos-academicos>
   </div>
 
