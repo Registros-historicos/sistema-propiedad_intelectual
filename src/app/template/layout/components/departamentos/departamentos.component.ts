@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { TablerosService, Departamento } from 'src/app/api/services/tableros.service';
 
 interface DepartamentoDisplay {
@@ -15,6 +15,7 @@ interface DepartamentoDisplay {
 export class DepartamentosComponent implements OnInit {
   departamentos: DepartamentoDisplay[] = [];
   isLoading: boolean = true;
+  @Output() exportExcel = new EventEmitter<void>();
 
   // Mapeo de iconos por palabras clave en el nombre del departamento
   private iconosPorDepartamento: { [key: string]: string } = {
@@ -72,26 +73,16 @@ export class DepartamentosComponent implements OnInit {
     });
   }
 
-  /**
-   * Obtiene el icono adecuado basándose en palabras clave en el nombre del departamento
-   */
   private obtenerIcono(nombreDepartamento: string): string {
-    // Buscar coincidencia con palabras clave
     for (const [keyword, icono] of Object.entries(this.iconosPorDepartamento)) {
       if (nombreDepartamento.includes(keyword)) {
         return icono;
       }
     }
-    
-    // Icono por defecto si no hay coincidencia
     return 'school';
   }
 
   exportToExcel(): void {
-    alert('Funcionalidad pendiente');
-  }
-
-  generatePDF(): void {
-    alert('Funcionalidad pendiente');
+    this.exportExcel.emit();
   }
 }
