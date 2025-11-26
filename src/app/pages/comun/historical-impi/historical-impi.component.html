@@ -37,15 +37,59 @@
       </div>
 
       <form [formGroup]="form" (ngSubmit)="submit()">
-        <div class="mb-4">
-          <label class="form-label fw-semibold">Seleccionar año</label>
-          <select class="form-select" formControlName="year">
-            <option *ngFor="let year of years" [value]="year">
-              {{ year }}
-            </option>
-          </select>
+        
+        <div class="col-md-12 mb-3">
+          <label class="form-label fw-bold">Selección de Años</label>
+          
+          <div class="dropdown">
+              <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center" 
+                      type="button" 
+                      id="yearDropdown" 
+                      (click)="toggleDropdown()"
+                      aria-expanded="false">
+                  <span>
+                      {{ form.get('year')?.value?.length > 0 
+                         ? 'Años seleccionados: ' + form.get('year')?.value?.length 
+                         : 'Seleccionar años' }}
+                  </span>
+              </button>
+      
+              <div class="dropdown-menu w-100 p-2" 
+                   [class.show]="dropdownOpen" 
+                   aria-labelledby="yearDropdown"
+                   (click)="$event.stopPropagation()"
+                   style="max-height: 250px; overflow-y: auto;">
+      
+                  <div class="form-check mb-2">
+                      <input class="form-check-input" type="checkbox" id="selectAll"
+                             [checked]="form.get('year')?.value?.length === years.length"
+                             (change)="onToggleYear('Seleccionar todo')">
+                      <label class="form-check-label fw-bold cursor-pointer" for="selectAll">
+                          Seleccionar todo
+                      </label>
+                  </div>
+      
+                  <div class="dropdown-divider"></div>
+      
+                  <ng-container *ngFor="let year of years">
+                      <div class="form-check">
+                          <input class="form-check-input" type="checkbox" [id]="'year-'+year"
+                                 [checked]="form.get('year')?.value?.includes(year)"
+                                 (change)="onToggleYear(year)">
+                          <label class="form-check-label cursor-pointer" [for]="'year-'+year">
+                              {{ year }}
+                          </label>
+                      </div>
+                  </ng-container>
+      
+              </div>
+          </div>
+      
+          <div *ngIf="dropdownOpen" 
+               (click)="dropdownOpen = false"
+               style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 900;">
+          </div>
         </div>
-
         <div class="mb-2">
           <label class="form-label fw-semibold">Seleccionar archivo</label>
           <div
@@ -66,6 +110,7 @@
                     o selecciona un archivo
                     <input
                       type="file"
+                      id="fileInput"
                       accept=".xls,.xlsx"
                       hidden
                       (change)="onFileSelected($event)"
@@ -161,7 +206,6 @@
         </ul>
       </div>
 
-      <!-- Información adicional sobre las hojas -->
       <ng-container *ngIf="availableSheets.length > 0">
         <div class="mt-3">
           <details class="border rounded p-3">
