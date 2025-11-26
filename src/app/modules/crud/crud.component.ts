@@ -30,6 +30,7 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
   @Output() viewEvent = new EventEmitter<number>();
   @Output() followEvent = new EventEmitter<number>();
   @Output() createEvent = new EventEmitter<boolean>();
+  @Output() modalDismissedEvent = new EventEmitter<void>();
 
   dtOptions: Config = {};
 
@@ -164,21 +165,25 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
           case 'view':
             this.viewEvent.emit(this.idInAction);
             this.modalRef = this.modalService.open(this.modal, this.modalConfig);
+            this.setupModalDismissListener();
             /* console.log('Navigating to:', `${this.route}/${id}`);
             this.router.navigate([`${this.route}/${id}`]); */
             break;
           case 'follow':
             this.followEvent.emit(this.idInAction);
             this.modalRef = this.modalService.open(this.modal, this.modalConfig);
+            this.setupModalDismissListener();
             break;
           case 'create':
             this.createEvent.emit(true);
             this.modalRef = this.modalService.open(this.modal, this.modalConfig);
+            this.setupModalDismissListener();
             break;
 
           case 'edit':
             this.editEvent.emit(this.idInAction);
             this.modalRef = this.modalService.open(this.modal, this.modalConfig);
+            this.setupModalDismissListener();
             break;
 
           case 'delete':
@@ -232,5 +237,13 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
       confirmButtonText: this.translate.instant('BUTTON.CONFIRM'),
       cancelButtonText: this.translate.instant('BUTTON.CANCEL')
     };
+  }
+
+  private setupModalDismissListener() {
+    if (this.modalRef) {
+      this.modalRef.dismissed.subscribe(() => {
+        this.modalDismissedEvent.emit();
+      });
+    }
   }
 }

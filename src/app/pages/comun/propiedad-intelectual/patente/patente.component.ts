@@ -93,6 +93,8 @@ interface SubsectorItem {
   styleUrl: './patente.component.scss'
 })
 export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
+  readonly RAMAS_IMPI_IDS = [176, 177, 178, 179, 180, 181];
+
   cepatList: Cepat[] = [];
 
   // 🔹 Subconjunto filtrado por CEPA seleccionado
@@ -760,7 +762,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
           data: 'institucion',
           orderable: true,
           render: (data) => {
-            return `<span class="fw-semibold text-gray-600">${data || ''}</span>`;
+            return `<span class="fw-semibold text-gray-600">${data === '-' ? 'N/A' : data}</span>`;
           },
         },
         {
@@ -1306,13 +1308,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       this.service.deletePatent(id).subscribe({
         next: () => {
           this.reloadEvent.emit(true);
-
-          // Opcional: Mostrar alerta de éxito
-          this.showAlert({
-            icon: 'success',
-            title: 'Eliminado',
-            text: 'El registro fue deshabilitado correctamente.'
-          });
+          // La notificación de éxito ya se muestra en el componente crud
         },
         error: (error) => {
           console.error('❌ Error al deshabilitar:', error);
@@ -1537,16 +1533,28 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     // --- Mapeo de catálogos (Rama, Medio de ingreso, Subsector) ---
 
     // 1) Rama: buscamos el id_param a partir del nombre elegido en el <select>
-    const ramaSeleccionada = this.ramasCatalogo.find(
-      r => r.nombre === this.patenteModel.rama
-    );
-    const ramaParamId = ramaSeleccionada?.id_param;
+    let ramaParamId: number | null = null;
+    if ((this.patenteModel as any).rama_param != null) {
+      const ramaId = typeof (this.patenteModel as any).rama_param === 'string'
+        ? parseInt((this.patenteModel as any).rama_param, 10)
+        : (this.patenteModel as any).rama_param;
+      ramaParamId = !isNaN(ramaId) ? ramaId : null;
+    } else if (this.patenteModel.rama) {
+      const ramaSeleccionada = this.ramasCatalogo.find(r => r.nombre === this.patenteModel.rama);
+      ramaParamId = ramaSeleccionada?.id_param ?? null;
+    }
 
     // 2) Medio de ingreso
-    const medioSeleccionado = this.mediosIngresoCatalogo.find(
-      m => m.nombre === this.patenteModel.medioIngreso
-    );
-    const medioIngresoParamId = medioSeleccionado?.id_param;
+    let medioIngresoParamId: number | null = null;
+    if ((this.patenteModel as any).medio_ingreso_param != null) {
+      const medioId = typeof (this.patenteModel as any).medio_ingreso_param === 'string'
+        ? parseInt((this.patenteModel as any).medio_ingreso_param, 10)
+        : (this.patenteModel as any).medio_ingreso_param;
+      medioIngresoParamId = !isNaN(medioId) ? medioId : null;
+    } else if (this.patenteModel.medioIngreso) {
+      const medioSeleccionado = this.mediosIngresoCatalogo.find(m => m.nombre === this.patenteModel.medioIngreso);
+      medioIngresoParamId = medioSeleccionado?.id_param ?? null;
+    }
 
     // 3) Subsector: id y nombre (el nombre lo mostramos en UI / reporte)
     let subsectorId: number | string | null = null;
@@ -1570,6 +1578,18 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     // Si a partir del subsector ya actualizaste tipoSector y sector
     // en el método actualizarSectorDesdeSubsector(), aquí solo los respetamos.
 
+    // 4) Año de renovación: convertir a entero o null
+    let anioRenovacion: number | null = null;
+    if (this.patenteModel.anioRenovacion !== undefined && this.patenteModel.anioRenovacion !== null) {
+      const raw = String(this.patenteModel.anioRenovacion).trim();
+      if (raw !== '' && raw.toUpperCase() !== 'N/A') {
+        const parsed = Number(raw);
+        if (!Number.isNaN(parsed)) {
+          anioRenovacion = parsed;
+        }
+      }
+    }
+
     // --- Construimos el payload explícito que se mandará al servicio ---
 
     const payload: any = {
@@ -1579,7 +1599,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       solicitudId: this.patenteModel.solicitudId || this.patenteModel.no_expediente || this.patenteModel.numeroExpediente,
       no_expediente: this.patenteModel.no_expediente || this.patenteModel.solicitudId || this.patenteModel.numeroExpediente,
       numeroExpediente: this.patenteModel.numeroExpediente || this.patenteModel.no_expediente,
-      titulo: this.patenteModel.titulo || this.patenteModel.denominacion || this.patenteModel.nombrePatente,
+      titulo: this.patenteModel.denominacion,
       nombrePatente: this.patenteModel.denominacion || this.patenteModel.nombrePatente,
       denominacion: this.patenteModel.denominacion,
 
@@ -1608,7 +1628,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       medioIngreso: this.patenteModel.medioIngreso,
       tecnologicoOrigen: this.patenteModel.tecnologicoOrigen,
       cePat: this.patenteModel.cePat,
-      anioRenovacion: this.patenteModel.anioRenovacion,
+      anioRenovacion: anioRenovacion,
 
       // Sector / Tipo de sector (texto calculado a partir del subsector)
       tipoSector: this.patenteModel.tipoSector,
@@ -1625,11 +1645,11 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
 
       // Hints explícitos para el backend (id de parametrización):
       // se usarán en mapFrontendToBackend si existen
-      rama_param: ramaParamId ?? (this.patenteModel as any).rama_param,
-      medio_ingreso_param: medioIngresoParamId ?? (this.patenteModel as any).medio_ingreso_param,
-      tipo_sector_param: this.tipoSectorSeleccionadoId ?? (this.patenteModel as any).tipo_sector_param,
+      rama_param: ramaParamId,
+      medio_ingreso_param: medioIngresoParamId,
+      tipo_sector_param: this.tipoSectorSeleccionadoId ?? null,
       id_subsector: subsectorId,
-      tipo_ingreso_param: (this.patenteModel as any).tipo_ingreso_param, // ej. IMPI = 44
+      tipo_ingreso_param: (this.patenteModel as any).tipo_ingreso_param || null,
     };
 
     this.service.updatePatent(id, payload).subscribe({
@@ -1643,15 +1663,8 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         };
         this.showAlert(alertaExito);
 
-        // Limpiar previsualización y archivo seleccionado después de guardar
-        if (this.filePreviewUrl) {
-          URL.revokeObjectURL(this.filePreviewUrl);
-          this.filePreviewUrl = null;
-        }
-        this.selectedFile = null;
-        if (this.archivoInput && this.archivoInput.nativeElement) {
-          this.archivoInput.nativeElement.value = '';
-        }
+        // Limpiar todos los datos de edición
+        this.limpiarDatosEdicion();
 
         modal.close();
         this.reloadEvent.emit(true);
@@ -2075,9 +2088,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  closeForm(modal: any) {
-    modal.dismiss('cancel');
-
+  private limpiarDatosEdicion(): void {
     // Limpiar URL de previsualización
     if (this.filePreviewUrl) {
       URL.revokeObjectURL(this.filePreviewUrl);
@@ -2100,13 +2111,58 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       estatus: 'En trámite',
       descripcion: '',
       anioRenovacion: (new Date().getFullYear() + 1).toString(),
-      documentos: []
+      documentos: [],
+      numeroExpediente: '',
+      numeroTitulo: '',
+      denominacion: '',
+      rama: '',
+      medioIngreso: '',
+      tecnologicoOrigen: '',
+      cePat: 'N/A',
+      tipoSector: '',
+      sector: '',
+      subsector: '',
+      fechaExpedicion: '',
+      archivo: '',
+      observaciones: '',
+      inventores: []
     };
+
+    // Limpiar selecciones de sector
+    this.tipoSectorSeleccionadoId = null;
+    this.sectorSeleccionadoId = null;
+    this.subsectorIdSeleccionado = null;
+    this.sectoresFiltrados = [];
+    this.subsectoresFiltrados = [];
+
+    // Limpiar selecciones de CEPat e instituciones
+    this.selectedCepatId = null;
+    this.institucionSeleccionadaCepat = null;
+    this.institucionesCepat = [];
+
+    // Limpiar flags de edición
+    this.isInicializandoDesdeRegistro = false;
+    this.isViewMode = true;
+    this.isEditingStatus = false;
+    this.editedStatus = '';
+    this.editedObservations = '';
+    this.originalStatus = '';
+    this.originalObservations = '';
 
     this.estadoSeleccionado = 0;
     this.institucionSeleccionada = 0;
     this.institucionesFiltradas = [];
     this.selectedFile = null;
+  }
+
+  closeForm(modal: any) {
+    modal.dismiss('cancel');
+    this.limpiarDatosEdicion();
+  }
+
+  onModalDismissed() {
+    // Este método se llama cuando se cierra el modal (backdrop, ESC, botón X)
+    this.limpiarDatosEdicion();
   }
 
   getStatusOrder(status: string): number {
@@ -2161,20 +2217,22 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.parametrizacionesServices.getAll().subscribe({
       next: (catalogos) => {
-        console.log('[cargarCatalogos] Catálogos recibidos:', catalogos);
         this.catalogosAll = catalogos;
 
-        // id_tema según tu backend:
-        this.ramasCatalogo = catalogos[3]?.lista ?? [];  // rama_param
-        this.mediosIngresoCatalogo = catalogos[8]?.lista ?? []; // medio_ingreso_param
-        this.tiposSectorCatalogo = catalogos[2]?.lista ?? [];  // tipo_sector_param
-        this.estatusCatalogo = catalogos[7]?.lista ?? [];      // estatus_param
-        this.subsectoresCatalogo = catalogos[17]?.lista ?? []; // subsectores/actividades
+        // 🔹 1) Ramas: solo las de IMPI
+        const todasLasRamas = catalogos[3]?.lista ?? [];  // tema 3 = rama_param
 
-        console.log('[cargarCatalogos] Tipos de sector cargados:', this.tiposSectorCatalogo.length);
-        console.log('[cargarCatalogos] Subsectores cargados:', this.subsectoresCatalogo.length);
+        this.ramasCatalogo = todasLasRamas.filter(rama =>
+          this.RAMAS_IMPI_IDS.includes(rama.id_param)
+        );
 
-        // 🔹 Construimos catálogo de SECTORES a partir de los subsectores
+        // 🔹 2) Resto de catálogos, igual que antes
+        this.mediosIngresoCatalogo = catalogos[8]?.lista ?? [];   // medio_ingreso_param
+        this.tiposSectorCatalogo = catalogos[2]?.lista ?? [];   // tipo_sector_param
+        this.estatusCatalogo = catalogos[7]?.lista ?? [];   // estatus_param
+        this.subsectoresCatalogo = catalogos[17]?.lista ?? [];  // subsectores/actividades
+
+        // 🔹 3) Construir catálogo de sectores a partir de subsectores (como ya lo tienes)
         const sectoresMap = new Map<number, Parametrizacion>();
         const temaSubsectores = catalogos[17];
 
@@ -2190,12 +2248,6 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
         }
 
         this.sectoresCatalogo = Array.from(sectoresMap.values());
-        console.log('[cargarCatalogos] Sectores construidos:', this.sectoresCatalogo.length);
-        console.log('[cargarCatalogos] Detalle de sectores construidos:', this.sectoresCatalogo.map(s => ({
-          id: s.id_param,
-          nombre: s.nombre,
-          padre: s.id_param_padre
-        })));
 
         // 🔹 Ajustamos las listas filtradas según la selección actual (si ya hay datos)
         this.actualizarListasDesdeSeleccionActual();
@@ -2286,9 +2338,9 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       const sectoresOfTipo = this.sectoresFiltrados.length
         ? this.sectoresFiltrados
         : this.sectoresCatalogo.filter(sec => {
-            const padre = sec.id_param_padre != null ? Number(sec.id_param_padre) : null;
-            return padre !== null && padre === tipoId;
-          });
+          const padre = sec.id_param_padre != null ? Number(sec.id_param_padre) : null;
+          return padre !== null && padre === tipoId;
+        });
 
       const sectorIdsOfTipo = new Set(sectoresOfTipo.map(s => Number(s.id_param)));
 
@@ -2347,45 +2399,45 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private actualizarSectorDesdeSubsector(idSubsector: number | null): void {
-  console.log('[actualizarSectorDesdeSubsector] idSubsector:', idSubsector);
+    console.log('[actualizarSectorDesdeSubsector] idSubsector:', idSubsector);
 
-  if (!idSubsector || !this.catalogosAll) {
-    this.patenteModel.sector = '';
-    this.patenteModel.tipoSector = '';
-    this.patenteModel.subsector = 'N/A';
-    this.tipoSectorSeleccionadoId = null;
-    this.sectorSeleccionadoId = null;
-    return;
+    if (!idSubsector || !this.catalogosAll) {
+      this.patenteModel.sector = '';
+      this.patenteModel.tipoSector = '';
+      this.patenteModel.subsector = 'N/A';
+      this.tipoSectorSeleccionadoId = null;
+      this.sectorSeleccionadoId = null;
+      return;
+    }
+
+    // Subsector
+    const subsector = this.subsectoresCatalogo.find(s => s.id_param === idSubsector);
+    if (!subsector) {
+      console.warn('[actualizarSectorDesdeSubsector] Subsector no encontrado para id', idSubsector);
+      return;
+    }
+
+    this.subsectorIdSeleccionado = subsector.id_param;
+    this.patenteModel.subsector = subsector.nombre || String(subsector.id_param);
+
+    // Sector (padre del subsector)
+    const sectorParam = subsector.id_param_padre
+      ? this.findParamById(subsector.id_param_padre)
+      : undefined;
+
+    // Tipo de sector (padre del sector)
+    const tipoSectorParam = sectorParam?.id_param_padre
+      ? this.findParamById(sectorParam.id_param_padre)
+      : undefined;
+
+    this.sectorSeleccionadoId = sectorParam?.id_param ?? null;
+    this.tipoSectorSeleccionadoId = tipoSectorParam?.id_param ?? null;
+
+    this.patenteModel.sector = sectorParam?.nombre || '';
+    this.patenteModel.tipoSector = tipoSectorParam?.nombre || '';
+
+    this.actualizarListasDesdeSeleccionActual();
   }
-
-  // Subsector
-  const subsector = this.subsectoresCatalogo.find(s => s.id_param === idSubsector);
-  if (!subsector) {
-    console.warn('[actualizarSectorDesdeSubsector] Subsector no encontrado para id', idSubsector);
-    return;
-  }
-
-  this.subsectorIdSeleccionado = subsector.id_param;
-  this.patenteModel.subsector = subsector.nombre || String(subsector.id_param);
-
-  // Sector (padre del subsector)
-  const sectorParam = subsector.id_param_padre
-    ? this.findParamById(subsector.id_param_padre)
-    : undefined;
-
-  // Tipo de sector (padre del sector)
-  const tipoSectorParam = sectorParam?.id_param_padre
-    ? this.findParamById(sectorParam.id_param_padre)
-    : undefined;
-
-  this.sectorSeleccionadoId = sectorParam?.id_param ?? null;
-  this.tipoSectorSeleccionadoId = tipoSectorParam?.id_param ?? null;
-
-  this.patenteModel.sector = sectorParam?.nombre || '';
-  this.patenteModel.tipoSector = tipoSectorParam?.nombre || '';
-
-  this.actualizarListasDesdeSeleccionActual();
-}
 
 
   onTipoSectorChange(event: any): void {

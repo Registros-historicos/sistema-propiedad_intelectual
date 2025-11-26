@@ -25,7 +25,7 @@
   <div class="card-body pt-0">
     <app-crud [datatableConfig]="datatableConfig" route="/coordinador/propiedades/patente"
       (deleteEvent)="delete($event)" (editEvent)="edit($event)" (viewEvent)="view($event)" [reload]="reloadEvent"
-      [modal]="isViewMode ? formModal : formModalEdit">
+      (modalDismissedEvent)="onModalDismissed()" [modal]="isViewMode ? formModal : formModalEdit">
     </app-crud>
   </div>
 </div>
@@ -168,10 +168,11 @@
               {{ patenteModel.archivo }}
             </span>
             <span *ngIf="!patenteModel.archivo" class="text-muted">Sin archivo</span>
-            <button *ngIf="patenteModel.archivo" type="button" class="btn btn-sm btn-light-primary"
-                    (click)="downloadDocument(patenteModel.archivo)">
-              <app-keenicon name="download" class="fs-5">Ver</app-keenicon>
-            </button>
+            <span *ngIf="patenteModel.archivo">
+              <mat-icon style="color: black;" (click)="downloadDocument(patenteModel.archivo)">
+                visibility
+              </mat-icon>
+            </span>
           </div>
         </div>
         <div class="fv-row col-md-6">
@@ -263,23 +264,23 @@
       Editar Registro IMPI
     </h3>
     <button type="button" class="btn-close btn-close-white" aria-label="Close"
-      (click)="modal.dismiss('Cross click')"></button>
+      (click)="closeForm(modal)"></button>
   </div>
 
   <div class="modal-body">
     <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-650px">
-      <div class="row g-9 mb-7">
+      <div class="row g-9 mb-5">
         <div class="fv-row col-md-6">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">N. Expediente</label>
-          <input type="text" class="form-control" [(ngModel)]="patenteModel.numeroExpediente" />
+          <input type="text" class="form-control" disabled [(ngModel)]="patenteModel.numeroExpediente" />
         </div>
         <div class="fv-row col-md-6">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">N. de Título</label>
-          <input type="text" class="form-control" [(ngModel)]="patenteModel.id_registro" />
+          <input type="text" class="form-control" disabled [(ngModel)]="patenteModel.id_registro" />
         </div>
       </div>
 
-      <div class="row g-9 mb-7">
+      <div class="row g-9 mb-5">
         <div class="fv-row col-md-6">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">Denominación</label>
           <input type="text" class="form-control" [(ngModel)]="patenteModel.denominacion" />
@@ -296,7 +297,7 @@
         </div>
       </div>
 
-      <div class="row g-9 mb-7">
+      <div class="row g-9 mb-5">
         <div class="fv-row col-md-6">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">Estatus</label>
           <select class="form-select" [(ngModel)]="patenteModel.estatus">
@@ -328,8 +329,8 @@
         </div>
       </div>
 
-      <div class="row g-9 mb-7">
-        <div class="row g-9 mb-7">
+      <div class="row g-9 mb-5">
+        <div class="row g-9 mb-5">
           <div class="fv-row col-md-6">
             <label class="fw-semibold fs-6 mb-2 text-gray-600">CePat</label>
             <select id="cePat" class="form-select" name="cePat" [(ngModel)]="selectedCepatId"
@@ -358,8 +359,8 @@
         </div>
       </div>
 
-      <div class="row g-9 mb-7">
-        <div class="row g-9 mb-7">
+      <div class="row g-9 mb-5">
+        <div class="row g-9 mb-5">
           <div class="fv-row col-md-6">
             <label class="fw-semibold fs-6 mb-2 text-gray-600">Año Renovación</label>
             <select class="form-select form-select-sm" id="anioRenovacion" name="anioRenovacion"
@@ -382,8 +383,8 @@
         </div>
       </div>
 
-      <div class="row g-9 mb-7">
-        <div class="row g-9 mb-7">
+      <div class="row g-9 mb-5">
+        <div class="row g-9 mb-5">
           <div class="fv-row col-md-6">
             <label class="fw-semibold fs-6 mb-2 text-gray-600">Sector</label>
             <select class="form-select" id="sector" name="sector" [(ngModel)]="sectorSeleccionadoId"
@@ -407,7 +408,7 @@
         </div>
       </div>
 
-      <div class="row g-9 mb-7">
+      <div class="row g-9 mb-5">
         <div class="fv-row col-md-6">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">Fecha de Solicitud</label>
           <input type="date" class="form-control" [(ngModel)]="patenteModel.fechaSolicitud" />
@@ -418,7 +419,7 @@
         </div>
       </div>
 
-      <div class="row g-9 mb-7">
+      <div class="row g-9 mb-5">
         <div class="fv-row col-md-6">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">Archivo</label>
           <input type="file" class="form-control" accept=".pdf" (change)="onArchivoSelected($event)" #archivoInput />
@@ -429,10 +430,11 @@
               <app-keenicon name="document" class="fs-5 me-2"></app-keenicon>
               <span>Archivo actual: <strong>{{ patenteModel.archivo }}</strong></span>
             </small>
-            <button type="button" class="btn btn-sm btn-light-primary ms-2"
-                    (click)="downloadDocument(patenteModel.archivo)">
-              <app-keenicon name="download" class="fs-5">Ver</app-keenicon>
-            </button>
+            <span *ngIf="patenteModel.archivo">
+              <mat-icon style="color: black;" (click)="downloadDocument(patenteModel.archivo)">
+                visibility
+              </mat-icon>
+            </span>
           </div>
 
           <!-- Sin archivo -->
@@ -450,7 +452,7 @@
       </div>
 
       <!-- Previsualización del archivo PDF -->
-      <div class="row g-9 mb-7" *ngIf="filePreviewUrl">
+      <div class="row g-9 mb-5" *ngIf="filePreviewUrl">
         <div class="fv-row col-md-12">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">
             <app-keenicon name="eye" class="fs-5 me-1"></app-keenicon>
@@ -468,7 +470,7 @@
         </div>
       </div>
 
-      <div class="fv-row mb-7">
+      <div class="fv-row mb-5">
         <label class="fw-semibold fs-6 mb-2 text-gray-600">Descripción</label>
         <textarea class="form-control" rows="3" [(ngModel)]="patenteModel.descripcion"></textarea>
       </div>
