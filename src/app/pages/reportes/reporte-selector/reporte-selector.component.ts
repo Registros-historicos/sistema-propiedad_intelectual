@@ -91,6 +91,10 @@ export class ReporteSelectorComponent implements OnInit {
       (a, b) => a.nombre.localeCompare(b.nombre, 'es')
     );
 
+    this.sectores = [...SECTORES_DATA].sort(
+      (a, b) => a.nombre.localeCompare(b.nombre, 'es')
+    );
+
     this.loadUserProfile();
     this.instituciones = this.getAllInstitutes()
     .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
