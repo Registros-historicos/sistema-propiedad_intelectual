@@ -25,7 +25,7 @@
   <div class="card-body pt-0">
     <app-crud [datatableConfig]="datatableConfig" route="/coordinador/propiedades/modelo-utilidad"
       (deleteEvent)="delete($event)" (editEvent)="edit($event)" (viewEvent)="view($event)" [reload]="reloadEvent"
-      [modal]="isViewMode ? formModal : formModalEdit">
+      (modalDismissedEvent)="onModalDismissed()" [modal]="isViewMode ? formModal : formModalEdit">
     </app-crud>
   </div>
 </div>
@@ -42,7 +42,7 @@
   </div>
 
   <div class="modal-body">
-    <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-650px">
+    <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-700px">
 
       <div class="notice d-flex bg-light-info rounded border-info border border-dashed mb-7 p-6">
         <app-keenicon name="information-5" class="fs-2tx text-info me-4"></app-keenicon>
@@ -171,10 +171,11 @@
               {{ indautorModel.archivo }}
             </span>
             <span *ngIf="!indautorModel.archivo" class="text-muted">Sin archivo</span>
-            <button *ngIf="indautorModel.archivo" type="button" class="btn btn-sm btn-light-primary"
-                    disabled (click)="downloadDocument(indautorModel.archivo)">
-              <app-keenicon name="download" class="fs-5">Ver</app-keenicon>
-            </button>
+            <span *ngIf="indautorModel.archivo">
+              <mat-icon style="color: black;" (click)="downloadDocument(indautorModel.archivo)">
+                visibility
+              </mat-icon>
+            </span>
           </div>
         </div>
         <div class="fv-row col-md-6">
@@ -263,7 +264,7 @@
       Editar Registro INDAUTOR
     </h3>
     <button type="button" class="btn-close btn-close-white" aria-label="Close"
-      (click)="modal.dismiss('Cross click')"></button>
+      (click)="closeForm(modal)"></button>
   </div>
 
   <div class="modal-body">
@@ -272,11 +273,11 @@
       <div class="row g-9 mb-7">
         <div class="fv-row col-md-6">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">N. Expediente</label>
-          <input type="text" class="form-control" [(ngModel)]="indautorModel.numeroExpediente" />
+          <input type="text" class="form-control" disabled [(ngModel)]="indautorModel.numeroExpediente" />
         </div>
         <div class="fv-row col-md-6">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">N. de Título</label>
-          <input type="text" class="form-control" [(ngModel)]="indautorModel.id_registro" />
+          <input type="text" class="form-control" disabled [(ngModel)]="indautorModel.id_registro" />
         </div>
       </div>
 
@@ -431,10 +432,11 @@
               <app-keenicon name="document" class="fs-5 me-2"></app-keenicon>
               <span>Archivo actual: <strong>{{ indautorModel.archivo }}</strong></span>
             </small>
-            <button type="button" class="btn btn-sm btn-light-primary ms-2"
-                    (click)="downloadDocument(indautorModel.archivo)">
-              <app-keenicon name="download" class="fs-5">Ver</app-keenicon>
-            </button>
+            <span>
+              <mat-icon style="color: black;" (click)="downloadDocument(indautorModel.archivo)">
+                visibility
+              </mat-icon>
+            </span>
           </div>
 
           <!-- Sin archivo -->

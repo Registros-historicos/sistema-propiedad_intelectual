@@ -13,6 +13,7 @@ import {TranslationModule} from '../../../modules/i18n';
 import { FormsModule } from '@angular/forms';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
+import { MatIcon } from '@angular/material/icon';
 
 
 @NgModule({
@@ -32,6 +33,7 @@ import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
     TranslationModule,
     SweetAlert2Module.forChild(),
     NgbCollapseModule,
+    MatIcon
   ]
 })
 export class PropiedadIntelectualModule { }
