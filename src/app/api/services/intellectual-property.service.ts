@@ -572,7 +572,7 @@ export class IntellectualPropertyService {
 
     return {
       no_expediente: registro.no_expediente || registro.solicitudId || registro.numeroExpediente || '',
-      titulo: registro.titulo || registro.denominacion || registro.nombrePatente || '',
+      titulo: registro.denominacion,
       descripcion: registro.descripcion || '',
       tipo_ingreso_param: tipoIngresoParam,
       id_usuario: idUsuario,

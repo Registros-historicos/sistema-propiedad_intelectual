@@ -350,8 +350,8 @@ export class PatentsService {
     const institucion_nombre =
       (Array.isArray(backendPatent.instituciones) && backendPatent.instituciones.length > 0)
         ? (typeof backendPatent.instituciones[0] === 'string'
-            ? backendPatent.instituciones[0]
-            : backendPatent.instituciones[0]?.nombre)
+          ? backendPatent.instituciones[0]
+          : backendPatent.instituciones[0]?.nombre)
         : backendPatent.institucion || 'N/A';
 
     const id_institucion =
@@ -564,9 +564,10 @@ export class PatentsService {
       ? String(patent.rama_param)
       : this.mapRamaToBackend(patent.rama);
 
-    const medioIngresoParam = patent.medio_ingreso_param != null
-      ? String(patent.medio_ingreso_param)
-      : this.mapMedioIngresoToBackend(patent.medioIngreso);
+    const rawMedio =
+      (patent.medio_ingreso_param ?? patent.medioIngreso ?? '') as string;
+
+    const medioIngresoParam = this.mapMedioIngresoToBackend(rawMedio);
 
     let tipoSectorParam = patent.tipo_sector_param != null
       ? String(patent.tipo_sector_param)
@@ -601,6 +602,20 @@ export class PatentsService {
       return '44';
     })();
 
+    let anioRenovacion: number | null = null;
+    if (patent.anioRenovacion !== undefined && patent.anioRenovacion !== null) {
+      const raw = String(patent.anioRenovacion).trim();
+
+      // Si viene vacío o como "N/A", lo mandamos como null
+      if (raw !== '' && raw.toUpperCase() !== 'N/A') {
+        const parsed = Number(raw);
+        // Si es un número válido, lo enviamos; si no, también lo dejamos en null
+        if (!Number.isNaN(parsed)) {
+          anioRenovacion = parsed;
+        }
+      }
+    }
+
     return {
       no_expediente: patent.no_expediente || patent.solicitudId || patent.numeroExpediente || '',
       titulo: patent.titulo || patent.denominacion || patent.nombrePatente || '',
@@ -617,7 +632,7 @@ export class PatentsService {
       tipo_registro_param: this.TIPO_PATENTE,
       fec_solicitud: formatDate(patent.fechaSolicitud),
       tecnologico_origen: patent.tecnologicoOrigen || null,
-      anio_renovacion: patent.anioRenovacion || null,
+      anio_renovacion: anioRenovacion,
       id_subsector: idSubsector,
     };
   }

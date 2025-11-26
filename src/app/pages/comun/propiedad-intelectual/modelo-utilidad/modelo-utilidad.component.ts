@@ -46,6 +46,7 @@ interface Inventor {
 })
 export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly TIPO_INDAUTOR = '45';
+  readonly RAMAS_INDAUTOR_IDS = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
 
   pageLength = 10;
   dtInstance: any;
@@ -155,7 +156,7 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
     private institucionesService: InstitucionesService,
     private fileUploadService: FileUploadService,
     private sanitizer: DomSanitizer
-  ) {}
+  ) { }
 
   ngAfterViewInit(): void {
     if (this.dtInstance) {
@@ -271,7 +272,7 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
           title: this.translate.instant('TABLE.INSTITUTION') || 'INSTITUCIÓN',
           data: 'institucion',
           orderable: true,
-          render: (data: string) => `<span class="fw-semibold text-gray-600">${data || '—'}</span>`,
+          render: (data: string) => `<span class="fw-semibold text-gray-600">${data === '-' ? 'N/A' : data}</span>`,
         },
         {
           title: this.translate.instant('TABLE.DATE') || 'FECHA DE SOLICITUD',
@@ -304,23 +305,39 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
   private cargarCatalogos(): void {
     this.paramService.getAll().subscribe({
       next: (cats: Catalogos) => {
+        // Guardamos todos los catálogos crudos
         this.catalogosAll = cats;
-        this.ramasCatalogo = (cats[3]?.lista || []) as Parametrizacion[];
-        this.mediosIngresoCatalogo = (cats[8]?.lista || []) as Parametrizacion[];
-        this.tiposSectorCatalogo = (cats[2]?.lista || []) as Parametrizacion[];
-        this.estatusCatalogo = (cats[7]?.lista || []) as Parametrizacion[];
-        this.subsectoresCatalogo = (cats[17]?.lista || []) as Parametrizacion[];
 
-        const sectoresSet = new Set<number>();
-        this.subsectoresCatalogo.forEach(sub => {
-          if (sub.id_param_padre) {
-            sectoresSet.add(sub.id_param_padre);
+        // 1) Ramas (tema 3) filtradas SOLO a INDAUTOR
+        const todasLasRamas = cats[3]?.lista || [];
+        this.ramasCatalogo = todasLasRamas.filter(r =>
+          this.RAMAS_INDAUTOR_IDS.includes(r.id_param)
+        );
+
+        // 2) Catálogo directo por tema-id según ParametrizacionesService
+        this.mediosIngresoCatalogo = (cats[8]?.lista ?? []); // medio_ingreso_param
+        this.tiposSectorCatalogo = (cats[2]?.lista ?? []); // tipo_sector_param
+        this.estatusCatalogo = (cats[7]?.lista ?? []); // estatus_param
+        this.subsectoresCatalogo = (cats[17]?.lista ?? []); // subsectores / instituciones
+
+        // 3) Construimos la lista de sectores a partir de los subsectores
+        const sectoresMap = new Map<number, Parametrizacion>();
+        const temaSubsectores = cats[17];
+
+        if (temaSubsectores?.lista) {
+          for (const sub of temaSubsectores.lista) {
+            if (sub.id_param_padre) {
+              const sector = this.findParamById(sub.id_param_padre);
+              if (sector && !sectoresMap.has(sector.id_param)) {
+                sectoresMap.set(sector.id_param, sector);
+              }
+            }
           }
-        });
+        }
 
-        this.sectoresCatalogo = Array.from(sectoresSet)
-          .map(id => this.findParamById(id))
-          .filter(Boolean) as Parametrizacion[];
+        this.sectoresCatalogo = Array.from(sectoresMap.values());
+
+        this.actualizarListasDesdeSeleccionActual();
       },
       error: (e) => console.error('❌ Error cargando catálogos', e),
     });
@@ -337,6 +354,160 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
       }
     }
     return undefined;
+  }
+
+  private actualizarListasDesdeSeleccionActual(): void {
+    if (!this.subsectoresCatalogo || !this.subsectoresCatalogo.length) {
+      console.warn('[Sector] No hay subsectores disponibles (catálogos aún no cargados).');
+      return;
+    }
+
+    // Aseguramos sectoresCatalogo por si viniera vacío
+    if (!this.sectoresCatalogo || !this.sectoresCatalogo.length) {
+      const sectoresSet = new Map<number, Parametrizacion>();
+      for (const sub of this.subsectoresCatalogo) {
+        const sector = this.findParamById(sub.id_param_padre || 0);
+        if (sector && !sectoresSet.has(sector.id_param)) {
+          sectoresSet.set(sector.id_param, sector);
+        }
+      }
+      this.sectoresCatalogo = Array.from(sectoresSet.values());
+    }
+
+    const tipoId =
+      this.tipoSectorSeleccionadoId != null ? Number(this.tipoSectorSeleccionadoId) : null;
+    const sectorId =
+      this.sectorSeleccionadoId != null ? Number(this.sectorSeleccionadoId) : null;
+
+    if (tipoId !== null) {
+      console.log('[DEBUG] Filtrando sectores para tipo sector ID:', tipoId);
+      console.log('[DEBUG] Total sectores en catálogo:', this.sectoresCatalogo.length);
+      console.log('[DEBUG] Detalle de sectores:', this.sectoresCatalogo.map(s => ({
+        id: s.id_param,
+        nombre: s.nombre,
+        padre: s.id_param_padre
+      })));
+
+      this.sectoresFiltrados = this.sectoresCatalogo.filter(sec => {
+        const padre = sec.id_param_padre != null ? Number(sec.id_param_padre) : null;
+        return padre !== null && padre === tipoId;
+      });
+
+      console.log('[DEBUG] Sectores filtrados encontrados:', this.sectoresFiltrados.length);
+      console.log('[DEBUG] Detalle sectores filtrados:', this.sectoresFiltrados.map(s => ({
+        id: s.id_param,
+        nombre: s.nombre,
+        padre: s.id_param_padre
+      })));
+    } else {
+      this.sectoresFiltrados = [...this.sectoresCatalogo];
+    }
+
+    // 2) Si tenemos subsector seleccionado, alineamos sector y tipo
+    if (this.subsectorIdSeleccionado) {
+      const subsector = this.subsectoresCatalogo.find(
+        s => s.id_param === this.subsectorIdSeleccionado
+      );
+      if (subsector) {
+        const sectorFromSubsector = this.findParamById(subsector.id_param_padre || 0);
+        if (sectorFromSubsector) {
+          this.sectorSeleccionadoId = sectorFromSubsector.id_param;
+          if (!this.tipoSectorSeleccionadoId && sectorFromSubsector.id_param_padre) {
+            this.tipoSectorSeleccionadoId = sectorFromSubsector.id_param_padre;
+          }
+        }
+      }
+    }
+
+    // 3) Filtramos subsectores según sector / tipo
+    if (sectorId !== null) {
+      this.subsectoresFiltrados = this.subsectoresCatalogo.filter(sub => {
+        const padre = sub.id_param_padre != null ? Number(sub.id_param_padre) : null;
+        return padre !== null && padre === sectorId;
+      });
+    } else if (tipoId !== null) {
+      const sectoresOfTipo = this.sectoresFiltrados.length
+        ? this.sectoresFiltrados
+        : this.sectoresCatalogo.filter(sec => {
+          const padre = sec.id_param_padre != null ? Number(sec.id_param_padre) : null;
+          return padre !== null && padre === tipoId;
+        });
+
+      const sectorIdsOfTipo = new Set(sectoresOfTipo.map(s => Number(s.id_param)));
+
+      this.subsectoresFiltrados = this.subsectoresCatalogo.filter(sub => {
+        const padre = sub.id_param_padre != null ? Number(sub.id_param_padre) : null;
+        return padre !== null && sectorIdsOfTipo.has(padre);
+      });
+    } else {
+      this.subsectoresFiltrados = [...this.subsectoresCatalogo];
+    }
+
+    console.log('[actualizarListasDesdeSeleccionActual] Estado final:', {
+      tipoSectorSeleccionadoId: this.tipoSectorSeleccionadoId,
+      sectorSeleccionadoId: this.sectorSeleccionadoId,
+      subsectorIdSeleccionado: this.subsectorIdSeleccionado,
+      sectoresFiltrados: this.sectoresFiltrados,
+      subsectoresFiltrados: this.subsectoresFiltrados
+    });
+  }
+
+  private actualizarSectorDesdeSubsector(idSubsector: number | null): void {
+    if (!idSubsector) {
+      // Limpia toda la cadena Tipo → Sector → Subsector
+      this.subsectorIdSeleccionado = null;
+      this.sectorSeleccionadoId = null;
+      this.tipoSectorSeleccionadoId = null;
+
+      this.subsectoresFiltrados = [];
+      this.sectoresFiltrados = [];
+
+      this.indautorModel.subsector = 'N/A';
+      this.indautorModel.sector = '';
+      this.indautorModel.tipoSector = '';
+      return;
+    }
+
+    // 1) Obtener el subsector desde el catálogo global
+    const subsector = this.findParamById(idSubsector);
+    if (!subsector) {
+      console.warn('[Sector] No se encontró subsector con id', idSubsector);
+      return;
+    }
+
+    this.subsectorIdSeleccionado = subsector.id_param;
+    this.indautorModel.subsector = subsector.nombre;
+
+    // 2) Sector = padre del subsector
+    let sector: Parametrizacion | undefined;
+    if (subsector.id_param_padre) {
+      sector = this.findParamById(subsector.id_param_padre);
+    }
+
+    if (sector) {
+      this.sectorSeleccionadoId = sector.id_param;
+      this.indautorModel.sector = sector.nombre;
+    } else {
+      this.sectorSeleccionadoId = null;
+      this.indautorModel.sector = '';
+    }
+
+    // 3) Tipo de sector = padre del sector
+    let tipoSector: Parametrizacion | undefined;
+    if (sector && sector.id_param_padre) {
+      tipoSector = this.findParamById(sector.id_param_padre);
+    }
+
+    if (tipoSector) {
+      this.tipoSectorSeleccionadoId = tipoSector.id_param;
+      this.indautorModel.tipoSector = tipoSector.nombre;
+    } else {
+      this.tipoSectorSeleccionadoId = null;
+      this.indautorModel.tipoSector = '';
+    }
+
+    // 4) Actualizamos las listas filtradas con la selección ya alineada
+    this.actualizarListasDesdeSeleccionActual();
   }
 
   private cargarTodasInstituciones(): void {
@@ -518,45 +689,78 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   onTipoSectorChange(event: any): void {
-    const id = event?.target?.value;
-    this.tipoSectorSeleccionadoId = id ? Number(id) : null;
+    console.log(event.target)
+    const prevalue = (event.target as HTMLSelectElement).value;
+    const value = prevalue.split(':')[1]
+    this.tipoSectorSeleccionadoId = value ? Number(value) : null;
 
-    if (!this.tipoSectorSeleccionadoId) {
-      this.sectoresFiltrados = [];
-      this.subsectoresFiltrados = [];
-      this.sectorSeleccionadoId = null;
-      this.subsectorIdSeleccionado = null;
-      return;
-    }
-
-    this.sectoresFiltrados = this.sectoresCatalogo.filter(
-      s => s.id_param_padre === this.tipoSectorSeleccionadoId
-    );
-    this.subsectoresFiltrados = [];
+    // Limpia niveles inferiores
     this.sectorSeleccionadoId = null;
     this.subsectorIdSeleccionado = null;
-  }
+    this.indautorModel.sector = '';
+    this.indautorModel.subsector = 'N/A';
 
-  onSectorChange(event: any): void {
-    const id = event?.target?.value;
-    this.sectorSeleccionadoId = id ? Number(id) : null;
-
-    if (!this.sectorSeleccionadoId) {
+    if (!this.tipoSectorSeleccionadoId) {
+      this.indautorModel.tipoSector = '';
+      this.sectoresFiltrados = [];
       this.subsectoresFiltrados = [];
-      this.subsectorIdSeleccionado = null;
       return;
     }
 
-    this.subsectoresFiltrados = this.subsectoresCatalogo.filter(
-      sub => sub.id_param_padre === this.sectorSeleccionadoId
+    const tipo = this.tiposSectorCatalogo.find(
+      t => t.id_param === this.tipoSectorSeleccionadoId
     );
-    this.subsectorIdSeleccionado = null;
+    this.indautorModel.tipoSector = tipo?.nombre ?? '';
+
+    this.actualizarListasDesdeSeleccionActual();
   }
 
-  onSubsectorChange(event: any): void {
-    const id = event?.target?.value;
-    this.subsectorIdSeleccionado = id ? Number(id) : null;
+
+  onSectorChange(event: any): void {
+    const prevalue = (event.target as HTMLSelectElement).value;
+    const value = prevalue.split(':')[1]
+    this.sectorSeleccionadoId = value ? Number(value) : null;
+
+    this.subsectorIdSeleccionado = null;
+    this.indautorModel.subsector = 'N/A';
+
+    if (!this.sectorSeleccionadoId) {
+      this.indautorModel.sector = '';
+      this.subsectoresFiltrados = [];
+      return;
+    }
+
+    const sector = this.sectoresCatalogo.find(
+      s => s.id_param === this.sectorSeleccionadoId
+    );
+    this.indautorModel.sector = sector?.nombre ?? '';
+
+    // Si el sector tiene padre, actualizamos también el tipo de sector
+    if (sector?.id_param_padre) {
+      this.tipoSectorSeleccionadoId = sector.id_param_padre;
+      const tipo = this.tiposSectorCatalogo.find(
+        t => t.id_param === this.tipoSectorSeleccionadoId
+      );
+      this.indautorModel.tipoSector = tipo?.nombre ?? '';
+    }
+
+    this.actualizarListasDesdeSeleccionActual();
   }
+
+
+  onSubsectorChange(event: any): void {
+    const prevalue = (event.target as HTMLSelectElement).value;
+    const value = prevalue.split(':')[1]
+    this.subsectorIdSeleccionado = value ? Number(value) : null;
+
+    if (!this.subsectorIdSeleccionado) {
+      this.indautorModel.subsector = 'N/A';
+      return;
+    }
+
+    this.actualizarSectorDesdeSubsector(this.subsectorIdSeleccionado);
+  }
+
 
   onFilter(ev: any): void {
     this.search = ev.target.value?.trim() || '';
@@ -593,6 +797,7 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
 
     this.service.getRegistro(id).subscribe({
       next: (registro: PatenteUIModel) => {
+        console.log(registro)
         this.indautorModel = { ...registro };
         this.preseleccionarCepatEInstitucionDesdeRegistro();
         this.inicializarSeleccionesDesdeRegistro();
@@ -604,6 +809,114 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   private inicializarSeleccionesDesdeRegistro(): void {
+    // Inicializar rama desde rama_param o rama
+    if ((this.indautorModel as any).rama_param) {
+      const ramaParamValue = (this.indautorModel as any).rama_param;
+      console.log(ramaParamValue)
+
+      // 1) Primero intentar buscar por nombre exacto (ya que generalmente llega como texto)
+      let ramaEncontrada = this.ramasCatalogo.find(r => r.nombre === ramaParamValue);
+      console.log(ramaEncontrada)
+
+      if (!ramaEncontrada) {
+        // 2) Si no encuentra por nombre exacto, intentar búsqueda parcial (case insensitive)
+        const valorBusqueda = String(ramaParamValue).toLowerCase();
+        ramaEncontrada = this.ramasCatalogo.find(r =>
+          r.nombre.toLowerCase() === valorBusqueda
+        );
+      }
+
+      if (!ramaEncontrada) {
+        // 3) Intentar con búsqueda por contenido
+        const valorBusqueda = String(ramaParamValue).toLowerCase();
+        ramaEncontrada = this.ramasCatalogo.find(r =>
+          r.nombre.toLowerCase().includes(valorBusqueda)
+        );
+      }
+
+      if (!ramaEncontrada) {
+        // 4) Como último recurso, intentar como número (por si acaso viene el ID)
+        const ramaParamId = Number(ramaParamValue);
+        if (!isNaN(ramaParamId) && ramaParamId > 0) {
+          ramaEncontrada = this.ramasCatalogo.find(r => r.id_param === ramaParamId);
+        }
+      }
+
+      // Si encontramos la rama, asignar el ID al campo rama_param (que es el que usa el select)
+      if (ramaEncontrada) {
+        console.log('✅ Asignando rama:', ramaEncontrada.nombre, 'con ID:', ramaEncontrada.id_param);
+        (this.indautorModel as any).rama_param = ramaEncontrada.id_param;
+        this.indautorModel.rama = ramaEncontrada.nombre;
+        console.log('✅ Rama asignada - rama_param:', (this.indautorModel as any).rama_param, 'rama:', this.indautorModel.rama);
+      } else {
+        console.error('❌ No se encontró la rama en el catálogo para:', ramaParamValue);
+      }
+    } else if (this.indautorModel.rama) {
+      // Si solo viene rama (sin rama_param), buscar en el catálogo
+      const ramaEncontrada = this.ramasCatalogo.find(r => r.nombre === this.indautorModel.rama);
+      if (ramaEncontrada) {
+        (this.indautorModel as any).rama_param = ramaEncontrada.id_param;
+      } else {
+        // Intentar búsqueda parcial
+        const ramaActual = this.indautorModel.rama;
+        const ramaEncontradaParcial = this.ramasCatalogo.find(r =>
+          r.nombre.toLowerCase().includes(ramaActual.toLowerCase())
+        );
+        if (ramaEncontradaParcial) {
+          (this.indautorModel as any).rama_param = ramaEncontradaParcial.id_param;
+          this.indautorModel.rama = ramaEncontradaParcial.nombre;
+        }
+      }
+    }
+
+    // Inicializar medio_ingreso_param
+    if ((this.indautorModel as any).medio_ingreso_param) {
+      const medioIngresoValue = (this.indautorModel as any).medio_ingreso_param;
+      console.log('medio_ingreso_param recibido:', medioIngresoValue);
+
+      // 1) Primero intentar buscar por nombre exacto
+      let medioEncontrado = this.mediosIngresoCatalogo.find(m => m.nombre === medioIngresoValue);
+
+      if (!medioEncontrado) {
+        // 2) Búsqueda case-insensitive
+        const valorBusqueda = String(medioIngresoValue).toLowerCase();
+        medioEncontrado = this.mediosIngresoCatalogo.find(m =>
+          m.nombre.toLowerCase() === valorBusqueda
+        );
+      }
+
+      if (!medioEncontrado) {
+        // 3) Búsqueda por contenido
+        const valorBusqueda = String(medioIngresoValue).toLowerCase();
+        medioEncontrado = this.mediosIngresoCatalogo.find(m =>
+          m.nombre.toLowerCase().includes(valorBusqueda)
+        );
+      }
+
+      if (!medioEncontrado) {
+        // 4) Como último recurso, intentar como número
+        const medioId = Number(medioIngresoValue);
+        if (!isNaN(medioId) && medioId > 0) {
+          medioEncontrado = this.mediosIngresoCatalogo.find(m => m.id_param === medioId);
+        }
+      }
+
+      // Si encontramos el medio de ingreso, asignar el ID
+      if (medioEncontrado) {
+        console.log('✅ Asignando medio_ingreso_param:', medioEncontrado.nombre, 'con ID:', medioEncontrado.id_param);
+        (this.indautorModel as any).medio_ingreso_param = medioEncontrado.id_param;
+        this.indautorModel.medioIngreso = medioEncontrado.nombre;
+      } else {
+        console.error('❌ No se encontró el medio de ingreso en el catálogo para:', medioIngresoValue);
+      }
+    } else if (this.indautorModel.medioIngreso) {
+      // Si solo viene medioIngreso (sin medio_ingreso_param), buscar en el catálogo
+      const medioEncontrado = this.mediosIngresoCatalogo.find(m => m.nombre === this.indautorModel.medioIngreso);
+      if (medioEncontrado) {
+        (this.indautorModel as any).medio_ingreso_param = medioEncontrado.id_param;
+      }
+    }
+
     if (this.indautorModel.tipo_sector_param) {
       this.tipoSectorSeleccionadoId = typeof this.indautorModel.tipo_sector_param === 'number'
         ? this.indautorModel.tipo_sector_param
@@ -689,21 +1002,74 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   private actualizarRegistro(id: number, modal: any): void {
+    // Mapear rama_param a entero o null
+    let ramaParam: number | null = null;
+    if (this.indautorModel.rama_param != null) {
+      const ramaId = typeof this.indautorModel.rama_param === 'string'
+        ? parseInt(this.indautorModel.rama_param, 10)
+        : this.indautorModel.rama_param;
+      ramaParam = !isNaN(ramaId) ? ramaId : null;
+    } else if (this.indautorModel.rama) {
+      // Buscar en el catálogo por nombre
+      const ramaEncontrada = this.ramasCatalogo.find(r => r.nombre === this.indautorModel.rama);
+      ramaParam = ramaEncontrada?.id_param ?? null;
+    }
+
+    // Mapear medio_ingreso_param a entero o null
+    let medioIngresoParam: number | null = null;
+    if (this.indautorModel.medio_ingreso_param != null) {
+      const medioId = typeof this.indautorModel.medio_ingreso_param === 'string'
+        ? parseInt(this.indautorModel.medio_ingreso_param, 10)
+        : this.indautorModel.medio_ingreso_param;
+      medioIngresoParam = !isNaN(medioId) ? medioId : null;
+    } else if (this.indautorModel.medioIngreso) {
+      const medioEncontrado = this.mediosIngresoCatalogo.find(m => m.nombre === this.indautorModel.medioIngreso);
+      medioIngresoParam = medioEncontrado?.id_param ?? null;
+    }
+
+    // Mapear estatus_param a entero o null
+    let estatusParam: number | null = null;
+    if (this.indautorModel.estatus_param != null) {
+      const estatusId = typeof this.indautorModel.estatus_param === 'string'
+        ? parseInt(this.indautorModel.estatus_param, 10)
+        : this.indautorModel.estatus_param;
+      estatusParam = !isNaN(estatusId) ? estatusId : null;
+    } else if (this.indautorModel.estatus) {
+      const estatusEncontrado = this.estatusCatalogo.find(e => e.nombre === this.indautorModel.estatus);
+      estatusParam = estatusEncontrado?.id_param ?? null;
+    }
+
+    // Mapear anio_renovacion a entero o null
+    let anioRenovacion: number | null = null;
+    if (this.indautorModel.anioRenovacion !== undefined && this.indautorModel.anioRenovacion !== null) {
+      const raw = String(this.indautorModel.anioRenovacion).trim();
+      if (raw !== '' && raw.toUpperCase() !== 'N/A') {
+        const parsed = Number(raw);
+        if (!Number.isNaN(parsed)) {
+          anioRenovacion = parsed;
+        }
+      }
+    }
+
+    // Crear una copia del modelo sin los campos _param que vamos a sobrescribir
+    const { rama_param: _, medio_ingreso_param: __, estatus_param: ___, anioRenovacion: ____, ...modeloLimpio } = this.indautorModel as any;
+
     const payload = {
-      ...this.indautorModel,
+      ...modeloLimpio,
       id_institucion: this.institucionSeleccionadaCepat,
       id_cepat: this.selectedCepatId,
-      tipo_sector_param: this.tipoSectorSeleccionadoId,
-      sector_param: this.sectorSeleccionadoId,
-      id_subsector: this.subsectorIdSeleccionado,
+      tipo_sector_param: this.tipoSectorSeleccionadoId ?? null,
+      sector_param: this.sectorSeleccionadoId ?? null,
+      id_subsector: this.subsectorIdSeleccionado ?? null,
+      rama_param: ramaParam,
+      medio_ingreso_param: medioIngresoParam,
+      estatus_param: estatusParam,
+      anio_renovacion: anioRenovacion,
     };
 
     this.service.updateRegistro(id, payload, this.TIPO_INDAUTOR).subscribe({
       next: () => {
         this.isSaving = false;
-        this.isViewMode = true;
-        this.selectedFile = null;
-        this.filePreviewUrl = null;
 
         this.showAlert({
           icon: 'success',
@@ -712,6 +1078,9 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
           timer: 1800,
           showConfirmButton: false,
         });
+
+        // Limpiar todos los datos de edición
+        this.limpiarDatosEdicion();
 
         if (this.dtInstance) {
           this.dtInstance.ajax.reload(null, false);
@@ -737,7 +1106,7 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
         if (this.dtInstance) {
           this.dtInstance.ajax.reload(null, false);
         }
-        this.showAlert({ icon: 'success', title: 'Deshabilitado', text: 'El registro fue deshabilitado.' });
+        // La notificación de éxito ya se muestra en el componente crud
       },
       error: () => {
         this.showAlert({ icon: 'error', title: 'Error', text: 'No se pudo deshabilitar el registro.' });
@@ -795,11 +1164,20 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
     });
   }
 
-  closeForm(modal: any): void {
-    modal.dismiss('cancel');
+  private limpiarDatosEdicion(): void {
+    // Limpiar URL de previsualización
+    if (this.filePreviewUrl) {
+      URL.revokeObjectURL(this.filePreviewUrl);
+      this.filePreviewUrl = null;
+    }
+
+    // Limpiar el input de archivo
+    if (this.archivoInput && this.archivoInput.nativeElement) {
+      this.archivoInput.nativeElement.value = '';
+    }
+
     this.isViewMode = true;
     this.selectedFile = null;
-    this.filePreviewUrl = null;
 
     this.indautorModel = {
       id: 0,
@@ -829,11 +1207,32 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
       inventores: [],
     };
 
+    // Limpiar selecciones de sector
     this.selectedCepatId = null;
     this.institucionSeleccionadaCepat = null;
     this.tipoSectorSeleccionadoId = null;
     this.sectorSeleccionadoId = null;
     this.subsectorIdSeleccionado = null;
+
+    // Limpiar listas filtradas
+    this.sectoresFiltrados = [];
+    this.subsectoresFiltrados = [];
+    this.institucionesCepat = [];
+
+    // Limpiar flags de edición
+    this.isInicializandoDesdeRegistro = false;
+    this.isEditingStatus = false;
+    this.isSaving = false;
+  }
+
+  closeForm(modal: any): void {
+    modal.dismiss('cancel');
+    this.limpiarDatosEdicion();
+  }
+
+  onModalDismissed(): void {
+    // Este método se llama cuando se cierra el modal (backdrop, ESC, botón X)
+    this.limpiarDatosEdicion();
   }
 
   showAlert(swalOptions: SweetAlertOptions): void {
