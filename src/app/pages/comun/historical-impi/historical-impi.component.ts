@@ -98,16 +98,54 @@ export class HistoricalImpiComponent {
 
     // Rango: 2022 - Año actual
     const currentYear = new Date().getFullYear();
-    this.years = ['Seleccionar todo'];
+    this.years = [];
     for (let y = 2022; y <= currentYear; y++) {
       this.years.push(y);
     }
 
     this.form = this.fb.group({
-      year: ['Seleccionar todo'],
+      year: [[]],  // <-- ahora sí es un array vacío
       file: [null, [Validators.required, this.excelFileValidator]],
     });
+
   }
+
+  dropdownOpen = false;
+
+toggleDropdown() {
+  this.dropdownOpen = !this.dropdownOpen;
+}
+
+onToggleYear(option: any) {
+  const control = this.form.get('year');
+  let selected = control?.value || [];
+
+  // Caso: Seleccionar todo
+  if (option === 'Seleccionar todo') {
+    if (selected.length === this.years.length - 1) {
+      control?.setValue([]);
+    } else {
+      control?.setValue(this.years.filter(y => y !== 'Seleccionar todo'));
+    }
+    return;
+  }
+
+  // Caso: Años individuales
+  if (selected.includes(option)) {
+    // --> Aquí es donde se des-selecciona si ya estaba seleccionado
+    selected = selected.filter((x: any) => x !== option);
+  } else {
+    selected.push(option);
+  }
+
+  // Activar "Seleccionar todo" automáticamente si ya están todos
+  const totalYears = this.years.length - 1;
+  if (selected.length === totalYears) {
+    control?.setValue(this.years.filter(y => y !== 'Seleccionar todo'));
+  } else {
+    control?.setValue(selected);
+  }
+}
 
   regresarAHistoricos(): void {
     this.navigationService.navigateToHistoricalRecords();
@@ -550,6 +588,7 @@ export class HistoricalImpiComponent {
     }
 
     const selectedYear = this.form.get('year')?.value;
+    const yearsAsCommaString = selectedYear.join(',');
     if (!this.workbook) {
       Swal.fire({
         icon: 'error',
@@ -588,6 +627,26 @@ export class HistoricalImpiComponent {
         if (single) targetSheets.push(single);
       }
 
+      let hojas = "";
+
+if (selectedYear === 'Seleccionar todo') {
+  targetSheets = this.getPreviewableSheets().filter(s => !s.toLowerCase().includes('clasificaciones'));
+  hojas = this.years
+    .filter(y => y !== 'Seleccionar todo')
+    .join(','); // "2022,2023,2024"
+} else if (Array.isArray(selectedYear)) {
+  targetSheets = selectedYear
+    .map((y: number | string) => this.getSheetNameForYear(y))
+    .filter((s: string | null) => s !== null) as string[];
+
+  hojas = targetSheets.join(','); // <-- importante!
+} else {
+  const single = this.getSheetNameForYear(selectedYear);
+  if (single) targetSheets.push(single);
+  hojas = single || "";
+}
+
+
       if (this.availableSheets.includes('AUTORES')) {
         targetSheets.push('AUTORES');
       }
@@ -596,7 +655,7 @@ export class HistoricalImpiComponent {
       console.log('Enviando archivo completo con hojas:', hojasSeleccionadas);
 
       const response = await this.cargaMasivaService
-        .uploadExcel('impi', this.file!, hojasSeleccionadas)
+        .uploadExcel('impi', this.file!, hojas)
         .toPromise();
 
       Swal.close();
@@ -616,8 +675,7 @@ export class HistoricalImpiComponent {
       `,
         confirmButtonColor: '#28a745',
       }).then(() => {
-        this.removeFile();
-        this.form.reset({ year: 'Seleccionar todo', file: null });
+        this.resetForm();
       });
 
     } catch (error: any) {
@@ -632,6 +690,25 @@ export class HistoricalImpiComponent {
       this.isUploading = false;
     }
   }
+
+
+  resetForm() {
+  this.form.reset({
+    year: [],
+    file: null
+  });
+
+  this.file = null;
+  this.fileName = null;
+  this.excelData = [];
+  this.excelHeaders = [];
+  this.workbook = null;
+  this.sheetDataCache.clear();
+
+  // Limpia el input file manualmente
+  const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+  if (fileInput) fileInput.value = '';
+}
 
 
   cancel() {
@@ -689,13 +766,40 @@ export class HistoricalImpiComponent {
     const expectedNorm = normalizeArray(expected);
     const actualNorm = normalizeArray(actual);
 
-    const missing = expectedNorm.filter(h => !actualNorm.includes(h));
-    const extra = actualNorm.filter(h => !expectedNorm.includes(h));
+    console.log('COMPARACIÓN DE ENCABEZADOS:');
+    console.log('Esperados normalizados:', expectedNorm);
+    console.log('Actuales normalizados:', actualNorm);
+
+    const expectedFiltered = expectedNorm.filter(h => h !== '');
+    const actualFiltered = actualNorm.filter(h => h !== '');
+
+    console.log('Esperados filtrados:', expectedFiltered);
+    console.log('Actuales filtrados:', actualFiltered);
+
+    const missing = expectedFiltered.filter(h => !actualFiltered.includes(h));
+    const extra = actualFiltered.filter(h => !expectedFiltered.includes(h));
+
+    console.log('Faltantes:', missing);
+    console.log('Extra:', extra);
 
     let outOfOrder = false;
     if (missing.length === 0 && extra.length === 0) {
-      outOfOrder = expectedNorm.length === actualNorm.length &&
-        expectedNorm.some((h, i) => h !== actualNorm[i]);
+      for (let i = 0; i < Math.max(expectedNorm.length, actualNorm.length); i++) {
+        const exp = expectedNorm[i] || '';
+        const act = actualNorm[i] || '';
+
+        if (exp === '' && act === '') continue;
+
+        if ((exp === '') !== (act === '')) {
+          outOfOrder = true;
+          break;
+        }
+
+        if (exp !== '' && act !== '' && exp !== act) {
+          outOfOrder = true;
+          break;
+        }
+      }
     }
 
     return {
@@ -714,22 +818,54 @@ export class HistoricalImpiComponent {
     try {
       const selectedYear = this.form.get('year')?.value;
       const sheetsToValidate: { name: string, headers: string[] }[] = [];
-      if (selectedYear === 'Seleccionar todo') {
-        const processableSheets = this.getPreviewableSheets();
-        for (const sheetName of processableSheets) {
-          const { headers } = await this.readExcelSheet(sheetName);
-          sheetsToValidate.push({ name: sheetName, headers });
+      let targetSheets: string[] = [];
+
+      // ---------------------------------------------------------
+      // CORRECCIÓN: Manejo de Array para el Multi-Select de IMPI
+      // ---------------------------------------------------------
+      
+      if (Array.isArray(selectedYear)) {
+        // Caso 1: Es un Array (Lógica de IMPI)
+        targetSheets = selectedYear
+          .map((y: number | string) => this.getSheetNameForYear(y))
+          .filter((s: string | null): s is string => s !== null);
+
+        // Si el array está vacío pero debería seleccionar todo (fallback)
+        if (targetSheets.length === 0 && selectedYear.includes('Seleccionar todo')) {
+           targetSheets = this.getPreviewableSheets().filter(s => !s.toLowerCase().includes('clasificaciones'));
         }
-      } else {
+
+      } else if (selectedYear === 'Seleccionar todo') {
+        // Caso 2: String "Seleccionar todo" (Lógica legacy/Indautor)
+        targetSheets = this.getPreviewableSheets().filter(s => !s.toLowerCase().includes('clasificaciones'));
+        
+      } else if (selectedYear) {
+        // Caso 3: Un solo año seleccionado (No array)
         const targetSheetName = this.getSheetNameForYear(selectedYear);
         if (targetSheetName) {
-          const { headers } = await this.readExcelSheet(targetSheetName);
-          sheetsToValidate.push({ name: targetSheetName, headers });
+          targetSheets.push(targetSheetName);
         }
       }
 
-      if (sheetsToValidate.length === 0) {
-        throw new Error('No se encontraron hojas válidas para validar');
+      // Agregar hoja de AUTORES si existe en el excel, ya que siempre se envía
+      const autoresSheet = this.availableSheets.find(s => s.toUpperCase() === 'AUTORES');
+      if (autoresSheet && !targetSheets.includes(autoresSheet)) {
+        targetSheets.push(autoresSheet);
+      }
+
+      if (targetSheets.length === 0) {
+        // Si no hay hojas seleccionadas, no validamos nada (o lanzamos error si es requerido)
+        // Para evitar el error "No se encontraron hojas", retornamos true si no se seleccionó nada, 
+        // o lanzamos error según tu lógica de negocio. Aquí asumo que debe haber al menos una.
+        throw new Error('No se encontraron hojas válidas correspondientes a los años seleccionados.');
+      }
+
+      // ---------------------------------------------------------
+      // Lectura de encabezados de las hojas detectadas
+      // ---------------------------------------------------------
+      for (const sheetName of targetSheets) {
+        const { headers } = await this.readExcelSheet(sheetName);
+        sheetsToValidate.push({ name: sheetName, headers });
       }
 
       const validationErrors: Array<{
@@ -744,7 +880,10 @@ export class HistoricalImpiComponent {
       for (const sheet of sheetsToValidate) {
         let expectedHeaders: string[];
 
-        if (sheet.name.toLowerCase() === 'autores') {
+        console.log(`Validando hoja: ${sheet.name}`);
+
+        // Seleccionar encabezados esperados según el tipo de hoja
+        if (sheet.name.toUpperCase() === 'AUTORES') {
           expectedHeaders = [...this.EXPECTED_AUTHORS_HEADERS];
         } else {
           expectedHeaders = [...this.EXPECTED_YEAR_HEADERS];
@@ -776,11 +915,12 @@ export class HistoricalImpiComponent {
       Swal.fire({
         icon: 'error',
         title: 'Error de validación',
-        text: 'No se pudo validar la estructura del archivo contra la plantilla',
+        text: 'No se pudo validar la estructura del archivo. Asegúrate de que los nombres de las hojas coincidan con los años seleccionados.',
       });
       return false;
     }
   }
+
   private async showHeaderValidationError(errors: any[]): Promise<void> {
     const errorDetails = errors.map(error => {
       const missingHtml = error.missing.length > 0 ?

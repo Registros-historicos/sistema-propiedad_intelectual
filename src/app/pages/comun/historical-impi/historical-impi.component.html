@@ -37,14 +37,46 @@
       </div>
 
       <form [formGroup]="form" (ngSubmit)="submit()">
-        <div class="mb-4">
-          <label class="form-label fw-semibold">Seleccionar año</label>
-          <select class="form-select" formControlName="year">
-            <option *ngFor="let year of years" [value]="year">
-              {{ year }}
-            </option>
-          </select>
-        </div>
+        <div class="mb-4 position-relative">
+  <label class="form-label fw-semibold">Seleccionar año</label>
+
+  <!-- Botón visual del dropdown -->
+  <div
+    class="form-select d-flex justify-content-between align-items-center"
+    (click)="toggleDropdown()"
+  >
+    {{
+      form.get('year')?.value?.length > 0
+        ? form.get('year')?.value.join(', ')
+        : 'Seleccionar años'
+    }}
+    <i class="bi bi-chevron-down"></i>
+  </div>
+
+  <!-- Menú desplegable con checkboxes -->
+  <div
+    *ngIf="dropdownOpen"
+    class="border rounded p-2 bg-white position-absolute w-100"
+    style="z-index: 999; max-height: 200px; overflow-y: auto;"
+    (click)="$event.stopPropagation()"
+  >
+    <div *ngFor="let option of years">
+      <label class="d-flex align-items-center gap-2">
+        <input
+          type="checkbox"
+          [checked]="
+            option === 'Seleccionar todo'
+              ? form.get('year')?.value.length === years.length - 1
+              : form.get('year')?.value.includes(option)
+          "
+          (change)="onToggleYear(option)"
+        />
+        {{ option }}
+      </label>
+    </div>
+  </div>
+</div>
+
 
         <div class="mb-2">
           <label class="form-label fw-semibold">Seleccionar archivo</label>
