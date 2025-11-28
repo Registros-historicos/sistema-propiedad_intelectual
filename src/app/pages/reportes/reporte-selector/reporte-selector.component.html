@@ -145,7 +145,7 @@
     <!-- f) Por Sector -->
     <ng-container *ngSwitchCase="'sectoriales'">
       <div class="form-row">
-        <label>Sector</label>
+        <label>Subsector</label>
         <select name="sector" ngModel>
           <option value="">Todos</option>
           <option *ngFor="let s of sectores" [value]="s.nombre">{{ s.nombre }}</option>
@@ -254,7 +254,7 @@
         />
       </div>
       <div class="form-row">
-        <label>Sector</label>
+        <label>Subsector</label>
         <select name="sector" ngModel>
           <option value="">Todos</option>
           <option *ngFor="let s of sectores" [value]="s.nombre">{{ s.nombre }}</option>
@@ -294,7 +294,7 @@
         />
       </div>
       <div class="form-row">
-        <label>Sector</label>
+        <label>Subsector</label>
         <select name="sector" ngModel>
           <option value="">Todos</option>
           <option *ngFor="let s of sectores" [value]="s.nombre">{{ s.nombre }}</option>
@@ -484,7 +484,7 @@
     <!-- Ñ) Por investigadores -->
     <ng-container *ngSwitchCase="'investigadores'">
       <div class="form-row">
-        <label>Sector</label>
+        <label>Subsector</label>
         <select name="sector" ngModel>
           <option value="">Todos</option>
           <option *ngFor="let s of sectores" [value]="s.nombre">{{ s.nombre }}</option>
