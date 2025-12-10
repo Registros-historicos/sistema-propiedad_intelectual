@@ -112,6 +112,17 @@ export class HistoricalImpiComponent {
 
   dropdownOpen = false;
 
+  private loadYearsFromSheets(): void {
+  const detectedYears = this.availableSheets
+    .filter(name => /^[0-9]{4}$/.test(name.trim()))
+    .map(name => parseInt(name.trim(), 10))
+    .sort((a, b) => a - b); 
+
+  this.years = detectedYears;
+
+  this.form.get('year')?.setValue([]);
+}
+
 toggleDropdown() {
   this.dropdownOpen = !this.dropdownOpen;
 }
@@ -175,6 +186,9 @@ onToggleYear(option: any) {
         console.log('Hojas disponibles:', this.availableSheets);
 
         await this.preloadAllSheets();
+        this.loadYearsFromSheets();
+        console.log("Años detectados:", this.years);
+
 
       } catch (error) {
         console.error('Error al cargar el workbook:', error);
@@ -211,16 +225,27 @@ onToggleYear(option: any) {
     return null;
   }
 
-  removeFile() {
-    this.file = null;
-    this.fileName = null;
-    this.workbook = null;
-    this.availableSheets = [];
-    this.sheetDataCache.clear();
-    this.form.patchValue({ file: null });
-    this.excelData = [];
-    this.excelHeaders = [];
+removeFile() {
+  this.file = null;
+  this.fileName = null;
+  this.workbook = null;
+  this.availableSheets = [];
+  this.sheetDataCache.clear();
+  this.form.patchValue({ file: null });
+  this.excelData = [];
+  this.excelHeaders = [];
+
+  const currentYear = new Date().getFullYear();
+  this.years = [];
+  for (let y = 2022; y <= currentYear; y++) {
+    this.years.push(y);
   }
+
+  this.form.get('year')?.setValue([]);
+
+  console.log("Años reiniciados después de quitar archivo:", this.years);
+}
+
 
   onDrop(event: DragEvent) {
     event.preventDefault();
