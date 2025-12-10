@@ -89,13 +89,7 @@
         <div class="fv-row col-md-6">
           <label class="fw-semibold fs-6 mb-2 text-gray-600">Estatus</label>
           <div class="form-control form-control-solid d-flex align-items-center">
-            <span class="badge" [ngClass]="{
-                    'badge-light-success': patenteModel.estatus === 'Aprobada',
-                    'badge-light-primary': patenteModel.estatus === 'Registrada',
-                    'badge-light-warning': patenteModel.estatus === 'En trámite',
-                    'badge-light-danger': patenteModel.estatus === 'Trámite con observaciones',
-                    'badge-light-info': patenteModel.estatus === 'Concluida'
-                  }" class="fs-7 fw-bold">
+            <span class="badge" class="fs-7 fw-bold">
               {{ patenteModel.estatus }}
             </span>
           </div>

@@ -20,7 +20,7 @@ export interface Institucion {
 })
 export class InstitucionesService {
 
-    private apiUrl = `${environment.apiUrl}/institucion`;
+    private apiUrl = `${environment.apiUrl}/api/institucion`;
 
     constructor(private http: HttpClient) { }
 
