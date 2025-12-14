@@ -1490,6 +1490,59 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
+    // Validación de fechas: formato válido y año >= 2000; además solicitud <= expedición
+    const fechaSolicitud: string | Date = (this.patenteModel as any).fechaSolicitud;
+    const fechaExpedicion: string | Date = (this.patenteModel as any).fechaExpedicion;
+
+    const formatos = ['YYYY-MM-DD', 'DD-MM-YYYY', 'YYYY/MM/DD', 'DD/MM/YYYY'];
+    const parseStrict = (val: string | Date): Date | null => {
+      if (!val) return null;
+      if (val instanceof Date) return isNaN(val.getTime()) ? null : val;
+      const s = String(val).trim();
+      const m = moment(s, formatos, true);
+      return m.isValid() ? m.toDate() : null;
+    };
+
+    if (fechaSolicitud) {
+      const solDate = parseStrict(fechaSolicitud);
+      if (!solDate || solDate.getFullYear() < 2000) {
+        const alertaError: SweetAlertOptions = {
+          icon: 'warning',
+          title: 'Fecha de solicitud inválida',
+          text: 'Usa un formato válido (DD-MM-YYYY) y año 2000 o posterior.',
+        };
+        this.showAlert(alertaError);
+        return;
+      }
+    }
+
+    if (fechaExpedicion) {
+      const expDate = parseStrict(fechaExpedicion);
+      if (!expDate || expDate.getFullYear() < 2000) {
+        const alertaError: SweetAlertOptions = {
+          icon: 'warning',
+          title: 'Fecha de expedición inválida',
+          text: 'Usa un formato válido (DD-MM-YYYY) y año 2000 o posterior.',
+        };
+        this.showAlert(alertaError);
+        return;
+      }
+    }
+
+    if (fechaSolicitud && fechaExpedicion) {
+      const solDate = parseStrict(fechaSolicitud)!;
+      const expDate = parseStrict(fechaExpedicion)!;
+      if (solDate.getTime() > expDate.getTime()) {
+        const alertaError: SweetAlertOptions = {
+          icon: 'warning',
+          title: 'Validación de fechas',
+          text: 'Las fechas son inconsistentes: la solicitud debe ser anterior o igual a la expedición.',
+        };
+        this.showAlert(alertaError);
+        return;
+      }
+    }
+
     this.isSaving = true;
 
     // 🔹 Si hay un archivo seleccionado, primero lo subimos al servidor
