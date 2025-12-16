@@ -27,11 +27,11 @@ export class ParametrizacionesService {
   constructor(private http: HttpClient) {}
 
     private readonly ESTATUS_FALLBACK: { [id: number]: string } = {
-    1: 'Registrada',
+    /**1: 'Registrada',
     2: 'En trámite',
     3: 'Trámite con observaciones',
     4: 'Aprobada',
-    5: 'Concluida',
+    5: 'Concluida',**/
     26: 'Confirmada',
     27: 'Pendiente',
     28: 'Con Observaciones',

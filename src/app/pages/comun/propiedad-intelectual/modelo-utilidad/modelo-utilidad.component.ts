@@ -1071,13 +1071,12 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
       next: () => {
         this.isSaving = false;
 
-        this.showAlert({
+        const alertaExito: SweetAlertOptions = {
           icon: 'success',
-          title: '¡Guardado!',
-          text: 'Los cambios se guardaron correctamente.',
-          timer: 1800,
-          showConfirmButton: false,
-        });
+          title: 'Registro actualizado',
+          text: 'El modelo de utilidad se actualizó correctamente.',
+        };
+        this.showAlert(alertaExito);
 
         // Limpiar todos los datos de edición
         this.limpiarDatosEdicion();
@@ -1090,11 +1089,12 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
       },
       error: (err) => {
         this.isSaving = false;
-        this.showAlert({
+        const alertaError: SweetAlertOptions = {
           icon: 'error',
-          title: 'Error al guardar',
-          text: 'Ocurrió un error al guardar los cambios.'
-        });
+          title: 'Error',
+          text: 'Ocurrió un problema al actualizar el modelo de utilidad. Inténtalo de nuevo.',
+        };
+        this.showAlert(alertaError);
         console.error('Error al actualizar registro:', err);
       },
     });
