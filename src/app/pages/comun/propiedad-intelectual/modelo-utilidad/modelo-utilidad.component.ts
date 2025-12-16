@@ -977,6 +977,58 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
       return;
     }
 
+    // Validación de formato y rango (año >= 2000) y coherencia (solicitud <= expedición)
+    const fechaSolicitudStr = this.indautorModel.fechaSolicitud?.toString() || '';
+    const fechaExpedicionStr = this.indautorModel.fechaExpedicion?.toString() || '';
+
+    const formatos = ['YYYY-MM-DD', 'DD-MM-YYYY', 'YYYY/MM/DD', 'DD/MM/YYYY'];
+    const parseStrict = (val: string): Date | null => {
+      const s = String(val).trim();
+      if (!s) return null;
+      const m = moment(s, formatos, true);
+      return m.isValid() ? m.toDate() : null;
+    };
+
+    if (fechaSolicitudStr) {
+      const solDate = parseStrict(fechaSolicitudStr);
+      if (!solDate || solDate.getFullYear() < 2000) {
+        const alertaError: SweetAlertOptions = {
+          icon: 'warning',
+          title: 'Fecha de solicitud inválida',
+          text: 'Usa un formato válido (DD-MM-YYYY) y año 2000 o posterior.',
+        };
+        this.showAlert(alertaError);
+        return;
+      }
+    }
+
+    if (fechaExpedicionStr) {
+      const expDate = parseStrict(fechaExpedicionStr);
+      if (!expDate || expDate.getFullYear() < 2000) {
+        const alertaError: SweetAlertOptions = {
+          icon: 'warning',
+          title: 'Fecha de expedición inválida',
+          text: 'Usa un formato válido (DD-MM-YYYY) y año 2000 o posterior.',
+        };
+        this.showAlert(alertaError);
+        return;
+      }
+    }
+
+    if (fechaSolicitudStr && fechaExpedicionStr) {
+      const solDate = parseStrict(fechaSolicitudStr)!;
+      const expDate = parseStrict(fechaExpedicionStr)!;
+      if (solDate.getTime() > expDate.getTime()) {
+        const alertaError: SweetAlertOptions = {
+          icon: 'warning',
+          title: 'Validación de fechas',
+          text: 'Las fechas son inconsistentes: la solicitud debe ser anterior o igual a la expedición.',
+        };
+        this.showAlert(alertaError);
+        return;
+      }
+    }
+
     const id = this.indautorModel.id;
     this.isSaving = true;
 
@@ -1071,13 +1123,12 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
       next: () => {
         this.isSaving = false;
 
-        this.showAlert({
+        const alertaExito: SweetAlertOptions = {
           icon: 'success',
-          title: '¡Guardado!',
-          text: 'Los cambios se guardaron correctamente.',
-          timer: 1800,
-          showConfirmButton: false,
-        });
+          title: 'Registro actualizado',
+          text: 'El modelo de utilidad se actualizó correctamente.',
+        };
+        this.showAlert(alertaExito);
 
         // Limpiar todos los datos de edición
         this.limpiarDatosEdicion();
@@ -1090,11 +1141,12 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
       },
       error: (err) => {
         this.isSaving = false;
-        this.showAlert({
+        const alertaError: SweetAlertOptions = {
           icon: 'error',
-          title: 'Error al guardar',
-          text: 'Ocurrió un error al guardar los cambios.'
-        });
+          title: 'Error',
+          text: 'Ocurrió un problema al actualizar el modelo de utilidad. Inténtalo de nuevo.',
+        };
+        this.showAlert(alertaError);
         console.error('Error al actualizar registro:', err);
       },
     });
