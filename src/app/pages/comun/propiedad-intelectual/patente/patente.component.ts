@@ -19,18 +19,8 @@ import { FileUploadService } from '../../../../api/services/file-upload.service'
 
 type EstatusPatente = 'Registrada' | 'En trámite' | 'Trámite con observaciones' | 'Aprobada' | 'Concluida';
 
-interface Inventor {
-  curp: string;
-  nombreCompleto: string;
-  sexo: string;
-  tipoInvestigador: string;
-  institucion: string;
-  programaEducativo: string;
-  cuerpoAcademico: string;
-  departamento: string;
-  fechaAfiliacion: string; // YYYY-MM-DD
-  fechaFin: string; // YYYY-MM-DD
-}
+import { Inventor } from '../../../../api/models/patent.model';
+import { forkJoin, of } from 'rxjs';  // Agrega esta importación para forkJoin y of
 
 // Estructura del dataset local usado por la tabla y los modales
 interface ImpiLocalItem {
@@ -218,7 +208,9 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     inventores: [
       {
         curp: "",
-        nombreCompleto: "",
+        nombre: "",
+        apellidoPaterno: "",
+        apellidoMaterno: "",
         sexo: "",
         tipoInvestigador: "",
         institucion: "",
@@ -262,241 +254,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   // Datos locales de maquetado para IMPI en este componente (independiente de otros)
-  private readonly FAKE_IMPI_DATA_LOCAL: ImpiLocalItem[] = [
-    {
-      id: 1,
-      rama: 'Invención',
-      titulo: 'Sistema Cuántico de Encriptación de Datos',
-      institucion: 'TecNM / Instituto Tecnológico de Ensenada',
-      fechaSolicitud: '2025-09-08',
-      numeroExpediente: 'EXP-0001',
-      numeroCertificado: 'CERT-0001',
-      estatus: 'En trámite',
-      descripcion: '',
-      observaciones: '',
-      inventores: [
-        {
-          curp: 'PEAJ900101HDFRRN01',
-          nombreCompleto: 'Pedro Álvarez Juárez',
-          sexo: 'M',
-          tipoInvestigador: 'Profesor-Investigador',
-          institucion: 'TecNM / Instituto Tecnológico de Ensenada',
-          programaEducativo: 'Ingeniería en Sistemas',
-          cuerpoAcademico: 'Cómputo Aplicado',
-          departamento: 'Sistemas y Computación',
-          fechaAfiliacion: '2020-03-15',
-          fechaFin: ''
-        }
-      ]
-    },
-    {
-      id: 2,
-      rama: 'Modelo de Utilidad',
-      titulo: 'Dispositivo Portátil para Purificación de Agua',
-      institucion: 'TecNM / Instituto Tecnológico de La Paz',
-      fechaSolicitud: '2025-09-05',
-      numeroExpediente: 'EXP-0002',
-      numeroCertificado: 'CERT-0002',
-      estatus: 'Registrada',
-      descripcion: '',
-      observaciones: '',
-      inventores: [
-        {
-          curp: 'LOPR920202MDFRRS02',
-          nombreCompleto: 'Lourdes Pérez Ríos',
-          sexo: 'F',
-          tipoInvestigador: 'Estudiante',
-          institucion: 'TecNM / Instituto Tecnológico de La Paz',
-          programaEducativo: 'Química',
-          cuerpoAcademico: 'Procesos Químicos',
-          departamento: 'Química',
-          fechaAfiliacion: '2023-01-10',
-          fechaFin: ''
-        },
-        {
-          curp: 'HOGM850606HDFTRN03',
-          nombreCompleto: 'Hugo Gómez Martínez',
-          sexo: 'M',
-          tipoInvestigador: 'Técnico Académico',
-          institucion: 'TecNM / Instituto Tecnológico de La Paz',
-          programaEducativo: 'Ingeniería Química',
-          cuerpoAcademico: 'Procesos Químicos',
-          departamento: 'Ingeniería',
-          fechaAfiliacion: '2021-09-01',
-          fechaFin: ''
-        }
-      ]
-    },
-    {
-      id: 3,
-      rama: 'Diseño Industrial',
-      titulo: 'Silla Ergonómica con Materiales Reciclados',
-      institucion: 'TecNM / Instituto Tecnológico de Campeche',
-      fechaSolicitud: '2025-09-01',
-      numeroExpediente: 'EXP-0003',
-      numeroCertificado: 'CERT-0003',
-      estatus: 'En trámite',
-      descripcion: '',
-      observaciones: '',
-      inventores: []
-    },
-    {
-      id: 4,
-      rama: 'Invención',
-      titulo: 'Algoritmo de IA para Detección Temprana de Cáncer',
-      institucion: 'TecNM / Instituto Tecnológico Superior de Calkiní',
-      fechaSolicitud: '2025-08-28',
-      numeroExpediente: 'EXP-0004',
-      numeroCertificado: 'CERT-0004',
-      estatus: 'En trámite',
-      descripcion: '',
-      observaciones: '',
-      inventores: []
-    },
-    {
-      id: 5,
-      rama: 'Modelo de Utilidad',
-      titulo: 'Mecanismo de Cierre Automático para Contenedores',
-      institucion: 'TecNM / Instituto Tecnológico de la Selva',
-      fechaSolicitud: '2025-08-25',
-      numeroExpediente: 'EXP-0005',
-      numeroCertificado: 'CERT-0005',
-      estatus: 'En trámite',
-      descripcion: '',
-      observaciones: '',
-      inventores: []
-    },
-    {
-      id: 6,
-      rama: 'Invención',
-      titulo: 'Dron Autónomo para Monitoreo Agrícola',
-      institucion: 'TecNM / Instituto Tecnológico de Tapachula',
-      fechaSolicitud: '2025-08-22',
-      numeroExpediente: 'EXP-0006',
-      numeroCertificado: 'CERT-0006',
-      estatus: 'En trámite',
-      descripcion: '',
-      observaciones: '',
-      inventores: []
-    },
-    {
-      id: 7,
-      rama: 'Diseño Industrial',
-      titulo: 'Lámpara LED de Bajo Consumo con Forma Orgánica',
-      institucion: 'TecNM / Instituto Tecnológico de Tuxtla Gutiérrez',
-      fechaSolicitud: '2025-08-19',
-      numeroExpediente: 'EXP-0007',
-      numeroCertificado: 'CERT-0007',
-      estatus: 'En trámite',
-      descripcion: '',
-      observaciones: '',
-      inventores: []
-    },
-    {
-      id: 8,
-      rama: 'Modelo de Utilidad',
-      titulo: 'Filtro de Aire Mejorado para Automóviles',
-      institucion: 'TecNM / Instituto Tecnológico Superior de Cintalapa',
-      fechaSolicitud: '2025-08-15',
-      numeroExpediente: 'EXP-0008',
-      numeroCertificado: 'CERT-0008',
-      estatus: 'En trámite',
-      descripcion: '',
-      observaciones: '',
-      inventores: []
-    },
-    {
-      id: 9,
-      rama: 'Invención',
-      titulo: 'Batería de Grafeno de Carga Ultra Rápida',
-      institucion: 'TecNM / Instituto Tecnológico Superior de Comitán',
-      fechaSolicitud: '2025-08-11',
-      numeroExpediente: 'EXP-0009',
-      numeroCertificado: 'CERT-0009',
-      estatus: 'En trámite',
-      descripcion: '',
-      observaciones: '',
-      inventores: []
-    },
-    {
-      id: 10,
-      rama: 'Diseño Industrial',
-      titulo: 'Mobiliario Urbano Inteligente con Paneles Solares',
-      institucion: 'TecNM / Instituto Tecnológico de Gustavo A. Madero',
-      fechaSolicitud: '2025-08-07',
-      numeroExpediente: 'EXP-0010',
-      numeroCertificado: 'CERT-0010',
-      estatus: 'En trámite',
-      descripcion: '',
-      observaciones: '',
-      inventores: []
-    },
-    {
-      id: 11,
-      rama: 'Invención',
-      titulo: 'Software de Simulación de Reacciones Químicas',
-      institucion: 'TecNM / Instituto Tecnológico de Gustavo A. Madero II',
-      fechaSolicitud: '2025-08-04',
-      numeroExpediente: 'EXP-0011',
-      numeroCertificado: 'CERT-0011',
-      estatus: 'En trámite',
-      descripcion: '',
-      observaciones: '',
-      inventores: []
-    },
-    {
-      id: 12,
-      rama: 'Modelo de Utilidad',
-      titulo: 'Sistema de Riego por Goteo de Alta Eficiencia',
-      institucion: 'TecNM / Instituto Tecnológico José Mario Molina Pasquel y Henríquez',
-      fechaSolicitud: '2025-08-01',
-      numeroExpediente: 'EXP-0012',
-      numeroCertificado: 'CERT-0012',
-      estatus: 'En trámite',
-      descripcion: '',
-      observaciones: '',
-      inventores: []
-    },
-    {
-      id: 13,
-      rama: 'Invención',
-      titulo: 'Prótesis Robótica Controlada por Señales Neuronales',
-      institucion: 'TecNM / Instituto Tecnológico de Celaya',
-      fechaSolicitud: '2025-07-29',
-      numeroExpediente: 'EXP-0013',
-      numeroCertificado: 'CERT-0013',
-      estatus: 'En trámite',
-      descripcion: '',
-      observaciones: '',
-      inventores: []
-    },
-    {
-      id: 14,
-      rama: 'Diseño Industrial',
-      titulo: 'Empaque Ecológico para Alimentos a Base de Algas',
-      institucion: 'TecNM / Instituto Tecnológico de León',
-      fechaSolicitud: '2025-07-25',
-      numeroExpediente: 'EXP-0014',
-      numeroCertificado: 'CERT-0014',
-      estatus: 'En trámite',
-      descripcion: '',
-      observaciones: '',
-      inventores: []
-    },
-    {
-      id: 15,
-      rama: 'Modelo de Utilidad',
-      titulo: 'Herramienta Multifuncional para Ciclismo Urbano',
-      institucion: 'TecNM / Instituto Tecnológico de Irapuato',
-      fechaSolicitud: '2025-07-21',
-      numeroExpediente: 'EXP-0015',
-      numeroCertificado: 'CERT-0015',
-      estatus: 'En trámite',
-      descripcion: '',
-      observaciones: '',
-      inventores: []
-    }
-  ];
+  private readonly FAKE_IMPI_DATA_LOCAL: ImpiLocalItem[] = [ ];
 
   tranlatesPlaceholders: any = {};
 
@@ -575,21 +333,132 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // Helpers para autores
+
   addInventor(): void {
-    if (!this.patenteModel.inventores) this.patenteModel.inventores = [];
-    this.patenteModel.inventores.push({
-      curp: "PEAJ900101HDFRRN01",
-      nombreCompleto: "Pedro Álvarez Juárez",
-      sexo: "M",
-      tipoInvestigador: "Profesor-Investigador",
-      institucion: "Instituto Tecnológico de Orizaba",
-      programaEducativo: "Ingeniería en Sistemas Computacionales",
-      cuerpoAcademico: "CA de Sistemas Computacionales",
-      departamento: "Sistemas Computacionales",
-      fechaAfiliacion: "2025-09-12",
-      fechaFin: "2027-09-12",
-    });
+  if (!this.patenteModel.inventores) {
+    this.patenteModel.inventores = [];
   }
+
+  this.patenteModel.inventores.push({
+    curp: '',
+    nombre: '',
+    apellidoPaterno: '',
+    apellidoMaterno: '',
+    sexo: '',
+    tipoInvestigador: '',
+    institucion: '',
+    programaEducativo: '',
+    cuerpoAcademico: '',
+    departamento: '',
+    fechaAfiliacion: '',
+    fechaFin: '',
+  });
+}
+
+
+cargarCurp(inv: any): void {
+  if (!inv.curp) {
+    return;
+  }
+
+ const persona = this.listaInvestigadores.find(
+    (p: any) => p.curp === inv.curp
+  );
+
+  if (!persona) {
+    return;
+  }
+
+  inv.nombre = persona.nombre;
+  inv.apellidoPaterno = persona.apellidoPaterno;
+  inv.apellidoMaterno = persona.apellidoMaterno;
+  inv.sexo = persona.sexo;
+  inv.tipoInvestigador = persona.tipoInvestigador;
+  inv.institucion = persona.institucion;
+  inv.programaEducativo = persona.programaEducativo;
+  inv.cuerpoAcademico = persona.cuerpoAcademico;
+  inv.departamento = persona.departamento;
+  inv.fechaAfiliacion = persona.fechaAfiliacion;
+  inv.fechaFin = persona.fechaFin;
+
+  console.log('✅ Datos del inventor actualizados desde CURP:', inv);
+  console.log('   Persona encontrada:', persona);
+}
+
+
+
+private hydrateInventores(): void {
+  if (!this.patenteModel?.inventores || this.patenteModel.inventores.length === 0) {
+    return;
+  }
+
+  let hidratados = 0;
+  this.patenteModel.inventores.forEach((inv, index) => {
+    if (inv.curp) {
+      const persona = this.listaInvestigadores.find(p => p.curp === inv.curp);
+      if (persona) {
+        // Copiamos todos los datos
+        Object.assign(inv, persona);
+        hidratados++;
+        console.log(`✅ Inventor ${index + 1} hidratado: ${inv.curp} → ${inv.nombre} ${inv.apellidoPaterno}`);
+      } else {
+        console.warn(`⚠️ CURP no encontrada en la lista: ${inv.curp}`);
+      }
+    }
+  });
+
+  console.log(`✅ Hidratación completada: ${hidratados}/${this.patenteModel.inventores.length} inventores`);
+
+  // Forzamos detección de cambios si es necesario (por si el modal ya está abierto)
+  this.cdr.detectChanges();
+}
+onCurpChange(inv: any): void {
+  if (!inv.curp) {
+    return;
+  }
+
+ const persona = this.listaInvestigadores.find(
+    (p: any) => p.curp === inv.curp
+  );
+
+  if (!persona) {
+    return;
+  }
+
+          const sexoValue = Number(inv.sexo);
+        if (sexoValue === 2) {
+          inv.sexo = "Femenino";
+        } else if (sexoValue === 1) {
+          inv.sexo = "Masculino";
+        } else {
+          inv.sexo = "Otro";
+        }
+
+        const tipoInvValue = Number(inv.tipoInvestigador);
+        if (tipoInvValue === 46) {
+          inv.tipoInvestigador = "Docente";
+        } else if (tipoInvValue === 47) {
+          inv.tipoInvestigador = "Administrativo";
+        } else if (tipoInvValue === 48) {
+          inv.tipoInvestigador = "Alumno";
+        }
+      
+
+  inv.nombre = persona.nombre;
+  inv.apellidoPaterno = persona.apellidoPaterno;
+  inv.apellidoMaterno = persona.apellidoMaterno;
+  inv.institucion = persona.institucion;
+  inv.programaEducativo = persona.programaEducativo;
+  inv.cuerpoAcademico = persona.cuerpoAcademico;
+  inv.departamento = persona.departamento;
+  inv.fechaAfiliacion = persona.fechaAfiliacion;
+  inv.fechaFin = persona.fechaFin;
+
+  console.log('✅ Datos del inventor actualizados desde CURP:', inv);
+  console.log('   Persona encontrada:', persona);
+}
+
+
 
   removeInventor(index: number): void {
     if (!this.patenteModel.inventores) return;
@@ -608,12 +477,50 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+listaInvestigadores: Inventor[] = [];
+
+
+
+
+
+cargarInvestigadores(): void {
+  this.service.getInvestigadores().subscribe({
+    
+    next: (data) => {
+      // Map API Inventor to local Inventor interface
+      this.listaInvestigadores = data.map((item: any) => (
+        // haz que si sexo es dos pone F, si es uno pone M, si es otro pone otro
+
+
+        {
+        curp: item.curp || '',
+        nombre: item.nombre || item.nombre || '',
+        apellidoPaterno: item.ape_pat || '',
+        apellidoMaterno: item.ape_mat || '',
+        sexo: item.sexo_param  || '',
+        tipoInvestigador: item.tipo_investigador_param || '',
+        institucion: item.institucion || '',
+        programaEducativo: item.programaEducativo || '',
+        cuerpoAcademico: item.cuerpoAcademico || '',
+        departamento: item.departamento || '',
+        fechaAfiliacion: item.fechaAfiliacion || '',
+        fechaFin: item.fechaFin || ''
+      }));
+      console.log('✅ Investigadores cargados:', this.listaInvestigadores);
+    },
+    error: (err) => {
+      console.error('❌ Error al cargar investigadores:', err);
+    }
+  });
+}
+
+
   ngOnInit(): void {
     this.placeholder = this.translate.instant('TABLE.PLACEHOLDER_SEARCH')
     this.cargarCatalogos();
     this.cargarCepats();
     this.cargarTodasInstituciones();
-
+    this.cargarInvestigadores();
     // Para mostrar el mismo arreglo y columnas que en INDAUTOR/local, usa el dataset local propio de este componente
 
     this.datatableConfig = {
@@ -1065,20 +972,52 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
 
+    
+
+   
+    console.log('✅ CURPs originales copiadas:', this.originalInventoresCurps);
     // 🔹 CEPat + institución (usando la institución del registro)
     this.preseleccionarCepatEInstitucionDesdeRegistro();
   }
 
   private preseleccionarCepatEInstitucionDesdeRegistro(): void {
+
     console.log('[preseleccionarCepatEInstitucionDesdeRegistro] Iniciando...');
 
     // 🔹 Activamos el flag para evitar que onCepatChange limpie los valores
     this.isInicializandoDesdeRegistro = true;
 
+
+
     // 0) Limpiar estado previo, para no arrastrar datos de otro registro
     this.selectedCepatId = null;
     this.institucionSeleccionadaCepat = null;
     this.institucionesCepat = [];
+    this.hydrateInventores();
+    
+
+    if (this.patenteModel.inventores && this.patenteModel.inventores.length > 0) {
+      for (const inv of this.patenteModel.inventores) {
+        const sexoValue = Number(inv.sexo);
+        if (sexoValue === 2) {
+          inv.sexo = "Femenino";
+        } else if (sexoValue === 1) {
+          inv.sexo = "Masculino";
+        } else {
+          inv.sexo = "Otro";
+        }
+
+        const tipoInvValue = Number(inv.tipoInvestigador);
+        if (tipoInvValue === 46) {
+          inv.tipoInvestigador = "Docente";
+        } else if (tipoInvValue === 47) {
+          inv.tipoInvestigador = "Administrativo";
+        } else if (tipoInvValue === 48) {
+          inv.tipoInvestigador = "Alumno";
+        }
+      }      
+
+  }
 
     if (!this.patenteModel) {
       this.isInicializandoDesdeRegistro = false;
@@ -1286,12 +1225,43 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     console.log('  - institucionSeleccionadaCepat:', this.institucionSeleccionadaCepat);
     console.log('  - institucionesCepat.length:', this.institucionesCepat.length);
 
+
+    for (const inv of this.patenteModel.inventores || []) {
+      this.originalInventoresCurps.push(inv.curp);
+    }
+
+
     // 🔹 Desactivamos el flag al finalizar
     this.isInicializandoDesdeRegistro = false;
   }
 
 
 
+  originalInventoresCurps: string[] = [];  //
+
+private procederConGuardado(modal: any): void {
+    if (this.selectedFile) {
+      this.fileUploadService.uploadFile(this.selectedFile, 'patentes').subscribe({
+        next: (response: any) => {
+          this.patenteModel.archivo = response.fileName;
+          
+        },
+        error: (error) => {
+          console.error('Error al subir archivo:', error);
+          const alertaError: SweetAlertOptions = {
+            icon: 'error',
+            title: 'Error al subir archivo',
+            text: 'Ocurrió un error al subir el archivo',
+            customClass: {
+              confirmButton: 'btn btn-danger'
+            }
+          };
+          this.showAlert(alertaError);
+        }
+      });
+    } else {
+    }
+  }
 
 
   resetFormularioInstitucion(): void {
@@ -1325,6 +1295,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   view(id: number) {
     this.isViewMode = true;
     this.cdr.detectChanges();
+    
 
     if (this.useLocalFakeData) {
       const numericId = Number(id);
@@ -1354,6 +1325,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
           descripcion: item.descripcion || 'Sistema automatizado que utiliza nanotecnología para la purificación de agua residual, incorporando sensores IoT para monitoreo en tiempo real',
           inventores: item.inventores && item.inventores.length ? JSON.parse(JSON.stringify(item.inventores)) : []
         } as PatenteUIModel;
+        
       }
     } else {
       this.service.getPatent(id).subscribe((patente: IPatentModel) => {
@@ -1363,6 +1335,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
           ...patente,
           denominacion: patente.nombrePatente || this.patenteModel.denominacion,
         };
+        
         this.inicializarSeleccionesDesdePatente();
       });
     }
@@ -1395,6 +1368,7 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.cdr.detectChanges();
+    
     if (this.useLocalFakeData) {
       const numericId = Number(id);
       const item = this.FAKE_IMPI_DATA_LOCAL.find(x => x.id === numericId);
@@ -1579,7 +1553,83 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
       // Si no hay archivo nuevo, continuar con el guardado normal
       this.performSaveEdit(modal, id);
     }
+
+
+    const currentCurps = this.patenteModel.inventores
+      ?.map(inv => inv.curp)
+      .filter(curp => !!curp && curp.trim() !== '') || [];
+
+    const removedCurps = this.originalInventoresCurps.filter(curp => !currentCurps.includes(curp));
+    const addedCurps = currentCurps.filter(curp => !this.originalInventoresCurps.includes(curp));
+
+    console.log('🔍 Comparación de CURPs:', {
+      originales: this.originalInventoresCurps,
+      actuales: currentCurps,
+      eliminadas: removedCurps,
+      nuevas: addedCurps
+    });
+
+    const noExpediente = this.patenteModel.numeroExpediente || '';  // Asegúrate de que exista
+    if (!noExpediente) {
+      // Error si no hay expediente (necesario para las APIs)
+      const alertaError: SweetAlertOptions = {
+        icon: 'error',
+        title: 'Error',
+        text: 'No se puede vincular/desvincular sin número de expediente.'
+      };
+      this.showAlert(alertaError);
+      return;
+    }
+
+    // Preparar llamadas a APIs
+    const desvincularCalls: Observable<any>[] = removedCurps.map(curp =>
+      this.service.desvincularInvestigador(curp, noExpediente)
+    );
+
+    const vincularCalls: Observable<any>[] = addedCurps.map(curp =>
+      this.service.vincularInvestigador(curp, noExpediente)
+    );
+
+    const allCalls = [...desvincularCalls, ...vincularCalls];
+
+    if (allCalls.length > 0) {
+      // Ejecutar en paralelo y esperar
+      forkJoin(allCalls).subscribe({
+        next: (responses) => {
+          console.log('✅ Vinculaciones/Desvinculaciones completadas:', responses);
+          // Proceder con el guardado (upload o directo)
+          this.procederConGuardado(modal);
+        },
+        error: (error) => {
+          console.error('❌ Error en vinculación/desvinculación:', error);
+          const alertaError: SweetAlertOptions = {
+            icon: 'error',
+            title: 'Error',
+            text: 'Hubo un problema al vincular/desvincular investigadores. Inténtalo de nuevo.'
+          };
+          this.showAlert(alertaError);
+        }
+      });
+    } else {
+      // Sin cambios en CURPs, proceder directamente
+      this.procederConGuardado(modal);
+    }
+
   }
+
+  private inicializarDesdeRegistro(registro: PatenteUIModel): void {
+    // ... (código existente para asignar this.patenteModel = { ...registro })
+
+    // Nueva lógica: Copia las CURPs originales (filtrando vacías)
+    this.originalInventoresCurps = registro.inventores
+      ?.map(inv => inv.curp)
+      .filter(curp => !!curp && curp.trim() !== '') || [];
+
+    console.log('✅ CURPs originales copiadas:', this.originalInventoresCurps);
+
+    // ... (resto del método, como hidratación, etc.)
+  }
+
 
   private performSaveEdit(modal: any, id: number) {
 
@@ -2006,7 +2056,30 @@ export class PatenteComponent implements OnInit, AfterViewInit, OnDestroy {
   // Inventores no vacíos para visualización
   get inventoresVisibles(): Inventor[] {
     const invs = this.patenteModel.inventores || [];
-    return invs.filter(i => !!(i && (i.curp || i.nombreCompleto || i.institucion)));
+    return invs
+      .map(i => {
+        // Map API Inventor to local Inventor interface
+        const nombre = (i as any).nombre || (i as any).nombreCompleto || '';
+        const apellidoPaterno = (i as any).apellidoPaterno || '';
+        const apellidoMaterno = (i as any).apellidoMaterno || '';
+        const nombreCompleto = `${nombre} ${apellidoPaterno} ${apellidoMaterno}`.trim();
+        
+        return {
+          curp: i.curp || '',
+          nombre: i.nombre || nombreCompleto || '',
+          apellidoPaterno: i.apellidoPaterno || '',
+          apellidoMaterno: i.apellidoMaterno || '',
+          sexo: i.sexo ?? '',
+          tipoInvestigador: i.tipoInvestigador || '',
+          institucion: i.institucion || '',
+          programaEducativo: i.programaEducativo || '',
+          cuerpoAcademico: i.cuerpoAcademico || '',
+          departamento: i.departamento || '',
+          fechaAfiliacion: i.fechaAfiliacion || '',
+          fechaFin: i.fechaFin || ''
+        };
+      })
+      .filter(i => !!(i && (i.curp || i.nombre || i.institucion)));
   }
 
   onObservacionesChange(): void {

@@ -26,18 +26,12 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 declare const $: any;
 
-interface Inventor {
-  curp: string;
-  nombreCompleto: string;
-  sexo: 'M' | 'F' | '';
-  tipoInvestigador: string;
-  institucion: string;
-  programaEducativo: string;
-  cuerpoAcademico: string;
-  departamento: string;
-  fechaAfiliacion: string;
-  fechaFin: string;
-}
+import { Inventor } from '../../../../api/models/patent.model';
+import { forkJoin, of } from 'rxjs';  // Agrega esta importación para forkJoin y 
+
+import { Observable } from 'rxjs';
+import { PatentsService } from 'src/app/api/services/patents.service';
+
 
 @Component({
   selector: 'app-modelo-utilidad',
@@ -45,11 +39,12 @@ interface Inventor {
   styleUrl: './modelo-utilidad.component.scss',
 })
 export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy {
+  [x: string]: any;
   private readonly TIPO_INDAUTOR = '45';
   readonly RAMAS_INDAUTOR_IDS = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
 
   pageLength = 10;
-  dtInstance: any;
+
   lengthMenu: number[] = [5, 10, 15, 20];
 
   datatableConfig: Config = {} as Config;
@@ -126,7 +121,9 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
     inventores: [
       {
         curp: '',
-        nombreCompleto: '',
+        nombre: '',
+        apellidoPaterno: '',
+        apellidoMaterno: '',
         sexo: '',
         tipoInvestigador: '',
         institucion: '',
@@ -148,7 +145,8 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
   search: string = '';
 
   constructor(
-    private service: IntellectualPropertyService,
+    private service: PatentsService,
+    private services: IntellectualPropertyService,
     private cdr: ChangeDetectorRef,
     private translate: TranslateService,
     private paramService: ParametrizacionesService,
@@ -172,6 +170,7 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
     this.cargarCepats();
     this.cargarTodasInstituciones();
     this.generarAniosRenovacion();
+    this.cargarInvestigadores();
 
     this.datatableConfig = {
       serverSide: true,
@@ -194,7 +193,7 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
         zeroRecords: this.translate.instant('TABLE.ZERO_RECORDS'),
       },
       ajax: (dataTablesParameters: any, callback) => {
-        this.service.getRegistros(this.TIPO_INDAUTOR, dataTablesParameters, this.search).subscribe({
+        this.services.getRegistros(this.TIPO_INDAUTOR, dataTablesParameters, this.search).subscribe({
           next: (resp: any) => {
             callback(resp);
           },
@@ -602,6 +601,11 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
     const idInstitucion = this.indautorModel.id_institucion;
     const nombreInstitucion = this.indautorModel.tecnologicoOrigen;
 
+  for (const inv of this.indautorModel.inventores || []) {
+      this.originalInventoresCurps.push(inv.curp);
+    }
+
+
     let cepatDeducido: number | null = null;
 
     if (idInstitucion) {
@@ -618,6 +622,8 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
     if (cepatDeducido) {
       this.isInicializandoDesdeRegistro = true;
       this.selectedCepatId = cepatDeducido;
+      
+    this.hydrateInventores();
 
       if (this.mapaCepatInstituciones && this.mapaCepatInstituciones[cepatDeducido]) {
         this.institucionesCepat = [...this.mapaCepatInstituciones[cepatDeducido]];
@@ -631,7 +637,39 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
         this.isInicializandoDesdeRegistro = false;
       }, 0);
     }
+
   }
+
+
+  
+  originalInventoresCurps: string[] = [];  //
+
+private procederConGuardado(modal: any): void {
+    if (this.selectedFile) {
+      this.fileUploadService.uploadFile(this.selectedFile, 'patentes').subscribe({
+        next: (response: any) => {
+          this.indautorModel.archivo = response.fileName;
+          
+        },
+        error: (error) => {
+          console.error('Error al subir archivo:', error);
+          const alertaError: SweetAlertOptions = {
+            icon: 'error',
+            title: 'Error al subir archivo',
+            text: 'Ocurrió un error al subir el archivo',
+            customClass: {
+              confirmButton: 'btn btn-danger'
+            }
+          };
+          this.showAlert(alertaError);
+        }
+      });
+    } else {
+    }
+  }
+
+
+
 
   onCepatChange(cepatId: number | null): void {
     const id = cepatId !== null ? Number(cepatId) : NaN;
@@ -778,9 +816,10 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
 
   view(id: number): void {
     this.isViewMode = true;
+    this.hydrateInventores();
     this.cdr.detectChanges();
 
-    this.service.getRegistro(id).subscribe({
+    this.services.getRegistro(id).subscribe({
       next: (registro: PatenteUIModel) => {
         this.indautorModel = { ...registro };
         this.preseleccionarCepatEInstitucionDesdeRegistro();
@@ -795,7 +834,7 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
     this.isViewMode = false;
     this.cdr.detectChanges();
 
-    this.service.getRegistro(id).subscribe({
+    this.services.getRegistro(id).subscribe({
       next: (registro: PatenteUIModel) => {
         console.log(registro)
         this.indautorModel = { ...registro };
@@ -934,11 +973,42 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
         sub => sub.id_param_padre === this.sectorSeleccionadoId
       );
     }
+      console.log('✅ CURPs originales copiadas:', this.originalInventoresCurps);
+    // 🔹 CEPat + institución (usando la institución del registro)
+    this.preseleccionarCepatEInstitucionDesdeRegistro();
+  
 
     if (this.indautorModel.id_subsector) {
       this.subsectorIdSeleccionado = this.indautorModel.id_subsector;
     }
+    
+    this.hydrateInventores();
+
+
+    if (this.indautorModel.inventores && this.indautorModel.inventores.length > 0) {
+      for (const inv of this.indautorModel.inventores) {
+        const sexoValue = Number(inv.sexo);
+        if (sexoValue === 2) {
+          this.inv.sexo = 'Femenino';
+        } else if (sexoValue === 1) {
+          this.inv.sexo = 'Masculino';
+        } else {
+          this.inv.sexo = 'Otro';
+        }
+
+        
+        const tipoInvValue = Number(inv.tipoInvestigador);
+        if (tipoInvValue === 46) {
+          this.inv.tipoInvestigador = "Docente";
+        } else if (tipoInvValue === 47) {
+          this.inv.tipoInvestigador = "Administrativo";
+        } else if (tipoInvValue === 48) {
+          this.inv.tipoInvestigador = "Alumno";
+        }
+      }      
+
   }
+}
 
   onArchivoSelected(event: any): void {
     const file = event.target?.files?.[0];
@@ -1051,6 +1121,273 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
     } else {
       this.actualizarRegistro(id, modal);
     }
+  
+
+   // 🔹 Si hay un archivo seleccionado, primero lo subimos al servidor
+      if (this.selectedFile) {
+        this.fileUploadService.uploadFile(this.selectedFile, 'patentes').subscribe({
+          next: (response) => {
+            if (response.success) {
+              // Actualizar el nombre del archivo con el devuelto por el servidor
+              this.indautorModel.archivo = response.filename;
+              // Continuar con el guardado del registro
+              this.performSaveEdit(modal, id);
+            } else {
+              this.isSaving = false;
+              const alertaError: SweetAlertOptions = {
+                icon: 'error',
+                title: 'Error al subir archivo',
+                text: response.message || 'No se pudo subir el archivo.',
+              };
+              this.showAlert(alertaError);
+            }
+          },
+          error: (error) => {
+            this.isSaving = false;
+            console.error('Error al subir archivo:', error);
+            const alertaError: SweetAlertOptions = {
+              icon: 'error',
+              title: 'Error al subir archivo',
+              text: 'Ocurrió un error al intentar subir el archivo.',
+            };
+            this.showAlert(alertaError);
+          }
+        });
+      } else {
+        // Si no hay archivo nuevo, continuar con el guardado normal
+        this.performSaveEdit(modal, id);
+      }
+  
+  
+      const currentCurps = this.indautorModel.inventores
+        ?.map(inv => inv.curp)
+        .filter(curp => !!curp && curp.trim() !== '') || [];
+  
+      const removedCurps = this.originalInventoresCurps.filter(curp => !currentCurps.includes(curp));
+      const addedCurps = currentCurps.filter(curp => !this.originalInventoresCurps.includes(curp));
+  
+      console.log('🔍 Comparación de CURPs:', {
+        originales: this.originalInventoresCurps,
+        actuales: currentCurps,
+        eliminadas: removedCurps,
+        nuevas: addedCurps
+      });
+  
+      const noExpediente = this.indautorModel.numeroExpediente || '';  // Asegúrate de que exista
+      if (!noExpediente) {
+        // Error si no hay expediente (necesario para las APIs)
+        const alertaError: SweetAlertOptions = {
+          icon: 'error',
+          title: 'Error',
+          text: 'No se puede vincular/desvincular sin número de expediente.'
+        };
+        this.showAlert(alertaError);
+        return;
+      }
+  
+      // Preparar llamadas a APIs
+      const desvincularCalls: Observable<any>[] = removedCurps.map(curp =>
+        this.service.desvincularInvestigador(curp, noExpediente)
+      );
+  
+      const vincularCalls: Observable<any>[] = addedCurps.map(curp =>
+        this.service.vincularInvestigador(curp, noExpediente)
+      );
+  
+      const allCalls = [...desvincularCalls, ...vincularCalls];
+  
+      if (allCalls.length > 0) {
+        // Ejecutar en paralelo y esperar
+        forkJoin(allCalls).subscribe({
+          next: (responses) => {
+            console.log('✅ Vinculaciones/Desvinculaciones completadas:', responses);
+            // Proceder con el guardado (upload o directo)
+            this.procederConGuardado(modal);
+          },
+          error: (error) => {
+            console.error('❌ Error en vinculación/desvinculación:', error);
+            const alertaError: SweetAlertOptions = {
+              icon: 'error',
+              title: 'Error',
+              text: 'Hubo un problema al vincular/desvincular investigadores. Inténtalo de nuevo.'
+            };
+            this.showAlert(alertaError);
+          }
+        });
+      } else {
+        // Sin cambios en CURPs, proceder directamente
+        this.procederConGuardado(modal);
+      }
+  
+    }
+  
+    private inicializarDesdeRegistro(registro: PatenteUIModel): void {
+      // ... (código existente para asignar this.indautorModel = { ...registro })
+  
+      // Nueva lógica: Copia las CURPs originales (filtrando vacías)
+      this.originalInventoresCurps = registro.inventores
+        ?.map(inv => inv.curp)
+        .filter(curp => !!curp && curp.trim() !== '') || [];
+  
+      console.log('✅ CURPs originales copiadas:', this.originalInventoresCurps);
+  
+      // ... (resto del método, como hidratación, etc.)
+    }
+
+
+    
+  private performSaveEdit(modal: any, id: number) {
+
+    // --- Mapeo de catálogos (Rama, Medio de ingreso, Subsector) ---
+
+    // 1) Rama: buscamos el id_param a partir del nombre elegido en el <select>
+    let ramaParamId: number | null = null;
+    if ((this.indautorModel as any).rama_param != null) {
+      const ramaId = typeof (this.indautorModel as any).rama_param === 'string'
+        ? parseInt((this.indautorModel as any).rama_param, 10)
+        : (this.indautorModel as any).rama_param;
+      ramaParamId = !isNaN(ramaId) ? ramaId : null;
+    } else if (this.indautorModel.rama) {
+      const ramaSeleccionada = this.ramasCatalogo.find(r => r.nombre === this.indautorModel.rama);
+      ramaParamId = ramaSeleccionada?.id_param ?? null;
+    }
+
+    // 2) Medio de ingreso
+    let medioIngresoParamId: number | null = null;
+    if ((this.indautorModel as any).medio_ingreso_param != null) {
+      const medioId = typeof (this.indautorModel as any).medio_ingreso_param === 'string'
+        ? parseInt((this.indautorModel as any).medio_ingreso_param, 10)
+        : (this.indautorModel as any).medio_ingreso_param;
+      medioIngresoParamId = !isNaN(medioId) ? medioId : null;
+    } else if (this.indautorModel.medioIngreso) {
+      const medioSeleccionado = this.mediosIngresoCatalogo.find(m => m.nombre === this.indautorModel.medioIngreso);
+      medioIngresoParamId = medioSeleccionado?.id_param ?? null;
+    }
+
+    // 3) Subsector: id y nombre (el nombre lo mostramos en UI / reporte)
+    let subsectorId: number | string | null = null;
+    let subsectorNombre: string | null = null;
+
+    if (this.subsectorIdSeleccionado) {
+      const subsector = this.subsectoresCatalogo.find(
+        s => s.id_param === this.subsectorIdSeleccionado
+      );
+      subsectorId = subsector?.id_param ?? null;
+      subsectorNombre = subsector?.nombre ?? null;
+    } else if (this.indautorModel.subsector) {
+      // En registros antiguos, subsector viene como id en string (ej. "282")
+      subsectorId = this.indautorModel.subsector;
+      subsectorNombre = this.obtenerNombreSubsectorPorId(this.indautorModel.subsector);
+    }
+
+    if (this.subsectorIdSeleccionado) {
+      this.indautorModel.subsector = String(this.subsectorIdSeleccionado);
+    }
+    // Si a partir del subsector ya actualizaste tipoSector y sector
+    // en el método actualizarSectorDesdeSubsector(), aquí solo los respetamos.
+
+    // 4) Año de renovación: convertir a entero o null
+    let anioRenovacion: number | null = null;
+    if (this.indautorModel.anioRenovacion !== undefined && this.indautorModel.anioRenovacion !== null) {
+      const raw = String(this.indautorModel.anioRenovacion).trim();
+      if (raw !== '' && raw.toUpperCase() !== 'N/A') {
+        const parsed = Number(raw);
+        if (!Number.isNaN(parsed)) {
+          anioRenovacion = parsed;
+        }
+      }
+    }
+
+    // --- Construimos el payload explícito que se mandará al servicio ---
+
+    const payload: any = {
+      // Identificadores y títulos
+      id,
+      id_registro: id,
+      solicitudId: this.indautorModel.solicitudId || this.indautorModel.no_expediente || this.indautorModel.numeroExpediente,
+      no_expediente: this.indautorModel.no_expediente || this.indautorModel.solicitudId || this.indautorModel.numeroExpediente,
+      numeroExpediente: this.indautorModel.numeroExpediente || this.indautorModel.no_expediente,
+      titulo: this.indautorModel.denominacion,
+      nombrePatente: this.indautorModel.denominacion || this.indautorModel.nombrePatente,
+      denominacion: this.indautorModel.denominacion,
+
+      // Datos de solicitud (usuario, institución, correo)
+      solicitante: this.indautorModel.solicitante,
+      institucion: this.indautorModel.institucion,
+      correo: this.indautorModel.correo,
+
+      // 🔹 IDs para CEPat e Institución (crítico para poder recuperar después)
+      id_institucion: this.institucionSeleccionadaCepat,
+      id_cepat: this.selectedCepatId,
+
+      // Fechas (se mandan como string YYYY-MM-DD, el servicio las normaliza)
+      fechaSolicitud: this.indautorModel.fechaSolicitud,
+      fechaExpedicion: this.indautorModel.fechaExpedicion || null,
+
+      // Descripción y observaciones
+      descripcion: this.indautorModel.descripcion,
+      observaciones: this.indautorModel.observaciones,
+
+      // Estatus (texto, el servicio lo mapea a id)
+      estatus: this.indautorModel.estatus,
+
+      // Rama, Medio de ingreso, Tecnológico de origen, CePat, Año de renovación
+      rama: this.indautorModel.rama,
+      medioIngreso: this.indautorModel.medioIngreso,
+      tecnologicoOrigen: this.indautorModel.tecnologicoOrigen,
+      cePat: this.indautorModel.cePat,
+      anioRenovacion: anioRenovacion,
+
+      // Sector / Tipo de sector (texto calculado a partir del subsector)
+      tipoSector: this.indautorModel.tipoSector,
+      sector: this.indautorModel.sector,
+
+      // Subsector como texto para UI/reportes
+      subsector: subsectorNombre || this.indautorModel.subsector,
+
+      // Documento
+      archivo: this.indautorModel.archivo || (this.indautorModel.documentos?.[0] ?? ''),
+
+      // Inventores
+      inventores: this.indautorModel.inventores || [],
+
+      // Hints explícitos para el backend (id de parametrización):
+      // se usarán en mapFrontendToBackend si existen
+      rama_param: ramaParamId,
+      medio_ingreso_param: medioIngresoParamId,
+      tipo_sector_param: this.tipoSectorSeleccionadoId ?? null,
+      id_subsector: subsectorId,
+      tipo_ingreso_param: (this.indautorModel as any).tipo_ingreso_param || null,
+    };
+
+    this.service.updatePatent(id, payload).subscribe({
+      next: () => {
+        this.isSaving = false;
+
+        const alertaExito: SweetAlertOptions = {
+          icon: 'success',
+          title: 'Registro actualizado',
+          text: 'La patente se actualizó correctamente.',
+        };
+        this.showAlert(alertaExito);
+
+        // Limpiar todos los datos de edición
+        this.limpiarDatosEdicion();
+
+        modal.close();
+        this.reloadEvent.emit(true);
+      },
+      error: (error) => {
+        this.isSaving = false;
+        console.error('Error al actualizar patente:', error);
+        const alertaError: SweetAlertOptions = {
+          icon: 'error',
+          title: 'Error',
+          text: 'Ocurrió un problema al actualizar la patente. Inténtalo de nuevo.',
+        };
+        this.showAlert(alertaError);
+      },
+    });
   }
 
   private actualizarRegistro(id: number, modal: any): void {
@@ -1120,7 +1457,7 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
       archivo: this.indautorModel.archivo || (this.indautorModel.documentos?.[0] ?? ''),
     };
 
-    this.service.updateRegistro(id, payload, this.TIPO_INDAUTOR).subscribe({
+    this.services.updateRegistro(id, payload, this.TIPO_INDAUTOR).subscribe({
       next: () => {
         this.isSaving = false;
 
@@ -1154,7 +1491,7 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   delete(id: number): void {
-    this.service.deleteRegistro(id).subscribe({
+    this.services.deleteRegistro(id).subscribe({
       next: () => {
         if (this.dtInstance) {
           this.dtInstance.ajax.reload(null, false);
@@ -1170,16 +1507,18 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
   addInventor(): void {
     if (!this.indautorModel.inventores) this.indautorModel.inventores = [];
     this.indautorModel.inventores.push({
-      curp: 'LOPR920202MDFRRS02',
-      nombreCompleto: 'Lourdes Pérez Ríos',
-      sexo: 'F',
-      tipoInvestigador: 'Técnico Académico',
-      institucion: 'Instituto Tecnológico Orizaba',
-      programaEducativo: 'Ingeniería Informática',
-      cuerpoAcademico: 'CA de Informática y Computación',
-      departamento: 'Sistemas Computacionales',
-      fechaAfiliacion: '2025-09-12',
-      fechaFin: '2027-06-23',
+      curp: '',
+      nombre: '',
+      apellidoMaterno: '',
+      apellidoPaterno: '',
+      sexo: '',
+      tipoInvestigador: '',
+      institucion: '',
+      programaEducativo: '',
+      cuerpoAcademico: '',
+      departamento: '',
+      fechaAfiliacion: '',
+      fechaFin: '',
     });
   }
 
@@ -1190,11 +1529,153 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
     }
   }
 
-  get inventoresVisibles(): Inventor[] {
-    const invs = this.indautorModel.inventores || [];
-    return invs.filter((i) => !!(i && (i.curp || i.nombreCompleto || i.institucion)));
+
+  
+private hydrateInventores(): void {
+  if (!this.indautorModel?.inventores || this.indautorModel.inventores.length === 0) {
+    return;
   }
 
+  let hidratados = 0;
+  this.indautorModel.inventores.forEach((inv, index) => {
+    if (inv.curp) {
+      const persona = this.listaInvestigadores.find(p => p.curp === inv.curp);
+      if (persona) {
+        // Copiamos todos los datos
+        Object.assign(inv, persona);
+
+        hidratados++;
+        console.log(inv.departamento);
+        console.log(`✅ Inventor ${index + 1} hidratado: ${inv.curp} → ${inv.nombre} ${inv.apellidoPaterno}`);
+      } else {
+        console.warn(`⚠️ CURP no encontrada en la lista: ${inv.curp}`);
+      }
+    }
+  });
+
+  console.log(`✅ Hidratación completada: ${hidratados}/${this.indautorModel.inventores.length} inventores`);
+
+  // Forzamos detección de cambios si es necesario (por si el modal ya está abierto)
+  this.cdr.detectChanges();
+}
+
+onCurpChange(inv: any): void {
+  if (!inv.curp) {
+    return;
+  }
+
+ const persona = this.listaInvestigadores.find(
+    (p: any) => p.curp === inv.curp
+  );
+
+  if (!persona) {
+    return;
+  }
+  
+          const sexoValue = Number(inv.sexo);
+        if (sexoValue === 2) {
+          inv.sexo = "Femenino";
+        } else if (sexoValue === 1) {
+          inv.sexo = "Masculino";
+        } else {
+          inv.sexo = "Otro";
+        }
+
+        const tipoInvValue = Number(inv.tipoInvestigador);
+        if (tipoInvValue === 46) {
+          inv.tipoInvestigador = "Docente";
+        } else if (tipoInvValue === 47) {
+          inv.tipoInvestigador = "Administrativo";
+        } else if (tipoInvValue === 48) {
+          inv.tipoInvestigador = "Alumno";
+        }
+      
+
+
+  inv.nombre = persona.nombre;
+  inv.apellidoPaterno = persona.apellidoPaterno;
+  inv.apellidoMaterno = persona.apellidoMaterno;
+  inv.institucion = persona.institucion;
+  inv.programaEducativo = persona.programaEducativo;
+  inv.cuerpoAcademico = persona.cuerpoAcademico;
+  inv.departamento = persona.departamento;
+  inv.fechaAfiliacion = persona.fechaAfiliacion;
+  inv.fechaFin = persona.fechaFin;
+
+  console.log('✅ Datos del inventor actualizados desde CURP:', inv);
+  console.log('   Persona encontrada:', persona);
+}
+
+
+
+listaInvestigadores: Inventor[] = [];
+
+
+
+
+
+cargarInvestigadores(): void {
+  this.service.getInvestigadores().subscribe({
+    
+    next: (data) => {
+      // Map API Inventor to local Inventor interface
+      this.listaInvestigadores = data.map((item: any) => (
+        // haz que si sexo es dos pone F, si es uno pone M, si es otro pone otro
+
+
+        {
+        curp: item.curp || '',
+        nombre: item.nombre || item.nombre || '',
+        apellidoPaterno: item.ape_pat || '',
+        apellidoMaterno: item.ape_mat || '',
+        sexo: item.sexo_param  || '',
+        tipoInvestigador: item.tipo_investigador_param || '',
+        institucion: item.institucion || '',
+        programaEducativo: item.programaEducativo || '',
+        cuerpoAcademico: item.cuerpoAcademico || '',
+        departamento: item.departamento || '',
+        fechaAfiliacion: item.fechaAfiliacion || '',
+        fechaFin: item.fechaFin || ''
+      }));
+      console.log('✅ Investigadores cargados:', this.listaInvestigadores);
+    },
+    error: (err) => {
+      console.error('❌ Error al cargar investigadores:', err);
+    }
+  });
+}
+
+
+
+
+  // Inventores no vacíos para visualización
+  get inventoresVisibles(): Inventor[] {
+    const invs = this.indautorModel.inventores || [];
+    return invs
+      .map(i => {
+        // Map API Inventor to local Inventor interface
+        const nombre = (i as any).nombre || (i as any).nombreCompleto || '';
+        const apellidoPaterno = (i as any).apellidoPaterno || '';
+        const apellidoMaterno = (i as any).apellidoMaterno || '';
+        const nombreCompleto = `${nombre} ${apellidoPaterno} ${apellidoMaterno}`.trim();
+        
+        return {
+          curp: i.curp || '',
+          nombre: i.nombre || nombreCompleto || '',
+          apellidoPaterno: i.apellidoPaterno || '',
+          apellidoMaterno: i.apellidoMaterno || '',
+          sexo: i.sexo ?? '',
+          tipoInvestigador: i.tipoInvestigador || '',
+          institucion: i.institucion || '',
+          programaEducativo: i.programaEducativo || '',
+          cuerpoAcademico: i.cuerpoAcademico || '',
+          departamento: i.departamento || '',
+          fechaAfiliacion: i.fechaAfiliacion || '',
+          fechaFin: i.fechaFin || ''
+        };
+      })
+      .filter(i => !!(i && (i.curp || i.nombre || i.institucion)));
+  }
   downloadDocument(documentName: string): void {
     if (!documentName) {
       this.showAlert({ icon: 'warning', title: 'Sin archivo', text: 'No hay archivo disponible.' });
@@ -1232,33 +1713,6 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
     this.isViewMode = true;
     this.selectedFile = null;
 
-    this.indautorModel = {
-      id: 0,
-      solicitudId: '',
-      nombrePatente: '',
-      solicitante: '',
-      fechaSolicitud: '',
-      estatus: 'En trámite',
-      descripcion: '',
-      institucion: '',
-      correo: '',
-      documentos: [''],
-      numeroExpediente: '',
-      numeroTitulo: '',
-      denominacion: '',
-      rama: '',
-      medioIngreso: '',
-      tecnologicoOrigen: '',
-      cePat: 'N/A',
-      anioRenovacion: '',
-      tipoSector: '',
-      sector: '',
-      subsector: '',
-      fechaExpedicion: '',
-      archivo: '',
-      observaciones: '',
-      inventores: [],
-    };
 
     // Limpiar selecciones de sector
     this.selectedCepatId = null;

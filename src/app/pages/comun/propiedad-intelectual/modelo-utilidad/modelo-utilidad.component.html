@@ -209,10 +209,9 @@
             </div>
             <div class="col-md-6">
               <label class="form-label text-gray-600">Nombre Completo</label>
-              <input class="form-control form-control-solid bg-light" [value]="inv.nombreCompleto" readonly />
+              <input class="form-control form-control-solid bg-light" [value]="inv.nombre + ' ' + inv.apellidoPaterno + ' ' + inv.apellidoMaterno" readonly />
             </div>
             <div class="col-md-4">
-              <label class="form-label text-gray-600">Sexo</label>
               <input class="form-control form-control-solid bg-light" [value]="inv.sexo" readonly />
             </div>
             <div class="col-md-8">
@@ -477,69 +476,157 @@
         <label class="fw-semibold fs-6 mb-2 text-gray-600">Descripción</label>
         <textarea class="form-control" rows="3" [(ngModel)]="indautorModel.descripcion"></textarea>
       </div>
+<div class="separator separator-dashed my-7"></div>
 
-      <!-- Inventores -->
-      <!-- <div class="separator separator-dashed my-7"></div>
-      <div class="d-flex align-items-center justify-content-between mb-4">
-        <div class="fw-bold fs-4">Inventores</div>
-        <button type="button" class="btn btn-sm btn-primary" (click)="addInventor()">Agregar autor</button>
+<div class="d-flex align-items-center justify-content-between mb-4">
+  <div class="fw-bold fs-4">Inventores</div>
+  <button type="button" class="btn btn-sm btn-primary" (click)="addInventor()">
+    Agregar autor
+  </button>
+</div>
+
+<div
+  *ngFor="let inv of indautorModel.inventores; let i = index"
+  class="card card-flush mb-5"
+>
+  <div class="card-header py-3">
+    <div class="card-title fw-bold">Autor {{ i + 1 }}</div>
+    <div class="card-toolbar" *ngIf="i > 0">
+      <button
+        type="button"
+        class="btn btn-sm btn-light-danger"
+        (click)="removeInventor(i)"
+      >
+        Quitar
+      </button>
+    </div>
+  </div>
+
+  <div class="card-body pt-3">
+    <div class="row g-6">
+
+      <!-- CURP -->
+<div class="col-md-6">
+  <label class="form-label text-gray-600">CURP</label>
+<select
+  class="form-select"
+  [(ngModel)]="inv.curp"
+  (change)="onCurpChange(inv)"
+  
+>
+  <option value="">Seleccione CURP</option>
+  <option *ngFor="let persona of listaInvestigadores" [value]="persona.curp">
+    {{ persona.curp }}
+  </option>
+</select>
+</div>
+
+
+      <!-- Nombre -->
+      <div class="col-md-6">
+        <label class="form-label text-gray-600">Nombre Completo</label>
+        <input
+  class="form-control"
+  [value]="
+    (inv.nombre || '') + ' ' +
+    (inv.apellidoPaterno || '') + ' ' +
+    (inv.apellidoMaterno || '')
+  "
+  readonly
+/>
+
       </div>
-      <div *ngFor="let inv of indautorModel.inventores; let i = index" class="card card-flush mb-5">
-        <div class="card-header py-3">
-          <div class="card-title fw-bold">Autor {{ i + 1 }}</div>
-          <div class="card-toolbar" *ngIf="i > 0">
-            <button type="button" class="btn btn-sm btn-light-danger" (click)="removeInventor(i)">Quitar</button>
-          </div>
+
+      <!-- Sexo -->
+      <div class="col-md-4">
+        <label class="form-label text-gray-600">Sexo</label>
+        <input
+          class="form-control"
+          [(ngModel)]="inv.sexo"
+          readonly
+        />
+      </div>
+
+      <!-- Tipo de investigador -->
+      <div class="col-md-8">
+        <label class="form-label text-gray-600">Tipo de investigador</label>
+        <input
+          class="form-control"
+          [(ngModel)]="inv.tipoInvestigador"
+          readonly
+        />
+      </div>
+
+      <!-- Institución 
+      <div class="col-md-6">
+        <label class="form-label text-gray-600">Institución</label>
+        <input
+          class="form-control"
+          [(ngModel)]="inv.institucion"
+          readonly
+        />
+      </div>
+
+       Programa Educativo 
+      <div class="col-md-6">
+        <label class="form-label text-gray-600">Programa Educativo</label>
+        <input
+          class="form-control"
+          [(ngModel)]="inv.programaEducativo"
+          readonly
+        />
+      </div>
+
+       Cuerpo Académico 
+      <div class="col-md-6">
+        <label class="form-label text-gray-600">Cuerpo Académico</label>
+        <input
+          class="form-control"
+          [(ngModel)]="inv.cuerpoAcademico"
+          readonly
+        />
+      </div>
+
+      Departamento 
+      <div class="col-md-6">
+        <label class="form-label text-gray-600">Departamento</label>
+        <input
+          class="form-control"
+          [(ngModel)]="inv.departamento"
+          readonly
+        />
+      </div>
+
+       Fecha de Afiliación 
+      <div class="col-md-6">
+        <label class="form-label text-gray-600">Fecha de Afiliación</label>
+        <input
+          class="form-control"
+          type="date"
+          [(ngModel)]="inv.fechaAfiliacion"
+          readonly
+        />
+      </div>
+
+      <-- Fecha de Fin --
+      <div class="col-md-6">
+        <label class="form-label text-gray-600">Fecha de Fin</label>
+        <input
+          class="form-control"
+          type="date"
+          [(ngModel)]="inv.fechaFin"
+          readonly
+        />
+      </div>
+      -->
+      
+
+</div>
+
+
+
         </div>
-        <div class="card-body pt-3">
-          <div class="row g-6">
-            <div class="col-md-6">
-              <label class="form-label text-gray-600">CURP</label>
-              <input class="form-control" [(ngModel)]="inv.curp" />
-            </div>
-            <div class="col-md-6">
-              <label class="form-label text-gray-600">Nombre Completo</label>
-              <input class="form-control" [(ngModel)]="inv.nombreCompleto" />
-            </div>
-            <div class="col-md-4">
-              <label class="form-label text-gray-600">Sexo</label>
-              <select class="form-select" [(ngModel)]="inv.sexo">
-                <option value="">Seleccione</option>
-                <option value="M">M</option>
-                <option value="F">F</option>
-              </select>
-            </div>
-            <div class="col-md-8">
-              <label class="form-label text-gray-600">Tipo de investigador</label>
-              <input class="form-control" [(ngModel)]="inv.tipoInvestigador" />
-            </div>
-            <div class="col-md-6">
-              <label class="form-label text-gray-600">Institución</label>
-              <input class="form-control" [(ngModel)]="inv.institucion" />
-            </div>
-            <div class="col-md-6">
-              <label class="form-label text-gray-600">Programa Educativo</label>
-              <input class="form-control" [(ngModel)]="inv.programaEducativo" />
-            </div>
-            <div class="col-md-6">
-              <label class="form-label text-gray-600">Cuerpo Académico</label>
-              <input class="form-control" [(ngModel)]="inv.cuerpoAcademico" />
-            </div>
-            <div class="col-md-6">
-              <label class="form-label text-gray-600">Departamento</label>
-              <input class="form-control" [(ngModel)]="inv.departamento" />
-            </div>
-            <div class="col-md-6">
-              <label class="form-label text-gray-600">Fecha de Afiliación</label>
-              <input class="form-control" type="date" [(ngModel)]="inv.fechaAfiliacion" />
-            </div>
-            <div class="col-md-6">
-              <label class="form-label text-gray-600">Fecha de Fin</label>
-              <input class="form-control" type="date" [(ngModel)]="inv.fechaFin" />
-            </div>
-          </div>
-        </div>
-      </div> -->
+      </div> 
     </div>
   </div>
 
