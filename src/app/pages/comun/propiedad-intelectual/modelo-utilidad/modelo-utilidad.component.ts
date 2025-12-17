@@ -1103,7 +1103,7 @@ private procederConGuardado(modal: any): void {
     this.isSaving = true;
 
     if (this.selectedFile) {
-      this.fileUploadService.uploadFile(this.selectedFile, 'indautor').subscribe({
+      this.fileUploadService.uploadFile(this.selectedFile, 'patentes').subscribe({
         next: (uploadResp) => {
           this.indautorModel.archivo = uploadResp.filename;
           this.actualizarRegistro(id, modal);
@@ -1454,6 +1454,7 @@ private procederConGuardado(modal: any): void {
       medio_ingreso_param: medioIngresoParam,
       estatus_param: estatusParam,
       anio_renovacion: anioRenovacion,
+      archivo: this.indautorModel.archivo || (this.indautorModel.documentos?.[0] ?? ''),
     };
 
     this.services.updateRegistro(id, payload, this.TIPO_INDAUTOR).subscribe({
@@ -1681,7 +1682,7 @@ cargarInvestigadores(): void {
       return;
     }
 
-    this.fileUploadService.downloadFile(documentName, 'indautor').subscribe({
+    this.fileUploadService.downloadFile(documentName, 'patentes').subscribe({
       next: (blob) => {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
