@@ -7,7 +7,7 @@ export const environment = {
   appVersion: 'v8.2.4',
   USERDATA_KEY: 'authf649fc9a5f55',
   isMockEnabled: true,
-  apiUrl: 'http://localhost:8000',
+  apiUrl: 'http://20.14.208.230:8000',
   appThemeName: 'Metronic',
   appPurchaseUrl: 'https://1.envato.market/EA4JP',
   appHTMLIntegration:
@@ -161,9 +161,9 @@ export const environment = {
   },
   /* API Endpoints y la Key, en su momento deberá ser almacenada en un entorno seguro, dejo esta tarea a los backend */
   REPORTS_API_KEY: 'secret-key',
-  REPORTS_API_URL: 'http://localhost:8000/',
+  REPORTS_API_URL: 'http://20.14.208.230:8000/',
   REPORTES_API_KEY: 'uKSryfJz+EZQkINd56LCswKDIigFff4nc8q4oJZOkBw8Vwgtp2ExMYkfNBSFfTZS/6Sm0Dok97JfSb4SpA1bXg==',
-  REPORTES_API_URL: 'http://localhost:8000/',
+  REPORTES_API_URL: 'http://20.14.208.230:8000/',
 };
 
 /*
