@@ -1117,6 +1117,7 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
       medio_ingreso_param: medioIngresoParam,
       estatus_param: estatusParam,
       anio_renovacion: anioRenovacion,
+      archivo: this.indautorModel.archivo || (this.indautorModel.documentos?.[0] ?? ''),
     };
 
     this.service.updateRegistro(id, payload, this.TIPO_INDAUTOR).subscribe({
