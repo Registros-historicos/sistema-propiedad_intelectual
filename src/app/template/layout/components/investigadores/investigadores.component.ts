@@ -19,7 +19,7 @@ export class InvestigadoresComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const url = 'http://20.14.208.230:8000/api/tableros/investigadores/por-coordinador/';
+    const url = '/api/tableros/investigadores/por-coordinador/';
     this.http.get<any[]>(url).subscribe({
       next: (data) => {
         // Suponemos que el endpoint devuelve un array de objetos con la forma proporcionada

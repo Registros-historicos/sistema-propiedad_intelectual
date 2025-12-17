@@ -12,12 +12,18 @@ export interface IPaginatedPatentsResponse {
   limit: number;
   results: any[];
 }
+interface CurpResponse {
+  curp: string;
+}
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class PatentsService {
   private apiUrl = '/api/registros';
+  
+  private apiUrlinv = '/api/';
   private readonly TIPO_PATENTE = '44';
   private catalogos?: Catalogos;
 
@@ -26,6 +32,35 @@ export class PatentsService {
     private paramService: ParametrizacionesService
   ) {
     this.cargarCatalogos();
+  }
+public cargarCurps(): Observable<string[]> {
+  return this.http
+    .get<CurpResponse[]>(`${this.apiUrlinv}investigadores/investigadores/curps/`)
+    .pipe(
+      map(response => {
+        console.log('Respuesta de curps desde el servicio:', response);
+        return response.map(item => item.curp);
+      })
+    );
+}
+
+getInvestigadores(): Observable<Inventor[]> {
+  return this.http.get<Inventor[]>(
+    `${this.apiUrlinv}investigadores/investigadores/all/`
+  );
+}
+
+
+desvincularInvestigador(curp: string, noExpediente: string): Observable<any> {
+    const body = { curp, no_expediente: noExpediente };
+    return this.http.post(
+    `${this.apiUrl}/desvincular-investigador/` , body);
+  }
+
+  vincularInvestigador(curp: string, noExpediente: string): Observable<any> {
+    const body = { curp, no_expediente: noExpediente };
+    return this.http.post(
+    `${this.apiUrl}/vincular-investigador/` , body);
   }
 
   private cargarCatalogos(): void {
