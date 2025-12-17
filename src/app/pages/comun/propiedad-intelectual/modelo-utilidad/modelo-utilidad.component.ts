@@ -1033,7 +1033,7 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
     this.isSaving = true;
 
     if (this.selectedFile) {
-      this.fileUploadService.uploadFile(this.selectedFile, 'indautor').subscribe({
+      this.fileUploadService.uploadFile(this.selectedFile, 'patentes').subscribe({
         next: (uploadResp) => {
           this.indautorModel.archivo = uploadResp.filename;
           this.actualizarRegistro(id, modal);
@@ -1201,7 +1201,7 @@ export class ModeloUtilidadComponent implements OnInit, AfterViewInit, OnDestroy
       return;
     }
 
-    this.fileUploadService.downloadFile(documentName, 'indautor').subscribe({
+    this.fileUploadService.downloadFile(documentName, 'patentes').subscribe({
       next: (blob) => {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
