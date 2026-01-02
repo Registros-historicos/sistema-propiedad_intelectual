@@ -24,6 +24,7 @@ import { TranslationModule } from 'src/app/modules/i18n';
 import Swal, { SweetAlertOptions } from 'sweetalert2';
 import { CrudModule } from '../../../modules/crud/crud.module';
 import { SharedModule } from '../../../template/shared/shared.module';
+import { environment } from 'src/environments/environment';
 
 const ESTATUS_OPTIONS = [
   { value: 24, label: 'Activo' },
@@ -135,8 +136,8 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
     const previousInstitucionId = this.coordinadorModel?.id_institucion || null;
 
     const doAssignNew = () => {
-      // Construir URL absoluto al endpoint indicado y enviar el body { id_coordinador }
-      const externalUrl = `http://20.14.208.230:8000/api/institucion/usuario/${idInstitucion}/`;
+      // Construir URL usando variable de entorno y enviar el body { id_coordinador }
+      const externalUrl = `${environment.apiUrl}/api/institucion/usuario/${idInstitucion}/`;
       const body = { id_coordinador: idUsuario };
       console.log('[DEBUG] CEPAT: assignInstitucion -> PUT', externalUrl, 'body=', body);
 
@@ -247,8 +248,8 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     }
 
-    // Endpoint absoluto solicitado (coordinadores por CEPAT)
-    const externalUrl = 'http://20.14.208.230:8000/api/tableros/coordinadores/por-cepat/';
+    // Endpoint usando variable de entorno (coordinadores por CEPAT)
+    const externalUrl = `${environment.apiUrl}/api/tableros/coordinadores/por-cepat/`;
 
     console.log('[DEBUG] CEPAT: requesting external URL ->', externalUrl);
 
