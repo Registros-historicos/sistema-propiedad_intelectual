@@ -9,7 +9,6 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { HttpClient } from '@angular/common/http';
 import { SwalComponent, SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { Config } from 'datatables.net';
 import { forkJoin, Observable } from 'rxjs';
@@ -19,12 +18,12 @@ import {
   Institucion,
 } from 'src/app/api/services/cepat.service';
 import { CoordinatorHttpService } from 'src/app/api/services/coordinador.service';
+import { TablerosService } from 'src/app/api/services/tableros.service';
 import { UsersService } from 'src/app/api/services/usuarios.service';
 import { TranslationModule } from 'src/app/modules/i18n';
 import Swal, { SweetAlertOptions } from 'sweetalert2';
 import { CrudModule } from '../../../modules/crud/crud.module';
 import { SharedModule } from '../../../template/shared/shared.module';
-import { TablerosService } from 'src/app/api/services/tableros.service';
 
 const ESTATUS_OPTIONS = [
   { value: 24, label: 'Activo' },
@@ -59,7 +58,6 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
   selectedInstitutoId: number | null = null;
   selectedInstitutoName: string | null = null;
   showAddInstitucion: boolean = false;
-
   estatusOptions = ESTATUS_OPTIONS;
   isDataReady: boolean = false;
   private allCoordinators: any[] = [];
@@ -82,7 +80,6 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
 
   @ViewChild('noticeSwal')
   noticeSwal!: SwalComponent;
-
   swalOptions: SweetAlertOptions = {};
 
   constructor(
@@ -90,7 +87,6 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private translate: TranslateService,
     private userService: UsersService,
-    private http: HttpClient,
     private coordinatorService: CoordinatorHttpService,
     private tablerosService: TablerosService
   ) {}
@@ -103,7 +99,6 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
       this.cepatService.getInstitucionesPorEstado(selectedStateId).subscribe({
         next: (instituciones) => {
           this.institutoList = instituciones;
-          console.log('[DEBUG] CEPAT: instituciones cargadas para estado', selectedStateId, 'count=', Array.isArray(instituciones) ? instituciones.length : 0);
           this.cdr.detectChanges();
         },
         error: () => {
@@ -114,17 +109,12 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
     }
   }
 
-  onInstitutoSelect(): void {
-    // Log del id y nombre (si está disponible) cuando el usuario selecciona una institución
-    const id = this.selectedInstitutoId;
-    const seleccion = this.institutoList.find((i) => i.id_institucion === id as any);
-    console.log('[DEBUG] CEPAT: onInstitutoSelect -> selectedInstitutoId =', id, 'selectedInstitutoName =', seleccion?.nombre_institucion || null);
-  }
-
   assignInstitucion(): void {
-    const idInstitucion = this.selectedInstitutoId;
+    const idInstitucionNueva = this.selectedInstitutoId;
     const idUsuario = this.coordinadorModel?.id_usuario;
-    if (!idInstitucion || !idUsuario) {
+    const previousInstitucionId = this.coordinadorModel?.id_institucion;
+
+    if (!idInstitucionNueva || !idUsuario) {
       this.showAlert({
         title: 'Error',
         text: 'Debes seleccionar un estado e institución, y el usuario debe existir.',
@@ -132,72 +122,51 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
       });
       return;
     }
-    // Si el coordinador ya estaba asignado a otra institución, primero desasignarla enviando id_coordinador = 0
-    const previousInstitucionId = this.coordinadorModel?.id_institucion || null;
 
-    const doAssignNew = () => {
-      // Construir URL absoluto al endpoint indicado y enviar el body { id_coordinador }
-      const externalUrl = `http://20.14.208.230:8000/api/institucion/usuario/${idInstitucion}/`;
-      const body = { id_coordinador: idUsuario };
-      console.log('[DEBUG] CEPAT: assignInstitucion -> PUT', externalUrl, 'body=', body);
+    const performAssignment = () => {
+      this.coordinatorService.updateInstitutionByIdCoordinator(idInstitucionNueva, idUsuario)
+        .subscribe({
+          next: (resp) => {
+            if (resp && typeof resp === 'object') {
+              this.selectedInstitutoId = resp.id_institucion || idInstitucionNueva;
+              this.selectedInstitutoName = resp.nombre || resp.nombre_institucion || this.selectedInstitutoName;
+              this.coordinadorModel.id_institucion = this.selectedInstitutoId;
+              this.coordinadorModel.nombre_institucion = this.selectedInstitutoName;
+            }
 
-      this.http.put<any>(externalUrl, body).subscribe({
-        next: (resp) => {
-          console.log('[DEBUG] CEPAT: assignInstitucion response =', resp);
-
-          // Actualizar UI si el backend devuelve la institución asignada
-          if (resp && typeof resp === 'object') {
-            this.selectedInstitutoId = resp.id_institucion || this.selectedInstitutoId || idInstitucion;
-            this.selectedInstitutoName = resp.nombre || resp.nombre_institucion || this.selectedInstitutoName;
-            this.coordinadorModel.id_institucion = this.selectedInstitutoId;
-          } else {
-            // Si no devuelve objeto, usar los valores locales
-            this.coordinadorModel.id_institucion = idInstitucion;
+            this.showAlert({
+              title: '¡Éxito!',
+              text: 'Institución asignada al coordinador correctamente.',
+              icon: 'success',
+            });
+            this.selectedStateForInstitucion = null;
+            this.institutoList = [];
+            this.showAddInstitucion = false;
+            this.cdr.detectChanges();
+            this.loadCepats(false); 
+          },
+          error: (err) => {
+            this.showAlert({
+              title: 'Error',
+              text: err.message || 'No se pudo asignar la institución.',
+              icon: 'error',
+            });
           }
-
-          this.showAlert({
-            title: '¡Éxito!',
-            text: 'Institución asignada al coordinador correctamente.',
-            icon: 'success',
-          });
-          // Limpiar los controles de selección (pero conservar la institución asignada en el modelo/visualización)
-          this.selectedStateForInstitucion = null;
-          this.institutoList = [];
-          // dejar selectedInstitutoName para mostrar la institución asignada; limpiar el dropdown seleccionado
-          this.selectedInstitutoId = null;
-          this.showAddInstitucion = false;
-          this.cdr.detectChanges();
-          this.loadCepats(false);
-        },
-        error: (err) => {
-          console.error('Error asignando institución:', err);
-          this.showAlert({
-            title: 'Error',
-            text: 'No se pudo asignar la institución.',
-            icon: 'error',
-          });
-        },
-      });
+        });
     };
 
-    if (previousInstitucionId && previousInstitucionId !== idInstitucion) {
-      console.log('[DEBUG] CEPAT: previous institution detected, clearing it first ->', previousInstitucionId);
-      // Llamada al servicio relativo (usa proxy y agrega auth si corresponde)
-      // Usar null para desasignar (backend espera null para quitar id_coordinador)
-      this.coordinatorService.updateInstitutionByIdCoordinator(previousInstitucionId, null).subscribe({
-        next: () => {
-          console.log('[DEBUG] CEPAT: previous institution cleared (id_coordinador = 0) for', previousInstitucionId);
-          // Continuar con la asignación a la nueva institución
-          doAssignNew();
-        },
-        error: (err) => {
-          console.error('Error limpiando institución previa:', err);
-          // Aun si falla, intentamos asignar la nueva institución para no bloquear al usuario
-          doAssignNew();
-        },
-      });
+    if (previousInstitucionId && previousInstitucionId !== idInstitucionNueva) {
+      this.coordinatorService.updateInstitutionByIdCoordinator(previousInstitucionId, null)
+        .subscribe({
+          next: () => {
+            performAssignment();
+          },
+          error: (err) => {
+            performAssignment();
+          }
+        });
     } else {
-      doAssignNew();
+      performAssignment();
     }
   }
 
@@ -221,7 +190,6 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
             text: 'Institución desvinculada correctamente.',
             icon: 'success',
           });
-          // Limpiar selección local y actualizar listado
           this.selectedInstitutoId = null;
           this.selectedInstitutoName = null;
           this.selectedStateForInstitucion = null;
@@ -230,7 +198,6 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
           this.loadCepats(false);
         },
         error: (err) => {
-          console.error('Error desvinculando institución:', err);
           this.showAlert({
             title: 'Error',
             text: 'No se pudo desvincular la institución.',
@@ -519,23 +486,14 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
   }
 
   edit(id: number) {
-    console.log('[DEBUG] CEPAT: edit() called with id =', id);
     const cepat = this.allCoordinators.find((c) => c.id === Number(id));
     if (!cepat) return;
-
-    // Usar únicamente los datos ya provistos por el endpoint por-estados-cepat
     this.coordinadorModel = { ...cepat };
-
-    // Intentar obtener estados asignados e información de institución desde el objeto de listado
     this.estadosAsignados = (cepat as any).estados || (cepat as any).estados_asignados || (cepat as any).assigned_states || [];
-
     this.coordinadorModel.id_cepat = (cepat as any).id_cepat || this.coordinadorModel.id_cepat || 0;
     this.cepatName = (cepat as any).nombre_cepat || (cepat as any).nombre || this.cepatName;
-
     this.selectedInstitutoId = (cepat as any).id_institucion || (cepat as any).id_instituto || null;
     this.selectedInstitutoName = (cepat as any).nombre_institucion || (cepat as any).institucion_nombre || null;
-
-    console.log('[DEBUG] CEPAT: coordinadorModel populated from listing ->', this.coordinadorModel, 'estadosAsignados:', this.estadosAsignados);
   }
 
   eliminarEstado(idEstado: number): void {
@@ -564,15 +522,12 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
     this.estadosAsignados = [];
     this.estadosSeleccionados = [];
     this.showAddInstitucion = false;
-    // Limpieza de selects/internos para evitar valores residuales
     this.selectedStateForInstitucion = null;
     this.institutoList = [];
     this.selectedInstitutoId = null;
-    // No tocar selectedInstitutoName aquí: si se cerró el modal queremos conservar la visualización hasta reload
   }
 
   toggleAddInstitucion(): void {
-    // Si estamos cerrando el panel, limpiar los selects para evitar que queden opciones seleccionadas
     if (this.showAddInstitucion) {
       this.selectedStateForInstitucion = null;
       this.institutoList = [];
