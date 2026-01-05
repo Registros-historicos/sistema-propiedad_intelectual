@@ -91,6 +91,12 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
     private tablerosService: TablerosService
   ) {}
 
+
+  onInstitutoSelect(): void {
+    const id = this.selectedInstitutoId;
+    this.institutoList.find((i) => i.id_institucion === id as any);
+  }
+
   onEstadoChangeForInstitucion(): void {
     const selectedStateId = this.selectedStateForInstitucion;
     this.selectedInstitutoId = null;
