@@ -24,6 +24,7 @@ import { TranslationModule } from 'src/app/modules/i18n';
 import Swal, { SweetAlertOptions } from 'sweetalert2';
 import { CrudModule } from '../../../modules/crud/crud.module';
 import { SharedModule } from '../../../template/shared/shared.module';
+import { TablerosService } from 'src/app/api/services/tableros.service';
 
 const ESTATUS_OPTIONS = [
   { value: 24, label: 'Activo' },
@@ -62,7 +63,6 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
   estatusOptions = ESTATUS_OPTIONS;
   isDataReady: boolean = false;
   private allCoordinators: any[] = [];
-  rawResponse: any = null;
   estadosAsignados: Estado[] = [];
   cepatName: string = '';
   estadosAEliminar: number[] = [];
@@ -91,7 +91,8 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
     private translate: TranslateService,
     private userService: UsersService,
     private http: HttpClient,
-    private coordinatorService: CoordinatorHttpService
+    private coordinatorService: CoordinatorHttpService,
+    private tablerosService: TablerosService
   ) {}
 
   onEstadoChangeForInstitucion(): void {
@@ -240,39 +241,14 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
   }
 
   private loadCepats(isInitialLoad: boolean = false): void {
-    // Usar el endpoint externo para tipo 36 según solicitud
-    const userType = 36;
     if (isInitialLoad) {
       this.isDataReady = false;
       this.cdr.detectChanges();
     }
 
-    // Endpoint absoluto solicitado (coordinadores por CEPAT)
-    const externalUrl = 'http://20.14.208.230:8000/api/tableros/coordinadores/por-cepat/';
-
-    console.log('[DEBUG] CEPAT: requesting external URL ->', externalUrl);
-
-    // Mostrar estado de 'loading' en la UI para pruebas
-    this.rawResponse = { status: 'loading', url: externalUrl };
-    this.cdr.detectChanges();
-
-    this.http.get<any[]>(externalUrl).subscribe({
+    this.tablerosService.loadCepats().subscribe({
       next: (data) => {
-        // Guardar la respuesta cruda para impresión en la UI
-        this.rawResponse = data;
-        console.log('[DEBUG] CEPAT: rawResponse saved, length =', Array.isArray(data) ? data.length : 'not-array');
-        console.log('[DEBUG] CEPAT: raw response length =', Array.isArray(data) ? data.length : 'not-array', 'firstItem =', Array.isArray(data) && data.length ? data[0] : data);
-        // Normalizar respuesta: mapear id y estatus (no filtrar, usar exactamente lo que devuelve el endpoint)
-        const transformed = (Array.isArray(data) ? data : []).map((coord: any) => ({
-          ...coord,
-          id: coord.id_usuario,
-          estatus: coord.estatus || coord.estatus_param || coord.status || null,
-        }));
-
-        console.log('[DEBUG] CEPAT: transformed coordinators ->', transformed);
-
-        this.allCoordinators = transformed;
-
+        this.allCoordinators = data;
         if (isInitialLoad) {
           this.initializeDataTables(this.allCoordinators);
           this.isDataReady = true;
@@ -288,22 +264,11 @@ export class CoordinatorListingCepatComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       },
       error: (error) => {
-        console.error('Error cargando usuarios desde endpoint externo:', error);
-
-        // Mostrar el error en la UI (rawResponse) para facilitar pruebas
-        this.rawResponse = {
-          status: 'error',
-          message: error?.message || 'Error desconocido',
-          details: error,
-        };
-        this.cdr.detectChanges();
-
         this.showAlert({
           title: 'Error',
-          text: 'No se pudieron cargar los datos desde el endpoint externo.',
+          text: 'No se pudieron cargar los datos.',
           icon: 'error',
         });
-
         if (isInitialLoad) {
           this.initializeDataTables([]);
           this.isDataReady = true;

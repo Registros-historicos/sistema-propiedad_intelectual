@@ -311,4 +311,21 @@ export class TablerosService {
     );
   }
 
+  loadCepats(): Observable<any[]> {
+    const endpointUrl = '/api/tableros/coordinadores/por-cepat/';
+    return this.http.get<any[]>(endpointUrl).pipe(
+      map(data => {
+        const items = Array.isArray(data) ? data : [];
+        return items.map((coord: any) => ({
+          ...coord,
+          id: coord.id_usuario, 
+          estatus: coord.estatus || coord.estatus_param || coord.status || null,
+        }));
+      }),
+      catchError(error => {
+        return of([]);
+      })
+    );
+  }
+
 }
